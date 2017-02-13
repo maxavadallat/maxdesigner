@@ -1,0 +1,34 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/main.qml</file>
+        <file>assets/images/background02.png</file>
+        <file>qml/Constants.js</file>
+        <file>qml/ProjectPane.qml</file>
+        <file>qml/PropertiesPane.qml</file>
+        <file>qml/Style.js</file>
+        <file>qml/DMouseArea.qml</file>
+        <file>qml/DRectangle.qml</file>
+        <file>qml/DText.qml</file>
+        <file>qml/DButton.qml</file>
+        <file>qml/DTextInput.qml</file>
+        <file>qml/MainGrabArea.qml</file>
+        <file>qml/DCheckBox.qml</file>
+        <file>qml/DSpinner.qml</file>
+        <file>qml/DEditorBackground.qml</file>
+        <file>qml/DPane.qml</file>
+        <file>qml/DTracer.qml</file>
+        <file>qml/DSwitch.qml</file>
+        <file>qml/DRadioButton.qml</file>
+        <file>qml/DRadioButtonGroup.qml</file>
+        <file>qml/DScrollIndicator.qml</file>
+        <file>qml/DControl.qml</file>
+        <file>qml/DButtonBase.qml</file>
+        <file>qml/DRadioButtonGroupItem.qml</file>
+        <file>qml/DSection.qml</file>
+        <file>qml/DAnimation.qml</file>
+        <file>qml/DFadeAnimation.qml</file>
+        <file>qml/DFlickable.qml</file>
+        <file>qml/DContainer.qml</file>
+        <file>qml/DResizeArea.qml</file>
+    </qresource>
+</RCC>

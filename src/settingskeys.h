@@ -1,0 +1,6 @@
+#ifndef SETTINGSKEYS_H
+#define SETTINGSKEYS_H
+
+
+
+#endif // SETTINGSKEYS_H
