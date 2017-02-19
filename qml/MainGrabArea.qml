@@ -19,11 +19,23 @@ MouseArea {
 
     drag.filterChildren: true
 
+    acceptedButtons: { Qt.LeftButton /*| Qt.RightButton*/ }
+
+//    signal rightButtonClicked(var posX, var posY)
+
     onReleased: {
         //console.log("MaingrabArea.onReleased");
-        // Clear Drag Target
-        clearDragTarget();
+        if (mouse.button == Qt.LeftButton) {
+            // Clear Drag Target
+            clearDragTarget();
+        }
     }
+
+//    onClicked: {
+//        if (mouse.button === Qt.RightButton) {
+//            mainGrabAreaRoot.rightButtonClicked(mouse.x, mouse.y);
+//        }
+//    }
 
     // Set Drag Target
     function setDragTarget(item) {

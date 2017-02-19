@@ -18,7 +18,14 @@ SOURCES             += src/main.cpp \
                     src/infodialog.cpp \
                     src/newprojectdialog.cpp \
                     src/projectpropertiesdialog.cpp \
-                    src/componentpropertiesdialog.cpp
+                    src/componentpropertiesdialog.cpp \
+                    src/qmlprojectparser.cpp \
+                    src/qmleditorwindow.cpp \
+                    src/basecomponentsmodel.cpp \
+                    src/openfilesmodel.cpp \
+                    src/componentslistmodel.cpp \
+                    src/projectlistmodel.cpp \
+                    src/viewslistmodel.cpp
 
 # Headers
 HEADERS             += src/mainwindow.h \
@@ -32,7 +39,14 @@ HEADERS             += src/mainwindow.h \
                     src/infodialog.h \
                     src/newprojectdialog.h \
                     src/projectpropertiesdialog.h \
-                    src/componentpropertiesdialog.h
+                    src/componentpropertiesdialog.h \
+                    src/qmlprojectparser.h \
+                    src/qmleditorwindow.h \
+                    src/basecomponentsmodel.h \
+                    src/openfilesmodel.h \
+                    src/componentslistmodel.h \
+                    src/projectlistmodel.h \
+                    src/viewslistmodel.h
 
 # Forms
 FORMS               += ui/mainwindow.ui \
@@ -42,7 +56,8 @@ FORMS               += ui/mainwindow.ui \
                     ui/infodialog.ui \
                     ui/newprojectdialog.ui \
                     ui/projectpropertiesdialog.ui \
-                    ui/componentpropertiesdialog.ui
+                    ui/componentpropertiesdialog.ui \
+                    ui/qmleditorwindow.ui
 
 # Resources
 RESOURCES           += maxdesigner.qrc
@@ -63,5 +78,4 @@ OBJECTS_DIR         = ./objs
 MOC_DIR             = ./objs
 UI_DIR              = ./objs
 RCC_DIR             = ./objs
-
 

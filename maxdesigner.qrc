@@ -30,5 +30,15 @@
         <file>qml/DFlickable.qml</file>
         <file>qml/DContainer.qml</file>
         <file>qml/DResizeArea.qml</file>
+        <file>qml/DTree.qml</file>
+        <file>qml/DViewContainer.qml</file>
+        <file>qml/DPopup.qml</file>
+        <file>qml/DPopupItem.qml</file>
+        <file>qml/DPopupItemObject.qml</file>
+        <file>qml/DPopupArea.qml</file>
+        <file>qml/DPosIndicator.qml</file>
+        <file>qml/DFlipable.qml</file>
+        <file>qml/DFormulaEditor.qml</file>
+        <file>qml/DSizeIndicator.qml</file>
     </qresource>
 </RCC>

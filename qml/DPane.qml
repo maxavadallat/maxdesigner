@@ -3,13 +3,13 @@ import QtQuick 2.0
 import "Constants.js" as CONSTS
 import "Style.js" as STYLE
 
-DMouseArea {
+DContainer {
     id: paneRoot
 
     width: CONSTS.defaultPaneWidth
     height: CONSTS.defaultPaneHeight
 
-    Behavior on height { NumberAnimation { duration: STYLE.animDuration } }
+    //Behavior on height { NumberAnimation { duration: STYLE.animDuration } }
 
     property string title: ""
 
@@ -30,6 +30,13 @@ DMouseArea {
     //default property alias paneContainer: paneContainerColumn.children
     default property alias paneContainer: paneContent.contentContainer
 
+    enableSizeOverlay: false
+    enablePosOverlay: false
+
+    clipContent: false
+
+    //clip: false
+
     //state: stateShown
 
 //    onXChanged: {
@@ -39,6 +46,46 @@ DMouseArea {
 //    onYChanged: {
 
 //    }
+
+    property Connections parentConnections: Connections {
+        target: parent
+
+        onWidthChanged: {
+            //console.log("DPane.Connections.onWidthChanged - parent.width: " + parent.width);
+
+            // Check State
+            if (paneRoot.state === paneRoot.stateHidden) {
+
+            } else {
+                // Check X Position
+                if (parent.width > 0 && (paneRoot.x + paneRoot.width + STYLE.defaultMargin) > parent.width) {
+                    // Adjust X Pos To Stay Visible
+                    paneRoot.x = parent.width - (paneRoot.width + STYLE.defaultMargin);
+                }
+            }
+        }
+
+        onHeightChanged: {
+            //console.log("DPane.Connections.onHeightChanged - parent.height: " + parent.height);
+
+            // Check Y Position
+            if (parent.height > 0 && (paneRoot.y + paneRoot.height + STYLE.defaultMargin) > parent.height) {
+                // Adjust Y Pos To Stay Visible
+                paneRoot.y = parent.height - (paneRoot.height + STYLE.defaultMargin);
+            }
+
+//            // Check State
+//            if (paneRoot.state === paneRoot.stateHidden) {
+
+//            } else {
+//                // Check Y Position
+//                if (parent.height > 0 && (paneRoot.y + paneRoot.height + STYLE.defaultMargin) > parent.height) {
+//                    // Adjust Y Pos To Stay Visible
+//                    paneRoot.y = parent.height - (paneRoot.height + STYLE.defaultMargin);
+//                }
+//            }
+        }
+    }
 
     onPressed: {
         // Set Drag Target - ASSUMING Parent is MainGrabArea
@@ -82,6 +129,7 @@ DMouseArea {
         anchors.fill: parent
     }
 
+    // Title
     DText {
         id: titleText
         anchors.left: parent.left
@@ -90,50 +138,6 @@ DMouseArea {
         anchors.topMargin: STYLE.defaultMargin
         text: paneRoot.title
     }
-
-//    Item {
-//        id: paneContainer
-//        anchors.fill: parent
-//        anchors {
-//            leftMargin: STYLE.defaultMargin
-//            topMargin: titleText.height + STYLE.defaultMargin * 2
-//            rightMargin: STYLE.defaultMargin
-//            bottomMargin: STYLE.defaultMargin
-//        }
-
-//        clip: true
-
-//        Flickable {
-//            id: paneContainerFlickable
-
-//            anchors.fill: parent
-//            flickableDirection: Flickable.VerticalFlick
-//            pixelAligned: true
-//            contentWidth: paneContainerColumn.width
-//            contentHeight: paneContainerColumn.height
-
-//            interactive: contentHeight > height
-
-//            Column {
-//                id: paneContainerColumn
-//                width: parent.width
-//                spacing: STYLE.defaultSpacing
-//            }
-//        }
-
-//        DScrollIndicator {
-//            x: parent.width - width
-//            viewSize: paneContainerFlickable.height
-//            viewContentSize: paneContainerFlickable.contentHeight
-//            viewContentPos: paneContainerFlickable.contentY
-//        }
-
-////        Rectangle {
-////            anchors.fill: parent
-////            color: "transparent"
-////            border.color: "orange"
-////        }
-//    }
 
     // Content Flickable
     DFlickable {
@@ -169,9 +173,11 @@ DMouseArea {
             //text: paneRoot.state === paneRoot.stateHidden ? paneRoot.title : "•••"
             text: "•••"
             horizontalAlignment: Text.AlignHCenter
+            color: buttonMouseArea.pressed ? STYLE.colorBorder : STYLE.colorFontDark
         }
 
         DMouseArea {
+            id: buttonMouseArea
             anchors.fill: parent
             onClicked: {
                 // Check State
@@ -183,46 +189,6 @@ DMouseArea {
                     paneRoot.show();
                 }
             }
-        }
-    }
-
-    Connections {
-        target: parent
-
-        onWidthChanged: {
-            //console.log("DPane.Connections.onWidthChanged - parent.width: " + parent.width);
-
-            // Check State
-            if (paneRoot.state === paneRoot.stateHidden) {
-
-            } else {
-                // Check X Position
-                if (parent.width > 0 && (paneRoot.x + paneRoot.width + STYLE.defaultMargin) > parent.width) {
-                    // Adjust X Pos To Stay Visible
-                    paneRoot.x = parent.width - (paneRoot.width + STYLE.defaultMargin);
-                }
-            }
-        }
-
-        onHeightChanged: {
-            //console.log("DPane.Connections.onHeightChanged - parent.height: " + parent.height);
-
-            // Check Y Position
-            if (parent.height > 0 && (paneRoot.y + paneRoot.height + STYLE.defaultMargin) > parent.height) {
-                // Adjust Y Pos To Stay Visible
-                paneRoot.y = parent.height - (paneRoot.height + STYLE.defaultMargin);
-            }
-
-//            // Check State
-//            if (paneRoot.state === paneRoot.stateHidden) {
-
-//            } else {
-//                // Check Y Position
-//                if (parent.height > 0 && (paneRoot.y + paneRoot.height + STYLE.defaultMargin) > parent.height) {
-//                    // Adjust Y Pos To Stay Visible
-//                    paneRoot.y = parent.height - (paneRoot.height + STYLE.defaultMargin);
-//                }
-//            }
         }
     }
 

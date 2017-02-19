@@ -1,2 +1,3 @@
 # maxdesigner
-QML Designer for the masses! X )
+
+QML Designer for da masses! X )

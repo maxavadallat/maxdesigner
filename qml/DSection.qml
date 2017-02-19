@@ -10,9 +10,14 @@ Item {
 
     property string title: "Section"
 
-    readonly property int openedHeight: Math.max(contentFlickable.contentHeight + sectionHeader.height + STYLE.defaultMargin * 2, 200)
+    property int minHeight: 200
+
+    readonly property int openedHeight: Math.max(contentFlickable.contentHeight + sectionHeader.height + STYLE.defaultMargin * 2, minHeight)
 
     default property alias contentContainer: contentFlickable.contentContainer
+
+    property alias titleBgColor: titleBGRect.color
+    property string bgColor: "transparent"
 
     readonly property string stateOpen: "open"
     readonly property string stateClosed: "closed"
@@ -43,6 +48,7 @@ Item {
         }
 
         DRectangle {
+            id: titleBGRect
             anchors.fill: parent
             color: STYLE.colorFontDark
             border.color: "transparent"

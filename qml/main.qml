@@ -31,11 +31,6 @@ Item {
         property bool yInit: false
 
         Component.onCompleted: {
-//            projectPane.x = STYLE.defaultMargin;
-//            projectPane.y = (mainRoot.height - projectPane.height) / 2;
-
-//            propertiesPane.x = mainRoot.width - width - STYLE.defaultMargin;
-//            propertiesPane.y = (mainRoot.height - propertiesPane.height) / 2;
         }
 
         onWidthChanged: {
@@ -44,9 +39,7 @@ Item {
                 projectPane.x = STYLE.defaultMargin;
                 propertiesPane.x = mainGrabArea.width - propertiesPane.width - STYLE.defaultMargin;
 
-                //demoPane.x = (mainGrabArea.width - demoPane.width) / 2
-
-                demoContainer.x = (mainGrabArea.width - demoContainer.width) / 2
+                demoViewContainer.x = (mainGrabArea.width - demoViewContainer.width) / 2
             }
         }
 
@@ -56,18 +49,18 @@ Item {
                 projectPane.y = (mainRoot.height - projectPane.height) / 2;
                 propertiesPane.y = (mainRoot.height - propertiesPane.height) / 2;
 
-                //demoPane.y = (mainRoot.height - demoPane.height) / 2;
-
-                demoContainer.y = (mainRoot.height - demoContainer.height) / 2;
+                demoViewContainer.y = (mainRoot.height - demoViewContainer.height) / 2;
             }
+        }
+
+        onClicked: {
+            // Hide Popups
+            mainPopupArea.hidePopups();
         }
 
         // Project Pane
         ProjectPane {
             id: projectPane
-//            x: STYLE.defaultMargin
-//            y: (mainRoot.height - height) / 2
-
             hideToSide: hideToLeft
         }
 
@@ -77,98 +70,21 @@ Item {
             hideToSide: hideToRight
         }
 
-        DContainer {
-            id: demoContainer
+        DViewContainer {
+            id: demoViewContainer
 
-            width: 300
-            height: 128
-
-
+            DFormulaEditor {
+                id: formulaEditor
+                x: 50
+                y: 50
+            }
         }
 
-//        DPane {
-//            id: demoPane
-//            width: 400
-//            height: 540
-//            title: "Demo"
-
-//            DSection {
-//                width: demoPane.contentWidth
-//                title: "Section 1"
-
-//                DButton {
-//                    onClicked: checked = !checked;
-//                }
-
-//                DCheckBox {
-//                    onClicked: checked = !checked;
-//                }
-
-//                DCheckBox {
-//                    rightAligned: true
-//                    onClicked: checked = !checked;
-//                }
-
-//                DSwitch {
-//                    onClicked: checked = !checked;
-//                }
-
-//                DSwitch {
-//                    rightAligned: true
-//                    onClicked: checked = !checked;
-//                }
-
-//                DRadioButtonGroup {
-//                    model: [
-//                        DRadioButtonGroupItem { title: "Item 1" },
-//                        DRadioButtonGroupItem { title: "Item 2" },
-//                        DRadioButtonGroupItem { title: "Item 3" },
-//                        DRadioButtonGroupItem { title: "Item 4" }
-//                    ]
-
-//                    onButtonSelected: {
-//                        //console.log("onButtonSelected - buttonIndex: " + buttonIndex);
-//                        // Set Current Index
-//                        currentIndex = buttonIndex;
-//                    }
-//                }
-
-//                DRadioButtonGroup {
-//                    rightAligned: true
-//                    model: [
-//                        DRadioButtonGroupItem { title: "Item 1" },
-//                        DRadioButtonGroupItem { title: "Item 2" },
-//                        DRadioButtonGroupItem { title: "Item 3" },
-//                        DRadioButtonGroupItem { title: "Item 4" }
-//                    ]
-
-//                    onButtonSelected: {
-//                        //console.log("onButtonSelected - buttonIndex: " + buttonIndex);
-//                        // Set Current Index
-//                        currentIndex = buttonIndex;
-//                    }
-//                }
-
-//            }
-
-//            DSection {
-//                width: demoPane.contentWidth
-//                title: "Section 2"
-//            }
-
-//            DSection {
-//                width: demoPane.contentWidth
-//                title: "Section 3"
-//            }
-//        }
+        DPopupArea {
+            id: mainPopupArea
+            anchors.fill: parent
+        }
 
     }
-
-//    // Main Container
-//    Item {
-//        id: mainContainer
-//        anchors.fill: parent
-//        //anchors.margins:
-//    }
 }
 

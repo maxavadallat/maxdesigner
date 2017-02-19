@@ -9,6 +9,12 @@
 #include "infodialog.h"
 #include "aboutdialog.h"
 
+#include "basecomponentsmodel.h"
+#include "componentslistmodel.h"
+#include "viewslistmodel.h"
+#include "openfilesmodel.h"
+
+
 namespace Ui {
 class MainWindow;
 }
@@ -42,10 +48,19 @@ private slots:
 
 private:
     // UI
-    Ui::MainWindow*     ui;
+    Ui::MainWindow*         ui;
 
     // Settings
-    SettingsControler*  mSettings;
+    SettingsControler*      mSettings;
+
+    // Base Components List Model
+    BaseComponentsModel*    mBaseComponents;
+    // Components List Model
+    ComponentsListModel*    mComponents;
+    // Views List Model
+    ViewsListModel*         mViews;
+    // Open Files List Model
+    OpenFilesModel*         mOpenfiles;
 };
 
 #endif // MAINWINDOW_H

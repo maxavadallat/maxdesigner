@@ -11,6 +11,13 @@ class SettingsControler : public QObject
 {
     Q_OBJECT
 
+//    Q_PROPERTY(bool showProjectPane READ showProjectPane WRITE setShowProjectPane NOTIFY showProjectPaneChanged)
+//    Q_PROPERTY(bool showPropertiesPane READ showPropertiesPane WRITE setShowPropertiesPane NOTIFY showPropertiesPaneChanged)
+
+//    Q_PROPERTY(QPoint projectPanePos READ projectPanePos WRITE setProjectPanePos NOTIFY projectPanePosChanged)
+//    Q_PROPERTY(QPoint propertiesPanePos READ propertiesPanePos WRITE setPropertiesPanePos NOTIFY propertiesPanePosChanged)
+
+
 public:
     // Get Instance
     static SettingsControler* getInstance();

@@ -1,43 +1,76 @@
 import QtQuick 2.0
+import QtGraphicalEffects 1.0
 
 import "Constants.js" as CONSTS
 import "Style.js" as STYLE
 
 DMouseArea {
-    id: paneRoot
+    id: containerRoot
 
     width: CONSTS.defaultPaneWidth
     height: CONSTS.defaultPaneHeight
 
+    default property alias mainContainer: contentContainer.children
 
-//    onXChanged: {
+    property bool focused: false
 
-//    }
+    property bool selected: false
 
-//    onYChanged: {
+    property var model: null
 
-//    }
+    property int minWidth: 0
+    property int minHeight: 0
+
+    property bool showBackground: true
+    property bool enableSizeOverlay: true
+    property bool enablePosOverlay: true
+
+    property alias backgroundColor: containerBG.color
+    property alias border: containerBG.border
+    //property alias borderColor: containerBG.border.color
+
+    property alias clipContent: contentContainer.clip
 
     onPressed: {
-        // Set Drag Target - ASSUMING Parent is MainGrabArea
-        parent.setDragTarget(paneRoot);
+        if (parent.setDragTarget !== undefined) {
+            // Set Drag Target - ASSUMING Parent is MainGrabArea
+            parent.setDragTarget(containerRoot);
+        }
     }
 
     onReleased: {
-        // Clear Drag Target - ASSUMING Parent is MainGrabArea
-        parent.clearDragTarget();
+        if (parent.clearDragTarget !== undefined) {
+            // Clear Drag Target - ASSUMING Parent is MainGrabArea
+            parent.clearDragTarget();
+        }
     }
 
     // Background
     DRectangle {
-        id: paneBG
+        id: containerBG
         anchors.fill: parent
+        visible: containerRoot.showBackground
     }
 
-    DText {
-        id: titleText
+    Item {
+        id: contentContainer
+        anchors.fill: parent
+        clip: true
+    }
+
+    DPosIndicator {
+        id: posIndicator
+        anchors.left: parent.left
+        anchors.top: parent.top
+        posX: enablePosOverlay ? containerRoot.x : 0
+        posY: enablePosOverlay ? containerRoot.y : 0
+    }
+
+    DSizeIndicator {
+        id: sizeIndicator
         anchors.centerIn: parent
-        text: "DContainer"
+        sizeW: enableSizeOverlay ? containerRoot.width : 0
+        sizeH: enableSizeOverlay ? containerRoot.height : 0
     }
 
     DResizeArea {
@@ -54,14 +87,14 @@ DMouseArea {
             if (pressed) {
                 var deltaX = pressPosX - mouse.x;
 
-                if (parent.width + deltaX > 0) {
+                if (parent.width + deltaX > containerRoot.minWidth) {
                     parent.x = parent.x - deltaX;
                     parent.width = parent.width + deltaX;
                 }
 
                 var deltaY = pressPosY - mouse.y;
 
-                if (parent.height + deltaY > 0) {
+                if (parent.height + deltaY > containerRoot.minHeight) {
                     parent.y = parent.y - deltaY;
                     parent.height = parent.height + deltaY;
                 }
@@ -82,7 +115,7 @@ DMouseArea {
             if (pressed) {
                 var deltaY = pressPosY - mouse.y;
 
-                if (parent.height + deltaY > 0) {
+                if (parent.height + deltaY > containerRoot.minHeight) {
                     parent.y = parent.y - deltaY;
                     parent.height = parent.height + deltaY;
                 }
@@ -104,14 +137,14 @@ DMouseArea {
             if (pressed) {
                 var deltaX = pressPosX - mouse.x;
 
-                if (parent.width - deltaX > 0) {
+                if (parent.width - deltaX > containerRoot.minWidth) {
                     //parent.x = parent.x - deltaX;
                     parent.width = parent.width - deltaX;
                 }
 
                 var deltaY = pressPosY - mouse.y;
 
-                if (parent.height + deltaY > 0) {
+                if (parent.height + deltaY > containerRoot.minHeight) {
                     parent.y = parent.y - deltaY;
                     parent.height = parent.height + deltaY;
                 }
@@ -132,7 +165,7 @@ DMouseArea {
             if (pressed) {
                 var deltaX = pressPosX - mouse.x;
 
-                if (parent.width + deltaX > 0) {
+                if (parent.width + deltaX > containerRoot.minWidth) {
                     parent.x = parent.x - deltaX;
                     parent.width = parent.width + deltaX;
                 }
@@ -153,7 +186,7 @@ DMouseArea {
             if (pressed) {
                 var deltaX = pressPosX - mouse.x;
 
-                if (parent.width - deltaX > 0) {
+                if (parent.width - deltaX > containerRoot.minWidth) {
                     parent.width = parent.width - deltaX;
                 }
             }
@@ -174,14 +207,14 @@ DMouseArea {
             if (pressed) {
                 var deltaX = pressPosX - mouse.x;
 
-                if (parent.width + deltaX > 0) {
+                if (parent.width + deltaX > containerRoot.minWidth) {
                     parent.x = parent.x - deltaX;
                     parent.width = parent.width + deltaX;
                 }
 
                 var deltaY = pressPosY - mouse.y;
 
-                if (parent.height - deltaY > 0) {
+                if (parent.height - deltaY > containerRoot.minHeight) {
                     parent.height = parent.height - deltaY;
                 }
             }
@@ -201,7 +234,7 @@ DMouseArea {
             if (pressed) {
                 var deltaY = pressPosY - mouse.y;
 
-                if (parent.height - deltaY > 0) {
+                if (parent.height - deltaY > containerRoot.minHeight) {
                     parent.height = parent.height - deltaY;
                 }
             }
@@ -222,13 +255,13 @@ DMouseArea {
             if (pressed) {
                 var deltaX = pressPosX - mouse.x;
 
-                if (parent.width - deltaX > 0) {
+                if (parent.width - deltaX > containerRoot.minWidth) {
                     parent.width = parent.width - deltaX;
                 }
 
                 var deltaY = pressPosY - mouse.y;
 
-                if (parent.height - deltaY > 0) {
+                if (parent.height - deltaY > containerRoot.minHeight) {
                     parent.height = parent.height - deltaY;
                 }
             }
