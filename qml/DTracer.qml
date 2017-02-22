@@ -6,5 +6,5 @@ Rectangle {
     anchors.fill: parent
     color: "transparent"
     border.color: STYLE.colorTrace
-    visible: false
+    visible: settingsController.tracerVisible
 }

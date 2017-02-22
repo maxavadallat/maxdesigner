@@ -30,6 +30,8 @@ DContainer {
     //default property alias paneContainer: paneContainerColumn.children
     default property alias paneContainer: paneContent.contentContainer
 
+    property alias enablePaneContent: paneContent.enabled
+
     enableSizeOverlay: false
     enablePosOverlay: false
 

@@ -4,9 +4,9 @@
 #include <QObject>
 #include <QList>
 #include <QAbstractListModel>
-#include <QJsonObject>
+//#include <QJsonObject>
 
-class BaseComponentInfo;
+class ComponentInfo;
 
 //==============================================================================
 // Base Components List Model
@@ -16,6 +16,10 @@ class BaseComponentsModel : public QAbstractListModel
 public:
     // Constructor
     explicit BaseComponentsModel(QObject* aParent = NULL);
+
+    // Set Base Components Dir
+    void setBaseComponentsDir(const QString& aDirPath);
+
     // Destructor
     ~BaseComponentsModel();
 
@@ -24,6 +28,8 @@ private:
     void init();
     // Clear
     void clear();
+    // Load Base Components
+    void loadBaseComponents();
 
 public: // from QAbstractListModel
     // Row Count
@@ -34,10 +40,10 @@ public: // from QAbstractListModel
     virtual QHash<int,QByteArray> roleNames() const;
 
 private: // Data
-
     // Base Component List
-    QList<BaseComponentInfo>    mBaseComponentList;
-
+    QList<ComponentInfo>    mBaseComponentList;
+    // Base Components Dir
+    QString                 mBaseComponentsDir;
 };
 
 
@@ -47,7 +53,7 @@ private: // Data
 
 
 
-
+/*
 //==============================================================================
 // Base Component Info Class
 //==============================================================================
@@ -77,5 +83,6 @@ private: // Data
     // Component Info
     QJsonObject mInfo;
 };
+*/
 
 #endif // BASECOMPONENTSMODEL_H

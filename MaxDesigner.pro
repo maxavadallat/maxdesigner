@@ -16,7 +16,6 @@ SOURCES             += src/main.cpp \
                     src/aboutdialog.cpp \
                     src/confirmdialog.cpp \
                     src/infodialog.cpp \
-                    src/newprojectdialog.cpp \
                     src/projectpropertiesdialog.cpp \
                     src/componentpropertiesdialog.cpp \
                     src/qmlprojectparser.cpp \
@@ -24,8 +23,14 @@ SOURCES             += src/main.cpp \
                     src/basecomponentsmodel.cpp \
                     src/openfilesmodel.cpp \
                     src/componentslistmodel.cpp \
-                    src/projectlistmodel.cpp \
-                    src/viewslistmodel.cpp
+                    src/viewslistmodel.cpp \
+                    src/projectmodel.cpp \
+                    src/propertiesmodel.cpp \
+                    src/componentinfo.cpp \
+                    src/qmlparser.cpp \
+                    src/qmlgenerator.cpp \
+                    src/recentprojectsmodel.cpp \
+                    src/projectitemmodel.cpp
 
 # Headers
 HEADERS             += src/mainwindow.h \
@@ -37,7 +42,6 @@ HEADERS             += src/mainwindow.h \
                     src/aboutdialog.h \
                     src/confirmdialog.h \
                     src/infodialog.h \
-                    src/newprojectdialog.h \
                     src/projectpropertiesdialog.h \
                     src/componentpropertiesdialog.h \
                     src/qmlprojectparser.h \
@@ -45,8 +49,14 @@ HEADERS             += src/mainwindow.h \
                     src/basecomponentsmodel.h \
                     src/openfilesmodel.h \
                     src/componentslistmodel.h \
-                    src/projectlistmodel.h \
-                    src/viewslistmodel.h
+                    src/viewslistmodel.h \
+                    src/projectmodel.h \
+                    src/propertiesmodel.h \
+                    src/componentinfo.h \
+                    src/qmlparser.h \
+                    src/qmlgenerator.h \
+                    src/recentprojectsmodel.h \
+                    src/projectitemmodel.h
 
 # Forms
 FORMS               += ui/mainwindow.ui \
@@ -54,10 +64,9 @@ FORMS               += ui/mainwindow.ui \
                     ui/aboutdialog.ui \
                     ui/confirmdialog.ui \
                     ui/infodialog.ui \
-                    ui/newprojectdialog.ui \
+                    ui/qmleditorwindow.ui \
                     ui/projectpropertiesdialog.ui \
-                    ui/componentpropertiesdialog.ui \
-                    ui/qmleditorwindow.ui
+                    ui/componentpropertiesdialog.ui
 
 # Resources
 RESOURCES           += maxdesigner.qrc
@@ -68,7 +77,6 @@ ICON                = assets/icons/designer.03.icns
 } else {
 
 }
-
 
 # Other Files
 OTHER_FILES         += README.md

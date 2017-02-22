@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QAbstractListModel>
 #include <QList>
-#include <QJsonObject>
+//#include <QJsonObject>
 
 
 class ComponentInfo;
@@ -51,7 +51,7 @@ private: // Data
 
 
 
-
+/*
 //==============================================================================
 // Component Info Class
 //==============================================================================
@@ -81,6 +81,6 @@ private: // Data
     // Component Info
     QJsonObject mInfo;
 };
-
+*/
 
 #endif // COMPONENTSLISTMODEL_H

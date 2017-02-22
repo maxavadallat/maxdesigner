@@ -11,6 +11,8 @@ class SettingsControler : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(bool tracerVisible READ tracerVisible WRITE setTracerVisible NOTIFY tracerVisibleChanged)
+
 //    Q_PROPERTY(bool showProjectPane READ showProjectPane WRITE setShowProjectPane NOTIFY showProjectPaneChanged)
 //    Q_PROPERTY(bool showPropertiesPane READ showPropertiesPane WRITE setShowPropertiesPane NOTIFY showPropertiesPaneChanged)
 
@@ -40,14 +42,24 @@ public:
     // Restore Defaults
     void restoreDefaults();
 
+    // Get Tracer Visible
+    bool tracerVisible();
+    // Set Tracer Visible
+    void setTracerVisible(const bool& aVisible);
+
 signals:
 
+    // Tracer Visible Changed Signal
+    void tracerVisibleChanged(const bool& aVisible);
 
 private:
     // Settings
     QSettings       mSettings;
     // Reference Counter
     int             mRefCounter;
+
+    // Tracer Visible
+    bool            mTracerVisible;
 };
 
 #endif // SETTINGSCONTROLER_H

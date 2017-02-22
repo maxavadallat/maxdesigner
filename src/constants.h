@@ -2,41 +2,78 @@
 #define CONSTANTS_H
 
 
-// Main Controller Name
-#define DEFAULT_MAIN_CONTROLLER_NAME                    "mainController"
+// Application Info
+#define DEFAULT_APPLICATION_NAME                        "MaxDesigner"
+#define DEFAULT_ORGANIZATION_NAME                       "MySoft"
+#define DEFAULT_ORGANIZATION_DOMAIN                     "mysoft.com"
 
-// Settings Controller Name
-#define DEFAULT_GLOBAL_SETTINGS_CONTROLLER              "settingsController"
-
-// Base Components List Model Name
-#define DEFAULT_BASE_COMPONENTS_MODEL_NAME              "baseComponentsModel"
-
-// Components List Model Name
-#define DEFAULT_COMPONENTS_MODEL_NAME                   "componentsModel"
-
-// Views List Model Name
-#define DEFAULT_VIEWS_MODEL_NAME                        "viewsModel"
-
-// Open Files List Model Name
-#define DEFAULT_OPEN_FILE_MODEL_NAME                    "openFilesModel"
-
-// Main QML File
+// Main Window QML Widget QML File
 #define DEFAULT_MAIN_QMLFILE_URL                        "qrc:/qml/main.qml"
 
-// QML Project File Extension
+// Main Controller Name
+#define DEFAULT_MAIN_CONTROLLER_NAME                    "mainController"
+// Settings Controller Name
+#define DEFAULT_GLOBAL_SETTINGS_CONTROLLER              "settingsController"
+// Base Components List Model Name
+#define DEFAULT_BASE_COMPONENTS_MODEL_NAME              "baseComponentsModel"
+// Project Tree Item Model Name
+#define DEFAULT_PROJECT_TREE_MODEL_NAME                 "projectTreeModel"
+// Components List Model Name
+#define DEFAULT_COMPONENTS_MODEL_NAME                   "componentsModel"
+// Views List Model Name
+#define DEFAULT_VIEWS_MODEL_NAME                        "viewsModel"
+// Open Files List Model Name
+#define DEFAULT_OPEN_FILES_MODEL_NAME                   "openFilesModel"
+
+// Open Project Model Name
+#define DEFAULT_OPEN_RECENT_PROJECTS_MODEL_NAME         "recentProjectsModel"
+
+// Current/Open Project Model Name
+#define DEFAULT_OPEN_PROJECT_MODEL_NAME                 "projectModel"
+
+
+// JSON File Extensions
+#define DEFAULT_JSON_SUFFIX                             "json"
 #define DEFAULT_QML_PROJECT_SUFFIX                      "qmlproject"
-// Image File Extensions
 #define DEFAULT_IMAGE_SUFFIXES                          "jpg jpeg png bmp gif tiff"
-// QML File Extension
 #define DEFAULT_QML_SUFFIX                              "qml"
-// JS File Extension
 #define DEFAULT_JS_SUFFIX                               "js"
+
+// Default Dirs & File Names
+#define DEFAULT_PROJECT_NAME                            "myproject"
+#define DEFAULT_PROJECT_MAIN_QML_FILE_NAME              "main.qml"
+#define DEFAULT_PROJECT_QML_DIR_NAME                    "qml"
+#define DEFAULT_PROJECT_JS_DIR_NAME                     "qml"
+#define DEFAULT_PROJECT_IMAGES_DIR_NAME                 "qml"
+#define DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME         "basecomponents"
+#define DEFAULT_PROJECT_COMPONENTS_DIR_NAME             "components"
+#define DEFAULT_PROJECT_VIEWS_DIR_NAME                  "views"
+
+// JSON Keys for Project Info
+#define JSON_KEY_PROJECT_NAME                           "projectName"
+#define JSON_KEY_PROJECT_DIR                            "projectDir"
+#define JSON_KEY_PROJECT_MAIN_QML                       "projectMainQML"
+#define JSON_KEY_PROJECT_QML_DIR                        "projectQMLDir"
+#define JSON_KEY_PROJECT_JS_DIR                         "projectJSDir"
+#define JSON_KEY_PROJECT_IMAGES_DIR                     "projectImagesDir"
+#define JSON_KEY_PROJECT_BASECOMPONENTS_DIR             "projectBaseComponentsDir"
+#define JSON_KEY_PROJECT_COMPONENTS_DIR                 "projectComponentsDir"
+#define JSON_KEY_PROJECT_VIEWS_DIR                      "projectViewsDir"
+#define JSON_KEY_PROJECT_IMPORT_PATHS                   "projectImportPaths"
+#define JSON_KEY_PROJECT_PLUGIN_PATHS                   "projectPluginPaths"
 
 
 // JSON Keys for Component Info
-#define JSON_KEY_COMPONENT_NAME                         "name"
-#define JSON_KEY_COMPONENT_PARENT                       "parent"
-#define JSON_KEY_COMPONENT_PROPERTIES                   "properties"
+#define JSON_KEY_COMPONENT_NAME                         "compoenntName"
+#define JSON_KEY_COMPONENT_TYPE                         "compoenntType"
+#define JSON_KEY_COMPONENT_BASE                         "componentBase"
+#define JSON_KEY_COMPONENT_PROPERTIES                   "componentProperties"
+
+
+// Component Types
+#define COMPONENT_TYPE_BASECOMPONENT                    "BaseComponent"
+#define COMPONENT_TYPE_COMPONENT                        "Component"
+#define COMPONENT_TYPE_VIEW                             "View"
 
 
 #endif // CONSTANTS_H

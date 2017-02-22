@@ -1,19 +1,19 @@
-#ifndef PROJECTLISTMODEL_H
-#define PROJECTLISTMODEL_H
+#ifndef PROJECTITEMMODEL_H
+#define PROJECTITEMMODEL_H
 
 #include <QObject>
 #include <QAbstractItemModel>
 
 //==============================================================================
-// Project List Model
+// Project Item Model
 //==============================================================================
-class ProjectListModel : public QAbstractItemModel
+class ProjectItemModel : public QAbstractItemModel
 {
 public:
     // Constructor
-    explicit ProjectListModel(QObject* aParent = NULL);
+    explicit ProjectItemModel(QObject* aParent = NULL);
     // Destructor
-    ~ProjectListModel();
+    ~ProjectItemModel();
 
 private:
     // Init
@@ -42,4 +42,4 @@ private: // Data
 
 };
 
-#endif // PROJECTLISTMODEL_H
+#endif // PROJECTITEMMODEL_H

@@ -4,9 +4,9 @@
 #include <QObject>
 #include <QList>
 #include <QAbstractListModel>
-#include <QJsonObject>
+//#include <QJsonObject>
 
-class ViewInfo;
+class ComponentInfo;
 
 //==============================================================================
 // View List Model
@@ -36,7 +36,7 @@ public: // from QAbstractListModel
 private: // Data
 
     // View List
-    QList<ViewInfo>    mViewList;
+    QList<ComponentInfo>    mViewList;
 
 };
 
@@ -47,7 +47,7 @@ private: // Data
 
 
 
-
+/*
 //==============================================================================
 // View Info Class
 //==============================================================================
@@ -77,6 +77,6 @@ private: // Data
     // Component Info
     QJsonObject mInfo;
 };
-
+*/
 
 #endif // VIEWSLISTMODEL_H

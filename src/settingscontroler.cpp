@@ -31,6 +31,7 @@ SettingsControler* SettingsControler::getInstance()
 SettingsControler::SettingsControler(QObject* aParent)
     : QObject(aParent)
     , mRefCounter(1)
+    , mTracerVisible(false)
 {
 
 }
@@ -73,6 +74,28 @@ void SettingsControler::release()
         // Delete Settings Controller Singleton instance
         delete settingsSingleton;
         settingsSingleton = NULL;
+    }
+}
+
+//==============================================================================
+// Get Tracer Visible
+//==============================================================================
+bool SettingsControler::tracerVisible()
+{
+    return mTracerVisible;
+}
+
+//==============================================================================
+// Set Tracer Visible
+//==============================================================================
+void SettingsControler::setTracerVisible(const bool& aVisible)
+{
+    // Check Tracer Visible
+    if (mTracerVisible != aVisible) {
+        // Set Tracer Visible
+        mTracerVisible = aVisible;
+        // Emit Tracer Visible Changed Signal
+        emit tracerVisibleChanged(mTracerVisible);
     }
 }
 

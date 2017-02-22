@@ -1,6 +1,8 @@
 #include <QDebug>
 #include <QJsonDocument>
-#include "src/viewslistmodel.h"
+
+#include "viewslistmodel.h"
+#include "componentinfo.h"
 
 //==============================================================================
 // Constructor
@@ -102,7 +104,7 @@ ViewsListModel::~ViewsListModel()
 
 
 
-
+/*
 
 //==============================================================================
 // Constructor
@@ -182,3 +184,4 @@ ViewInfo::~ViewInfo()
 {
     // ...
 }
+*/

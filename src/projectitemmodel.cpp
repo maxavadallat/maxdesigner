@@ -1,13 +1,13 @@
 
 #include <QDebug>
 
-#include "src/projectlistmodel.h"
+#include "src/projectitemmodel.h"
 
 
 //==============================================================================
 // Constructor
 //==============================================================================
-ProjectListModel::ProjectListModel(QObject* aParent)
+ProjectItemModel::ProjectItemModel(QObject* aParent)
     : QAbstractItemModel(aParent)
 {
     // Init
@@ -17,7 +17,7 @@ ProjectListModel::ProjectListModel(QObject* aParent)
 //==============================================================================
 // Init
 //==============================================================================
-void ProjectListModel::init()
+void ProjectItemModel::init()
 {
 
 }
@@ -25,7 +25,7 @@ void ProjectListModel::init()
 //==============================================================================
 // Clear
 //==============================================================================
-void ProjectListModel::clear()
+void ProjectItemModel::clear()
 {
 
 }
@@ -33,7 +33,7 @@ void ProjectListModel::clear()
 //==============================================================================
 // Index
 //==============================================================================
-QModelIndex ProjectListModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex ProjectItemModel::index(int row, int column, const QModelIndex &parent) const
 {
     return QModelIndex();
 }
@@ -41,7 +41,7 @@ QModelIndex ProjectListModel::index(int row, int column, const QModelIndex &pare
 //==============================================================================
 // Parent
 //==============================================================================
-QModelIndex ProjectListModel::parent(const QModelIndex& child) const
+QModelIndex ProjectItemModel::parent(const QModelIndex& child) const
 {
     return QModelIndex();
 }
@@ -49,7 +49,7 @@ QModelIndex ProjectListModel::parent(const QModelIndex& child) const
 //==============================================================================
 // Sibling
 //==============================================================================
-QModelIndex ProjectListModel::sibling(int row, int column, const QModelIndex& idx) const
+QModelIndex ProjectItemModel::sibling(int row, int column, const QModelIndex& idx) const
 {
     return QModelIndex();
 }
@@ -57,7 +57,7 @@ QModelIndex ProjectListModel::sibling(int row, int column, const QModelIndex& id
 //==============================================================================
 // Row Count
 //==============================================================================
-int ProjectListModel::rowCount(const QModelIndex& parent) const
+int ProjectItemModel::rowCount(const QModelIndex& parent) const
 {
     return 0;
 }
@@ -65,7 +65,7 @@ int ProjectListModel::rowCount(const QModelIndex& parent) const
 //==============================================================================
 // Column Count
 //==============================================================================
-int ProjectListModel::columnCount(const QModelIndex& parent) const
+int ProjectItemModel::columnCount(const QModelIndex& parent) const
 {
     return 0;
 }
@@ -73,7 +73,7 @@ int ProjectListModel::columnCount(const QModelIndex& parent) const
 //==============================================================================
 // Has Childrent
 //==============================================================================
-bool ProjectListModel::hasChildren(const QModelIndex& parent) const
+bool ProjectItemModel::hasChildren(const QModelIndex& parent) const
 {
     return false;
 }
@@ -81,7 +81,7 @@ bool ProjectListModel::hasChildren(const QModelIndex& parent) const
 //==============================================================================
 // Data
 //==============================================================================
-QVariant ProjectListModel::data(const QModelIndex& index, int role) const
+QVariant ProjectItemModel::data(const QModelIndex& index, int role) const
 {
     return "";
 }
@@ -89,7 +89,7 @@ QVariant ProjectListModel::data(const QModelIndex& index, int role) const
 //==============================================================================
 // Destructor
 //==============================================================================
-ProjectListModel::~ProjectListModel()
+ProjectItemModel::~ProjectItemModel()
 {
     // ...
 }

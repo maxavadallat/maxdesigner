@@ -24,13 +24,24 @@ Item {
         }
     }
 
+    DWelcome {
+        anchors.centerIn: parent
+    }
+
     MainGrabArea {
         id: mainGrabArea
 
         property bool xInit: false
         property bool yInit: false
 
+        visible: false
+
         Component.onCompleted: {
+//            projectPane.x = STYLE.defaultMargin;
+//            projectPane.y = (mainRoot.height - projectPane.height) / 2;
+
+//            propertiesPane.x = mainRoot.width - width - STYLE.defaultMargin;
+//            propertiesPane.y = (mainRoot.height - propertiesPane.height) / 2;
         }
 
         onWidthChanged: {
@@ -38,6 +49,10 @@ Item {
                 xInit = true;
                 projectPane.x = STYLE.defaultMargin;
                 propertiesPane.x = mainGrabArea.width - propertiesPane.width - STYLE.defaultMargin;
+
+                //demoPane.x = (mainGrabArea.width - demoPane.width) / 2
+
+                //demoContainer.x = (mainGrabArea.width - demoContainer.width) / 2
 
                 demoViewContainer.x = (mainGrabArea.width - demoViewContainer.width) / 2
             }
@@ -49,41 +64,258 @@ Item {
                 projectPane.y = (mainRoot.height - projectPane.height) / 2;
                 propertiesPane.y = (mainRoot.height - propertiesPane.height) / 2;
 
+                //demoPane.y = (mainRoot.height - demoPane.height) / 2;
+
+                //demoContainer.y = (mainRoot.height - demoContainer.height) / 2;
+
                 demoViewContainer.y = (mainRoot.height - demoViewContainer.height) / 2;
             }
         }
 
         onClicked: {
             // Hide Popups
-            mainPopupArea.hidePopups();
+            //mainPopupArea.hidePopups();
         }
+
+//        onClicked: {
+//            if (mouse.button === Qt.RightButton) {
+//                // Hide Sub Popup
+//                subPopup.hide();
+//                // Show Popup
+//                mainPopup.show(mouse.x, mouse.y);
+//            } else {
+//                // Hide Sub Popup
+//                subPopup.hide();
+//                // Hide Popup
+//                mainPopup.hide();
+//            }
+//        }
+
 
         // Project Pane
         ProjectPane {
             id: projectPane
             hideToSide: hideToLeft
+
+            enablePaneContent: false
+
+            //hidden: true
         }
 
         // Properties Pane
         PropertiesPane {
             id: propertiesPane
             hideToSide: hideToRight
+
+            //enableContent: false
+            enablePaneContent: false
+
+            //hidden: true
         }
 
         DViewContainer {
             id: demoViewContainer
 
-            DFormulaEditor {
-                id: formulaEditor
-                x: 50
-                y: 50
-            }
+            //hidden: true
+
+//            DFormulaEditor {
+//                id: formulaEditor
+//                x: 50
+//                y: 50
+//                //anchors.centerIn: parent
+//            }
+
+//            DFlipable {
+//                id: flipable
+
+//                width: STYLE.spinnerWidth
+//                height: STYLE.spinnerHeight
+
+//                anchors.centerIn: parent
+//                anchors.verticalCenterOffset: -50
+
+//                front: Rectangle {
+//                    width: STYLE.spinnerWidth
+//                    height: STYLE.spinnerHeight
+//                    color: "orange"
+//                }
+
+//                back: Rectangle {
+//                    width: STYLE.spinnerWidth
+//                    height: STYLE.spinnerHeight
+//                    color: "purple"
+//                }
+//            }
         }
 
-        DPopupArea {
-            id: mainPopupArea
-            anchors.fill: parent
-        }
+//        DPopupArea {
+//            id: mainPopupArea
+//            anchors.fill: parent
+//            //visible: false
+//        }
+
+
+//        DPopup {
+//            id: mainPopup
+
+//            model: [
+//                DPopupItemObject { text: "Item 1" },
+//                DPopupItemObject { text: "Item Test 2" },
+//                DPopupItemObject { text: "-" },
+//                DPopupItemObject { text: "Item 3"; disabled: true },
+//                DPopupItemObject { text: "-" },
+//                DPopupItemObject { text: "Item 4"; subMenuItem: true; subMenu: [
+//                    DPopupItemObject { text: "SubItem 1" },
+//                    DPopupItemObject { text: "SubItem 2" },
+//                    DPopupItemObject { text: "SubItem 3" },
+//                    DPopupItemObject { text: "SubItem 4" }
+//                ] },
+//                DPopupItemObject { text: "Item 5" }
+//            ]
+
+//            onItemHovered: {
+//                //console.log("mainPopup.onItemHovered - itemIndex: " + itemIndex + " - subMenuItem: " + subMenuItem);
+//                // Check If Sub Item
+//                if (!subMenuItem) {
+//                    // Hide Sub Popup
+//                    subPopup.hide();
+//                }
+//            }
+
+//            onItemSelected: {
+//                console.log("mainPopup.onItemSelected - itemIndex: " + itemIndex);
+//            }
+
+//            onSubMenuItemSelected: {
+//                console.log("mainPopup.onSubMenuItemSelected - itemIndex: " + itemIndex);
+//                // Set Sub Menu Popup Model
+//                subPopup.model = mainPopup.model[itemIndex].subMenu;
+//                // Show Sub-Popup
+//                subPopup.show(mainPopup.x + mainPopup.width, mainPopup.y + itemPosY);
+//            }
+//        }
+
+//        DPopup {
+//            id: subPopup
+
+//            onItemSelected: {
+//                console.log("subPopup.onItemSelected - itemIndex: " + itemIndex);
+//                // Hide Main Popup
+//                mainPopup.hide();
+//            }
+//        }
+
+//        DContainer {
+//            id: demoContainer
+
+//            width: 300
+//            height: 256
+
+
+//            Column {
+//                width: parent.width
+//                anchors.centerIn: parent
+//                spacing: 8
+
+//                DTextInput {
+//                    anchors.horizontalCenter: parent.horizontalCenter
+//                }
+
+//                DSpinner {
+//                    anchors.horizontalCenter: parent.horizontalCenter
+
+//                    value: 0
+
+//                    onValueDecreased: {
+//                        value = newValue;
+//                    }
+
+//                    onValueIncreased: {
+//                        value = newValue;
+//                    }
+
+//                    onTextUpdated: {
+//                        value = newValue;
+//                    }
+//                }
+//            }
+//        }
+
+//        DPane {
+//            id: demoPane
+//            width: 400
+//            height: 540
+//            title: "Demo"
+
+//            DSection {
+//                width: demoPane.contentWidth
+//                title: "Section 1"
+
+//                DButton {
+//                    onClicked: checked = !checked;
+//                }
+
+//                DCheckBox {
+//                    onClicked: checked = !checked;
+//                }
+
+//                DCheckBox {
+//                    rightAligned: true
+//                    onClicked: checked = !checked;
+//                }
+
+//                DSwitch {
+//                    onClicked: checked = !checked;
+//                }
+
+//                DSwitch {
+//                    rightAligned: true
+//                    onClicked: checked = !checked;
+//                }
+
+//                DRadioButtonGroup {
+//                    model: [
+//                        DRadioButtonGroupItem { title: "Item 1" },
+//                        DRadioButtonGroupItem { title: "Item 2" },
+//                        DRadioButtonGroupItem { title: "Item 3" },
+//                        DRadioButtonGroupItem { title: "Item 4" }
+//                    ]
+
+//                    onButtonSelected: {
+//                        //console.log("onButtonSelected - buttonIndex: " + buttonIndex);
+//                        // Set Current Index
+//                        currentIndex = buttonIndex;
+//                    }
+//                }
+
+//                DRadioButtonGroup {
+//                    rightAligned: true
+//                    model: [
+//                        DRadioButtonGroupItem { title: "Item 1" },
+//                        DRadioButtonGroupItem { title: "Item 2" },
+//                        DRadioButtonGroupItem { title: "Item 3" },
+//                        DRadioButtonGroupItem { title: "Item 4" }
+//                    ]
+
+//                    onButtonSelected: {
+//                        //console.log("onButtonSelected - buttonIndex: " + buttonIndex);
+//                        // Set Current Index
+//                        currentIndex = buttonIndex;
+//                    }
+//                }
+
+//            }
+
+//            DSection {
+//                width: demoPane.contentWidth
+//                title: "Section 2"
+//            }
+
+//            DSection {
+//                width: demoPane.contentWidth
+//                title: "Section 3"
+//            }
+//        }
 
     }
 }

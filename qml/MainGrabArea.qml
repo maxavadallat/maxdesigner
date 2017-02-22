@@ -7,6 +7,10 @@ MouseArea {
 
     property var dragTarget: undefined
 
+    opacity: 1.0
+    Behavior on opacity { DFadeAnimation { } }
+    visible: opacity > 0.0
+
     drag.target: mainGrabAreaRoot.dragTarget
 
     drag.axis: Drag.XandYAxis
@@ -25,7 +29,7 @@ MouseArea {
 
     onReleased: {
         //console.log("MaingrabArea.onReleased");
-        if (mouse.button == Qt.LeftButton) {
+        if (mouse.button === Qt.LeftButton) {
             // Clear Drag Target
             clearDragTarget();
         }

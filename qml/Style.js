@@ -29,7 +29,7 @@ var colorEditorBG                                   = "white";
 var colorRadioButton                                = "#FF57787F";
 
 // Default Trace Color
-var colorTrace                                      = "lime"//"#44007777";
+var colorTrace                                      = "#AA770077";
 
 // View Contaienr BG Gradient Colors
 var colorViewBG1                                    = "#11FFFFFF";

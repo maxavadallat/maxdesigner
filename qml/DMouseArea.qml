@@ -5,13 +5,15 @@ import "Style.js" as STYLE
 MouseArea {
     id: mouseAreaRoot
 
-    property alias tracerVisible: tracer.visible
+//    property alias tracerVisible: tracer.visible
 
-    opacity: enabled ? 1.0 : STYLE.disabledOpacity
+    property bool hidden: false
+
+    opacity: hidden ? 0.0 : (enabled ? 1.0 : STYLE.disabledOpacity)
     Behavior on opacity { NumberAnimation { duration: STYLE.animDuration } }
     visible: opacity > 0.0
 
     DTracer {
-        id: tracer
+//        id: tracer
     }
 }

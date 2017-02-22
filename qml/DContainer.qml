@@ -31,6 +31,8 @@ DMouseArea {
 
     property alias clipContent: contentContainer.clip
 
+    property alias enableContent: contentContainer.enabled
+
     onPressed: {
         if (parent.setDragTarget !== undefined) {
             // Set Drag Target - ASSUMING Parent is MainGrabArea

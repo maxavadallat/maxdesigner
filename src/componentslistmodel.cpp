@@ -1,6 +1,8 @@
 #include <QDebug>
 #include <QJsonDocument>
-#include "src/componentslistmodel.h"
+
+#include "componentslistmodel.h"
+#include "componentinfo.h"
 
 //==============================================================================
 // Constructor
@@ -98,7 +100,7 @@ ComponentsListModel::~ComponentsListModel()
 
 
 
-
+/*
 //==============================================================================
 // Constructor
 //==============================================================================
@@ -177,3 +179,4 @@ ComponentInfo::~ComponentInfo()
 {
     // ...
 }
+*/

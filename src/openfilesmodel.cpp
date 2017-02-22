@@ -127,12 +127,12 @@ QVariant OpenFilesModel::data(const QModelIndex& index, int role) const
     // Get File Info List Count
     int filCount = mFileInfoList.count();
 
-
     // Check Index
     if (i >= 0 && i < filCount) {
         // Switch Role
         switch (role) {
             case FileNameRole:      return mFileInfoList[i].fileName();
+            case FileIconRole:      return "";
         }
     }
 
@@ -149,6 +149,7 @@ QHash<int,QByteArray> OpenFilesModel::roleNames() const
 
     // Add Role Names
     rNames[FileNameRole] = "fileName";
+    rNames[FileIconRole] = "fileIcon";
 
     return rNames;
 }

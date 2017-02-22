@@ -51,7 +51,8 @@ private: // Data
 
     // Item Field Roles
     enum ItemRoles {
-        FileNameRole = Qt::UserRole + 1
+        FileNameRole = Qt::UserRole + 1,
+        FileIconRole
     };
 
     // Open File List

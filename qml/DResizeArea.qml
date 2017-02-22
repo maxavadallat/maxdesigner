@@ -15,7 +15,5 @@ MouseArea {
         pressPosY = mouse.y;
     }
 
-    DTracer {
-        visible: false
-    }
+    DTracer { }
 }

@@ -1,14 +1,18 @@
 #include <QDebug>
 #include <QJsonDocument>
-#include "src/basecomponentsmodel.h"
+
+#include "basecomponentsmodel.h"
+#include "componentinfo.h"
 
 //==============================================================================
 // Constructor
 //==============================================================================
 BaseComponentsModel::BaseComponentsModel(QObject* aParent)
     : QAbstractListModel(aParent)
+    , mBaseComponentsDir("")
 {
-
+    // Init
+    init();
 }
 
 //==============================================================================
@@ -16,7 +20,7 @@ BaseComponentsModel::BaseComponentsModel(QObject* aParent)
 //==============================================================================
 void BaseComponentsModel::init()
 {
-
+    // ...
 }
 
 //==============================================================================
@@ -26,13 +30,34 @@ void BaseComponentsModel::clear()
 {
     // Begin Reset Model
     beginResetModel();
-
     // Clear File Info List
     mBaseComponentList.clear();
-
     // End Reset Model
     endResetModel();
+}
 
+//==============================================================================
+// Load Base Components
+//==============================================================================
+void BaseComponentsModel::loadBaseComponents()
+{
+    // ...
+}
+
+//==============================================================================
+// Set Base Components Dir
+//==============================================================================
+void BaseComponentsModel::setBaseComponentsDir(const QString& aDirPath)
+{
+    // Check Base Compoents Dir
+    if (mBaseComponentsDir != aDirPath) {
+        // Set Base Components Dir
+        mBaseComponentsDir = aDirPath;
+        // Clear
+        clear();
+        // Load Base Components
+        loadBaseComponents();
+    }
 }
 
 //==============================================================================
@@ -102,7 +127,7 @@ BaseComponentsModel::~BaseComponentsModel()
 
 
 
-
+/*
 //==============================================================================
 // Constructor
 //==============================================================================
@@ -181,3 +206,4 @@ BaseComponentInfo::~BaseComponentInfo()
 {
     // ...
 }
+*/

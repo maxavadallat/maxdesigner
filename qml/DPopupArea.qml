@@ -9,6 +9,9 @@ DMouseArea {
 
     acceptedButtons: { Qt.RightButton }
 
+//    hoverEnabled: false
+//    drag.filterChildren: true
+
     signal itemSelected(var itemIndex)
     signal subItemSelected(var itemIndex)
 

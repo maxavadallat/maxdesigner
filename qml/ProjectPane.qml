@@ -11,7 +11,7 @@ DPane {
     title: "Project"
 
     DSection {
-        width: projectPaneRoot.width
+        width: projectPaneRoot.contentWidth
         title: "Base Components"
 
         state: stateOpen
@@ -19,6 +19,16 @@ DPane {
         Flow {
             width: contentWidth
             spacing: STYLE.defaultSpacing
+//            DRectangle {
+//                width: 84
+//                height: 64
+//                DText {
+//                    width: parent.width
+//                    anchors.centerIn: parent
+//                    text: "QtObject"
+//                    horizontalAlignment: Text.AlignHCenter
+//                }
+//            }
 
             DRectangle {
                 width: 84
@@ -81,7 +91,7 @@ DPane {
 
     DSection {
         id: ownComponentsSection
-        width: projectPaneRoot.width
+        width: projectPaneRoot.contentWidth
         title: "Own Components"
 
         state: stateOpen
@@ -162,21 +172,21 @@ DPane {
     }
 
     DSection {
-        width: projectPaneRoot.width
+        width: projectPaneRoot.contentWidth
         title: "Views"
 
         // ...
     }
 
     DSection {
-        width: projectPaneRoot.width
+        width: projectPaneRoot.contentWidth
         title: "Files"
 
         // ...
     }
 
     DSection {
-        width: projectPaneRoot.width
+        width: projectPaneRoot.contentWidth
         title: "Open Documents"
 
         // ...
