@@ -95,13 +95,15 @@
    </widget>
    <widget class="QMenu" name="menuComponent">
     <property name="title">
-     <string>Component</string>
+     <string>Components</string>
     </property>
     <addaction name="actionCreateComponent"/>
+    <addaction name="actionDefine_Base_Component"/>
     <addaction name="separator"/>
     <addaction name="actionComponentProperties"/>
     <addaction name="separator"/>
     <addaction name="actionRemoveComponent"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -182,6 +184,9 @@
    </property>
   </action>
   <action name="actionCreateComponent">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Create New Component</string>
    </property>
@@ -214,6 +219,9 @@
    </property>
   </action>
   <action name="actionCreateView">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Create New View</string>
    </property>
@@ -232,11 +240,6 @@
    </property>
    <property name="text">
     <string>Remove View</string>
-   </property>
-  </action>
-  <action name="actionClose_Project">
-   <property name="text">
-    <string>Close Project</string>
    </property>
   </action>
   <action name="actionSaveProject">
@@ -261,6 +264,14 @@
    </property>
    <property name="text">
     <string>Generate QML Sources</string>
+   </property>
+  </action>
+  <action name="actionDefine_Base_Component">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Define Base Component</string>
    </property>
   </action>
  </widget>

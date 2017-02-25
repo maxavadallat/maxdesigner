@@ -41,5 +41,6 @@
         <file>qml/DFormulaEditor.qml</file>
         <file>qml/DSizeIndicator.qml</file>
         <file>qml/DWelcome.qml</file>
+        <file>qml/DActivityIndicator.qml</file>
     </qresource>
 </RCC>

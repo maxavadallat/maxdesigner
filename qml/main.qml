@@ -1,5 +1,7 @@
 import QtQuick 2.0
 
+import enginecomponents 0.1
+
 import "Constants.js" as CONSTS
 import "Style.js" as STYLE
 
@@ -26,7 +28,15 @@ Item {
 
     DWelcome {
         anchors.centerIn: parent
+        opacity: mainController.currentProject ? 0.0 : 1.0
     }
+
+//    DActivityIndicator {
+//        width: 256
+//        height: 256
+//        anchors.centerIn: parent
+//        running: true
+//    }
 
     MainGrabArea {
         id: mainGrabArea
@@ -34,7 +44,7 @@ Item {
         property bool xInit: false
         property bool yInit: false
 
-        visible: false
+        opacity: mainController.currentProject ? 1.0 : 0.0
 
         Component.onCompleted: {
 //            projectPane.x = STYLE.defaultMargin;

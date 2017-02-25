@@ -1,9 +1,8 @@
 #include <QDebug>
-#include <QDir>
-#include <QDirIterator>
 #include <QJsonDocument>
+#include <QDirIterator>
 
-#include "basecomponentsmodel.h"
+#include "componentsmodel.h"
 #include "componentinfo.h"
 #include "projectmodel.h"
 #include "constants.h"
@@ -11,10 +10,10 @@
 //==============================================================================
 // Constructor
 //==============================================================================
-BaseComponentsModel::BaseComponentsModel(ProjectModel* aProjectModel, QObject* aParent)
+ComponentsModel::ComponentsModel(ProjectModel* aProjectModel, QObject* aParent)
     : QAbstractListModel(aParent)
     , mProjectModel(aProjectModel)
-    , mBaseComponentsDir(mProjectModel ? mProjectModel->baseComponentsDir() : "")
+    , mComponentsDir(mProjectModel ? mProjectModel->componentsDir() : "")
 {
     // Init
     init();
@@ -23,91 +22,92 @@ BaseComponentsModel::BaseComponentsModel(ProjectModel* aProjectModel, QObject* a
 //==============================================================================
 // Init
 //==============================================================================
-void BaseComponentsModel::init()
+void ComponentsModel::init()
 {
-    // Load Base Components
-    loadBaseComponents();
+    // Load Components
+    loadComponents();
 }
 
 //==============================================================================
 // Clear
 //==============================================================================
-void BaseComponentsModel::clear()
+void ComponentsModel::clear()
 {
     // Begin Reset Model
     beginResetModel();
 
-    // Iterate Through Base Component List
-    while (mBaseComponentList.count() > 0) {
-        // Delete Last
-        delete mBaseComponentList.takeLast();
+    // Iterate Through Components List
+    while (mComponentList.count() > 0) {
+        // Delete Item
+        delete mComponentList.takeLast();
     }
+
     // End Reset Model
     endResetModel();
 }
 
 //==============================================================================
-// Load Base Components
+// Load Components
 //==============================================================================
-void BaseComponentsModel::loadBaseComponents()
+void ComponentsModel::loadComponents()
 {
-    // Check Base Components Dir
-    if (mBaseComponentsDir.isEmpty()) {
+    // Check Components Dir
+    if (mComponentsDir.isEmpty()) {
         return;
     }
 
-    // Init Base Components Dir Iterator
-    QDirIterator bcIterator(mBaseComponentsDir, QStringList(DEFAULT_JSON_SUFFIX), QDir::Files | QDir::NoDotAndDotDot);
+    // Init Components Dir Iterator
+    QDirIterator cIterator(mComponentsDir, QStringList(DEFAULT_JSON_SUFFIX), QDir::Files | QDir::NoDotAndDotDot);
 
-    // Iterate Through Base Components Dir
-    while (bcIterator.hasNext()) {
+    // Iterate Through Components Dir
+    while (cIterator.hasNext()) {
         // Get Next Item
-        bcIterator.next();
+        cIterator.next();
         // Get Item Path
-        QString itemPath = bcIterator.filePath();
+        QString itemPath = cIterator.filePath();
 
-        qDebug() << "BaseComponentsModel::loadBaseComponents - itemPath: " << itemPath;
+        qDebug() << "ComponentsModel::loadComponents - itemPath: " << itemPath;
 
-        // Create Base Component
+        // Create New Component Info
         ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
-        // Add Base Component
-        addBaseComponent(newComponent);
+        // Add Component
+        addComponent(newComponent);
     }
 }
 
 //==============================================================================
-// Set Base Components Dir
+// Set Components Dir
 //==============================================================================
-void BaseComponentsModel::setBaseComponentsDir(const QString& aDirPath)
+void ComponentsModel::setComponentsDir(const QString& aDirPath)
 {
-    // Check Base Compoents Dir
-    if (mBaseComponentsDir != aDirPath) {
-        // Set Base Components Dir
-        mBaseComponentsDir = aDirPath;
+    // Check Components Dir
+    if (mComponentsDir != aDirPath) {
+        // Set Componens Dir
+        mComponentsDir = aDirPath;
         // Clear
         clear();
-        // Load Base Components
-        loadBaseComponents();
+        // Load Components
+        loadComponents();
     }
 }
 
 //==============================================================================
-// Add Base Component
+// Add Component
 //==============================================================================
-void BaseComponentsModel::addBaseComponent(ComponentInfo* aComponent)
+void ComponentsModel::addComponent(ComponentInfo* aComponent)
 {
     // Check Component
     if (aComponent) {
-        // Get Base Components Count
-        int bcCount = mBaseComponentList.count();
+        // Get Components Count
+        int cCount = mComponentList.count();
         // Get Index Of Component
-        int bcIndex = mBaseComponentList.indexOf(aComponent);
-        // Check Base Component Index
-        if (bcIndex < 0) {
+        int cIndex = mComponentList.indexOf(aComponent);
+        // Check Component Index
+        if (cIndex < 0) {
             // Begin Insert Rows
-            beginInsertRows(QModelIndex(), bcCount, bcCount);
-            // Append Base Component
-            mBaseComponentList << aComponent;
+            beginInsertRows(QModelIndex(), cCount, cCount);
+            // Append Component
+            mComponentList << aComponent;
             // End Insert Rows
             endInsertRows();
         }
@@ -115,27 +115,27 @@ void BaseComponentsModel::addBaseComponent(ComponentInfo* aComponent)
 }
 
 //==============================================================================
-// Remove Base Compoennt
+// Remove Compoennt
 //==============================================================================
-void BaseComponentsModel::removeBaseComponent(ComponentInfo* aComponent, const bool& aDelete)
+void ComponentsModel::removeComponent(ComponentInfo* aComponent, const bool& aDelete)
 {
     // Check Component
     if (aComponent) {
-        // Get Base Components Count
-        int bcCount = mBaseComponentList.count();
+        // Get Components Count
+        int cCount = mComponentList.count();
         // Get Index Of Component
-        int bcIndex = mBaseComponentList.indexOf(aComponent);
-        // Check Base Component Index
-        if (bcIndex >= 0 && bcIndex < bcCount) {
+        int cIndex = mComponentList.indexOf(aComponent);
+        // Check Component Index
+        if (cIndex >= 0 && cIndex < cCount) {
             // Begin Remove Rows
-            beginRemoveRows(QModelIndex(), bcIndex, bcIndex);
+            beginRemoveRows(QModelIndex(), cIndex, cIndex);
             // Check Deletion
             if (aDelete) {
                 // Delete Item
-                delete mBaseComponentList.takeAt(bcIndex);
+                delete mComponentList.takeAt(cIndex);
             } else {
                 // Remove Item
-                mBaseComponentList.removeAt(bcIndex);
+                mComponentList.removeAt(cIndex);
             }
             // End Remove Rows
             endRemoveRows();
@@ -146,23 +146,24 @@ void BaseComponentsModel::removeBaseComponent(ComponentInfo* aComponent, const b
 //==============================================================================
 // Row Count
 //==============================================================================
-int BaseComponentsModel::rowCount(const QModelIndex& ) const
+int ComponentsModel::rowCount(const QModelIndex& ) const
 {
-    return mBaseComponentList.count();
+    return mComponentList.count();
 }
 
 //==============================================================================
 // Data
 //==============================================================================
-QVariant BaseComponentsModel::data(const QModelIndex& index, int role) const
+QVariant ComponentsModel::data(const QModelIndex& index, int role) const
 {
-    // Get Ro
+    // Ger Row
     int row = index.row();
+
     // Check Row
-    if (row >= 0 && row < mBaseComponentList.count()) {
+    if (row >= 0 && row < mComponentList.count()) {
         // Switch Role
         switch (role) {
-            case ComponentNameRole: return mBaseComponentList[row]->property(JSON_KEY_COMPONENT_NAME).toString();
+            case ComponentNameRole: return mComponentList[row]->property(JSON_KEY_COMPONENT_NAME).toString();
         }
     }
 
@@ -172,7 +173,7 @@ QVariant BaseComponentsModel::data(const QModelIndex& index, int role) const
 //==============================================================================
 // Get Role Names
 //==============================================================================
-QHash<int,QByteArray> BaseComponentsModel::roleNames() const
+QHash<int,QByteArray> ComponentsModel::roleNames() const
 {
     // Init Role Names
     QHash<int,QByteArray> rNames;
@@ -186,16 +187,11 @@ QHash<int,QByteArray> BaseComponentsModel::roleNames() const
 //==============================================================================
 // Destructor
 //==============================================================================
-BaseComponentsModel::~BaseComponentsModel()
+ComponentsModel::~ComponentsModel()
 {
     // Clear
     clear();
-
-    // ...
 }
-
-
-
 
 
 
@@ -218,7 +214,7 @@ BaseComponentsModel::~BaseComponentsModel()
 //==============================================================================
 // Constructor
 //==============================================================================
-BaseComponentInfo::BaseComponentInfo(const QString& aName, QObject* aParent)
+ComponentInfo::ComponentInfo(const QString& aName, QObject* aParent)
     : QObject(aParent)
     , mName(aName)
 {
@@ -231,7 +227,7 @@ BaseComponentInfo::BaseComponentInfo(const QString& aName, QObject* aParent)
 //==============================================================================
 // Init
 //==============================================================================
-void BaseComponentInfo::init()
+void ComponentInfo::init()
 {
     // Init JSON File
     QFile infoFile(mName);
@@ -247,14 +243,14 @@ void BaseComponentInfo::init()
         // Set JSON Object
         mInfo = jsonDoc.object();
     } else {
-        qWarning() << "BaseComponentInfo::init - FILE OPEN ERROR - mName: " << mName;
+        qWarning() << "ComponentInfo::init - FILE OPEN ERROR - mName: " << mName;
     }
 }
 
 //==============================================================================
 // Get Component Name
 //==============================================================================
-QString BaseComponentInfo::name()
+QString ComponentInfo::name()
 {
     return mName;
 }
@@ -262,7 +258,7 @@ QString BaseComponentInfo::name()
 //==============================================================================
 // Save Info
 //==============================================================================
-void BaseComponentInfo::save()
+void ComponentInfo::save()
 {
     // Init Info File
     QFile infoFile(mName);
@@ -282,14 +278,14 @@ void BaseComponentInfo::save()
         // Close File
         infoFile.close();
     } else {
-        qWarning() << "BaseComponentInfo::save - FILE OPEN ERROR - mName: " << mName;
+        qWarning() << "ComponentInfo::save - FILE OPEN ERROR - mName: " << mName;
     }
 }
 
 //==============================================================================
 // Destructor
 //==============================================================================
-BaseComponentInfo::~BaseComponentInfo()
+ComponentInfo::~ComponentInfo()
 {
     // ...
 }

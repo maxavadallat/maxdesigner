@@ -125,6 +125,13 @@ var formulaEdiorWidth                               = 218;
 // Default Formule Editor Height
 var formulaEditorHeight                             = 72;
 
-
+// Default Activity Indicator Width
+var activityIndicatorWidth                          = 56;
+// Default Activity Indicator Height
+var activityIndicatorHeight                         = 56;
+// Default Activity Indicator Line Width
+var activityIndicatorLineWidth                      = 8;
+// Default Activity Indicator Interval
+var activityIndicatorInterval                       = 32;
 
 // ...

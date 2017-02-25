@@ -6,6 +6,7 @@
 #include <QJsonObject>
 
 class ComponentInfo;
+class ProjectModel;
 
 //==============================================================================
 // QML Parser Class
@@ -18,7 +19,7 @@ public:
     // Constructor
     explicit QMLParser(QObject* aParent = NULL);
     // Parse QML
-    ComponentInfo* parseQML(const QString& aFilePath);
+    ComponentInfo* parseQML(const QString& aFilePath, ProjectModel* aProjectModel = NULL);
 
 private:
 

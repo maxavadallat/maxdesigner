@@ -3,34 +3,58 @@
 
 #include <QObject>
 #include <QJsonObject>
+#include <QJsonValue>
 #include <QList>
 #include <QString>
+
+class ProjectModel;
 
 //==============================================================================
 // Component Info Class
 //==============================================================================
-class ComponentInfo : public QObject, public QJsonObject
+class ComponentInfo : public QObject
 {
     Q_OBJECT
 
-//    Q_PROPERTY(QString componentName READ componentName WRITE setComponentName NOTIFY componentNameChanged)
-//    Q_PROPERTY(QString componentType READ componentType WRITE setComponentType NOTIFY componentTypeChanged)
+    Q_PROPERTY(QString componentName READ componentName WRITE setComponentName NOTIFY componentNameChanged)
+    Q_PROPERTY(QString componentType READ componentType WRITE setComponentType NOTIFY componentTypeChanged)
+    Q_PROPERTY(QString componentBase READ componentBase WRITE setComponentBase NOTIFY componentBaseChanged)
 
 public:
     // Create Component From QML File
-    static ComponentInfo* fromQML(const QString& aFilePath);
+    static ComponentInfo* fromQML(const QString& aFilePath, ProjectModel* aProject);
+
+    // Create Component From Component Info File
+    static ComponentInfo* fromInfoFile(const QString& aFilePath, ProjectModel* aProject);
 
     // Constructor
-    explicit ComponentInfo(const QString& aName, const QString& aType, const QString& aParentName = "", QObject* aParent = NULL);
+    explicit ComponentInfo(const QString& aName, const QString& aType, ProjectModel* aProject = NULL, const QString& aBaseName = "", QObject* aParent = NULL);
+
+    // Get Component Name
+    QString componentName();
+    // Set Component Name
+    void setComponentName(const QString& aName);
+
+    // Get Component Type
+    QString componentType();
+    // Set Component Type
+    void setComponentType(const QString& aType);
+
+    // Get Component Base Name
+    QString componentBase();
+    // Set Component Base Name
+    void setComponentBase(const QString& aBaseName);
+
+    // Get Component Hierarchy
+    QStringList hierarchy();
 
     // Set Parent
     void setParent(ComponentInfo* aParent);
 
-    // Export To QML
-    void exportToQML(const QString& aFilePath);
-
-    // Add Propery
+    // Add Own Propery
     void addProperty(const QString& aName, const QVariant& aValue);
+    // Remove Property
+    void removeProperty(const QString& aName);
 
     // Get Property
     QVariant property(const QString& aName);
@@ -40,10 +64,21 @@ public:
     // Add Child
     void addChild(ComponentInfo* aChild);
     // Remove Child
-    void removeChild(ComponentInfo* aChild);
+    void removeChild(ComponentInfo* aChild, const bool& aDelete = true);
+
+    // Export To QML
+    void exportToQML(const QString& aFilePath);
 
     // Destructor
     ~ComponentInfo();
+
+signals:
+    // Component Name Changed Signal
+    void componentNameChanged(const QString& aName);
+    // Component Type Changed Signal
+    void componentTypeChanged(const QString& aType);
+    // Component Base Name Changed
+    void componentBaseChanged(const QString& aBaseName);
 
 private:
     // Init
@@ -56,16 +91,29 @@ private:
     void save();
 
 private: // Data
+    // Project Model
+    ProjectModel*           mProject;
+
+    // Component Info File Path
+    QString                 mInfoPath;
+    // QML File Path
+    QString                 mQMLPath;
+
     // Name
     QString                 mName;
     // Type
     QString                 mType;
-    // Parent Name
-    QString                 mParentName;
-    // Parent
-    ComponentInfo*          mParent;
+    // Base Component Name
+    QString                 mBaseName;
+    // Own Properties
+    QJsonObject             mOwnProperties;
     // Properties
     QJsonObject             mProperties;
+
+    // Base Component Info
+    ComponentInfo*          mBase;
+    // Parent Component Info
+    ComponentInfo*          mParent;
     // Children
     QList<ComponentInfo*>   mChildren;
 };

@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 
+#include "projectmodel.h"
 #include "qmlparser.h"
 #include "componentinfo.h"
 #include "constants.h"
@@ -18,7 +19,7 @@ QMLParser::QMLParser(QObject* aParent)
 //==============================================================================
 // Parse QML
 //==============================================================================
-ComponentInfo* QMLParser::parseQML(const QString& aFilePath)
+ComponentInfo* QMLParser::parseQML(const QString& aFilePath, ProjectModel* aProjectModel)
 {
     // Init File Info
     QFile qmlFile(aFilePath);
@@ -36,7 +37,7 @@ ComponentInfo* QMLParser::parseQML(const QString& aFilePath)
         QFileInfo qmlInfo(aFilePath);
 
         // Create New Component Info
-        ComponentInfo* newComponentInfo = new ComponentInfo(qmlInfo.baseName(), "");
+        ComponentInfo* newComponentInfo = new ComponentInfo(qmlInfo.baseName(), "", aProjectModel);
 
         // ...
 

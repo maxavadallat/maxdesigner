@@ -10,6 +10,7 @@ QT                  += core gui widgets quickwidgets qml quick
 
 # Sources
 SOURCES             += src/main.cpp \
+                    src/designerapplication.cpp \
                     src/mainwindow.cpp \
                     src/settingscontroler.cpp \
                     src/preferencesdialog.cpp \
@@ -22,18 +23,19 @@ SOURCES             += src/main.cpp \
                     src/qmleditorwindow.cpp \
                     src/basecomponentsmodel.cpp \
                     src/openfilesmodel.cpp \
-                    src/componentslistmodel.cpp \
-                    src/viewslistmodel.cpp \
                     src/projectmodel.cpp \
                     src/propertiesmodel.cpp \
                     src/componentinfo.cpp \
                     src/qmlparser.cpp \
                     src/qmlgenerator.cpp \
                     src/recentprojectsmodel.cpp \
-                    src/projectitemmodel.cpp
+                    src/projectitemmodel.cpp \
+                    src/componentsmodel.cpp \
+                    src/viewsmodel.cpp
 
 # Headers
 HEADERS             += src/mainwindow.h \
+                    src/designerapplication.h \
                     src/constants.h \
                     src/settingscontroler.h \
                     src/settingskeys.h \
@@ -48,15 +50,15 @@ HEADERS             += src/mainwindow.h \
                     src/qmleditorwindow.h \
                     src/basecomponentsmodel.h \
                     src/openfilesmodel.h \
-                    src/componentslistmodel.h \
-                    src/viewslistmodel.h \
                     src/projectmodel.h \
                     src/propertiesmodel.h \
                     src/componentinfo.h \
                     src/qmlparser.h \
                     src/qmlgenerator.h \
                     src/recentprojectsmodel.h \
-                    src/projectitemmodel.h
+                    src/projectitemmodel.h \
+                    src/componentsmodel.h \
+                    src/viewsmodel.h
 
 # Forms
 FORMS               += ui/mainwindow.ui \

@@ -6,7 +6,10 @@
 #include <QDir>
 #include <QDebug>
 
-#include "src/projectmodel.h"
+#include "projectmodel.h"
+#include "basecomponentsmodel.h"
+#include "componentsmodel.h"
+#include "viewsmodel.h"
 #include "constants.h"
 
 //==============================================================================
@@ -15,6 +18,10 @@
 ProjectModel::ProjectModel(QObject* parent)
     : QObject(parent)
     , mName("")
+    , mBaseComponents(NULL)
+    , mComponents(NULL)
+    , mViews(NULL)
+    , mCurrentComponent(NULL)
 {
     // Init
     init();
@@ -41,6 +48,8 @@ void ProjectModel::createQMLProject()
 //==============================================================================
 void ProjectModel::loadQMLProject(const QString& aFileName)
 {
+    Q_UNUSED(aFileName);
+
     // ...
 }
 
@@ -49,11 +58,11 @@ void ProjectModel::loadQMLProject(const QString& aFileName)
 //==============================================================================
 void ProjectModel::saveQMLProject()
 {
-
+    // ...
 }
 
 //==============================================================================
-// Create Base Components
+// Create/Register Base Components
 //==============================================================================
 void ProjectModel::createBaseComponents()
 {
@@ -83,7 +92,7 @@ void ProjectModel::initProject(const QString& aName, const QString& aDir)
 //==============================================================================
 // Load Project
 //==============================================================================
-void ProjectModel::loadProject(const QString& aFileName)
+bool ProjectModel::loadProject(const QString& aFileName)
 {
     // Init JSON File
     QFile jsonFile(aFileName);
@@ -103,34 +112,76 @@ void ProjectModel::loadProject(const QString& aFileName)
         mProperties = jsonDoc.object();
 
         // Emit Changes
+        emit projectNameChanged(projectName());
+        emit projectDirChanged(projectDir());
+        emit mainQMLFileChanged(mainQMLFile());
+        emit qmlDirChanged(qmlDir());
+        emit jsDirChanged(jsDir());
+        emit imagesDirChanged(imagesDir());
+        emit baseComponentsDirChanged(baseComponentsDir());
+        emit componentsDirChanged(componentsDir());
+        emit viewsDirChanged(viewsDir());
+        emit importPathsChanged(importPaths());
+        emit pluginPathsChanged(pluginPaths());
 
+        return true;
     }
+
+    qWarning() << "ProjectModel::loadProject - aFileName: " << aFileName << " - ERROR LOADING PROJECT!";
+
+    return false;
 }
 
 //==============================================================================
 // Save Project
 //==============================================================================
-void ProjectModel::saveProject(const QString& aFileName)
+bool ProjectModel::saveProject(const QString& aFileName)
 {
-    // Check If File Name Empty
-    if (aFileName.isEmpty()) {
-        // Init JSON File
-        QFile jsonFile(aFileName);
+    // Init Save File Name
+    QString saveFileName(aFileName);
 
-        // Open File For Reading
-        if (jsonFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            // Init Text Stream
-            QTextStream textStream(&jsonFile);
-            // Init JSON Document
-            QJsonDocument jsonDocument(mProperties);
-            // Write Document To Text Stream
-            textStream << jsonDocument.toJson();
-            // Flush
-            textStream.flush();
-            // Close File
-            jsonFile.close();
-        }
+    // Check File Name
+    if (saveFileName.isEmpty()) {
+        // Set Save File Name
+        saveFileName = absoluteProjectFilePath();
     }
+
+    qDebug() << "ProjectModel::saveProject - saveFileName: " << saveFileName;
+
+    // Init Project File Info
+    QFileInfo pfInfo(saveFileName);
+    // Get Project File Absolute Path
+    QString pfaPath = pfInfo.absolutePath();
+
+    // Init Temp Dir
+    QDir tempDir;
+
+    // Try to Make Path
+    if (!QFileInfo::exists(pfaPath) && !tempDir.mkpath(pfaPath)) {
+        qWarning() << "ProjectModel::saveProject - pfaPath: " << pfaPath << " - ERROR CREATING PROJECT PATH!";
+    }
+
+    // Init JSON File
+    QFile jsonFile(saveFileName);
+    // Open File For Reading
+    if (jsonFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        // Init Text Stream
+        QTextStream textStream(&jsonFile);
+        // Init JSON Document
+        QJsonDocument jsonDocument(mProperties);
+        // Write Document To Text Stream
+        textStream << jsonDocument.toJson();
+        // Flush
+        textStream.flush();
+        // Close File
+        jsonFile.close();
+
+        return true;
+    }
+
+    qWarning() << "ProjectModel::saveProject - saveFileName: " << saveFileName << " - ERROR SAVING PROJECT!";
+
+    return false;
 }
 
 //==============================================================================
@@ -143,6 +194,22 @@ void ProjectModel::closeProject(const bool& aSave)
         // Save Project
         saveProject();
     }
+}
+
+//==============================================================================
+// Get Absolute Project File Path
+//==============================================================================
+QString ProjectModel::absoluteProjectFilePath()
+{
+    // Init Absolute Project File Path
+    QString apfPath = "";
+
+    // Set Save File Name
+    apfPath += mProperties[JSON_KEY_PROJECT_DIR].toString() + "/";
+    apfPath += mProperties[JSON_KEY_PROJECT_NAME].toString() + "/";
+    apfPath += (mProperties[JSON_KEY_PROJECT_NAME].toString() + "." + DEFAULT_JSON_SUFFIX);
+
+    return apfPath;
 }
 
 //==============================================================================
@@ -438,7 +505,14 @@ QStringList ProjectModel::pluginPaths()
     // Init Plugin Paths
     QStringList pPaths;
 
-    // ...
+    // Get JSON Array
+    QJsonArray array = mProperties[JSON_KEY_PROJECT_PLUGIN_PATHS].toArray();
+
+    // Iterate Thru JSON Array
+    for (int i=0; i < array.size(); i++) {
+        // Append Item to String List
+        pPaths << array[i].toString();
+    }
 
     return pPaths;
 }
@@ -448,7 +522,21 @@ QStringList ProjectModel::pluginPaths()
 //==============================================================================
 void ProjectModel::addPluginPath(const QString& aPath)
 {
+    // Take JSON Array
+    QJsonArray jsonArray = mProperties.take(JSON_KEY_PROJECT_PLUGIN_PATHS).toArray();
 
+    // Init New JSON Value
+    QJsonValue jsonValue(aPath);
+
+    // Check Import Path
+    if (!jsonArray.contains(jsonValue)) {
+        // Append To JSON Array
+        jsonArray << jsonValue;
+        // Set Plugin Paths
+        mProperties[JSON_KEY_PROJECT_PLUGIN_PATHS] = jsonArray;
+        // Emit Plugin Paths Changed Signal
+        emit pluginPathsChanged(pluginPaths());
+    }
 }
 
 //==============================================================================
@@ -456,7 +544,45 @@ void ProjectModel::addPluginPath(const QString& aPath)
 //==============================================================================
 void ProjectModel::removePluginPath(const int& aIndex)
 {
+    // Take JSON Array
+    QJsonArray jsonArray = mProperties.take(JSON_KEY_PROJECT_PLUGIN_PATHS).toArray();
 
+    // Check Index
+    if (aIndex >= 0 && aIndex < jsonArray.size()) {
+        // Remove Value At Index
+        jsonArray.removeAt(aIndex);
+        // Set Plugin Paths
+        mProperties[JSON_KEY_PROJECT_PLUGIN_PATHS] = jsonArray;
+        // Emit Import Paths Changed Signal
+        emit pluginPathsChanged(importPaths());
+    } else {
+        // Set Plugin Paths
+        mProperties[JSON_KEY_PROJECT_PLUGIN_PATHS] = jsonArray;
+    }
+}
+
+//==============================================================================
+// Get Base Component Model
+//==============================================================================
+BaseComponentsModel* ProjectModel::baseComponentsModel()
+{
+    return mBaseComponents;
+}
+
+//==============================================================================
+// Get Components Model
+//==============================================================================
+ComponentsModel* ProjectModel::componentsModel()
+{
+    return mComponents;
+}
+
+//==============================================================================
+// Get Views Model
+//==============================================================================
+ViewsModel* ProjectModel::viewsModel()
+{
+    return mViews;
 }
 
 //==============================================================================
@@ -464,9 +590,18 @@ void ProjectModel::removePluginPath(const int& aIndex)
 //==============================================================================
 ComponentInfo* ProjectModel::currentComponent()
 {
-    return NULL;
+    return mCurrentComponent;
 }
 
+//==============================================================================
+// Get Component By Name
+//==============================================================================
+ComponentInfo* ProjectModel::getComponentByName(const QString& aName)
+{
+    Q_UNUSED(aName);
+
+    return NULL;
+}
 
 //==============================================================================
 // Destructor
@@ -474,4 +609,21 @@ ComponentInfo* ProjectModel::currentComponent()
 ProjectModel::~ProjectModel()
 {
     closeProject();
+
+    if (mBaseComponents) {
+        delete mBaseComponents;
+        mBaseComponents = NULL;
+    }
+
+    if (mComponents) {
+        delete mComponents;
+        mComponents = NULL;
+    }
+
+    if (mViews) {
+        delete mViews;
+        mViews = NULL;
+    }
+
+    // ...
 }

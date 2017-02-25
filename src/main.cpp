@@ -3,16 +3,17 @@
 #include <QImage>
 #include <QApplication>
 
+#include "designerapplication.h"
 #include "mainwindow.h"
 #include "constants.h"
 
 //==============================================================================
 // Main
 //==============================================================================
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     // Main Application
-    QApplication app(argc, argv);
+    DesignerApplication app(argc, argv);
 
     // Set Application Name
     app.setApplicationName(DEFAULT_APPLICATION_NAME);
@@ -23,8 +24,11 @@ int main(int argc, char *argv[])
 
     // Main Window
     MainWindow w;
+    // Set Main Window
+    app.setMainWindow(&w);
     // Show Main Window
     w.show();
+
     // Exec Main Event Loop
     return app.exec();
 }

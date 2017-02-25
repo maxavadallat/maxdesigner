@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QList>
 #include <QAbstractListModel>
-//#include <QJsonObject>
 
+class ProjectModel;
 class ComponentInfo;
 
 //==============================================================================
@@ -15,10 +15,15 @@ class BaseComponentsModel : public QAbstractListModel
 {
 public:
     // Constructor
-    explicit BaseComponentsModel(QObject* aParent = NULL);
+    explicit BaseComponentsModel(ProjectModel* aProjectModel, QObject* aParent = NULL);
 
     // Set Base Components Dir
     void setBaseComponentsDir(const QString& aDirPath);
+
+    // Add Base Component
+    void addBaseComponent(ComponentInfo* aComponent);
+    // Remove Base Compoennt
+    void removeBaseComponent(ComponentInfo* aComponent, const bool& aDelete = true);
 
     // Destructor
     ~BaseComponentsModel();
@@ -28,6 +33,7 @@ private:
     void init();
     // Clear
     void clear();
+
     // Load Base Components
     void loadBaseComponents();
 
@@ -40,8 +46,16 @@ public: // from QAbstractListModel
     virtual QHash<int,QByteArray> roleNames() const;
 
 private: // Data
+
+    // Item Field Roles
+    enum ItemRoles {
+        ComponentNameRole = Qt::UserRole + 1
+    };
+
+    // Project Model
+    ProjectModel*           mProjectModel;
     // Base Component List
-    QList<ComponentInfo>    mBaseComponentList;
+    QList<ComponentInfo*>   mBaseComponentList;
     // Base Components Dir
     QString                 mBaseComponentsDir;
 };

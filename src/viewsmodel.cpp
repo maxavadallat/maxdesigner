@@ -1,14 +1,19 @@
 #include <QDebug>
 #include <QJsonDocument>
+#include <QDirIterator>
 
-#include "viewslistmodel.h"
+#include "viewsmodel.h"
 #include "componentinfo.h"
+#include "projectmodel.h"
+#include "constants.h"
 
 //==============================================================================
 // Constructor
 //==============================================================================
-ViewsListModel::ViewsListModel(QObject* aParent)
+ViewsModel::ViewsModel(ProjectModel* aProjectModel, QObject* aParent)
     : QAbstractListModel(aParent)
+    , mProjectModel(aProjectModel)
+    , mViewsDir(mProjectModel ? mProjectModel->viewsDir() : "")
 {
     // Init
     init();
@@ -17,47 +22,147 @@ ViewsListModel::ViewsListModel(QObject* aParent)
 //==============================================================================
 // Init
 //==============================================================================
-void ViewsListModel::init()
+void ViewsModel::init()
 {
-    // ...
+    // Load Views
+    loadViews();
 }
 
 //==============================================================================
 // Clear
 //==============================================================================
-void ViewsListModel::clear()
+void ViewsModel::clear()
 {
     // Begin Reset Model
     beginResetModel();
 
-    // Clear File Info List
-    mViewList.clear();
+    // Iterate Through Views List
+    while (mViewsList.count() > 0) {
+        // Delete Item
+        delete mViewsList.takeLast();
+    }
 
     // End Reset Model
     endResetModel();
+}
 
+//==============================================================================
+// Load Views
+//==============================================================================
+void ViewsModel::loadViews()
+{
+    // Check Components Dir
+    if (mViewsDir.isEmpty()) {
+        return;
+    }
+
+    // Init Views Dir Iterator
+    QDirIterator vIterator(mViewsDir, QStringList(DEFAULT_JSON_SUFFIX), QDir::Files | QDir::NoDotAndDotDot);
+
+    // Iterate Through Views Dir
+    while (vIterator.hasNext()) {
+        // Get Next Item
+        vIterator.next();
+        // Get Item Path
+        QString itemPath = vIterator.filePath();
+
+        qDebug() << "ViewsModel::loadViews - itemPath: " << itemPath;
+
+        // Create View Info
+        ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
+        // Add View
+        addView(newComponent);
+    }
+}
+
+//==============================================================================
+// Set Views Dir
+//==============================================================================
+void ViewsModel::setViewsDir(const QString& aDirPath)
+{
+    // Check Views Dir
+    if (mViewsDir != aDirPath) {
+        // Set Views Dir
+        mViewsDir = aDirPath;
+        // Clear
+        clear();
+        // Load Views
+        loadViews();
+    }
+}
+
+//==============================================================================
+// Add View
+//==============================================================================
+void ViewsModel::addView(ComponentInfo* aView)
+{
+    // Check Component
+    if (aView) {
+        // Get Views Count
+        int vCount = mViewsList.count();
+        // Get Index Of View
+        int vIndex = mViewsList.indexOf(aView);
+        // Check View Index
+        if (vIndex < 0) {
+            // Begin Insert Rows
+            beginInsertRows(QModelIndex(), vCount, vCount);
+            // Append Component
+            mViewsList << aView;
+            // End Insert Rows
+            endInsertRows();
+        }
+    }
+}
+
+//==============================================================================
+// Remove View
+//==============================================================================
+void ViewsModel::removeView(ComponentInfo* aView, const bool& aDelete)
+{
+    // Check Component
+    if (aView) {
+        // Get Views Count
+        int vCount = mViewsList.count();
+        // Get Index Of Component
+        int vIndex = mViewsList.indexOf(aView);
+        // Check View Index
+        if (vIndex >= 0 && vIndex < vCount) {
+            // Begin Remove Rows
+            beginRemoveRows(QModelIndex(), vIndex, vIndex);
+            // Check Deletion
+            if (aDelete) {
+                // Delete Item
+                delete mViewsList.takeAt(vIndex);
+            } else {
+                // Remove Item
+                mViewsList.removeAt(vIndex);
+            }
+            // End Remove Rows
+            endRemoveRows();
+        }
+    }
 }
 
 //==============================================================================
 // Row Count
 //==============================================================================
-int ViewsListModel::rowCount(const QModelIndex& ) const
+int ViewsModel::rowCount(const QModelIndex& ) const
 {
-    return mViewList.count();
+    return mViewsList.count();
 }
 
 //==============================================================================
 // Data
 //==============================================================================
-QVariant ViewsListModel::data(const QModelIndex& index, int role) const
+QVariant ViewsModel::data(const QModelIndex& index, int role) const
 {
     // Get Ro
     int row = index.row();
     // Check Row
-    if (row >= 0 && row < mViewList.count()) {
+    if (row >= 0 && row < mViewsList.count()) {
         // Switch Role
         switch (role) {
-
+            case ViewNameRole:  return mViewsList[row]->property(JSON_KEY_COMPONENT_NAME).toString();
         }
     }
 
@@ -67,9 +172,13 @@ QVariant ViewsListModel::data(const QModelIndex& index, int role) const
 //==============================================================================
 // Get Role Names
 //==============================================================================
-QHash<int,QByteArray> ViewsListModel::roleNames() const
+QHash<int,QByteArray> ViewsModel::roleNames() const
 {
+    // Init Role Names
     QHash<int,QByteArray> rNames;
+
+    // Set Role Names
+    rNames[ViewNameRole] = "viewName";
 
     return rNames;
 }
@@ -77,7 +186,7 @@ QHash<int,QByteArray> ViewsListModel::roleNames() const
 //==============================================================================
 // Destructor
 //==============================================================================
-ViewsListModel::~ViewsListModel()
+ViewsModel::~ViewsModel()
 {
     // Clear
     clear();

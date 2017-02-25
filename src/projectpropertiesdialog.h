@@ -11,6 +11,7 @@ class ProjectPropertiesDialog;
 }
 
 class ImportPathsModel;
+class PluginPathsModel;
 
 //==============================================================================
 // New Project Dialog Class
@@ -69,12 +70,25 @@ public:
     // Set Views Directory
     void setViewsDir(const QString& aViewssDir);
 
+    // Set Import Paths
+    void setImportPaths(const QStringList& aImportPaths);
+
     // Add Import Path
     void addImportPath(const QString& aPath);
     // Remove Import Path
     void removeImportPath(const int& aIndex);
     // Clear Import Paths
     void clearImportPaths();
+
+    // Set Plugin Paths
+    void setPluginPaths(const QStringList& aPluginPaths);
+
+    // Add Plugin Path
+    void addPluginPath(const QString& aPath);
+    // Remove Plugin Path
+    void removePluginPath(const int& aIndex);
+    // Clear Plugin Paths
+    void clearPluginPaths();
 
     // Destructor
     ~ProjectPropertiesDialog();
@@ -147,6 +161,15 @@ private slots:
     // On Import Paths List Double Clicked Slot
     void on_importPathsList_doubleClicked(const QModelIndex &index);
 
+    // On Add Plugin Path Button Clicked Slot
+    void on_addPluginDirButton_clicked();
+    // On Remove Plugin Path Button Clicked Slot
+    void on_removePluginDirButton_clicked();
+
+    // On Plugin Paths List Clicked Slot
+    void on_pluginPathsList_clicked(const QModelIndex &index);
+    // On Plugin Paths List Double Clicked Slot
+    void on_pluginPathsList_doubleClicked(const QModelIndex &index);
 
 private: // Data
 
@@ -156,9 +179,13 @@ private: // Data
     SettingsControler*              mSettings;
     // Import Paths Model
     ImportPathsModel*               mImportPathsModel;
+    // Plugin Paths Model
+    PluginPathsModel*               mPluginPathsModel;
 
     // Import Path List Current Index
     int                             mIPLCurrentIndex;
+    // Plugin Paths List Current Index
+    int                             mPPLCurrentIndex;
 
     // New Project
     bool                            mNewProject;
@@ -195,6 +222,8 @@ public:
     // Construcotr
     explicit ImportPathsModel(QWidget* aParent = NULL);
 
+    // Set Import Paths
+    void setImportPaths(const QStringList& aImportPaths);
     // Add Import Path
     void addImportPath(const QString& aPath);
     // Set Import Path
@@ -216,20 +245,74 @@ public: // from QAbstractListModel
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
     // Data
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
-    // Get Role Names
-    virtual QHash<int,QByteArray> roleNames() const;
+//    // Get Role Names
+//    virtual QHash<int,QByteArray> roleNames() const;
 
 private: // Data
 
-    // Roles
-    enum IPMRoles {
-        ImportPathRole = Qt::UserRole + 1
-    };
+//    // Roles
+//    enum IPMRoles {
+//        ImportPathRole = Qt::UserRole + 1
+//    };
 
     // Import Paths
     QStringList     mImportPaths;
 };
 
+
+
+
+
+
+
+
+
+
+//==============================================================================
+// Plugin Paths Model Class
+//==============================================================================
+class PluginPathsModel : public QAbstractListModel
+{
+public:
+    // Construcotr
+    explicit PluginPathsModel(QWidget* aParent = NULL);
+
+    // Set Plugin Paths
+    void setPluginPaths(const QStringList& aPluginPaths);
+    // Add Plugin Path
+    void addPluginPath(const QString& aPath);
+    // Set Plugin Path
+    void setPluginPath(const int& aIndex, const QString& aPath);
+    // Remove Plugin Path
+    void removePluginPath(const int& aIndex);
+    // Clear
+    void clear();
+
+    // Destructor
+    ~PluginPathsModel();
+
+private:
+    // Init
+    void init();
+
+public: // from QAbstractListModel
+    // Row Count
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+    // Data
+    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+//    // Get Role Names
+//    virtual QHash<int,QByteArray> roleNames() const;
+
+private: // Data
+
+//    // Roles
+//    enum IPMRoles {
+//        PluginPathRole = Qt::UserRole + 1
+//    };
+
+    // Plugin Paths
+    QStringList     mPluginPaths;
+};
 
 
 

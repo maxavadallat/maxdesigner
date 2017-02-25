@@ -12,17 +12,18 @@
 #include "projectpropertiesdialog.h"
 
 #include "basecomponentsmodel.h"
-#include "componentslistmodel.h"
-#include "viewslistmodel.h"
+#include "componentsmodel.h"
+#include "viewsmodel.h"
 #include "openfilesmodel.h"
 
 #include "recentprojectsmodel.h"
 
-#include "projectmodel.h"
-
 namespace Ui {
 class MainWindow;
 }
+
+class ProjectModel;
+class ComponentInfo;
 
 //==============================================================================
 // Main Window Class
@@ -31,15 +32,32 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    Q_PROPERTY(ProjectModel* currentProject READ currentProject NOTIFY currentProjectChanged)
+    Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent WRITE setCurrentComponent NOTIFY currentComponentChanged)
+
 public:
     // Constructor
     explicit MainWindow(QWidget* aParent = NULL);
+
+    // Get Current Project
+    ProjectModel* currentProject();
+
+    // Get Current Component
+    ComponentInfo* currentComponent();
+    // Set Current Component
+    void setCurrentComponent(ComponentInfo* aComponent);
 
     // Open Project
     Q_INVOKABLE void openProject(const QString& aFilePath);
 
     // Destructor
     ~MainWindow();
+
+signals:
+    // Current Project Changed Signal
+    void currentProjectChanged(ProjectModel* aProject);
+    // Current Component Changed Signal
+    void currentComponentChanged(ComponentInfo* aCOmponent);
 
 private:
     // Init
@@ -53,6 +71,10 @@ private:
     void launchCreateNewProject();
     // Launch Open Project
     void launchOpenProject();
+    // Launch Save Project As
+    void launchSaveProjectAs();
+    // Launch Project
+    void launchProjectProperties();
 
     // ...
 
@@ -63,6 +85,9 @@ private:
     // Create New View
     void createNewView();
 
+    // Save Project
+    void saveProject(const QString& aFilePath = "");
+
     // ...
 
     // Update Project
@@ -71,6 +96,11 @@ private:
     void updateView();
     // Update Component
     void updateComponent();
+
+    // Close Project
+    void closeProject();
+    // Close View
+    void closeView();
 
     // Add Import Path
     void addImportPath(const QString& aDirPath);
@@ -89,10 +119,21 @@ private slots:
     void on_actionPreferences_triggered();
     // Action Create New Project Triggered Slot
     void on_actionCreateNewProject_triggered();
+    // Action Open Project Triggered Slot
+    void on_actionOpenFileOrProject_triggered();
+    // Action Save Project Triggered Slot
+    void on_actionSaveProject_triggered();
+    // Action Save Project As Triggered Slot
+    void on_actionSaveProjectAs_triggered();
+    // Action Project Properties Triggered Slot
+    void on_actionProjectProperties_triggered();
+    // Action Close Project Triggered Slot
+    void on_actionCloseProject_triggered();
+
+    // ...
+
     // Action Quit Triggered Slot
     void on_actionQuit_triggered();
-
-    void on_actionOpenFileOrProject_triggered();
 
 protected: // from QMainWindow
 
@@ -109,9 +150,9 @@ private:
     // Base Components List Model
     BaseComponentsModel*        mBaseComponents;
     // Components List Model
-    ComponentsListModel*        mComponents;
+    ComponentsModel*            mComponents;
     // Views List Model
-    ViewsListModel*             mViews;
+    ViewsModel*                 mViews;
     // Open Files List Model
     OpenFilesModel*             mOpenfiles;
 
@@ -125,6 +166,9 @@ private:
 
     // Project Model
     ProjectModel*               mProjectModel;
+
+    // Current Component
+    ComponentInfo*              mCurrentComponent;
 };
 
 #endif // MAINWINDOW_H

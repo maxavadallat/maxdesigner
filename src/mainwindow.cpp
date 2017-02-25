@@ -1,3 +1,4 @@
+#include <QApplication>
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QFileInfo>
@@ -6,6 +7,10 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
+#include "projectmodel.h"
+#include "componentinfo.h"
+
 #include "constants.h"
 
 //==============================================================================
@@ -15,9 +20,11 @@ MainWindow::MainWindow(QWidget* aParent)
     : QMainWindow(aParent)
     , ui(new Ui::MainWindow)
     , mSettings(SettingsControler::getInstance())
+
     , mBaseComponents(NULL)
     , mComponents(NULL)
     , mViews(NULL)
+
     , mOpenfiles(NULL)
     , mRecentProjects(NULL)
 
@@ -41,24 +48,6 @@ MainWindow::MainWindow(QWidget* aParent)
 //==============================================================================
 void MainWindow::init()
 {
-    // Check Base Components Model
-    if (!mBaseComponents) {
-        // Create Base Components Model
-        mBaseComponents = new BaseComponentsModel();
-    }
-
-    // Check Components Model
-    if (!mComponents) {
-        // Create Components Model
-        mComponents = new ComponentsListModel();
-    }
-
-    // Check Views Model
-    if (!mViews) {
-        // Create Views Model
-        mViews = new ViewsListModel();
-    }
-
     // Check Open File Model
     if (!mOpenfiles) {
         // Create Open Files Model
@@ -80,12 +69,13 @@ void MainWindow::init()
     // Set Context Properties - Settings
     ctx->setContextProperty(DEFAULT_GLOBAL_SETTINGS_CONTROLLER, mSettings);
 
-    // Set Context Properties - Base Components List Model
-    ctx->setContextProperty(DEFAULT_BASE_COMPONENTS_MODEL_NAME, mBaseComponents);
-    // Set Context Properties - Components List Model
-    ctx->setContextProperty(DEFAULT_COMPONENTS_MODEL_NAME, mComponents);
-    // Set Context Properties - Views List Model
-    ctx->setContextProperty(DEFAULT_VIEWS_MODEL_NAME, mViews);
+//    // Set Context Properties - Base Components List Model
+//    ctx->setContextProperty(DEFAULT_BASE_COMPONENTS_MODEL_NAME, mBaseComponents);
+//    // Set Context Properties - Components List Model
+//    ctx->setContextProperty(DEFAULT_COMPONENTS_MODEL_NAME, mComponents);
+//    // Set Context Properties - Views List Model
+//    ctx->setContextProperty(DEFAULT_VIEWS_MODEL_NAME, mViews);
+
     // Set Context Properties - Open Files List Model
     ctx->setContextProperty(DEFAULT_OPEN_FILES_MODEL_NAME, mOpenfiles);
     // Set Context Properties - Recent Projects List Model
@@ -93,6 +83,17 @@ void MainWindow::init()
 
     // ...
 
+    // Register Project Model
+    qmlRegisterUncreatableType<ProjectModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_PROJECT_MODEL, "");
+    // Register Component Info
+    qmlRegisterUncreatableType<ComponentInfo>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_COMPONENT_INFO, "");
+
+    // Register Base Components Model
+    qmlRegisterUncreatableType<BaseComponentsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_BASECOMPONENTS_MODEL, "");
+    // Register Components Model
+    qmlRegisterUncreatableType<ComponentsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_COMPONENTS_MODEL, "");
+    // Register Views Model
+    qmlRegisterUncreatableType<ViewsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_COMPONENT_INFO, "");
 
     // Get Engine
     //QQmlEngine* engine = ui->mainQuickWidget->engine();
@@ -105,7 +106,6 @@ void MainWindow::init()
 
     // Set Source
     ui->mainQuickWidget->setSource(QUrl(DEFAULT_MAIN_QMLFILE_URL));
-
 
     // ...
 
@@ -125,10 +125,64 @@ void MainWindow::restoreUI()
 }
 
 //==============================================================================
+// Get Current Project
+//==============================================================================
+ProjectModel* MainWindow::currentProject()
+{
+    return mProjectModel;
+}
+
+//==============================================================================
+// Get Current Component
+//==============================================================================
+ComponentInfo* MainWindow::currentComponent()
+{
+    return mCurrentComponent;
+}
+
+//==============================================================================
+// Set Current Component
+//==============================================================================
+void MainWindow::setCurrentComponent(ComponentInfo* aComponent)
+{
+    // Check Current Component
+    if (mCurrentComponent != aComponent) {
+        // Set Current Component
+        mCurrentComponent = aComponent;
+        // Emit Current Component Changed Signal
+        emit currentComponentChanged(mCurrentComponent);
+    }
+}
+
+//==============================================================================
 // Open Project
 //==============================================================================
 void MainWindow::openProject(const QString& aFilePath)
 {
+    // Check Project Model
+    if (!mProjectModel) {
+        // Create Project Model
+        mProjectModel = new ProjectModel();
+    }
+
+    // Load Project
+    if (mProjectModel->loadProject(aFilePath)) {
+        // Store recent Project
+        mRecentProjects->storeRecentProject(aFilePath);
+
+        // Enable Save Project Menu Item
+        ui->actionSaveProject->setEnabled(true);
+        // Enable Save As Project Menu Item
+        ui->actionSaveProjectAs->setEnabled(true);
+        // Enable Project Properties Menu Item
+        ui->actionProjectProperties->setEnabled(true);
+        // Enable Close Project Menu Item
+        ui->actionCloseProject->setEnabled(true);
+
+        // Emit Current Project Changed Signal
+        emit currentProjectChanged(mProjectModel);
+    }
+
     // ...
 }
 
@@ -152,6 +206,8 @@ void MainWindow::launchPreferences()
 //==============================================================================
 void MainWindow::launchCreateNewProject()
 {
+    qDebug() << "MainWindow::launchCreateNewProject";
+
     // Check Project Properties Dialog
     if (!mProjectPropertiesDiaog) {
         // Create Project Properties Dialog
@@ -166,7 +222,8 @@ void MainWindow::launchCreateNewProject()
     // Set Project Name
     mProjectPropertiesDiaog->setProjectName(DEFAULT_PROJECT_NAME);
     // Set Project dir
-    mProjectPropertiesDiaog->setProjectDir(QDir::homePath() + "/" + DEFAULT_PROJECT_NAME);
+    mProjectPropertiesDiaog->setProjectDir(QDir::homePath());
+
     // Set Main QML File
     //mProjectPropertiesDiaog->setMainQMLFile(QDir::homePath() + "/" + newProjectName + "/qml/main.qml");
     // Set QML dir
@@ -204,10 +261,100 @@ void MainWindow::launchOpenProject()
     // Init File Open Dialog
     QFileDialog fileOpenDialog;
 
+    // Set Directory
+    fileOpenDialog.setDirectory(QDir::homePath());
+
     // Exec File Open Dialog
     if (fileOpenDialog.exec()) {
         // Open Project
         openProject(fileOpenDialog.selectedFiles()[0]);
+    }
+
+    // Grab Keyboard Focus
+    grabKeyboard();
+}
+
+//==============================================================================
+// Launch Save Project As
+//==============================================================================
+void MainWindow::launchSaveProjectAs()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    // Release Keyboard Focus
+    releaseKeyboard();
+
+    // Init File Open Dialog
+    QFileDialog fileOpenDialog;
+
+    // Set Directory
+    fileOpenDialog.setDirectory(mProjectModel->projectDir());
+
+    // Exec File Open Dialog
+    if (fileOpenDialog.exec()) {
+        // Save Project
+        saveProject(fileOpenDialog.selectedFiles()[0]);
+    }
+
+    // Grab Keyboard Focus
+    grabKeyboard();
+
+}
+
+//==============================================================================
+// Launch Project
+//==============================================================================
+void MainWindow::launchProjectProperties()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    // Release Keyboard Focus
+    releaseKeyboard();
+
+    // Check Project Properties Dialog
+    if (!mProjectPropertiesDiaog) {
+        // Create Project Properties Dialog
+        mProjectPropertiesDiaog = new ProjectPropertiesDialog();
+    }
+
+    // reset Project Properties
+    mProjectPropertiesDiaog->reset();
+
+    // Set Up Project Properties Dialog
+    mProjectPropertiesDiaog->setNewProject(false);
+
+    // Set Project Name
+    mProjectPropertiesDiaog->setProjectName(mProjectModel->projectName());
+    // Set Project Dir
+    mProjectPropertiesDiaog->setProjectDir(mProjectModel->projectDir());
+    // Set Main QML File
+    mProjectPropertiesDiaog->setMainQMLFile(mProjectModel->mainQMLFile());
+    // Set QML Directory
+    mProjectPropertiesDiaog->setQMLDir(mProjectModel->qmlDir());
+    // Set JS Directory
+    mProjectPropertiesDiaog->setJSDir(mProjectModel->jsDir());
+    // Set Images Directory
+    mProjectPropertiesDiaog->setImagesDir(mProjectModel->imagesDir());
+    // Set Components Directory
+    mProjectPropertiesDiaog->setComponentsDir(mProjectModel->componentsDir());
+    // Set Views Directory
+    mProjectPropertiesDiaog->setViewsDir(mProjectModel->viewsDir());
+
+    // Set Import Paths
+    mProjectPropertiesDiaog->setImportPaths(mProjectModel->importPaths());
+    // Set Plugin Paths
+    mProjectPropertiesDiaog->setPluginPaths(mProjectModel->pluginPaths());
+
+    // Exec Dialog
+    if (mProjectPropertiesDiaog->exec()) {
+        // Set Project Properties
+
     }
 
     // Grab Keyboard Focus
@@ -229,8 +376,20 @@ void MainWindow::createNewProject()
 
     // Set Project Name
     mProjectModel->initProject(mProjectPropertiesDiaog->projectName(), mProjectPropertiesDiaog->projectDir());
+    // Set Base Components Dir
+    mProjectModel->setBaseComponentsDir(mProjectPropertiesDiaog->projectDir() + "/" + DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME);
 
-    mProjectModel->setBaseComponentsDir(mProjectPropertiesDiaog->projectDir() + "/basecomponents");
+    // Enable Save Project Menu Item
+    ui->actionSaveProject->setEnabled(true);
+    // Enable Save As Project Menu Item
+    ui->actionSaveProjectAs->setEnabled(true);
+    // Enable Project Properties Menu Item
+    ui->actionProjectProperties->setEnabled(true);
+    // Enable Close Project Menu Item
+    ui->actionCloseProject->setEnabled(true);
+
+    // Emit Current Project chnged Signal
+    emit currentProjectChanged(mProjectModel);
 }
 
 //==============================================================================
@@ -247,6 +406,23 @@ void MainWindow::createNewComponent()
 void MainWindow::createNewView()
 {
 
+}
+
+//==============================================================================
+// Save Project
+//==============================================================================
+void MainWindow::saveProject(const QString& aFilePath)
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    // Save Project
+    if (mProjectModel->saveProject(aFilePath)) {
+        // Store Recent
+        //mRecentProjects->storeRecentProject();
+    }
 }
 
 // ...
@@ -276,7 +452,47 @@ void MainWindow::updateComponent()
 }
 
 //==============================================================================
-// Add Import Path
+// Close Project
+//==============================================================================
+void MainWindow::closeProject()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    // Save Project
+    mProjectModel->saveProject();
+
+    // Emit Current Project Changed Signal
+    emit currentProjectChanged(NULL);
+
+    // Delete Project Model
+    delete mProjectModel;
+    mProjectModel = NULL;
+
+    // ...
+
+    // Enable Save Project Menu Item
+    ui->actionSaveProject->setEnabled(true);
+    // Enable Save As Project Menu Item
+    ui->actionSaveProjectAs->setEnabled(true);
+    // Enable Project Properties Menu Item
+    ui->actionProjectProperties->setEnabled(true);
+    // Enable Close Project Menu Item
+    ui->actionCloseProject->setEnabled(true);
+}
+
+//==============================================================================
+// Close View
+//==============================================================================
+void MainWindow::closeView()
+{
+
+}
+
+//==============================================================================
+// Add Import Path To Main QML Widget
 //==============================================================================
 void MainWindow::addImportPath(const QString& aDirPath)
 {
@@ -290,7 +506,7 @@ void MainWindow::addImportPath(const QString& aDirPath)
 }
 
 //==============================================================================
-// Remove Import Path
+// Remove Import Path From Main QML Widget
 //==============================================================================
 void MainWindow::removeImportPath(const QString& aDirPath)
 {
@@ -313,7 +529,7 @@ void MainWindow::removeImportPath(const QString& aDirPath)
 }
 
 //==============================================================================
-// Set QML2_IMPORT_PATH
+// Add Plugin Path to Main QML Widget
 //==============================================================================
 void MainWindow::addPluginPath(const QString& aDirPath)
 {
@@ -327,7 +543,7 @@ void MainWindow::addPluginPath(const QString& aDirPath)
 }
 
 //==============================================================================
-// Remove Plugin Path
+// Remove Plugin Path From Mqin QML Widget
 //==============================================================================
 void MainWindow::removePluginPath(const QString& aDirPath)
 {
@@ -385,6 +601,44 @@ void MainWindow::on_actionOpenFileOrProject_triggered()
 }
 
 //==============================================================================
+// Action Save Project Triggered Slot
+//==============================================================================
+void MainWindow::on_actionSaveProject_triggered()
+{
+    // Save Project
+    saveProject();
+}
+
+//==============================================================================
+// Action Save Project As Triggered Slot
+//==============================================================================
+void MainWindow::on_actionSaveProjectAs_triggered()
+{
+    // Launch Save Project As
+    launchSaveProjectAs();
+}
+
+//==============================================================================
+// Action Project Properties Triggered Slot
+//==============================================================================
+void MainWindow::on_actionProjectProperties_triggered()
+{
+    // Launch Project Properties
+    launchProjectProperties();
+}
+
+//==============================================================================
+// Action Close Project Triggered Slot
+//==============================================================================
+void MainWindow::on_actionCloseProject_triggered()
+{
+    // Close Project
+    closeProject();
+}
+
+// ...
+
+//==============================================================================
 // Action Quit Triggered Slot
 //==============================================================================
 void MainWindow::on_actionQuit_triggered()
@@ -433,20 +687,6 @@ MainWindow::~MainWindow()
     // Release Settings
     mSettings->release();
 
-    if (mBaseComponents) {
-        delete mBaseComponents;
-        mBaseComponents = NULL;
-    }
-
-    if (mComponents) {
-        delete mComponents;
-        mComponents = NULL;
-    }
-
-    if (mViews) {
-        delete mViews;
-        mViews = NULL;
-    }
 
     if (mOpenfiles) {
         delete mOpenfiles;
@@ -479,8 +719,6 @@ MainWindow::~MainWindow()
 
     // ...
 }
-
-
 
 
 

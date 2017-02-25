@@ -54,6 +54,7 @@ Column {
     Item {
         width: 256
         height: 8
+        visible: rpListView.count > 0
     }
 
     DText {
@@ -61,30 +62,36 @@ Column {
         anchors.horizontalCenter: parent.horizontalCenter
         text: "Recent Projects"
         //font.pixelSize: STYLE.fontSizeXL
+        visible: rpListView.count > 0
     }
 
     // Recent Project List
-
     ListView {
         id: rpListView
         width: 512
-        //height:
+        height: Math.min(contentHeight, delegateHeight * 5)
+
+        property int delegateHeight: STYLE.fontSizeL
 
         anchors.horizontalCenter: parent.horizontalCenter
-        //model: recentProjectsModel
+        model: recentProjectsModel
 
         delegate: DMouseArea {
             id: delegateRoot
             width: rpListView.width
+            height: rpListView.delegateHeight
+
             DText {
                 width: parent.width
+                anchors.verticalCenter: parent.verticalCenter
                 elide: Text.ElideMiddle
                 text: filePath
                 color: delegateRoot.pressed && delegateRoot.containsMouse ? STYLE.colorBorder : STYLE.colorFontDark
             }
 
             onClicked: {
-                //mainController.
+                // Open Project
+                mainController.openProject(filePath);
             }
         }
     }

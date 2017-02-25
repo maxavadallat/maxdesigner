@@ -1,31 +1,42 @@
-#ifndef COMPONENTSLISTMODEL_H
-#define COMPONENTSLISTMODEL_H
+#ifndef VIEWSLISTMODEL_H
+#define VIEWSLISTMODEL_H
 
 #include <QObject>
-#include <QAbstractListModel>
 #include <QList>
+#include <QAbstractListModel>
 //#include <QJsonObject>
 
-
+class ProjectModel;
 class ComponentInfo;
 
 //==============================================================================
-// Components List Model
+// View List Model
 //==============================================================================
-class ComponentsListModel : public QAbstractListModel
+class ViewsModel : public QAbstractListModel
 {
 public:
     // Constructor
-    explicit ComponentsListModel(QObject* aParent = NULL);
+    explicit ViewsModel(ProjectModel* aProjectModel, QObject* aParent = NULL);
+
+    // Set Views Dir
+    void setViewsDir(const QString& aDirPath);
+
+    // Add View
+    void addView(ComponentInfo* aView);
+    // Remove View
+    void removeView(ComponentInfo* aView, const bool& aDelete = true);
 
     // Destructor
-    ~ComponentsListModel();
+    ~ViewsModel();
 
 private:
     // Init
     void init();
     // Clear
     void clear();
+
+    // Load Views
+    void loadViews();
 
 public: // from QAbstractListModel
     // Row Count
@@ -37,12 +48,18 @@ public: // from QAbstractListModel
 
 private: // Data
 
-    // Component List
-    QList<ComponentInfo>    mComponentList;
+    // Item Field Roles
+    enum ItemRoles {
+        ViewNameRole = Qt::UserRole + 1
+    };
+
+    // Project Model
+    ProjectModel*           mProjectModel;
+    // View List
+    QList<ComponentInfo*>   mViewsList;
+    // Views Dir
+    QString                 mViewsDir;
 };
-
-
-
 
 
 
@@ -53,13 +70,13 @@ private: // Data
 
 /*
 //==============================================================================
-// Component Info Class
+// View Info Class
 //==============================================================================
-class ComponentInfo : public QObject
+class ViewInfo : public QObject
 {
 public:
     // Constructor
-    explicit ComponentInfo(const QString& aName, QObject* aParent = NULL);
+    explicit ViewInfo(const QString& aName, QObject* aParent = NULL);
 
     // Get Component Name
     QString name();
@@ -68,7 +85,7 @@ public:
     void save();
 
     // Destructor
-    ~ComponentInfo();
+    ~ViewInfo();
 
 private:
 
@@ -83,4 +100,4 @@ private: // Data
 };
 */
 
-#endif // COMPONENTSLISTMODEL_H
+#endif // VIEWSLISTMODEL_H

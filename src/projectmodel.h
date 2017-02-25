@@ -8,6 +8,9 @@
 #include <QJsonObject>
 
 class ComponentInfo;
+class BaseComponentsModel;
+class ComponentsModel;
+class ViewsModel;
 
 //==============================================================================
 // Project Model
@@ -27,20 +30,29 @@ class ProjectModel : public QObject
     Q_PROPERTY(QString viewsDir READ viewsDir WRITE setViewsDir NOTIFY viewsDirChanged)
     Q_PROPERTY(QStringList importPaths READ importPaths NOTIFY importPathsChanged)
     Q_PROPERTY(QStringList pluginPaths READ pluginPaths NOTIFY pluginPathsChanged)
+
+    Q_PROPERTY(BaseComponentsModel* baseComponentsModel READ baseComponentsModel NOTIFY baseComponentsModelChanged)
+    Q_PROPERTY(ComponentsModel* componentsModel READ componentsModel NOTIFY componentsModelChanged)
+    Q_PROPERTY(ViewsModel* viewsModel READ viewsModel NOTIFY viewsModelChanged)
+
     Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent NOTIFY currentComponentChanged)
 
 public:
+
     // Constructor
     explicit ProjectModel(QObject* aParent = NULL);
 
     // Init New Project
     void initProject(const QString& aName, const QString& aDir);
     // Load Project
-    void loadProject(const QString& aFileName);
+    bool loadProject(const QString& aFileName);
     // Save Project
-    void saveProject(const QString& aFileName = "");
+    bool saveProject(const QString& aFileName = "");
     // Close Project
     void closeProject(const bool& aSave = true);
+
+    // Get Absolute Project File Path
+    QString absoluteProjectFilePath();
 
     // Get Project Name
     QString projectName();
@@ -101,8 +113,18 @@ public:
     // Remove Plugin Path
     void removePluginPath(const int& aIndex);
 
+    // Get Base Component Model
+    BaseComponentsModel* baseComponentsModel();
+    // Get Components Model
+    ComponentsModel* componentsModel();
+    // Get Views Model
+    ViewsModel* viewsModel();
+
     // Get Current Component
     ComponentInfo* currentComponent();
+
+    // Get Component By Name
+    ComponentInfo* getComponentByName(const QString& aName);
 
     // Destructor
     ~ProjectModel();
@@ -130,6 +152,14 @@ signals:
     void importPathsChanged(const QStringList& aImportPaths);
     // Plugin Paths Changed Signal
     void pluginPathsChanged(const QStringList& aPluginPaths);
+
+    // Base Components Model Changed Signal
+    void baseComponentsModelChanged();
+    // Components Model Changed Signal
+    void componentsModelChanged();
+    // Views Model Changed Signal
+    void viewsModelChanged();
+
     // Current Component Changed Signal
     void currentComponentChanged(ComponentInfo* aComponent);
 
@@ -144,23 +174,24 @@ private:
     // Save QML Project
     void saveQMLProject();
 
-    // Create Base Components
+    // Create/register Base Components
     void createBaseComponents();
 
 private: // Data
 
     // Project File Name
-    QString         mName;
+    QString                 mName;
     // Project Properties
-    QJsonObject     mProperties;
+    QJsonObject             mProperties;
 
     // Base Components
-
+    BaseComponentsModel*    mBaseComponents;
     // Components
-
+    ComponentsModel*        mComponents;
     // Views
-
+    ViewsModel*             mViews;
     // Current Compoennt
+    ComponentInfo*          mCurrentComponent;
 };
 
 #endif // PROJECTMODEL_H
