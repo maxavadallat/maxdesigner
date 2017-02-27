@@ -74,8 +74,19 @@ void ComponentInfo::clear()
 //==============================================================================
 // Load
 //==============================================================================
-void ComponentInfo::load()
+void ComponentInfo::load(const QString& aFilePath)
 {
+    // Check File Path
+    if (aFilePath.isEmpty()) {
+        // Check Project
+        if (!mProject) {
+            return;
+        }
+    } else {
+        // Set Info Path
+        mInfoPath = aFilePath;
+    }
+
     // Init Component Info File
     QFile ciFile(mInfoPath);
 
@@ -85,20 +96,8 @@ void ComponentInfo::load()
         QString ciFileContent = ciFile.readAll();
         // Close File
         ciFile.close();
-        // Init Component Info Document
-        QJsonDocument ciDocument = QJsonDocument::fromJson(ciFileContent.toUtf8());
-        // Init JSON Object
-        QJsonObject ciObject = ciDocument.object();
-
-        // Set Component Name
-        setComponentName(ciObject[JSON_KEY_COMPONENT_NAME].toString());
-        // Set Component Type
-        setComponentType(ciObject[JSON_KEY_COMPONENT_TYPE].toString());
-        // Set Component Base Name
-        setComponentBase(ciObject[JSON_KEY_COMPONENT_BASE].toString());
-
-        // ...
-
+        // From JSON
+        fromJSON(ciFileContent.toUtf8());
     } else {
         qWarning() << "ComponentInfo::load - mInfoPath: " << mInfoPath << " - ERROR LOADING COMPONENT INFO!";
     }
@@ -107,32 +106,17 @@ void ComponentInfo::load()
 //==============================================================================
 // Save
 //==============================================================================
-void ComponentInfo::save()
+void ComponentInfo::save(const QString& aFilePath)
 {
     // Init Component Info File
-    QFile ciFile(mInfoPath);
+    QFile ciFile(aFilePath.isEmpty() ? mInfoPath : aFilePath);
 
     // Open File
     if (ciFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         // Init Text Stream
         QTextStream textStream(&ciFile);
-
-        // Init JSON Object
-        QJsonObject ciObject;
-
-        // Set Component Name
-        ciObject[JSON_KEY_COMPONENT_NAME] = QJsonValue(mName);
-        // Set Component Type
-        ciObject[JSON_KEY_COMPONENT_TYPE] = QJsonValue(mType);
-        // Set Component Base Name
-        ciObject[JSON_KEY_COMPONENT_BASE] = QJsonValue(mBaseName);
-
-        // ...
-
-        // Init JSON Document
-        QJsonDocument ciDocument(ciObject);
         // Write To Text Stream
-        textStream << ciDocument.toJson();
+        textStream << toJSON();
         // Flush Text Stream
         textStream.flush();
         // Close File
@@ -239,6 +223,69 @@ void ComponentInfo::exportToQML(const QString& aFilePath)
     Q_UNUSED(aFilePath);
 
     // ...
+}
+
+//==============================================================================
+// Get JSON Content/Sting
+//==============================================================================
+QByteArray ComponentInfo::toJSON()
+{
+    // Init JSON Object
+    QJsonObject ciObject;
+
+    // Set Component Name
+    ciObject[JSON_KEY_COMPONENT_NAME] = QJsonValue(mName);
+    // Set Component Type
+    ciObject[JSON_KEY_COMPONENT_TYPE] = QJsonValue(mType);
+    // Set Component Base Name
+    ciObject[JSON_KEY_COMPONENT_BASE] = QJsonValue(mBaseName);
+
+    // ...
+
+    // Save Own Properties
+
+    // Save Properties
+
+    // Save Parent
+
+    // Save Children
+
+    // Init JSON Document
+    QJsonDocument ciDocument(ciObject);
+
+    return ciDocument.toJson();
+}
+
+//==============================================================================
+// Set Up Component From JSON Content/String
+//==============================================================================
+void ComponentInfo::fromJSON(const QByteArray& aContent)
+{
+    // Init Component Info Document
+    QJsonDocument ciDocument = QJsonDocument::fromJson(aContent);
+    // Init JSON Object
+    QJsonObject ciObject = ciDocument.object();
+
+    // Set Component Name
+    setComponentName(ciObject[JSON_KEY_COMPONENT_NAME].toString());
+    // Set Component Type
+    setComponentType(ciObject[JSON_KEY_COMPONENT_TYPE].toString());
+    // Set Component Base Name
+    setComponentBase(ciObject[JSON_KEY_COMPONENT_BASE].toString());
+
+    // ...
+
+    // Set Own Properties
+
+    // Set Properties
+
+    // Set Base
+    mBase = mProject->getComponentByName(mBaseName);
+
+    // Set Parent
+
+    // Set Children
+
 }
 
 //==============================================================================

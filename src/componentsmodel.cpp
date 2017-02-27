@@ -144,6 +144,46 @@ void ComponentsModel::removeComponent(ComponentInfo* aComponent, const bool& aDe
 }
 
 //==============================================================================
+// Get Component Index By Name
+//==============================================================================
+int ComponentsModel::getComponentIndex(const QString& aName)
+{
+    // Get Components Count
+    int cCount = mComponentList.count();
+    // Iterate Through Components
+    for (int i=0; i<cCount; i++) {
+        // Get Component Info
+        ComponentInfo* component = mComponentList[i];
+        // Check Component Name
+        if (component->componentName() == aName) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+//==============================================================================
+// Get Component By Name
+//==============================================================================
+ComponentInfo* ComponentsModel::getComponent(const QString& aName)
+{
+    // Get Components Count
+    int cCount = mComponentList.count();
+    // Iterate Through Components
+    for (int i=0; i<cCount; i++) {
+        // Get Component Info
+        ComponentInfo* component = mComponentList[i];
+        // Check Component Name
+        if (component->componentName() == aName) {
+            return component;
+        }
+    }
+
+    return NULL;
+}
+
+//==============================================================================
 // Row Count
 //==============================================================================
 int ComponentsModel::rowCount(const QModelIndex& ) const
@@ -163,11 +203,12 @@ QVariant ComponentsModel::data(const QModelIndex& index, int role) const
     if (row >= 0 && row < mComponentList.count()) {
         // Switch Role
         switch (role) {
+            case Qt::UserRole:
             case ComponentNameRole: return mComponentList[row]->property(JSON_KEY_COMPONENT_NAME).toString();
         }
     }
 
-    return "";
+    return QVariant();
 }
 
 //==============================================================================

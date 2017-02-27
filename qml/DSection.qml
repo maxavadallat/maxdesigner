@@ -21,6 +21,7 @@ Item {
 
     readonly property string stateOpen: "open"
     readonly property string stateClosed: "closed"
+    readonly property string stateHidden: "hidden"
 
     clip: true
 
@@ -32,6 +33,11 @@ Item {
     function close() {
         // Set State
         sectionRoot.state = sectionRoot.stateClosed;
+    }
+
+    function hide() {
+        // Set State
+        sectionRoot.state = sectionRoot.stateHidden;
     }
 
     DMouseArea {
@@ -80,12 +86,6 @@ Item {
         }
     }
 
-//    Rectangle {
-//        anchors.fill: parent
-//        color: "transparent"
-//        border.color: "orange"
-//    }
-
     // Content
     DFlickable {
         id: contentFlickable
@@ -99,6 +99,12 @@ Item {
 
     states: [
         State {
+            name: sectionRoot.stateHidden
+            PropertyChanges { target: sectionRoot; height: 0 }
+            PropertyChanges { target: sectionRoot; opacity: 0.0 }
+        },
+
+        State {
             name: sectionRoot.stateClosed
             PropertyChanges { target: sectionRoot; height: STYLE.headerHeight }
         },
@@ -111,10 +117,18 @@ Item {
 
     transitions: [
         Transition {
+            to: sectionRoot.stateHidden
+
+            SequentialAnimation {
+                DAnimation { target: sectionRoot; properties: "height, opacity" }
+            }
+        },
+
+        Transition {
             to: sectionRoot.stateClosed
 
             SequentialAnimation {
-                DAnimation { target: sectionRoot; properties: "height" }
+                DAnimation { target: sectionRoot; properties: "height, opacity" }
             }
         },
 
@@ -122,7 +136,7 @@ Item {
             to: sectionRoot.stateOpen
 
             SequentialAnimation {
-                DAnimation { target: sectionRoot; properties: "height" }
+                DAnimation { target: sectionRoot; properties: "height, opacity" }
             }
         }
     ]

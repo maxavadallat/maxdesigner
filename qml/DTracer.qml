@@ -2,9 +2,13 @@ import QtQuick 2.0
 
 import "Style.js" as STYLE
 
-Rectangle {
+Loader {
     anchors.fill: parent
-    color: "transparent"
-    border.color: STYLE.colorTrace
-    visible: settingsController.tracerVisible
+    asynchronous: true
+    active: settingsController.tracerVisible
+    sourceComponent: Rectangle {
+        anchors.fill: parent
+        color: "transparent"
+        border.color: STYLE.colorTrace
+    }
 }

@@ -14,6 +14,9 @@ class QMLGenerator : public QObject
     Q_OBJECT
 
 public:
+    // Create/Update QML
+    static void updateQML(const QString& aQMLPath, ComponentInfo* aComponent);
+
     // Constructor
     explicit QMLGenerator(QObject* aParent = NULL);
 

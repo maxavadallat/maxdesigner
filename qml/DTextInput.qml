@@ -24,8 +24,8 @@ DControl {
     signal keyEvent(var event)
 
     // Set Editor Focus
-    function setEditorFocus(focus) {
-        textInput.focus = focus;
+    function setEditorFocus(aFocus) {
+        textInput.focus = aFocus;
     }
 
     DEditorBackground {

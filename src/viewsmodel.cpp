@@ -144,6 +144,46 @@ void ViewsModel::removeView(ComponentInfo* aView, const bool& aDelete)
 }
 
 //==============================================================================
+// Get Views Index By Name
+//==============================================================================
+int ViewsModel::getViewIndex(const QString& aName)
+{
+    // Get Viewss Count
+    int cCount = mViewsList.count();
+    // Iterate Through Viewss
+    for (int i=0; i<cCount; i++) {
+        // Get Views Info
+        ComponentInfo* component = mViewsList[i];
+        // Check Views Name
+        if (component->componentName() == aName) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+//==============================================================================
+// Get Views By Name
+//==============================================================================
+ComponentInfo* ViewsModel::getView(const QString& aName)
+{
+    // Get Viewss Count
+    int cCount = mViewsList.count();
+    // Iterate Through Viewss
+    for (int i=0; i<cCount; i++) {
+        // Get Views Info
+        ComponentInfo* component = mViewsList[i];
+        // Check Views Name
+        if (component->componentName() == aName) {
+            return component;
+        }
+    }
+
+    return NULL;
+}
+
+//==============================================================================
 // Row Count
 //==============================================================================
 int ViewsModel::rowCount(const QModelIndex& ) const
@@ -162,11 +202,12 @@ QVariant ViewsModel::data(const QModelIndex& index, int role) const
     if (row >= 0 && row < mViewsList.count()) {
         // Switch Role
         switch (role) {
+            case Qt::UserRole:
             case ViewNameRole:  return mViewsList[row]->property(JSON_KEY_COMPONENT_NAME).toString();
         }
     }
 
-    return "";
+    return QVariant();
 }
 
 //==============================================================================

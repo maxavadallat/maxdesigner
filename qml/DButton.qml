@@ -6,14 +6,16 @@ import "Constants.js" as CONSTS
 DButtonBase {
     id: buttonRoot
 
-    property string defaultBgColor: "transparent"
+    property string bgColor: "transparent"
+    property string highlightColor: STYLE.colorHighLight
+    property string selectedColor: STYLE.colorSelected
     property alias radius: buttonBg.radius
     property alias pixelSize: buttonText.font.pixelSize
 
     Rectangle {
         id: buttonBg
         anchors.fill: parent
-        color: highlight ? STYLE.colorHighLight : checked ? STYLE.colorSelected : buttonRoot.defaultBgColor
+        color: highlight ? buttonRoot.highlightColor : checked ? buttonRoot.selectedColor : buttonRoot.bgColor
         border.color: highlight ? STYLE.colorBorder : STYLE.colorFontDark
         radius: STYLE.defaultRadius
     }

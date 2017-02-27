@@ -249,6 +249,19 @@ void ProjectPropertiesDialog::setViewsDir(const QString& aViewssDir)
 }
 
 //==============================================================================
+// Get Import Paths
+//==============================================================================
+QStringList ProjectPropertiesDialog::importPaths()
+{
+    // Check Import Paths Model
+    if (mImportPathsModel) {
+
+    }
+
+    return QStringList();
+}
+
+//==============================================================================
 // Set Import Paths
 //==============================================================================
 void ProjectPropertiesDialog::setImportPaths(const QStringList& aImportPaths)
@@ -299,6 +312,19 @@ void ProjectPropertiesDialog::clearImportPaths()
 
     // Reset Import Path List Current Index
     mIPLCurrentIndex = -1;
+}
+
+//==============================================================================
+// Get Plugin PAths
+//==============================================================================
+QStringList ProjectPropertiesDialog::pluginPaths()
+{
+    // Check Plugin Paths Model
+    if (mPluginPathsModel) {
+
+    }
+
+    return QStringList();
 }
 
 //==============================================================================
@@ -418,16 +444,26 @@ void ProjectPropertiesDialog::on_addImportDirButton_clicked()
     // Init File Dialog
     QFileDialog aipDialog(NULL, "Add Import Path");
 
-    qDebug() << "ProjectPropertiesDialog::on_addImportDirButton_clicked - qmlDir: " << ui->qmlDirEdit->text();
+    // Get QML Dir Temp
+    QString qmlDirTemp = qmlDir();
+
+    // Check If Dir Exists
+    if (!QFile::exists(qmlDirTemp)) {
+        // Set QML Dir Temp
+        qmlDirTemp = QDir::homePath();
+    }
+
+    qDebug() << "ProjectPropertiesDialog::on_addImportDirButton_clicked - qmlDir: " << qmlDirTemp;
 
     // Set File Mode
     aipDialog.setFileMode(QFileDialog::DirectoryOnly);
     // Set Directory
-    aipDialog.setDirectory(ui->qmlDirEdit->text());
+    aipDialog.setDirectory(qmlDirTemp);
 
     // Exec Dialog
-    if (aipDialog.exec()) {
-        // ...
+    if (aipDialog.exec() && mImportPathsModel) {
+        // Add Import Path
+        mImportPathsModel->addImportPath(aipDialog.selectedFiles()[0]);
     }
 }
 
@@ -436,7 +472,13 @@ void ProjectPropertiesDialog::on_addImportDirButton_clicked()
 //==============================================================================
 void ProjectPropertiesDialog::on_removeImportDirButton_clicked()
 {
-    // ...
+    // Check Current Index
+    if (mImportPathsModel && mIPLCurrentIndex >= 0 && mIPLCurrentIndex < mImportPathsModel->rowCount()) {
+        // Remove Import Path
+        mImportPathsModel->removeImportPath(mIPLCurrentIndex);
+        // Adjust Current Index
+        mIPLCurrentIndex = qMin(mIPLCurrentIndex, mImportPathsModel->rowCount() - 1);
+    }
 }
 
 //==============================================================================
@@ -633,16 +675,26 @@ void ProjectPropertiesDialog::on_addPluginDirButton_clicked()
     // Init File Dialog
     QFileDialog aupDialog(NULL, "Add Plugin Path");
 
-    qDebug() << "ProjectPropertiesDialog::on_addPluginDirButton_clicked - qmlDir: " << ui->qmlDirEdit->text();
+    // Get QML Dir Temp
+    QString qmlDirTemp = qmlDir();
+
+    // Check If Dir Exists
+    if (!QFile::exists(qmlDirTemp)) {
+        // Set QML Dir Temp
+        qmlDirTemp = QDir::homePath();
+    }
+
+    qDebug() << "ProjectPropertiesDialog::on_addPluginDirButton_clicked - qmlDir: " << qmlDirTemp;
 
     // Set File Mode
     aupDialog.setFileMode(QFileDialog::DirectoryOnly);
     // Set Directory
-    aupDialog.setDirectory(ui->qmlDirEdit->text());
+    aupDialog.setDirectory(qmlDirTemp);
 
     // Exec Dialog
-    if (aupDialog.exec()) {
-        // ...
+    if (aupDialog.exec() && mPluginPathsModel) {
+        // Add Import Path
+        mPluginPathsModel->addPluginPath(aupDialog.selectedFiles()[0]);
     }
 }
 
@@ -651,6 +703,13 @@ void ProjectPropertiesDialog::on_addPluginDirButton_clicked()
 //==============================================================================
 void ProjectPropertiesDialog::on_removePluginDirButton_clicked()
 {
+    // Check Current Index
+    if (mPluginPathsModel && mPPLCurrentIndex >= 0 && mPPLCurrentIndex < mPluginPathsModel->rowCount()) {
+        // Remove Plugin Path
+        mPluginPathsModel->removePluginPath(mPPLCurrentIndex);
+        // Adjust Current Index
+        mPPLCurrentIndex = qMin(mPPLCurrentIndex, mPluginPathsModel->rowCount() - 1);
+    }
 }
 
 //==============================================================================
@@ -743,6 +802,14 @@ void ImportPathsModel::init()
 }
 
 //==============================================================================
+// Get Import Paths
+//==============================================================================
+QStringList ImportPathsModel::importPaths()
+{
+    return mImportPaths;
+}
+
+//==============================================================================
 // Set Import Paths
 //==============================================================================
 void ImportPathsModel::setImportPaths(const QStringList& aImportPaths)
@@ -760,6 +827,8 @@ void ImportPathsModel::setImportPaths(const QStringList& aImportPaths)
 //==============================================================================
 void ImportPathsModel::addImportPath(const QString& aPath)
 {
+    qDebug() << "ImportPathsModel::addImportPath - aPath: " << aPath;
+
     // Check Path
     if (mImportPaths.indexOf(aPath) == -1) {
         // Iterate Through Import Paths
@@ -829,6 +898,14 @@ void ImportPathsModel::clear()
 }
 
 //==============================================================================
+// Column Count
+//==============================================================================
+int ImportPathsModel::columnCount(const QModelIndex& ) const
+{
+    return 1;
+}
+
+//==============================================================================
 // Row Count
 //==============================================================================
 int ImportPathsModel::rowCount(const QModelIndex& ) const
@@ -841,6 +918,11 @@ int ImportPathsModel::rowCount(const QModelIndex& ) const
 //==============================================================================
 QVariant ImportPathsModel::data(const QModelIndex& index, int role) const
 {
+    // Check Index
+    if (!index.isValid()) {
+        return "";
+    }
+
     // Get Row
     int ipmRow = index.row();
 
@@ -848,12 +930,12 @@ QVariant ImportPathsModel::data(const QModelIndex& index, int role) const
     if (ipmRow >= 0 && ipmRow < mImportPaths.count()) {
         // Switch Role
         switch (role) {
+            //case Qt::UserRole:
             case Qt::DisplayRole:   return mImportPaths[ipmRow];
-//            case ImportPathRole:
         }
     }
 
-    return "";
+    return QVariant();
 }
 
 //==============================================================================
@@ -916,6 +998,14 @@ PluginPathsModel::PluginPathsModel(QWidget* aParent)
 void PluginPathsModel::init()
 {
     // ...
+}
+
+//==============================================================================
+// Get Plugin Paths
+//==============================================================================
+QStringList PluginPathsModel::pluginPaths()
+{
+    return mPluginPaths;
 }
 
 //==============================================================================
@@ -1005,6 +1095,14 @@ void PluginPathsModel::clear()
 }
 
 //==============================================================================
+// Column Count
+//==============================================================================
+int PluginPathsModel::columnCount(const QModelIndex& ) const
+{
+    return 1;
+}
+
+//==============================================================================
 // Row Count
 //==============================================================================
 int PluginPathsModel::rowCount(const QModelIndex& ) const
@@ -1018,18 +1116,18 @@ int PluginPathsModel::rowCount(const QModelIndex& ) const
 QVariant PluginPathsModel::data(const QModelIndex& index, int role) const
 {
     // Get Row
-    int ipmRow = index.row();
+    int ppmRow = index.row();
 
     // Check Row
-    if (ipmRow >= 0 && ipmRow < mPluginPaths.count()) {
+    if (ppmRow >= 0 && ppmRow < mPluginPaths.count()) {
         // Switch Role
         switch (role) {
-            case Qt::DisplayRole:   return mPluginPaths[ipmRow];
+            case Qt::DisplayRole:   return mPluginPaths[ppmRow];
 //            case PluginPathRole:
         }
     }
 
-    return "";
+    return QVariant();
 }
 
 //==============================================================================

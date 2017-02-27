@@ -18,7 +18,6 @@ SOURCES             += src/main.cpp \
                     src/confirmdialog.cpp \
                     src/infodialog.cpp \
                     src/projectpropertiesdialog.cpp \
-                    src/componentpropertiesdialog.cpp \
                     src/qmlprojectparser.cpp \
                     src/qmleditorwindow.cpp \
                     src/basecomponentsmodel.cpp \
@@ -31,7 +30,10 @@ SOURCES             += src/main.cpp \
                     src/recentprojectsmodel.cpp \
                     src/projectitemmodel.cpp \
                     src/componentsmodel.cpp \
-                    src/viewsmodel.cpp
+                    src/viewsmodel.cpp \
+                    src/createcomponentdialog.cpp \
+                    src/createviewdialog.cpp \
+                    src/minimizedcomponents.cpp
 
 # Headers
 HEADERS             += src/mainwindow.h \
@@ -45,7 +47,6 @@ HEADERS             += src/mainwindow.h \
                     src/confirmdialog.h \
                     src/infodialog.h \
                     src/projectpropertiesdialog.h \
-                    src/componentpropertiesdialog.h \
                     src/qmlprojectparser.h \
                     src/qmleditorwindow.h \
                     src/basecomponentsmodel.h \
@@ -58,7 +59,10 @@ HEADERS             += src/mainwindow.h \
                     src/recentprojectsmodel.h \
                     src/projectitemmodel.h \
                     src/componentsmodel.h \
-                    src/viewsmodel.h
+                    src/viewsmodel.h \
+                    src/createcomponentdialog.h \
+                    src/createviewdialog.h \
+                    src/minimizedcomponents.h
 
 # Forms
 FORMS               += ui/mainwindow.ui \
@@ -68,7 +72,8 @@ FORMS               += ui/mainwindow.ui \
                     ui/infodialog.ui \
                     ui/qmleditorwindow.ui \
                     ui/projectpropertiesdialog.ui \
-                    ui/componentpropertiesdialog.ui
+                    ui/createcomponentdialog.ui \
+                    ui/createviewdialog.ui
 
 # Resources
 RESOURCES           += maxdesigner.qrc

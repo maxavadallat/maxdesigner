@@ -1,7 +1,5 @@
 import QtQuick 2.0
 import QtGraphicalEffects 1.0
-import QtQuick.Controls 1.4
-import QtQuick.Controls.Styles 1.4
 
 import "Style.js" as STYLE
 
@@ -16,30 +14,32 @@ DControl {
     property int angle: 0
     property int step: 5
 
+    opacity: running ? 1.0 : 0.0
+
 //    smooth: true
 //    antialiasing: true
 
-//    Rectangle {
-//        id: activityIndicatorBase
-//        anchors.fill: parent
-//        radius: width * 0.5
-//        visible: false
-//    }
+    onRunningChanged: {
+        if (activityIndicatorRoot.running) {
+            activityIndicatorRoot.angle = 0;
+        }
+    }
 
     Canvas {
         id: activityIndicatorBase
-        anchors.fill: parent
+        anchors.centerIn: parent
 
-        property real radius: Math.min(width, height) * 0.5 - STYLE.activityIndicatorLineWidth
+        width: Math.min(activityIndicatorRoot.width, activityIndicatorRoot.height)
+        height: Math.min(activityIndicatorRoot.width, activityIndicatorRoot.height)
+
+        property real radius: width * 0.5 - STYLE.activityIndicatorLineWidth
         property int centreX: width * 0.5
         property int centreY: height * 0.5
 
         visible: false
 
-        //visible: false
         onPaint: {
             var ctx = getContext("2d");
-
 
             ctx.beginPath();
 
@@ -54,7 +54,7 @@ DControl {
 
     ConicalGradient {
         id: activityIndicatorGradient
-        anchors.fill: parent
+        anchors.fill: activityIndicatorBase
         source: activityIndicatorBase
         angle: activityIndicatorRoot.angle
         visible: false
@@ -81,14 +81,6 @@ DControl {
                 // Reset Angle
                 activityIndicatorRoot.angle = 0;
             }
-
-            // Request Paint
-            //activityIndicatorCanvas.requestPaint();
         }
     }
-
-//    BusyIndicator {
-//        id: busyIndicator
-//        anchors.fill: parent
-//    }
 }

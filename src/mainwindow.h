@@ -10,6 +10,7 @@
 #include "aboutdialog.h"
 
 #include "projectpropertiesdialog.h"
+#include "createcomponentdialog.h"
 
 #include "basecomponentsmodel.h"
 #include "componentsmodel.h"
@@ -75,32 +76,39 @@ private:
     void launchSaveProjectAs();
     // Launch Project
     void launchProjectProperties();
+    // Launch Define Base Component
+    void launchDefineBaseComponent();
+    // Launch Create Component
+    void launchCreateComponent();
+    // Launch Create View
+    void launchCreateView();
 
     // ...
 
     // Create New Project
     void createNewProject();
     // Create New Component
-    void createNewComponent();
-    // Create New View
-    void createNewView();
+    void createNewComponent(const QString& aName, const QString& aType = "");
 
     // Save Project
     void saveProject(const QString& aFilePath = "");
+    // Save Component
+    void saveComponent(const QString& aFilePath = "");
 
     // ...
 
     // Update Project
     void updateProject();
-    // Update View
-    void updateView();
     // Update Component
     void updateComponent();
 
     // Close Project
     void closeProject();
-    // Close View
-    void closeView();
+    // Close Component
+    void closeComponent();
+
+    // Remove Component By Name
+    void removeComponent(const QString& aName);
 
     // Add Import Path
     void addImportPath(const QString& aDirPath);
@@ -129,6 +137,16 @@ private slots:
     void on_actionProjectProperties_triggered();
     // Action Close Project Triggered Slot
     void on_actionCloseProject_triggered();
+    // Action Define Base Component Triggered Slot
+    void on_actionDefineBaseComponent_triggered();
+    // Action Create Component Triggered Slot
+    void on_actionCreateComponent_triggered();
+    // Action Create View Triggered Slot
+    void on_actionCreateView_triggered();
+    // Action Remove Component Triggered Slot
+    void on_actionRemoveComponent_triggered();
+    // Action Remove View Triggered Slot
+    void on_actionRemoveView_triggered();
 
     // ...
 
@@ -163,6 +181,8 @@ private:
     PreferencesDialog*          mPreferencesDialog;
     // Project Properties Dialog
     ProjectPropertiesDialog*    mProjectPropertiesDiaog;
+    // Define Base Component Dialog
+    DefineBaseComponentDialog*  mDefineBaseComponentDialog;
 
     // Project Model
     ProjectModel*               mProjectModel;

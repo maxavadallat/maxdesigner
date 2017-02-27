@@ -19,7 +19,7 @@ MouseArea {
     drag.minimumY: 0
     drag.maximumY: height
 
-    drag.threshold: 0
+    drag.threshold: 10
 
     drag.filterChildren: true
 

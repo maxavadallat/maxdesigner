@@ -10,6 +10,11 @@ DPane {
 
     title: "Project"
 
+    minWidth: 300
+    minHeight: 200
+
+    state: stateShown
+
     DSection {
         width: projectPaneRoot.contentWidth
         title: "Base Components"

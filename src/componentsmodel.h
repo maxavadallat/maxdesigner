@@ -26,6 +26,11 @@ public:
     // Remove Compoennt
     void removeComponent(ComponentInfo* aComponent, const bool& aDelete = true);
 
+    // Get Component Index By Name
+    int getComponentIndex(const QString& aName);
+    // Get Component By Name
+    ComponentInfo* getComponent(const QString& aName);
+
     // Destructor
     ~ComponentsModel();
 

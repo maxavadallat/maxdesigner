@@ -105,6 +105,8 @@ public:
     void addImportPath(const QString& aPath);
     // Remove Import Path
     void removeImportPath(const int& aIndex);
+    // Set Import Paths
+    void setImportPaths(const QStringList& aImportPaths);
 
     // Get Plugin Paths
     QStringList pluginPaths();
@@ -112,6 +114,8 @@ public:
     void addPluginPath(const QString& aPath);
     // Remove Plugin Path
     void removePluginPath(const int& aIndex);
+    // Set Plugin Paths
+    void setPluginPaths(const QStringList& aPluginPaths);
 
     // Get Base Component Model
     BaseComponentsModel* baseComponentsModel();
@@ -150,8 +154,16 @@ signals:
     void viewsDirChanged(const QString& aViewsDir);
     // Import Paths Changed Signal
     void importPathsChanged(const QStringList& aImportPaths);
+    // Import Path Added
+    void importPathAdded(const QString& aImportPath);
+    // Import Path Removed
+    void importPathRemoved(const QString& aImportPath);
     // Plugin Paths Changed Signal
     void pluginPathsChanged(const QStringList& aPluginPaths);
+    // Plugin Path Added
+    void pluginPathAdded(const QString& aPluginPath);
+    // Plugin Path Removed
+    void pluginPathRemoved(const QString& aPluginPath);
 
     // Base Components Model Changed Signal
     void baseComponentsModelChanged();

@@ -8,6 +8,7 @@
 #include <QString>
 
 class ProjectModel;
+class MainWindow;
 
 //==============================================================================
 // Component Info Class
@@ -53,7 +54,7 @@ public:
 
     // Add Own Propery
     void addProperty(const QString& aName, const QVariant& aValue);
-    // Remove Property
+    // Remove Own Property
     void removeProperty(const QString& aName);
 
     // Get Property
@@ -69,6 +70,12 @@ public:
     // Export To QML
     void exportToQML(const QString& aFilePath);
 
+    // Get JSON Content/Sting
+    QByteArray toJSON();
+
+    // Set Up Component From JSON Content/String
+    void fromJSON(const QByteArray& aContent);
+
     // Destructor
     ~ComponentInfo();
 
@@ -80,15 +87,18 @@ signals:
     // Component Base Name Changed
     void componentBaseChanged(const QString& aBaseName);
 
-private:
+protected:
+    friend class ProjectModel;
+    friend class MainWindow;
+
     // Init
     void init();
     // Clear
     void clear();
     // Load
-    void load();
+    void load(const QString& aFilePath = "");
     // Save
-    void save();
+    void save(const QString& aFilePath = "");
 
 private: // Data
     // Project Model
@@ -112,6 +122,7 @@ private: // Data
 
     // Base Component Info
     ComponentInfo*          mBase;
+
     // Parent Component Info
     ComponentInfo*          mParent;
     // Children

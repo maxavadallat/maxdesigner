@@ -70,6 +70,8 @@ public:
     // Set Views Directory
     void setViewsDir(const QString& aViewssDir);
 
+    // Get Import Paths
+    QStringList importPaths();
     // Set Import Paths
     void setImportPaths(const QStringList& aImportPaths);
 
@@ -80,6 +82,8 @@ public:
     // Clear Import Paths
     void clearImportPaths();
 
+    // Get Plugin PAths
+    QStringList pluginPaths();
     // Set Plugin Paths
     void setPluginPaths(const QStringList& aPluginPaths);
 
@@ -222,6 +226,8 @@ public:
     // Construcotr
     explicit ImportPathsModel(QWidget* aParent = NULL);
 
+    // Get Import Paths
+    QStringList importPaths();
     // Set Import Paths
     void setImportPaths(const QStringList& aImportPaths);
     // Add Import Path
@@ -241,6 +247,8 @@ private:
     void init();
 
 public: // from QAbstractListModel
+    // Column Count
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
     // Row Count
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
     // Data
@@ -277,6 +285,8 @@ public:
     // Construcotr
     explicit PluginPathsModel(QWidget* aParent = NULL);
 
+    // Get Plugin Paths
+    QStringList pluginPaths();
     // Set Plugin Paths
     void setPluginPaths(const QStringList& aPluginPaths);
     // Add Plugin Path
@@ -296,6 +306,8 @@ private:
     void init();
 
 public: // from QAbstractListModel
+    // Column Count
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
     // Row Count
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
     // Data

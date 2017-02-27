@@ -1,5 +1,7 @@
 import QtQuick 2.0
 
+import enginecomponents 0.1
+
 import "Style.js" as STYLE
 import "Constants.js" as CONSTS
 
@@ -10,6 +12,11 @@ DPane {
     height: 500
 
     title: "Properties"
+
+    minWidth: 300
+    minHeight: 200
+
+    state: stateShown
 
     Row {
         spacing: 2
@@ -118,16 +125,86 @@ DPane {
     }
 
     DSection {
+        width: propertiesPaneRoot.contentWidth
+        title: "Transitions"
+    }
+
+    DSection {
         id: itemSection
         width: propertiesPaneRoot.contentWidth
         title: "Item"
 
+        state: stateOpen
 
+        DButton {
+            //onClicked: checked = !checked;
+            //enabled: propertiesPaneRoot.parent.enabled
+            enabled: parent.enabled
+        }
+
+        DButton {
+            //onClicked: checked = !checked;
+            checked: true
+            enabled: parent.enabled
+        }
+
+        DCheckBox {
+            text: "CheckBox"
+            onClicked: checked = !checked;
+            enabled: parent.enabled
+        }
+
+        DCheckBox {
+            rightAligned: true
+            text: "CheckBox"
+            onClicked: checked = !checked;
+            enabled: parent.enabled
+        }
 
         DSwitch {
-            width: itemSection.width
-            text: "visible"
+            text: "Switch"
+            onClicked: checked = !checked;
+            enabled: parent.enabled
         }
+
+        DSwitch {
+            rightAligned: true
+            text: "Switch"
+            onClicked: checked = !checked;
+            enabled: parent.enabled
+        }
+
+        DRadioButtonGroup {
+            model: [
+                DRadioButtonGroupItem { title: "Item 1" },
+                DRadioButtonGroupItem { title: "Item 2" },
+                DRadioButtonGroupItem { title: "Item 3" },
+                DRadioButtonGroupItem { title: "Item 4" }
+            ]
+
+            onButtonSelected: {
+                //console.log("onButtonSelected - buttonIndex: " + buttonIndex);
+                // Set Current Index
+                currentIndex = buttonIndex;
+            }
+        }
+
+        DRadioButtonGroup {
+            rightAligned: true
+            model: [
+                DRadioButtonGroupItem { title: "Item 1" },
+                DRadioButtonGroupItem { title: "Item 2" },
+                DRadioButtonGroupItem { title: "Item 3" },
+                DRadioButtonGroupItem { title: "Item 4" }
+            ]
+
+            onButtonSelected: {
+                //console.log("onButtonSelected - buttonIndex: " + buttonIndex);
+                // Set Current Index
+                currentIndex = buttonIndex;
+            }
+        }
+
     }
 
 

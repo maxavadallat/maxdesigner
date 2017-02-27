@@ -5,7 +5,16 @@
 
 #include "qmlgenerator.h"
 #include "componentinfo.h"
+#include "projectmodel.h"
 #include "constants.h"
+
+//==============================================================================
+// Create/Update QML
+//==============================================================================
+void QMLGenerator::updateQML(const QString& aQMLPath, ComponentInfo* aComponent)
+{
+    // ...
+}
 
 //==============================================================================
 // Constructor

@@ -144,6 +144,46 @@ void BaseComponentsModel::removeBaseComponent(ComponentInfo* aComponent, const b
 }
 
 //==============================================================================
+// Get Component Index By Name
+//==============================================================================
+int BaseComponentsModel::getComponentIndex(const QString& aName)
+{
+    // Get Components Count
+    int cCount = mBaseComponentList.count();
+    // Iterate Through Components
+    for (int i=0; i<cCount; i++) {
+        // Get Component Info
+        ComponentInfo* component = mBaseComponentList[i];
+        // Check Component Name
+        if (component->componentName() == aName) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+//==============================================================================
+// Get Component By Name
+//==============================================================================
+ComponentInfo* BaseComponentsModel::getComponent(const QString& aName)
+{
+    // Get Components Count
+    int cCount = mBaseComponentList.count();
+    // Iterate Through Components
+    for (int i=0; i<cCount; i++) {
+        // Get Component Info
+        ComponentInfo* component = mBaseComponentList[i];
+        // Check Component Name
+        if (component->componentName() == aName) {
+            return component;
+        }
+    }
+
+    return NULL;
+}
+
+//==============================================================================
 // Row Count
 //==============================================================================
 int BaseComponentsModel::rowCount(const QModelIndex& ) const
@@ -162,11 +202,12 @@ QVariant BaseComponentsModel::data(const QModelIndex& index, int role) const
     if (row >= 0 && row < mBaseComponentList.count()) {
         // Switch Role
         switch (role) {
+            case Qt::UserRole:
             case ComponentNameRole: return mBaseComponentList[row]->property(JSON_KEY_COMPONENT_NAME).toString();
         }
     }
 
-    return "";
+    return QVariant();
 }
 
 //==============================================================================

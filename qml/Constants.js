@@ -16,3 +16,12 @@ var defaultButtonHeight                         = 32;
 
 // Default Button Group Width
 var defaultButtonGroupWidth                     = 128;
+
+
+// Minimized Components Row Height
+var minimizedComponentsHeight                   = 32;
+
+// Component Item Width & Height
+var componentItemWidth                          = 128;
+var componentItemHeight                         = 64;
+

@@ -26,6 +26,11 @@ public:
     // Remove View
     void removeView(ComponentInfo* aView, const bool& aDelete = true);
 
+    // Get View Index By Name
+    int getViewIndex(const QString& aName);
+    // Get View By Name
+    ComponentInfo* getView(const QString& aName);
+
     // Destructor
     ~ViewsModel();
 

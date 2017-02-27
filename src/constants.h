@@ -12,36 +12,40 @@
 
 // Main Window QML Widget Custom Components Import URI
 #define DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS       "enginecomponents"
+
 // Custom Component Name - Project Model
 #define DEFAULT_MAIN_QML_COMPONENTS_PROJECT_MODEL           "ProjectModel"
 // Custom Component Name - Base Components Model
 #define DEFAULT_MAIN_QML_COMPONENTS_BASECOMPONENTS_MODEL    "BaseComponentsModel"
 // Custom Component Name - Components Model
 #define DEFAULT_MAIN_QML_COMPONENTS_COMPONENTS_MODEL        "ComponentsModel"
+// Custom Compoents Name - Views List Model
+#define DEFAULT_MAIN_QML_COMPONENTS_VIEWS_MODEL             "ViewsModel"
+
 // Custom Component Name - Component Info
 #define DEFAULT_MAIN_QML_COMPONENTS_COMPONENT_INFO          "ComponentInfo"
+
+
 
 // Main Controller Name
 #define DEFAULT_MAIN_CONTROLLER_NAME                        "mainController"
 // Settings Controller Name
 #define DEFAULT_GLOBAL_SETTINGS_CONTROLLER                  "settingsController"
-// Base Components List Model Name
-#define DEFAULT_BASE_COMPONENTS_MODEL_NAME                  "baseComponentsModel"
+
+// Base Components Model
+#define MODEL_NAME_BASE_COMPONENTS                          "baseComponentsModel"
+// Components Model
+#define MODEL_NAME_COMPONENTS                               "componentsModel"
+// Views Model
+#define MODEL_NAME_VIEWS                                    "viewsModel"
 // Project Tree Item Model Name
-#define DEFAULT_PROJECT_TREE_MODEL_NAME                     "projectTreeModel"
-// Components List Model Name
-#define DEFAULT_COMPONENTS_MODEL_NAME                       "componentsModel"
-// Views List Model Name
-#define DEFAULT_VIEWS_MODEL_NAME                            "viewsModel"
+#define MODEL_NAME_PROJECT_TREE                             "projectTreeModel"
 // Open Files List Model Name
-#define DEFAULT_OPEN_FILES_MODEL_NAME                       "openFilesModel"
-
+#define MODEL_NAME_OPEN_FILES                               "openFilesModel"
+// Open Files List Model Name
+#define MODEL_NAME_MINIMIZED_COMPONENTS                     "minimizedCompoenntsModel"
 // Open Project Model Name
-#define DEFAULT_OPEN_RECENT_PROJECTS_MODEL_NAME             "recentProjectsModel"
-
-// Current/Open Project Model Name
-#define DEFAULT_OPEN_PROJECT_MODEL_NAME                     "projectModel"
-
+#define MODEL_NAME_RECENT_PROJECTS                          "recentProjectsModel"
 
 // JSON File Extensions
 #define DEFAULT_JSON_SUFFIX                                 "json"
@@ -85,6 +89,7 @@
 #define JSON_KEY_COMPONENT_BASE                             "componentBase"
 #define JSON_KEY_COMPONENT_OWN_PROPERTIES                   "componentOwnProperties"
 #define JSON_KEY_COMPONENT_PROPERTIES                       "componentProperties"
+#define JSON_KEY_COMPONENT_SOURCE                           "componentSource"
 #define JSON_KEY_COMPONENT_PARENT                           "componentParent"
 #define JSON_KEY_COMPONENT_CHILDREN                         "componentChildren"
 

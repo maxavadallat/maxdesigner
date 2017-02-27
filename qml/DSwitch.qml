@@ -43,13 +43,32 @@ DButtonBase {
 
     DRectangle {
         id: buttonSwitch
-        x: !switchRoot.checked ? buttonBG.x + 2 : buttonBG.x + buttonBG.width - width - 2
-        Behavior on x { DAnimation { } }
         width: buttonBG.height - 4
         height: width
         anchors.verticalCenter: buttonBG.verticalCenter
         radius: height / 2
         //border.color: switchRoot.highlight ? STYLE.colorBorder : STYLE.colorFontDark
         border.color: STYLE.colorFontDark
+
+        states: [
+            State {
+                name: "off"
+                when: !switchRoot.checked
+                PropertyChanges { target: buttonSwitch; x: buttonBG.x + 2 }
+            },
+
+            State {
+                name: "on"
+                when: switchRoot.checked
+                PropertyChanges { target: buttonSwitch; x: buttonBG.x + buttonBG.width - buttonSwitch.width - 2 }
+            }
+        ]
+
+        transitions: [
+            Transition {
+                DAnimation { target: buttonSwitch; property: "x" }
+            }
+
+        ]
     }
 }

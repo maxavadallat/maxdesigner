@@ -83,9 +83,12 @@ void ProjectModel::initProject(const QString& aName, const QString& aDir)
 {
     // Check Name
     if (!aName.isEmpty() && !aDir.isEmpty()) {
-
         // Set Project Name
+        setProjectName(aName);
+        // Set Project Dir
+        setProjectDir(aDir);
 
+        // ...
     }
 }
 
@@ -498,6 +501,14 @@ void ProjectModel::removeImportPath(const int& aIndex)
 }
 
 //==============================================================================
+// Set Import Paths
+//==============================================================================
+void ProjectModel::setImportPaths(const QStringList& aImportPaths)
+{
+
+}
+
+//==============================================================================
 // Get Plugin Paths
 //==============================================================================
 QStringList ProjectModel::pluginPaths()
@@ -559,6 +570,14 @@ void ProjectModel::removePluginPath(const int& aIndex)
         // Set Plugin Paths
         mProperties[JSON_KEY_PROJECT_PLUGIN_PATHS] = jsonArray;
     }
+}
+
+//==============================================================================
+// Set Plugin Paths
+//==============================================================================
+void ProjectModel::setPluginPaths(const QStringList& aPluginPaths)
+{
+
 }
 
 //==============================================================================

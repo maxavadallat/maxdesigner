@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget* aParent)
 
     , mPreferencesDialog(NULL)
     , mProjectPropertiesDiaog(NULL)
+    , mDefineBaseComponentDialog(NULL)
 
     , mProjectModel(NULL)
 {
@@ -77,9 +78,9 @@ void MainWindow::init()
 //    ctx->setContextProperty(DEFAULT_VIEWS_MODEL_NAME, mViews);
 
     // Set Context Properties - Open Files List Model
-    ctx->setContextProperty(DEFAULT_OPEN_FILES_MODEL_NAME, mOpenfiles);
+    ctx->setContextProperty(MODEL_NAME_OPEN_FILES, mOpenfiles);
     // Set Context Properties - Recent Projects List Model
-    ctx->setContextProperty(DEFAULT_OPEN_RECENT_PROJECTS_MODEL_NAME, mRecentProjects);
+    ctx->setContextProperty(MODEL_NAME_RECENT_PROJECTS, mRecentProjects);
 
     // ...
 
@@ -121,7 +122,9 @@ void MainWindow::init()
 void MainWindow::restoreUI()
 {
     // Grab Keyboard Focus
-    grabKeyboard();
+    //grabKeyboard();
+
+    //installEventFilter();
 }
 
 //==============================================================================
@@ -238,7 +241,7 @@ void MainWindow::launchCreateNewProject()
     //mProjectPropertiesDiaog->setViewsDir(QDir::homePath() + "/" + newProjectName + "/views");
 
     // Release Keyboard Focus
-    releaseKeyboard();
+    //releaseKeyboard();
 
     // Exec Dialog
     if (mProjectPropertiesDiaog->exec()) {
@@ -247,7 +250,7 @@ void MainWindow::launchCreateNewProject()
     }
 
     // Grab Keyboard Focus
-    grabKeyboard();
+    //grabKeyboard();
 }
 
 //==============================================================================
@@ -256,7 +259,7 @@ void MainWindow::launchCreateNewProject()
 void MainWindow::launchOpenProject()
 {
     // Release Keyboard Focus
-    releaseKeyboard();
+    //releaseKeyboard();
 
     // Init File Open Dialog
     QFileDialog fileOpenDialog;
@@ -271,7 +274,7 @@ void MainWindow::launchOpenProject()
     }
 
     // Grab Keyboard Focus
-    grabKeyboard();
+    //grabKeyboard();
 }
 
 //==============================================================================
@@ -285,7 +288,7 @@ void MainWindow::launchSaveProjectAs()
     }
 
     // Release Keyboard Focus
-    releaseKeyboard();
+    //releaseKeyboard();
 
     // Init File Open Dialog
     QFileDialog fileOpenDialog;
@@ -300,7 +303,7 @@ void MainWindow::launchSaveProjectAs()
     }
 
     // Grab Keyboard Focus
-    grabKeyboard();
+    //grabKeyboard();
 
 }
 
@@ -315,7 +318,7 @@ void MainWindow::launchProjectProperties()
     }
 
     // Release Keyboard Focus
-    releaseKeyboard();
+    //releaseKeyboard();
 
     // Check Project Properties Dialog
     if (!mProjectPropertiesDiaog) {
@@ -358,7 +361,74 @@ void MainWindow::launchProjectProperties()
     }
 
     // Grab Keyboard Focus
-    grabKeyboard();
+    //grabKeyboard();
+}
+
+//==============================================================================
+// Launch Define Base Component
+//==============================================================================
+void MainWindow::launchDefineBaseComponent()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    // Release Keyboard Focus
+    //releaseKeyboard();
+
+    // Check Define Base Component Dialog
+    if (!mDefineBaseComponentDialog) {
+        // Create Define Base Component Dialog
+        mDefineBaseComponentDialog = new DefineBaseComponentDialog();
+    }
+
+    // Exec Dialog
+    if (mDefineBaseComponentDialog->exec()) {
+        // Create Base Component
+
+    }
+
+    // Grab Keyboard Focus
+    //grabKeyboard();
+}
+
+//==============================================================================
+// Launch Create Component
+//==============================================================================
+void MainWindow::launchCreateComponent()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    // Release Keyboard Focus
+    //releaseKeyboard();
+
+    // ...
+
+    // Grab Keyboard Focus
+    //grabKeyboard();
+}
+
+//==============================================================================
+// Launch Create View
+//==============================================================================
+void MainWindow::launchCreateView()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    // Release Keyboard Focus
+    //releaseKeyboard();
+
+    // ...
+
+    // Grab Keyboard Focus
+    //grabKeyboard();
 }
 
 //==============================================================================
@@ -379,6 +449,26 @@ void MainWindow::createNewProject()
     // Set Base Components Dir
     mProjectModel->setBaseComponentsDir(mProjectPropertiesDiaog->projectDir() + "/" + DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME);
 
+    // Set Main QML File
+    mProjectModel->setMainQMLFile(mProjectPropertiesDiaog->mainQMLFile());
+    // Set QML Dir
+    mProjectModel->setQmlDir(mProjectPropertiesDiaog->qmlDir());
+    // Set JS Dir
+    mProjectModel->setJsDir(mProjectPropertiesDiaog->jsDir());
+    // Set Images Dir
+    mProjectModel->setImagesDir(mProjectPropertiesDiaog->imagesDir());
+    // Set Components Dir
+    mProjectModel->setComponentsDir(mProjectPropertiesDiaog->componentsDir());
+    // Set Views Dir
+    mProjectModel->setViewsDir(mProjectPropertiesDiaog->viewsDir());
+
+    // Set Import Paths
+    mProjectModel->setImportPaths(mProjectPropertiesDiaog->importPaths());
+    // Set Plugin Paths
+    mProjectModel->setPluginPaths(mProjectPropertiesDiaog->pluginPaths());
+
+    // ...
+
     // Enable Save Project Menu Item
     ui->actionSaveProject->setEnabled(true);
     // Enable Save As Project Menu Item
@@ -387,6 +477,8 @@ void MainWindow::createNewProject()
     ui->actionProjectProperties->setEnabled(true);
     // Enable Close Project Menu Item
     ui->actionCloseProject->setEnabled(true);
+    // Enable Define Base Components Menu
+    ui->actionDefineBaseComponent->setEnabled(true);
 
     // Emit Current Project chnged Signal
     emit currentProjectChanged(mProjectModel);
@@ -395,17 +487,29 @@ void MainWindow::createNewProject()
 //==============================================================================
 // Create New Component
 //==============================================================================
-void MainWindow::createNewComponent()
+void MainWindow::createNewComponent(const QString& aName, const QString& aType)
 {
+    // Check Name
+    if (!aName.isEmpty()) {
+        // Check Type
+        if (aType == COMPONENT_TYPE_BASECOMPONENT) {
 
-}
+            // ...
 
-//==============================================================================
-// Create New View
-//==============================================================================
-void MainWindow::createNewView()
-{
+        } else if (aType == COMPONENT_TYPE_COMPONENT) {
 
+            // ...
+
+        } else if (aType == COMPONENT_TYPE_VIEW) {
+
+            // ...
+
+        } else {
+            qWarning() << "MainWindow::createNewComponent - UNSUPPORTED COMPONENT TYPE!";
+        }
+    } else {
+        qWarning() << "MainWindow::createNewComponent - EMPTY COMPONENT NAME!";
+    }
 }
 
 //==============================================================================
@@ -421,8 +525,27 @@ void MainWindow::saveProject(const QString& aFilePath)
     // Save Project
     if (mProjectModel->saveProject(aFilePath)) {
         // Store Recent
-        //mRecentProjects->storeRecentProject();
+        mRecentProjects->storeRecentProject(mProjectModel->absoluteProjectFilePath());
     }
+}
+
+//==============================================================================
+// Save Current Component
+//==============================================================================
+void MainWindow::saveComponent(const QString& aFilePath)
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    // Check Current Component
+    if (!mCurrentComponent) {
+        return;
+    }
+
+    // Save Current Component
+    mCurrentComponent->save(aFilePath);
 }
 
 // ...
@@ -432,14 +555,10 @@ void MainWindow::saveProject(const QString& aFilePath)
 //==============================================================================
 void MainWindow::updateProject()
 {
-
-}
-
-//==============================================================================
-// Update View
-//==============================================================================
-void MainWindow::updateView()
-{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
 
 }
 
@@ -448,6 +567,10 @@ void MainWindow::updateView()
 //==============================================================================
 void MainWindow::updateComponent()
 {
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
 
 }
 
@@ -481,14 +604,34 @@ void MainWindow::closeProject()
     ui->actionProjectProperties->setEnabled(true);
     // Enable Close Project Menu Item
     ui->actionCloseProject->setEnabled(true);
+    // Enable Define Base Components Menu
+    ui->actionDefineBaseComponent->setEnabled(true);
+
+    // ...
 }
 
 //==============================================================================
 // Close View
 //==============================================================================
-void MainWindow::closeView()
+void MainWindow::closeComponent()
 {
+    // ...
+}
 
+//==============================================================================
+// Remove Component By Name
+//==============================================================================
+void MainWindow::removeComponent(const QString& aName)
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    // Check Name
+    if (!aName.isEmpty()) {
+        // ...
+    }
 }
 
 //==============================================================================
@@ -636,6 +779,57 @@ void MainWindow::on_actionCloseProject_triggered()
     closeProject();
 }
 
+//==============================================================================
+// Action Define Base Component Triggered Slot
+//==============================================================================
+void MainWindow::on_actionDefineBaseComponent_triggered()
+{
+    // Launch Create Base Component
+    launchDefineBaseComponent();
+}
+
+//==============================================================================
+// Action Create Component Triggered Slot
+//==============================================================================
+void MainWindow::on_actionCreateComponent_triggered()
+{
+    // Launch Create New Component
+    launchCreateComponent();
+}
+
+//==============================================================================
+// Action Create View Triggered Slot
+//==============================================================================
+void MainWindow::on_actionCreateView_triggered()
+{
+    // Launch Create New View
+    launchCreateView();
+}
+
+//==============================================================================
+// Action Remove Component Triggered Slot
+//==============================================================================
+void MainWindow::on_actionRemoveComponent_triggered()
+{
+    // Check Current Component
+    if (mCurrentComponent) {
+        // Remove Component
+        removeComponent(mCurrentComponent->componentName());
+    }
+}
+
+//==============================================================================
+// Action Remove View Triggered Slot
+//==============================================================================
+void MainWindow::on_actionRemoveView_triggered()
+{
+    // Check Current Component
+    if (mCurrentComponent) {
+        // Remove Component
+        removeComponent(mCurrentComponent->componentName());
+    }
+}
+
 // ...
 
 //==============================================================================
@@ -710,6 +904,11 @@ MainWindow::~MainWindow()
         mProjectPropertiesDiaog = NULL;
     }
 
+    if (mDefineBaseComponentDialog) {
+        delete mDefineBaseComponentDialog;
+        mDefineBaseComponentDialog = NULL;
+    }
+
     // ...
 
     if (mProjectModel) {
@@ -719,6 +918,5 @@ MainWindow::~MainWindow()
 
     // ...
 }
-
 
 

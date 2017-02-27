@@ -37,10 +37,4 @@ Item {
         viewContentSize: contentContainerFlickable.contentHeight
         viewContentPos: contentContainerFlickable.contentY
     }
-
-//    Rectangle {
-//        anchors.fill: parent
-//        color: "transparent"
-//        border.color: "purple"
-//    }
 }

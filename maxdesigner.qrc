@@ -42,5 +42,11 @@
         <file>qml/DSizeIndicator.qml</file>
         <file>qml/DWelcome.qml</file>
         <file>qml/DActivityIndicator.qml</file>
+        <file>qml/DPropertyItem.qml</file>
+        <file>qml/DSwipeGesture.qml</file>
+        <file>qml/DMinimizedComponents.qml</file>
+        <file>qml/DComponentRootContainer.qml</file>
+        <file>qml/DPaneBase.qml</file>
+        <file>qml/DComponentItem.qml</file>
     </qresource>
 </RCC>

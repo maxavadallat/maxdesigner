@@ -38,6 +38,16 @@ var colorViewBG2                                    = "#11FFFFFF";
 // Default Selection Highlight Color
 var colorSelectedHighLight                          = "#22FFFFFF";
 
+// Default Colors For Accept/OK
+var colorOK                                         = "#77007700";
+var colorOKHighLight                                = "#AA00AA00";
+var colorOKSelected                                 = "#7700AA00";
+
+// Default Colors for Decline/Cancel
+var colorCancel                                     = "#77770000";
+var colorCancelHighLight                            = "#AAAA0000";
+var colorCancelSelected                             = "#77AA0000";
+
 // Default Radius
 var defaultRadius                                   = 4;
 // Default Margin
@@ -133,5 +143,8 @@ var activityIndicatorHeight                         = 56;
 var activityIndicatorLineWidth                      = 8;
 // Default Activity Indicator Interval
 var activityIndicatorInterval                       = 32;
+
+
+
 
 // ...

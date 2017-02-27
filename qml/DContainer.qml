@@ -30,18 +30,19 @@ DMouseArea {
     //property alias borderColor: containerBG.border.color
 
     property alias clipContent: contentContainer.clip
-
     property alias enableContent: contentContainer.enabled
 
+    property bool mainDrag: true
+
     onPressed: {
-        if (parent.setDragTarget !== undefined) {
+        if (containerRoot.mainDrag && parent.setDragTarget !== undefined) {
             // Set Drag Target - ASSUMING Parent is MainGrabArea
             parent.setDragTarget(containerRoot);
         }
     }
 
     onReleased: {
-        if (parent.clearDragTarget !== undefined) {
+        if (containerRoot.mainDrag && parent.clearDragTarget !== undefined) {
             // Clear Drag Target - ASSUMING Parent is MainGrabArea
             parent.clearDragTarget();
         }
