@@ -33,6 +33,8 @@ MainWindow::MainWindow(QWidget* aParent)
     , mDefineBaseComponentDialog(NULL)
 
     , mProjectModel(NULL)
+    , mCurrentComponent(NULL)
+    , mScreenShotMode(false)
 {
     // Setup UI
     ui->setupUi(this);
@@ -128,6 +130,46 @@ void MainWindow::restoreUI()
 }
 
 //==============================================================================
+// Take Screen Shot
+//==============================================================================
+void MainWindow::takeScreenShot()
+{
+    // Check Current Project & Current Component
+    if (mProjectModel && mCurrentComponent && mCurrentComponent->componentType() == COMPONENT_TYPE_VIEW) {
+        qDebug() << "MainWindow::takeScreenShot";
+
+        // Set Screen Shot Mode
+        setScreenShotMode(true);
+
+        // Grab Fram Buffer
+        QImage ssImage = ui->mainQuickWidget->grabFramebuffer();
+
+        // Reset Screen Shot Mode
+        setScreenShotMode(false);
+
+
+
+        // ...
+
+
+    }
+}
+
+//==============================================================================
+// Set Screen Shot Mode
+//==============================================================================
+void MainWindow::setScreenShotMode(const bool& aScreenShotMode)
+{
+    // Check Screen Shot Mode
+    if (mScreenShotMode != aScreenShotMode) {
+        // Set Screen Shot Mode
+        mScreenShotMode = aScreenShotMode;
+        // Emit Screen Shot Mode Changed Signal
+        emit screenshotModeChanged(mScreenShotMode);
+    }
+}
+
+//==============================================================================
 // Get Current Project
 //==============================================================================
 ProjectModel* MainWindow::currentProject()
@@ -155,6 +197,14 @@ void MainWindow::setCurrentComponent(ComponentInfo* aComponent)
         // Emit Current Component Changed Signal
         emit currentComponentChanged(mCurrentComponent);
     }
+}
+
+//==============================================================================
+// Get Screen Shot Mode
+//==============================================================================
+bool MainWindow::screenshotMode()
+{
+    return mScreenShotMode;
 }
 
 //==============================================================================
@@ -447,7 +497,7 @@ void MainWindow::createNewProject()
     // Set Project Name
     mProjectModel->initProject(mProjectPropertiesDiaog->projectName(), mProjectPropertiesDiaog->projectDir());
     // Set Base Components Dir
-    mProjectModel->setBaseComponentsDir(mProjectPropertiesDiaog->projectDir() + "/" + DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME);
+    //mProjectModel->setBaseComponentsDir(mProjectPropertiesDiaog->projectDir() + "/" + mProjectPropertiesDiaog->projectName() + "/" + DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME);
 
     // Set Main QML File
     mProjectModel->setMainQMLFile(mProjectPropertiesDiaog->mainQMLFile());
@@ -709,6 +759,126 @@ void MainWindow::removePluginPath(const QString& aDirPath)
 }
 
 //==============================================================================
+// Import Path Added Slot
+//==============================================================================
+void MainWindow::importPathAdded(const QString& aImportPath)
+{
+    // Set Context Properties
+    QQmlContext* ctx = ui->mainQuickWidget->rootContext();
+    // Get Engine
+    QQmlEngine* engine = ctx ? ctx->engine() : NULL;
+
+    // Check Engine
+    if (engine) {
+        // Add Import Path
+        engine->addImportPath(aImportPath);
+    }
+}
+
+//==============================================================================
+// Import Path Removed Slot
+//==============================================================================
+void MainWindow::importPathRemoved(const QString& aImportPath)
+{
+    // Set Context Properties
+    QQmlContext* ctx = ui->mainQuickWidget->rootContext();
+    // Get Engine
+    QQmlEngine* engine = ctx ? ctx->engine() : NULL;
+
+    // Check Engine
+    if (engine) {
+        // Get Import Path List
+        QStringList ipList = engine->importPathList();
+        // Get Import Path Index
+        int ipIndex = ipList.indexOf(aImportPath);
+        // Check Import Path Index
+        if (ipIndex >= 0) {
+            // Remove Import Path
+            ipList.removeAt(ipIndex);
+            // Set Import Path List
+            engine->setImportPathList(ipList);
+        }
+    }
+}
+
+//==============================================================================
+// Import Paths Changed Slot
+//==============================================================================
+void MainWindow::importPathsChanged(const QStringList& aImportPaths)
+{
+    // Set Context Properties
+    QQmlContext* ctx = ui->mainQuickWidget->rootContext();
+    // Get Engine
+    QQmlEngine* engine = ctx ? ctx->engine() : NULL;
+
+    // Check Engine
+    if (engine) {
+        // Set Import Paths
+        engine->setImportPathList(aImportPaths);
+    }
+}
+
+//==============================================================================
+// Plugin Path Added Slot
+//==============================================================================
+void MainWindow::pluginPathAdded(const QString& aPluginPath)
+{
+    // Set Context Properties
+    QQmlContext* ctx = ui->mainQuickWidget->rootContext();
+    // Get Engine
+    QQmlEngine* engine = ctx ? ctx->engine() : NULL;
+
+    // Check Engine
+    if (engine) {
+        // Add Plugin Path
+        engine->addPluginPath(aPluginPath);
+    }
+}
+
+//==============================================================================
+// Plugin Path Removed Slot
+//==============================================================================
+void MainWindow::pluginPathRemoved(const QString& aPluginPath)
+{
+    // Set Context Properties
+    QQmlContext* ctx = ui->mainQuickWidget->rootContext();
+    // Get Engine
+    QQmlEngine* engine = ctx ? ctx->engine() : NULL;
+
+    // Check Engine
+    if (engine) {
+        // Get Plugin Path List
+        QStringList ppList = engine->importPathList();
+        // Get Import Path Index
+        int ppIndex = ppList.indexOf(aPluginPath);
+        // Check Import Path Index
+        if (ppIndex >= 0) {
+            // Remove Import Path
+            ppList.removeAt(ppIndex);
+            // Set Plugin Path List
+            engine->setPluginPathList(ppList);
+        }
+    }
+}
+
+//==============================================================================
+// Plugin Paths Changed Slot
+//==============================================================================
+void MainWindow::pluginPathsChanged(const QStringList& aPluginPaths)
+{
+    // Set Context Properties
+    QQmlContext* ctx = ui->mainQuickWidget->rootContext();
+    // Get Engine
+    QQmlEngine* engine = ctx ? ctx->engine() : NULL;
+
+    // Check Engine
+    if (engine) {
+        // Set Plugin Paths
+        engine->setPluginPathList(aPluginPaths);
+    }
+}
+
+//==============================================================================
 // Action About Triggered Slot
 //==============================================================================
 void MainWindow::on_actionAbout_triggered()
@@ -828,6 +998,15 @@ void MainWindow::on_actionRemoveView_triggered()
         // Remove Component
         removeComponent(mCurrentComponent->componentName());
     }
+}
+
+//==============================================================================
+// Action View Screenshot triggered Slot
+//==============================================================================
+void MainWindow::on_actionScreenshot_triggered()
+{
+    // Take Screen Shot
+    takeScreenShot();
 }
 
 // ...

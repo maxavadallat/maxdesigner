@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>assets/images/background02.jpeg</file>
+        <file>assets/images/tron-wallpaper-23.jpeg</file>
+        <file>assets/images/tron-wallpaper-27.jpeg</file>
+    </qresource>
+</RCC>

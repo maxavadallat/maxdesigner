@@ -12,7 +12,7 @@ DMouseArea {
 
     default property alias mainContainer: contentContainer.children
 
-    property bool focused: false
+    //property bool focused: false
 
     property bool selected: false
 
@@ -27,6 +27,7 @@ DMouseArea {
 
     property alias backgroundColor: containerBG.color
     property alias border: containerBG.border
+    property alias radius: containerBG.radius
     //property alias borderColor: containerBG.border.color
 
     property alias clipContent: contentContainer.clip
@@ -34,17 +35,122 @@ DMouseArea {
 
     property bool mainDrag: true
 
+    property bool setFocusOnResize: true
+
+    property bool rootContainer: false
+
+    property QtObject parentContainer: null
+
+    signal resizePressed()
+
     onPressed: {
-        if (containerRoot.mainDrag && parent.setDragTarget !== undefined) {
-            // Set Drag Target - ASSUMING Parent is MainGrabArea
-            parent.setDragTarget(containerRoot);
-        }
+        //console.log("DContainer.onPressed");
+//        if (containerRoot.mainDrag && parent.setDragTarget !== undefined) {
+//            // Set Drag Target - ASSUMING Parent is MainGrabArea
+//            parent.setDragTarget(containerRoot);
+//        }
     }
 
     onReleased: {
-        if (containerRoot.mainDrag && parent.clearDragTarget !== undefined) {
-            // Clear Drag Target - ASSUMING Parent is MainGrabArea
-            parent.clearDragTarget();
+        //console.log("DContainer.onReleased");
+//        if (containerRoot.mainDrag && parent.clearDragTarget !== undefined) {
+//            // Clear Drag Target - ASSUMING Parent is MainGrabArea
+//            parent.clearDragTarget();
+//        }
+    }
+
+    onFocusChanged: {
+        //console.log("DContainer.onFocusChanged - focus: " + focus);
+    }
+
+    Keys.onPressed: {
+        //console.log("DContainer.Keys.onPressed - key: " + event.key);
+
+        switch (event.key) {
+            case Qt.Key_Left:
+                // Check Auto repeat
+                if (event.isAutoRepeat) {
+                    // Move Left
+                    containerRoot.x -= CONSTS.componentMoveStep;
+                }
+            break;
+
+            case Qt.Key_Right:
+                // Check Auto repeat
+                if (event.isAutoRepeat) {
+                    // Move Left
+                    containerRoot.x += CONSTS.componentMoveStep;
+                }
+            break;
+
+            case Qt.Key_Up:
+                // Check Auto repeat
+                if (event.isAutoRepeat) {
+                    // Move Left
+                    containerRoot.y -= CONSTS.componentMoveStep;
+                }
+            break;
+
+            case Qt.Key_Down:
+                // Check Auto repeat
+                if (event.isAutoRepeat) {
+                    // Move Left
+                    containerRoot.y += CONSTS.componentMoveStep;
+                }
+            break;
+
+            // ...
+        }
+    }
+
+    Keys.onReleased: {
+        //console.log("DContainer.Keys.onReleased - key: " + event.key);
+
+        switch (event.key) {
+            case Qt.Key_Escape:
+                // Check If Root Container
+                if (!containerRoot.rootContainer) {
+                    // Check Parent Container
+                    if (containerRoot.parentContainer) {
+                        // Set Focus
+                        containerRoot.parentContainer.focus = true;
+                    }
+                }
+            break;
+
+            case Qt.Key_Left:
+                // Check Auto repeat
+                if (!event.isAutoRepeat) {
+                    // Move Left
+                    containerRoot.x -= CONSTS.componentMoveStep;
+                }
+            break;
+
+            case Qt.Key_Right:
+                // Check Auto repeat
+                if (!event.isAutoRepeat) {
+                    // Move Left
+                    containerRoot.x += CONSTS.componentMoveStep;
+                }
+            break;
+
+            case Qt.Key_Up:
+                // Check Auto repeat
+                if (!event.isAutoRepeat) {
+                    // Move Left
+                    containerRoot.y -= CONSTS.componentMoveStep;
+                }
+            break;
+
+            case Qt.Key_Down:
+                // Check Auto repeat
+                if (!event.isAutoRepeat) {
+                    // Move Left
+                    containerRoot.y += CONSTS.componentMoveStep;
+                }
+            break;
+
+            // ...
         }
     }
 
@@ -86,6 +192,20 @@ DMouseArea {
         anchors.topMargin: -STYLE.resizeAreaSize * 0.5
         cursorShape: Qt.SizeFDiagCursor
 
+        onPressed: {
+            // Check Main drag
+            if (mainDrag) {
+                // Emit Resize Pressed Signal
+                containerRoot.resizePressed();
+            }
+
+            // Check Set Focus On Resize
+            if (containerRoot.setFocusOnResize) {
+                // Set Focus
+                containerRoot.focus = true;
+            }
+        }
+
         onPositionChanged: {
             if (pressed) {
                 var deltaX = pressPosX - mouse.x;
@@ -114,6 +234,20 @@ DMouseArea {
         anchors.topMargin: -STYLE.resizeAreaSize * 0.5
         cursorShape: Qt.SizeVerCursor
 
+        onPressed: {
+            // Check Main drag
+            if (mainDrag) {
+                // Emit Resize Pressed Signal
+                containerRoot.resizePressed();
+            }
+
+            // Check Set Focus On Resize
+            if (containerRoot.setFocusOnResize) {
+                // Set Focus
+                containerRoot.focus = true;
+            }
+        }
+
         onPositionChanged: {
             if (pressed) {
                 var deltaY = pressPosY - mouse.y;
@@ -135,6 +269,20 @@ DMouseArea {
         anchors.top: parent.top
         anchors.topMargin: -STYLE.resizeAreaSize * 0.5
         cursorShape: Qt.SizeBDiagCursor
+
+        onPressed: {
+            // Check Main drag
+            if (mainDrag) {
+                // Emit Resize Pressed Signal
+                containerRoot.resizePressed();
+            }
+
+            // Check Set Focus On Resize
+            if (containerRoot.setFocusOnResize) {
+                // Set Focus
+                containerRoot.focus = true;
+            }
+        }
 
         onPositionChanged: {
             if (pressed) {
@@ -164,6 +312,20 @@ DMouseArea {
         anchors.verticalCenter: parent.verticalCenter
         cursorShape: Qt.SizeHorCursor
 
+        onPressed: {
+            // Check Main drag
+            if (mainDrag) {
+                // Emit Resize Pressed Signal
+                containerRoot.resizePressed();
+            }
+
+            // Check Set Focus On Resize
+            if (containerRoot.setFocusOnResize) {
+                // Set Focus
+                containerRoot.focus = true;
+            }
+        }
+
         onPositionChanged: {
             if (pressed) {
                 var deltaX = pressPosX - mouse.x;
@@ -185,6 +347,20 @@ DMouseArea {
         anchors.verticalCenter: parent.verticalCenter
         cursorShape: Qt.SizeHorCursor
 
+        onPressed: {
+            // Check Main drag
+            if (mainDrag) {
+                // Emit Resize Pressed Signal
+                containerRoot.resizePressed();
+            }
+
+            // Check Set Focus On Resize
+            if (containerRoot.setFocusOnResize) {
+                // Set Focus
+                containerRoot.focus = true;
+            }
+        }
+
         onPositionChanged: {
             if (pressed) {
                 var deltaX = pressPosX - mouse.x;
@@ -205,6 +381,20 @@ DMouseArea {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: -STYLE.resizeAreaSize * 0.5
         cursorShape: Qt.SizeBDiagCursor
+
+        onPressed: {
+            // Check Main drag
+            if (mainDrag) {
+                // Emit Resize Pressed Signal
+                containerRoot.resizePressed();
+            }
+
+            // Check Set Focus On Resize
+            if (containerRoot.setFocusOnResize) {
+                // Set Focus
+                containerRoot.focus = true;
+            }
+        }
 
         onPositionChanged: {
             if (pressed) {
@@ -233,6 +423,20 @@ DMouseArea {
         anchors.bottomMargin: -STYLE.resizeAreaSize * 0.5
         cursorShape: Qt.SizeVerCursor
 
+        onPressed: {
+            // Check Main drag
+            if (mainDrag) {
+                // Emit Resize Pressed Signal
+                containerRoot.resizePressed();
+            }
+
+            // Check Set Focus On Resize
+            if (containerRoot.setFocusOnResize) {
+                // Set Focus
+                containerRoot.focus = true;
+            }
+        }
+
         onPositionChanged: {
             if (pressed) {
                 var deltaY = pressPosY - mouse.y;
@@ -253,6 +457,20 @@ DMouseArea {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: -STYLE.resizeAreaSize * 0.5
         cursorShape: Qt.SizeFDiagCursor
+
+        onPressed: {
+            // Check Main drag
+            if (mainDrag) {
+                // Emit Resize Pressed Signal
+                containerRoot.resizePressed();
+            }
+
+            // Check Set Focus On Resize
+            if (containerRoot.setFocusOnResize) {
+                // Set Focus
+                containerRoot.focus = true;
+            }
+        }
 
         onPositionChanged: {
             if (pressed) {

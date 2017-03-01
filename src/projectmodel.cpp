@@ -18,6 +18,7 @@
 ProjectModel::ProjectModel(QObject* parent)
     : QObject(parent)
     , mName("")
+    , mDirty(false)
     , mBaseComponents(NULL)
     , mComponents(NULL)
     , mViews(NULL)
@@ -86,7 +87,9 @@ void ProjectModel::initProject(const QString& aName, const QString& aDir)
         // Set Project Name
         setProjectName(aName);
         // Set Project Dir
-        setProjectDir(aDir);
+        setProjectDir(aDir + "/" + aName);
+        // Set Base Components Dir
+        setBaseComponentsDir(projectDir() + "/" + DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME);
 
         // ...
     }
@@ -140,6 +143,11 @@ bool ProjectModel::loadProject(const QString& aFileName)
 //==============================================================================
 bool ProjectModel::saveProject(const QString& aFileName)
 {
+    // Check Dirty Properties
+    if (!mDirty) {
+        return true;
+    }
+
     // Init Save File Name
     QString saveFileName(aFileName);
 
@@ -179,6 +187,9 @@ bool ProjectModel::saveProject(const QString& aFileName)
         // Close File
         jsonFile.close();
 
+        // Reset Dirty Properties
+        mDirty = false;
+
         return true;
     }
 
@@ -209,7 +220,6 @@ QString ProjectModel::absoluteProjectFilePath()
 
     // Set Save File Name
     apfPath += mProperties[JSON_KEY_PROJECT_DIR].toString() + "/";
-    apfPath += mProperties[JSON_KEY_PROJECT_NAME].toString() + "/";
     apfPath += (mProperties[JSON_KEY_PROJECT_NAME].toString() + "." + DEFAULT_JSON_SUFFIX);
 
     return apfPath;
@@ -230,10 +240,13 @@ void ProjectModel::setProjectName(const QString& aName)
 {
     // Check Name
     if (aName != projectName()) {
+        qDebug() << "ProjectModel::setProjectName - aName: " << aName;
         // Set Project Name
         mProperties[JSON_KEY_PROJECT_NAME] = aName;
         // Emit Project Name Changed
         emit projectNameChanged(mProperties[JSON_KEY_PROJECT_NAME].toString());
+        // Set Dirty Properties
+        mDirty = true;
     }
 }
 
@@ -252,10 +265,13 @@ void ProjectModel::setProjectDir(const QString& aDir)
 {
     // Check Dir
     if (aDir != projectDir()) {
+        qDebug() << "ProjectModel::setProjectDir - aDir: " << aDir;
         // Set Project Dir
         mProperties[JSON_KEY_PROJECT_DIR] = aDir;
         // Emit Project Dir Changed
         emit projectDirChanged(mProperties[JSON_KEY_PROJECT_DIR].toString());
+        // Set Dirty Properties
+        mDirty = true;
     }
 }
 
@@ -278,6 +294,8 @@ void ProjectModel::setMainQMLFile(const QString& aQMLFile)
         mProperties[JSON_KEY_PROJECT_MAIN_QML] = aQMLFile;
         // Emit Main QML File Changed Signal
         emit mainQMLFileChanged(mProperties[JSON_KEY_PROJECT_MAIN_QML].toString());
+        // Set Dirty Properties
+        mDirty = true;
     }
 }
 
@@ -300,6 +318,8 @@ void ProjectModel::setQmlDir(const QString& aQMLDir)
         mProperties[JSON_KEY_PROJECT_QML_DIR] = aQMLDir;
         // Emit QML Dir Changed Signal
         emit qmlDirChanged(mProperties[JSON_KEY_PROJECT_QML_DIR].toString());
+        // Set Dirty Properties
+        mDirty = true;
     }
 }
 
@@ -322,6 +342,8 @@ void ProjectModel::setJsDir(const QString& aJSDir)
         mProperties[JSON_KEY_PROJECT_JS_DIR] = aJSDir;
         // Emit JS Dir Changed Signal
         emit jsDirChanged(mProperties[JSON_KEY_PROJECT_JS_DIR].toString());
+        // Set Dirty Properties
+        mDirty = true;
     }
 }
 
@@ -344,6 +366,8 @@ void ProjectModel::setImagesDir(const QString& aImagesDir)
         mProperties[JSON_KEY_PROJECT_IMAGES_DIR] = aImagesDir;
         // Emit Images Dir Changed Signal
         emit imagesDirChanged(mProperties[JSON_KEY_PROJECT_IMAGES_DIR].toString());
+        // Set Dirty Properties
+        mDirty = true;
     }
 }
 
@@ -362,10 +386,13 @@ void ProjectModel::setBaseComponentsDir(const QString& aBaseComponentsDir)
 {
     // Check Base Components Dir
     if (aBaseComponentsDir != baseComponentsDir()) {
+        qDebug() << "ProjectModel::setBaseComponentsDir - aBaseComponentsDir: " << aBaseComponentsDir;
         // Set Base Components Dir
         mProperties[JSON_KEY_PROJECT_BASECOMPONENTS_DIR] = aBaseComponentsDir;
         // Emit Base Components Dir Changed Signal
         emit baseComponentsDirChanged(mProperties[JSON_KEY_PROJECT_BASECOMPONENTS_DIR].toString());
+        // Set Dirty Properties
+        mDirty = true;
     }
 }
 
@@ -388,6 +415,8 @@ void ProjectModel::setComponentsDir(const QString& aComponentsDir)
         mProperties[JSON_KEY_PROJECT_COMPONENTS_DIR] = aComponentsDir;
         // Emit Components Dir Changed Signal
         emit componentsDirChanged(mProperties[JSON_KEY_PROJECT_COMPONENTS_DIR].toString());
+        // Set Dirty Properties
+        mDirty = true;
     }
 }
 
@@ -410,6 +439,8 @@ void ProjectModel::setViewsDir(const QString& aViewsDir)
         mProperties[JSON_KEY_PROJECT_VIEWS_DIR] = aViewsDir;
         // Emit Views Dir Changed Signal
         emit viewsDirChanged(mProperties[JSON_KEY_PROJECT_VIEWS_DIR].toString());
+        // Set Dirty Properties
+        mDirty = true;
     }
 }
 
@@ -432,30 +463,6 @@ QStringList ProjectModel::importPaths()
     return iPaths;
 }
 
-/*
-//==============================================================================
-// Set Import Paths
-//==============================================================================
-void ProjectModel::setImportPaths(const QStringList& aImportPaths)
-{
-    // Set Import Paths
-    mProperties[JSON_KEY_PROJECT_IMPORT_PATHS] = aImportPaths;
-    // Emit Import Paths Changed Signal
-
-
-//    for (int i=0; i<aImportPaths.count(); i++) {
-//        // Init JSON Array
-//        QJsonArray jsonArray;
-//        // Add Item
-//        jsonArray << aImportPaths[i];
-//        // Add Import Paath
-//        mProperties[JSON_KEY_PROJECT_IMPORT_PATHS] = jsonArray;
-//        // Emit Import Paths Changed Signal
-//        emit importPathsChanged(aImportPaths);
-//    }
-}
-*/
-
 //==============================================================================
 // Add Import Path
 //==============================================================================
@@ -473,8 +480,12 @@ void ProjectModel::addImportPath(const QString& aPath)
         jsonArray << jsonValue;
         // Set Import Paths
         mProperties[JSON_KEY_PROJECT_IMPORT_PATHS] = jsonArray;
+        // Emit Import Path Added Signal
+        emit importPathAdded(aPath);
         // Emit Import Paths Changed Signal
         emit importPathsChanged(importPaths());
+        // Set Dirty Properties
+        mDirty = true;
     }
 }
 
@@ -488,12 +499,18 @@ void ProjectModel::removeImportPath(const int& aIndex)
 
     // Check Index
     if (aIndex >= 0 && aIndex < jsonArray.size()) {
+        // Get Import Path
+        QString rImportPath = jsonArray[aIndex].toString();
         // Remove Value At Index
         jsonArray.removeAt(aIndex);
         // Set Import Paths
         mProperties[JSON_KEY_PROJECT_IMPORT_PATHS] = jsonArray;
+        // Emit Import Path Removed Signal
+        emit importPathRemoved(rImportPath);
         // Emit Import Paths Changed Signal
         emit importPathsChanged(importPaths());
+        // Set Dirty Properties
+        mDirty = true;
     } else {
         // Set Import Paths
         mProperties[JSON_KEY_PROJECT_IMPORT_PATHS] = jsonArray;
@@ -505,7 +522,10 @@ void ProjectModel::removeImportPath(const int& aIndex)
 //==============================================================================
 void ProjectModel::setImportPaths(const QStringList& aImportPaths)
 {
-
+    // Set Import Paths
+    mProperties[JSON_KEY_PROJECT_IMPORT_PATHS] = QJsonArray::fromStringList(aImportPaths);
+    // Set Dirty Properties
+    mDirty = true;
 }
 
 //==============================================================================
@@ -545,8 +565,12 @@ void ProjectModel::addPluginPath(const QString& aPath)
         jsonArray << jsonValue;
         // Set Plugin Paths
         mProperties[JSON_KEY_PROJECT_PLUGIN_PATHS] = jsonArray;
+        // Emit Plugin Path Added Signal
+        emit pluginPathAdded(aPath);
         // Emit Plugin Paths Changed Signal
         emit pluginPathsChanged(pluginPaths());
+        // Set Dirty Properties
+        mDirty = true;
     }
 }
 
@@ -560,12 +584,18 @@ void ProjectModel::removePluginPath(const int& aIndex)
 
     // Check Index
     if (aIndex >= 0 && aIndex < jsonArray.size()) {
+        // Get Plugin Path
+        QString rPluginPath = jsonArray[aIndex].toString();
         // Remove Value At Index
         jsonArray.removeAt(aIndex);
         // Set Plugin Paths
         mProperties[JSON_KEY_PROJECT_PLUGIN_PATHS] = jsonArray;
+        // Emit Plugin Path Removed Signal
+        emit pluginPathRemoved(rPluginPath);
         // Emit Import Paths Changed Signal
         emit pluginPathsChanged(importPaths());
+        // Set Dirty Properties
+        mDirty = true;
     } else {
         // Set Plugin Paths
         mProperties[JSON_KEY_PROJECT_PLUGIN_PATHS] = jsonArray;
@@ -577,7 +607,10 @@ void ProjectModel::removePluginPath(const int& aIndex)
 //==============================================================================
 void ProjectModel::setPluginPaths(const QStringList& aPluginPaths)
 {
-
+    // Set Plugin Paths
+    mProperties[JSON_KEY_PROJECT_PLUGIN_PATHS] = QJsonArray::fromStringList(aPluginPaths);
+    // Set Dirty Properties
+    mDirty = true;
 }
 
 //==============================================================================

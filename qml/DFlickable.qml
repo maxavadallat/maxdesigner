@@ -21,7 +21,6 @@ Item {
         pixelAligned: true
         contentWidth: contentContainerColumn.width
         contentHeight: contentContainerColumn.height
-
         interactive: contentHeight > height
 
         Column {

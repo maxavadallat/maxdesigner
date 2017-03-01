@@ -23,7 +23,9 @@ Item {
     readonly property string stateClosed: "closed"
     readonly property string stateHidden: "hidden"
 
-    clip: true
+    property alias clipContent: contentFlickable.clip
+
+    clip: false
 
     function open() {
         // Set State
@@ -45,7 +47,17 @@ Item {
         width: parent.width
         height: STYLE.headerHeight
 
-        onClicked: {
+        preventStealing: false
+
+//        onClicked: {
+//            if (sectionRoot.state === sectionRoot.stateOpen) {
+//                close();
+//            } else {
+//                open();
+//            }
+//        }
+
+        onReleased: {
             if (sectionRoot.state === sectionRoot.stateOpen) {
                 close();
             } else {
@@ -95,6 +107,7 @@ Item {
         anchors.topMargin: STYLE.defaultMargin
         anchors.bottom: parent.bottom
         anchors.bottomMargin: STYLE.defaultMargin
+        clip: true
     }
 
     states: [

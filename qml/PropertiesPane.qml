@@ -9,12 +9,18 @@ DPane {
     id: propertiesPaneRoot
 
     width: 300
-    height: 500
+    height: 600
 
     title: "Properties"
 
     minWidth: 300
     minHeight: 200
+
+    enablePaneContent: true
+
+    setFocusOnResize: false
+
+    topMouseAreaVisible: true
 
     state: stateShown
 
@@ -117,6 +123,71 @@ DPane {
     DSection {
         width: propertiesPaneRoot.contentWidth
         title: "Anchors & Margins"
+
+        state: stateOpen
+
+        Item {
+            width: propertiesPaneRoot.contentWidth
+            height: 210
+
+            DCheckBox {
+                width: 52
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                rightAligned: true
+                text: "Left"
+                onClicked: checked = !checked;
+            }
+
+            DCheckBox {
+                width: 60
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                text: "Right"
+                onClicked: checked = !checked;
+            }
+
+            DCheckBox {
+                width: 52
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                text: "Top"
+                onClicked: checked = !checked;
+            }
+
+            DCheckBox {
+                width: 78
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                text: "Bottom"
+                onClicked: checked = !checked;
+            }
+
+            Column {
+                anchors.centerIn: parent
+
+                DCheckBox {
+                    width: 152
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Horizontal Center"
+                    onClicked: checked = !checked;
+                }
+
+                DCheckBox {
+                    width: 78
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Center"
+                    onClicked: checked = !checked;
+                }
+
+                DCheckBox {
+                    width: 152
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Vertical Center"
+                    onClicked: checked = !checked;
+                }
+            }
+        }
     }
 
     DSection {

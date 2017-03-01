@@ -9,6 +9,7 @@
 
 class ProjectModel;
 class MainWindow;
+class QMLParser;
 
 //==============================================================================
 // Component Info Class
@@ -17,9 +18,15 @@ class ComponentInfo : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(bool protoType READ protoType NOTIFY protoTypeChanged)
+
     Q_PROPERTY(QString componentName READ componentName WRITE setComponentName NOTIFY componentNameChanged)
     Q_PROPERTY(QString componentType READ componentType WRITE setComponentType NOTIFY componentTypeChanged)
     Q_PROPERTY(QString componentBase READ componentBase WRITE setComponentBase NOTIFY componentBaseChanged)
+
+    Q_PROPERTY(bool focused READ focused WRITE setFocused NOTIFY focusedChanged)
+
+    Q_PROPERTY(QString sourcePath READ sourcePath NOTIFY sourcePathChanged)
 
 public:
     // Create Component From QML File
@@ -28,8 +35,11 @@ public:
     // Create Component From Component Info File
     static ComponentInfo* fromInfoFile(const QString& aFilePath, ProjectModel* aProject);
 
-    // Constructor
-    explicit ComponentInfo(const QString& aName, const QString& aType, ProjectModel* aProject = NULL, const QString& aBaseName = "", QObject* aParent = NULL);
+    // Clone Component Info
+    ComponentInfo* clone();
+
+    // Get Prototype
+    bool protoType();
 
     // Get Component Name
     QString componentName();
@@ -45,6 +55,14 @@ public:
     QString componentBase();
     // Set Component Base Name
     void setComponentBase(const QString& aBaseName);
+
+    // Get Focused State
+    bool focused();
+    // Set Focused State
+    void setFocused(const bool& aFocused);
+
+    // Get QML Source Path
+    QString sourcePath();
 
     // Get Component Hierarchy
     QStringList hierarchy();
@@ -80,16 +98,26 @@ public:
     ~ComponentInfo();
 
 signals:
+    // Prototype Changed Signal
+    void protoTypeChanged(const bool& aProtoType);
     // Component Name Changed Signal
     void componentNameChanged(const QString& aName);
     // Component Type Changed Signal
     void componentTypeChanged(const QString& aType);
     // Component Base Name Changed
     void componentBaseChanged(const QString& aBaseName);
+    // Focused State Changed Signal
+    void focusedChanged(const bool& aFocused);
+    // Source Path Changed Signal
+    void sourcePathChanged(const QString& aPath);
 
 protected:
     friend class ProjectModel;
     friend class MainWindow;
+    friend class QMLParser;
+
+    // Constructor
+    explicit ComponentInfo(const QString& aName, const QString& aType, ProjectModel* aProject = NULL, const QString& aBaseName = "", QObject* aParent = NULL);
 
     // Init
     void init();
@@ -100,6 +128,9 @@ protected:
     // Save
     void save(const QString& aFilePath = "");
 
+    // Set QML Source Path
+    void setSourcePath(const QString& aPath);
+
 private: // Data
     // Project Model
     ProjectModel*           mProject;
@@ -109,12 +140,19 @@ private: // Data
     // QML File Path
     QString                 mQMLPath;
 
+    // ProtoType
+    bool                    mProtoType;
+
     // Name
     QString                 mName;
     // Type
     QString                 mType;
     // Base Component Name
     QString                 mBaseName;
+
+    // Focused State
+    bool                    mFocused;
+
     // Own Properties
     QJsonObject             mOwnProperties;
     // Properties

@@ -116,6 +116,8 @@
     <addaction name="actionCreateView"/>
     <addaction name="separator"/>
     <addaction name="actionRemoveView"/>
+    <addaction name="separator"/>
+    <addaction name="actionScreenshot"/>
    </widget>
    <addaction name="menuMaxDesigner"/>
    <addaction name="menuFile"/>
@@ -274,6 +276,14 @@
    </property>
    <property name="text">
     <string>Define Base Component</string>
+   </property>
+  </action>
+  <action name="actionScreenshot">
+   <property name="text">
+    <string>Screenshot</string>
+   </property>
+   <property name="shortcut">
+    <string>F10</string>
    </property>
   </action>
  </widget>

@@ -10,9 +10,11 @@ var colorFontDark                                   = "#FF57787F";
 var colorBG                                         = "#AA000000";
 // Default Border Color
 var colorBorder                                     = "#FF8ED5E1";
-
 // Default Unfocused Border Color
 var colorBorderNoFocus                              = "#FF57787F";
+// Default Focused Border Color
+var colorBorderSelected                             = "#FFEC6302";
+
 // Defaukt Shadow Color
 var colorShadow                                     = "#EE000000";
 

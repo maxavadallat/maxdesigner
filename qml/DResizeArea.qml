@@ -15,5 +15,9 @@ MouseArea {
         pressPosY = mouse.y;
     }
 
+    preventStealing: true
+
+    cursorShape: Qt.SizeAllCursor
+
     DTracer { }
 }

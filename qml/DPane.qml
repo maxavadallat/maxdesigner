@@ -10,17 +10,20 @@ DPaneBase {
 
     readonly property int contentWidth: paneContent.width
 
+    property bool clipPaneContnet: true
+
     // Content Flickable
     DFlickable {
         id: paneContent
         anchors.fill: parent
-
         anchors {
             leftMargin: STYLE.defaultMargin
             topMargin: titleLabel.height + STYLE.defaultMargin * 2
             rightMargin: STYLE.defaultMargin
             bottomMargin: STYLE.defaultMargin
         }
+
+        clip: paneRoot.clipPaneContnet
     }
 }
 

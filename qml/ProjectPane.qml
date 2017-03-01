@@ -5,7 +5,7 @@ import "Style.js" as STYLE
 DPane {
     id: projectPaneRoot
 
-    width: 300
+    width: 360
     height: 600
 
     title: "Project"
@@ -13,84 +13,133 @@ DPane {
     minWidth: 300
     minHeight: 200
 
+    enablePaneContent: true
+
+    setFocusOnResize: false
+
+    topMouseAreaVisible: true
+
     state: stateShown
 
     DSection {
+        id: baseComponentsSection
         width: projectPaneRoot.contentWidth
         title: "Base Components"
-
         state: stateOpen
 
         Flow {
             width: contentWidth
             spacing: STYLE.defaultSpacing
+
+            DComponentItem {
+                //id: componentItemDemo
+                title: "QtObject"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    baseComponentsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    baseComponentsSection.clipContent = !grabbed;
+                }
+            }
+
+            DComponentItem {
+                title: "Item"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    baseComponentsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    baseComponentsSection.clipContent = !grabbed;
+                }
+            }
+
+            DComponentItem {
+                title: "Rectangle"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    baseComponentsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    baseComponentsSection.clipContent = !grabbed;
+                }
+            }
+
+            DComponentItem {
+                title: "Image"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    baseComponentsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    baseComponentsSection.clipContent = !grabbed;
+                }
+            }
+
+            DComponentItem {
+                title: "AnimatedImage"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    baseComponentsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    baseComponentsSection.clipContent = !grabbed;
+                }
+            }
+
+
+
 //            DRectangle {
 //                width: 84
 //                height: 64
 //                DText {
 //                    width: parent.width
 //                    anchors.centerIn: parent
-//                    text: "QtObject"
+//                    text: "Item"
 //                    horizontalAlignment: Text.AlignHCenter
 //                }
 //            }
 
-            DRectangle {
-                width: 84
-                height: 64
-                DText {
-                    width: parent.width
-                    anchors.centerIn: parent
-                    text: "Item"
-                    horizontalAlignment: Text.AlignHCenter
-                }
-            }
+//            DRectangle {
+//                width: 84
+//                height: 64
+//                DText {
+//                    width: parent.width
+//                    anchors.centerIn: parent
+//                    text: "Rectangle"
+//                    horizontalAlignment: Text.AlignHCenter
+//                }
+//            }
 
-            DRectangle {
-                width: 84
-                height: 64
-                DText {
-                    width: parent.width
-                    anchors.centerIn: parent
-                    text: "Rectangle"
-                    horizontalAlignment: Text.AlignHCenter
-                }
-            }
+//            DRectangle {
+//                width: 84
+//                height: 64
+//                DText {
+//                    width: parent.width
+//                    anchors.centerIn: parent
+//                    text: "Image"
+//                    horizontalAlignment: Text.AlignHCenter
+//                }
+//            }
 
-            DRectangle {
-                width: 84
-                height: 64
-                DText {
-                    width: parent.width
-                    anchors.centerIn: parent
-                    text: "Image"
-                    horizontalAlignment: Text.AlignHCenter
-                }
-            }
+//            DRectangle {
+//                width: 84
+//                height: 64
+//                DText {
+//                    width: parent.width
+//                    anchors.centerIn: parent
+//                    text: "BorderImage"
+//                    font.pixelSize: STYLE.fontSizeS
+//                    horizontalAlignment: Text.AlignHCenter
+//                }
+//            }
 
-            DRectangle {
-                width: 84
-                height: 64
-                DText {
-                    width: parent.width
-                    anchors.centerIn: parent
-                    text: "BorderImage"
-                    font.pixelSize: STYLE.fontSizeS
-                    horizontalAlignment: Text.AlignHCenter
-                }
-            }
-
-            DRectangle {
-                width: 84
-                height: 64
-                DText {
-                    width: parent.width
-                    anchors.centerIn: parent
-                    text: "AnimatedImage"
-                    font.pixelSize: STYLE.fontSizeXS
-                    horizontalAlignment: Text.AlignHCenter
-                }
-            }
+//            DRectangle {
+//                width: 84
+//                height: 64
+//                DText {
+//                    width: parent.width
+//                    anchors.centerIn: parent
+//                    text: "AnimatedImage"
+//                    font.pixelSize: STYLE.fontSizeXS
+//                    horizontalAlignment: Text.AlignHCenter
+//                }
+//            }
         }
     }
 
@@ -101,86 +150,146 @@ DPane {
 
         state: stateOpen
 
-        property int buttonWidth: 90
-
         Flow {
             width: contentWidth
             spacing: STYLE.defaultSpacing
-            DRectangle {
-                width: ownComponentsSection.buttonWidth
-                height: 64
-                DText {
-                    anchors.centerIn: parent
-                    text: "Label"
+
+            DComponentItem {
+                title: "Label"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    ownComponentsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    ownComponentsSection.clipContent = !grabbed;
                 }
             }
 
-            DRectangle {
-                width: ownComponentsSection.buttonWidth
-                height: 64
-                DText {
-                    anchors.centerIn: parent
-                    text: "Button"
+            DComponentItem {
+                title: "FlatButton"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    ownComponentsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    ownComponentsSection.clipContent = !grabbed;
                 }
             }
 
-            DRectangle {
-                width: ownComponentsSection.buttonWidth
-                height: 64
-                DText {
-                    anchors.centerIn: parent
-                    text: "CheckBox"
+            DComponentItem {
+                title: "Button3D"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    ownComponentsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    ownComponentsSection.clipContent = !grabbed;
                 }
             }
 
-            DRectangle {
-                width: ownComponentsSection.buttonWidth
-                height: 64
-                DText {
-                    anchors.centerIn: parent
-                    text: "TextInputField"
-                    font.pixelSize: STYLE.fontSizeS
+            DComponentItem {
+                title: "CheckBox"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    ownComponentsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    ownComponentsSection.clipContent = !grabbed;
                 }
             }
 
-            DRectangle {
-                width: ownComponentsSection.buttonWidth
-                height: 64
-                DText {
-                    width: parent.width
-                    anchors.centerIn: parent
-                    text: "RadioButtonGroup"
-                    font.pixelSize: STYLE.fontSizeXS
+            DComponentItem {
+                title: "TextInputField"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    ownComponentsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    ownComponentsSection.clipContent = !grabbed;
                 }
             }
 
-            DRectangle {
-                width: ownComponentsSection.buttonWidth
-                height: 64
-                DText {
-                    anchors.centerIn: parent
-                    text: "Slider"
-                    //font.pixelSize: STYLE.fontSizeXS
+            DComponentItem {
+                title: "RadioButtonGroup"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    ownComponentsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    ownComponentsSection.clipContent = !grabbed;
                 }
             }
 
-            DRectangle {
-                width: ownComponentsSection.buttonWidth
-                height: 64
-                DText {
-                    anchors.centerIn: parent
-                    text: "Spiner"
-                    //font.pixelSize: STYLE.fontSizeXS
+            DComponentItem {
+                title: "Slider"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    ownComponentsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    ownComponentsSection.clipContent = !grabbed;
                 }
             }
+
+            DComponentItem {
+                title: "Spinner"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    ownComponentsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    ownComponentsSection.clipContent = !grabbed;
+                }
+            }
+
+            // ...
         }
     }
 
     DSection {
+        id: viewsSection
         width: projectPaneRoot.contentWidth
         title: "Views"
 
-        // ...
+        Flow {
+            width: contentWidth
+            spacing: STYLE.defaultSpacing
+
+            DComponentItem {
+                title: "TopStatusBar"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    viewsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    viewsSection.clipContent = !grabbed;
+                }
+            }
+
+            DComponentItem {
+                title: "ApplicationBase"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    viewsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    viewsSection.clipContent = !grabbed;
+                }
+            }
+
+            DComponentItem {
+                title: "AppTile"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    viewsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    viewsSection.clipContent = !grabbed;
+                }
+            }
+
+            DComponentItem {
+                title: "ClimateBar"
+                onGrabbedChanged: {
+                    // Bring Section To Top
+                    viewsSection.z = grabbed ? 0.1 : 0.0;
+                    // Disable Content Clip
+                    viewsSection.clipContent = !grabbed;
+                }
+            }
+
+            // ...
+
+        }
     }
 
     DSection {

@@ -38,6 +38,22 @@ ComponentInfo* ComponentInfo::fromInfoFile(const QString& aFilePath, ProjectMode
 }
 
 //==============================================================================
+// Clone Component Info
+//==============================================================================
+ComponentInfo* ComponentInfo::clone()
+{
+    // Create Component Info
+    ComponentInfo* newComponent = new ComponentInfo(mName, mType, mProject, mBaseName);
+
+    // Set ProtoType
+    newComponent->mProtoType = false;
+
+    // ...
+
+    return newComponent;
+}
+
+//==============================================================================
 // Constructor
 //==============================================================================
 ComponentInfo::ComponentInfo(const QString& aName, const QString& aType, ProjectModel* aProject, const QString& aBaseName, QObject* aParent)
@@ -45,9 +61,11 @@ ComponentInfo::ComponentInfo(const QString& aName, const QString& aType, Project
     , mProject(aProject)
     , mInfoPath("")
     , mQMLPath("")
+    , mProtoType(true)
     , mName(aName)
     , mType(aType)
     , mBaseName(aBaseName)
+    , mFocused(false)
     , mBase(mProject ? mProject->getComponentByName(mBaseName) : NULL)
     , mParent(NULL)
 {
@@ -127,6 +145,14 @@ void ComponentInfo::save(const QString& aFilePath)
 }
 
 //==============================================================================
+// Get Prototype
+//==============================================================================
+bool ComponentInfo::protoType()
+{
+    return mProtoType;
+}
+
+//==============================================================================
 // Get Component Name
 //==============================================================================
 QString ComponentInfo::componentName()
@@ -189,6 +215,50 @@ void ComponentInfo::setComponentBase(const QString& aBaseName)
         mBaseName = aBaseName;
         // Emit Component Base Name Changed Signal
         emit componentBaseChanged(mBaseName);
+    }
+}
+
+//==============================================================================
+// Get Focused State
+//==============================================================================
+bool ComponentInfo::focused()
+{
+    return mFocused;
+}
+
+//==============================================================================
+// Set Focused State
+//==============================================================================
+void ComponentInfo::setFocused(const bool& aFocused)
+{
+    // Check Focused State
+    if (mFocused != aFocused) {
+        // Set Focused State
+        mFocused = aFocused;
+        // Emit Focused State Changed Signal
+        emit focusedChanged(mFocused);
+    }
+}
+
+//==============================================================================
+// Get QML Source Path
+//==============================================================================
+QString ComponentInfo::sourcePath()
+{
+    return mQMLPath;
+}
+
+//==============================================================================
+// Set QML Source Path
+//==============================================================================
+void ComponentInfo::setSourcePath(const QString& aPath)
+{
+    // Check QML Path
+    if (mQMLPath != aPath) {
+        // Set QML Path
+        mQMLPath = aPath;
+        // Emit Source Path Changed Signal
+        emit sourcePathChanged(mQMLPath);
     }
 }
 

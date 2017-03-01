@@ -36,6 +36,8 @@ class MainWindow : public QMainWindow
     Q_PROPERTY(ProjectModel* currentProject READ currentProject NOTIFY currentProjectChanged)
     Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent WRITE setCurrentComponent NOTIFY currentComponentChanged)
 
+    Q_PROPERTY(bool screenshotMode READ screenshotMode NOTIFY screenshotModeChanged)
+
 public:
     // Constructor
     explicit MainWindow(QWidget* aParent = NULL);
@@ -48,6 +50,9 @@ public:
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
 
+    // Get Screen Shot Mode
+    bool screenshotMode();
+
     // Open Project
     Q_INVOKABLE void openProject(const QString& aFilePath);
 
@@ -59,12 +64,20 @@ signals:
     void currentProjectChanged(ProjectModel* aProject);
     // Current Component Changed Signal
     void currentComponentChanged(ComponentInfo* aCOmponent);
+    // Screen Shot Mode Changed Signal
+    void screenshotModeChanged(const bool& aScreenShotMode);
 
 private:
     // Init
     void init();
     // restore UI
     void restoreUI();
+
+    // Take Screen Shot
+    void takeScreenShot();
+
+    // Set Screen Shot Mode
+    void setScreenShotMode(const bool& aScreenShotMode);
 
     // Launch Preferences
     void launchPreferences();
@@ -121,6 +134,22 @@ private:
     void removePluginPath(const QString& aDirPath);
 
 private slots:
+
+    // Import Path Added Slot
+    void importPathAdded(const QString& aImportPath);
+    // Import Path Removed Slot
+    void importPathRemoved(const QString& aImportPath);
+    // Import Paths Changed Slot
+    void importPathsChanged(const QStringList& aImportPaths);
+
+    // Plugin Path Added Slot
+    void pluginPathAdded(const QString& aPluginPath);
+    // Plugin Path Removed Slot
+    void pluginPathRemoved(const QString& aPluginPath);
+    // Plugin Paths Changed Slot
+    void pluginPathsChanged(const QStringList& aPluginPaths);
+
+
     // Action About Triggered Slot
     void on_actionAbout_triggered();
     // Action Preferences Triggered Slot
@@ -152,6 +181,8 @@ private slots:
 
     // Action Quit Triggered Slot
     void on_actionQuit_triggered();
+
+    void on_actionScreenshot_triggered();
 
 protected: // from QMainWindow
 
@@ -186,9 +217,10 @@ private:
 
     // Project Model
     ProjectModel*               mProjectModel;
-
     // Current Component
     ComponentInfo*              mCurrentComponent;
+    // Screen Shot Mode
+    bool                        mScreenShotMode;
 };
 
 #endif // MAINWINDOW_H

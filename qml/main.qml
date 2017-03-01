@@ -16,13 +16,18 @@ Item {
 
         Image {
             id: bgImage
-            width: 1024
-            height: 640
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: -256
-            source: "qrc:/assets/images/background02.png"
-            fillMode: Image.PreserveAspectFit
+//            width: 1024
+//            height: 640
+//            anchors.right: parent.right
+//            anchors.bottom: parent.bottom
+//            anchors.bottomMargin: -256
+//            fillMode: Image.PreserveAspectFit
+//            source: "qrc:/assets/images/background02.png"
+            anchors.fill: parent
+            source: "qrc:/assets/images/tron-wallpaper-23.jpeg"
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            opacity: 0.1
         }
     }
 
@@ -32,6 +37,12 @@ Item {
         opacity: 0.0
     }
 
+//    DPopupArea {
+//        id: mainPopupArea
+//        anchors.fill: parent
+//        // ...
+//    }
+
     MainGrabArea {
         id: mainGrabArea
 
@@ -40,15 +51,31 @@ Item {
 
         //opacity: mainController.currentProject ? 1.0 : 0.0
 
+//        Component.onCompleted: {
+//            projectPane.x = STYLE.defaultMargin;
+//            projectPane.y = (mainRoot.height - projectPane.height) / 2;
+
+//            propertiesPane.x = mainRoot.width - width - STYLE.defaultMargin;
+//            propertiesPane.y = (mainRoot.height - propertiesPane.height) / 2;
+//        }
+
         onWidthChanged: {
             if (width > 0 && !xInit) {
                 xInit = true;
                 projectPane.x = STYLE.defaultMargin;
                 propertiesPane.x = mainGrabArea.width - propertiesPane.width - STYLE.defaultMargin;
 
-                componentItemDemo.x = (mainGrabArea.width - componentItemDemo.width) / 2;
+                //demoPane.x = (mainGrabArea.width - demoPane.width) / 2;
 
-                dropAreaDemo.x = (mainGrabArea.width - dropAreaDemo.width) / 2;
+                //demoContainer.x = (mainGrabArea.width - demoContainer.width) / 2;
+
+                //demoViewContainer.x = (mainGrabArea.width - demoViewContainer.width) / 2;
+
+                componentRootDemo.x = (mainGrabArea.width - componentRootDemo.width) / 2;
+
+                //componentItemDemo.x = (mainGrabArea.width - componentItemDemo.width) / 2;
+
+                //dropAreaDemo.x = (mainGrabArea.width - dropAreaDemo.width) / 2;
             }
         }
 
@@ -58,18 +85,31 @@ Item {
                 projectPane.y = (mainRoot.height - projectPane.height) / 2;
                 propertiesPane.y = (mainRoot.height - propertiesPane.height) / 2;
 
-                componentItemDemo.y = (mainGrabArea.height - componentItemDemo.height) / 2;
+                //demoPane.y = (mainRoot.height - demoPane.height) / 2;
 
-                dropAreaDemo.y = mainGrabArea.height - dropAreaDemo.height - 32;
+                //demoContainer.y = (mainRoot.height - demoContainer.height) / 2;
+
+                //demoViewContainer.y = (mainRoot.height - demoViewContainer.height) / 2;
+
+                componentRootDemo.y = (mainGrabArea.height - componentRootDemo.height) / 2;
+
+                //componentItemDemo.y = 100;
+
+                //dropAreaDemo.y = mainGrabArea.height - dropAreaDemo.height - 32;
             }
         }
+
+//        onClicked: {
+//            // Hide Popups
+//            //mainPopupArea.hidePopups();
+//        }
 
         // Project Pane
         ProjectPane {
             id: projectPane
             hideToSide: hideToLeft
 
-            enablePaneContent: true
+            //hidden: true
         }
 
         // Properties Pane
@@ -77,41 +117,14 @@ Item {
             id: propertiesPane
             hideToSide: hideToRight
 
-            enablePaneContent: true
+            //hidden: true
         }
 
-        DComponentItem {
-            id: componentItemDemo
+        DComponentRootContainer {
+            id: componentRootDemo
+            width: 400
+            height: 300
         }
-
-        DropArea {
-            id: dropAreaDemo
-            width: 320
-            height: 200
-
-            property bool hovering: false
-
-            onEntered: {
-                hovering = true;
-
-            }
-
-            onExited: {
-                hovering = false;
-            }
-
-            onDropped: {
-                // ...
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                color: Qt.hsla(Math.random(), 0.5, 0.5, 0.3)
-                border.color: dropAreaDemo.hovering ? STYLE.colorBorder : STYLE.colorBorderNoFocus
-                radius: STYLE.defaultRadius
-            }
-        }
-
     }
 
     DMinimizedComponents {

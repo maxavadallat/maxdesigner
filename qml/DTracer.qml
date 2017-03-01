@@ -6,6 +6,7 @@ Loader {
     anchors.fill: parent
     asynchronous: true
     active: settingsController.tracerVisible
+    visible: settingsController.tracerVisible
     sourceComponent: Rectangle {
         anchors.fill: parent
         color: "transparent"

@@ -15,11 +15,24 @@ Item {
 
     property QtObject componentInfo: null
 
+    property bool grabbed: false
+
+    onGrabbedChanged: {
+        //console.log("componentItemRoot.onGrabbedChanged - grabbed: " + grabbed);
+
+        // Position Item For Grabbed State
+        dragContainer.x = mapToItem(mainGrabArea, dragContainer.hotSpotX, dragContainer.hotSpotY).x - dragContainer.hotSpotX;
+        dragContainer.y = mapToItem(mainGrabArea, dragContainer.hotSpotX, dragContainer.hotSpotY).y - dragContainer.hotSpotY;
+
+        // Set Parent For Grabbed State
+        dragContainer.parent = grabbed ? mainGrabArea : componentItemRoot
+    }
+
     DRectangle {
         anchors.fill: parent
         color: "transparent"
         border.color: STYLE.colorBorderNoFocus
-        opacity: dragContainer.grabbed ? 0.5 : 0.0
+        opacity: componentItemRoot.grabbed ? 0.5 : 0.0
     }
 
     DMouseArea {
@@ -27,35 +40,26 @@ Item {
         width: componentItemRoot.width
         height: componentItemRoot.height
 
-        property bool grabbed: false
+        drag.target: componentItemRoot.grabbed ? dragContainer : undefined
 
-        drag.target: grabbed ? dragContainer : undefined
-
-        //preventStealing: grabbed
-
-        Drag.active: grabbed
-        Drag.hotSpot.x: hotSpotX
-        Drag.hotSpot.y: hotSpotY
+        Drag.active: componentItemRoot.grabbed
+        Drag.hotSpot.x: hotSpotX / scale;
+        Drag.hotSpot.y: hotSpotY / scale;
         Drag.source: componentItemRoot.componentInfo
+        Drag.keys: [ CONSTS.newComponentDragKey ]
+
+        cursorShape: componentItemRoot.grabbed ? Qt.ClosedHandCursor : Qt.PointingHandCursor
 
         property int hotSpotX: 0
         property int hotSpotY: 0
 
         property int scaleDuration: 500
 
-        onGrabbedChanged: {
-            //console.log("DComponentItem.dragContainer.onGrabbedChanged - grabbed: " + grabbed);
-        }
-
         onPressed: {
-//            // Set Grabbed
-//            dragContainer.grabbed = true;
-//            // Set Hot Spot
-//            dragContainer.hotSpotX = mouse.x;
-//            dragContainer.hotSpotY = mouse.y;
-
             // Set Activity Indicator Running State
             loadingIndicator.running = true;
+            // Set Focus
+            dragContainer.focus = true;
         }
 
         onPressAndHold: {
@@ -63,30 +67,37 @@ Item {
             loadingIndicator.running = false;
 
             // Set Grabbed
-            dragContainer.grabbed = true;
+            componentItemRoot.grabbed = true;
+
             // Set Hot Spot
-            dragContainer.hotSpotX = mouse.x;
-            dragContainer.hotSpotY = mouse.y;
+            dragContainer.hotSpotX = mouse.x * scale;
+            dragContainer.hotSpotY = mouse.y * scale;
         }
 
         onReleased: {
+            // Check Grabbed State
+            if (componentItemRoot.grabbed) {
+                // Drop Item
+                Drag.drop();
+                // Reset Grabbed
+                componentItemRoot.grabbed = false;
+            }
+
             // Set Activity Indicator Running State
             loadingIndicator.running = false;
-            // Reset Grabbed
-            dragContainer.grabbed = false;
         }
 
         onCanceled: {
             // Set Activity Indicator Running State
             loadingIndicator.running = false;
             // Reset Grabbed
-            dragContainer.grabbed = false;
+            componentItemRoot.grabbed = false;
         }
 
         DRectangle {
             id: dragContainerBG
             anchors.fill: parent
-            border.color: dragContainer.pressed ? STYLE.colorBorder : STYLE.colorBorderNoFocus
+            border.color: dragContainer.focus ? STYLE.colorBorder : STYLE.colorBorderNoFocus
         }
 
         Loader {
@@ -99,7 +110,10 @@ Item {
 
         DText {
             id: componentTitleLabel
+            width: parent.width
             anchors.centerIn: parent
+            font.pixelSize: STYLE.fontSizeS
+            horizontalAlignment: Text.AlignHCenter
             text: "ComponentItem"
         }
 
@@ -112,16 +126,16 @@ Item {
         states: [
             State {
                 name: ""
-                when: !dragContainer.grabbed
+                when: !componentItemRoot.grabbed
 
                 //PropertyChanges { target: dragContainer; scale: 1.0 }
             },
 
             State {
                 name: "grabbed"
-                when: dragContainer.grabbed
+                when: componentItemRoot.grabbed
 
-                PropertyChanges { target: dragContainer; scale: 1.2 }
+                PropertyChanges { target: dragContainer; scale: 1.2; z: 0.1 }
             }
         ]
 
@@ -137,7 +151,7 @@ Item {
                     PropertyAction { target: dragContainer; properties: "width, height"; value: 0 }
                     ParallelAnimation {
                         DAnimation { target: dragContainer; property: "opacity"; to: 1.0 }
-                        DAnimation { target: dragContainer; properties: "x, y"; to: 0 }
+                        DAnimation { target: dragContainer; properties: "x, y, z"; to: 0 }
                         DAnimation { target: dragContainer; property: "width"; to: componentItemRoot.width }
                         DAnimation { target: dragContainer; property: "height"; to: componentItemRoot.height }
                     }
@@ -147,6 +161,7 @@ Item {
             Transition {
                 to: "grabbed"
                 SequentialAnimation {
+                    PropertyAction { target: dragContainer; property: "z" }
                     DAnimation { target: dragContainer; property: "scale"; duration: dragContainer.scaleDuration; easing.type: Easing.OutElastic }
                 }
             }

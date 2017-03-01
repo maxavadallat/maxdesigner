@@ -44,7 +44,9 @@ DContainer {
 
     readonly property int animDuration: 500
 
-    default property alias paneContainer: contentContainer.children
+    property alias paneContainer: contentContainer
+    default property alias paneContainerChildren: contentContainer.children
+
 
     property alias enablePaneContent: contentContainer.enabled
 
@@ -54,22 +56,12 @@ DContainer {
 
     property bool showTitle: true
 
+    property alias topMouseAreaVisible: topMouseArea.visible
+
     enableSizeOverlay: false
     enablePosOverlay: false
 
     clipContent: false
-
-    onXChanged: {
-        if (paneBaseRoot.state !== stateHidden) {
-            paneBaseRoot.lastShownX = paneBaseRoot.x;
-        }
-    }
-
-    onYChanged: {
-        if (paneBaseRoot.state !== stateHidden) {
-            paneBaseRoot.lastShownY = paneBaseRoot.y;
-        }
-    }
 
     property Connections parentConnections: Connections {
         target: parent
@@ -104,14 +96,32 @@ DContainer {
         }
     }
 
+    onXChanged: {
+        if (paneBaseRoot.state !== stateHidden) {
+            paneBaseRoot.lastShownX = paneBaseRoot.x;
+        }
+    }
+
+    onYChanged: {
+        if (paneBaseRoot.state !== stateHidden) {
+            paneBaseRoot.lastShownY = paneBaseRoot.y;
+        }
+    }
+
     onPressed: {
+        //console.log("DPaneBase.onPressed");
         // Set Drag Target - ASSUMING Parent is MainGrabArea
         parent.setDragTarget(paneBaseRoot);
     }
 
     onReleased: {
+        //console.log("DPaneBase.onReleased");
         // Clear Drag Target - ASSUMING Parent is MainGrabArea
-        parent.clearDragTarget();
+        //parent.clearDragTarget();
+    }
+
+    onResizePressed: {
+        paneBaseRoot.parent.setDragTarget(paneBaseRoot);
     }
 
     // Show
@@ -140,9 +150,36 @@ DContainer {
         visible: paneBaseRoot.showBackground
     }
 
+    // Content Container
     Item {
         id: contentContainer
         anchors.fill: parent
+    }
+
+    MouseArea {
+        id: topMouseArea
+        anchors.fill: parent
+
+        visible: paneBaseRoot.focus
+
+        onPressed: {
+            //console.log("DPaneBase.topMouseArea.onPressed");
+            // Set Drag Target - ASSUMING Parent is MainGrabArea
+            paneBaseRoot.parent.setDragTarget(paneBaseRoot);
+            mouse.accepted = false;
+        }
+
+        onReleased: {
+            //console.log("DPaneBase.topMouseArea.onReleased");
+            // Set Drag Target - ASSUMING Parent is MainGrabArea
+            paneBaseRoot.parent.clearDragTarget();
+            mouse.accepted = false;
+        }
+
+//        Rectangle {
+//            anchors.fill: parent
+//            color: "#22FF0000"
+//        }
     }
 
     // Title
@@ -159,6 +196,8 @@ DContainer {
     // Hide Indicator
     Item {
         id: hideShowButton
+
+        parent: paneBaseRoot
 
         width: paneBaseRoot.hideToSide === paneBaseRoot.hideToBottom ? CONSTS.defaultPaneHideButtonHeight : CONSTS.defaultPaneHideButtonWidth
         height: paneBaseRoot.hideToSide === paneBaseRoot.hideToBottom ? CONSTS.defaultPaneHideButtonWidth : CONSTS.defaultPaneHideButtonHeight
@@ -264,6 +303,11 @@ DContainer {
             SequentialAnimation {
                 ScriptAction {
                     script: {
+                        // Set Drag Target
+                        paneBaseRoot.parent.setDragTarget(paneBaseRoot);
+                        // Clear Drag Target
+                        paneBaseRoot.parent.clearDragTarget();
+                        // Set Hide Button Text
                         hideButtonText.text = "•••";
                     }
                 }
@@ -280,6 +324,7 @@ DContainer {
 
                 ScriptAction {
                     script: {
+                        // Set Hide Button Text
                         hideButtonText.text = paneBaseRoot.title;
                     }
                 }

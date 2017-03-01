@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>qml/main.qml</file>
-        <file>assets/images/background02.png</file>
         <file>qml/Constants.js</file>
         <file>qml/ProjectPane.qml</file>
         <file>qml/PropertiesPane.qml</file>
@@ -48,5 +47,6 @@
         <file>qml/DComponentRootContainer.qml</file>
         <file>qml/DPaneBase.qml</file>
         <file>qml/DComponentItem.qml</file>
+        <file>qml/DComponentChildContainer.qml</file>
     </qresource>
 </RCC>

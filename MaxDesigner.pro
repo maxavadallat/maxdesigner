@@ -76,7 +76,8 @@ FORMS               += ui/mainwindow.ui \
                     ui/createviewdialog.ui
 
 # Resources
-RESOURCES           += maxdesigner.qrc
+RESOURCES           += maxdesigner.qrc \
+                    maxdesignerimages.qrc
 
 macx: {
 # Icon

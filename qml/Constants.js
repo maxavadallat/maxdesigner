@@ -22,6 +22,11 @@ var defaultButtonGroupWidth                     = 128;
 var minimizedComponentsHeight                   = 32;
 
 // Component Item Width & Height
-var componentItemWidth                          = 128;
-var componentItemHeight                         = 64;
+var componentItemWidth                          = 108;
+var componentItemHeight                         = 58;
 
+// New Component Drag Key
+var newComponentDragKey                         = "Drag.NewComponent";
+
+// Component Move Step
+var componentMoveStep                           = 1;

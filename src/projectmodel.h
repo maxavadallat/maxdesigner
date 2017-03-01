@@ -154,15 +154,15 @@ signals:
     void viewsDirChanged(const QString& aViewsDir);
     // Import Paths Changed Signal
     void importPathsChanged(const QStringList& aImportPaths);
-    // Import Path Added
+    // Import Path Added Signal
     void importPathAdded(const QString& aImportPath);
-    // Import Path Removed
+    // Import Path Removed Signal
     void importPathRemoved(const QString& aImportPath);
     // Plugin Paths Changed Signal
     void pluginPathsChanged(const QStringList& aPluginPaths);
-    // Plugin Path Added
+    // Plugin Path Added Signal
     void pluginPathAdded(const QString& aPluginPath);
-    // Plugin Path Removed
+    // Plugin Path Removed Signal
     void pluginPathRemoved(const QString& aPluginPath);
 
     // Base Components Model Changed Signal
@@ -195,7 +195,8 @@ private: // Data
     QString                 mName;
     // Project Properties
     QJsonObject             mProperties;
-
+    // Dirty Properties
+    bool                    mDirty;
     // Base Components
     BaseComponentsModel*    mBaseComponents;
     // Components

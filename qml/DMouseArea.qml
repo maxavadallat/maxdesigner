@@ -11,5 +11,19 @@ MouseArea {
     Behavior on opacity { NumberAnimation { duration: STYLE.animDuration } }
     visible: opacity > 0.0
 
+    propagateComposedEvents: true
+
+    //signal pressedForParent()
+
+    onPressed: {
+        //console.log("DMouseArea.onPressed");
+        // Emit Pressed For Parent Signal
+        //mouseAreaRoot.pressedForParent();
+    }
+
+    onReleased: {
+        //console.log("DMouseArea.onReleased");
+    }
+
     DTracer { }
 }

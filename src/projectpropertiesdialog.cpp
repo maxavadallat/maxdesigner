@@ -255,7 +255,8 @@ QStringList ProjectPropertiesDialog::importPaths()
 {
     // Check Import Paths Model
     if (mImportPathsModel) {
-
+        // Get Import Paths
+        return mImportPathsModel->importPaths();
     }
 
     return QStringList();
@@ -321,7 +322,8 @@ QStringList ProjectPropertiesDialog::pluginPaths()
 {
     // Check Plugin Paths Model
     if (mPluginPathsModel) {
-
+        // Get Plugin Paths
+        return mPluginPathsModel->pluginPaths();
     }
 
     return QStringList();
@@ -385,7 +387,29 @@ void ProjectPropertiesDialog::clearPluginPaths()
 //==============================================================================
 void ProjectPropertiesDialog::on_projectDirBrowseButton_clicked()
 {
+    // Init Project Dir Select Dialog
+    QFileDialog sDialog(NULL, "Select Project Directory");
 
+    // Set File Mode
+    sDialog.setFileMode(QFileDialog::Directory);
+
+    // Init Selection Directory
+    QString sDirectory = ui->projectDirEdit->text();
+
+    // Check Directory
+    if (!QFile::exists(sDirectory)) {
+        // Adjust Selection Directory
+        sDirectory = QDir::homePath();
+    }
+
+    // Set Directory
+    sDialog.setDirectory(sDirectory);
+
+    // Exec Project Dir Select Dialog
+    if (sDialog.exec()) {
+        // Set Text
+        ui->projectDirEdit->setText(sDialog.selectedFiles()[0]);
+    }
 }
 
 //==============================================================================
@@ -393,7 +417,35 @@ void ProjectPropertiesDialog::on_projectDirBrowseButton_clicked()
 //==============================================================================
 void ProjectPropertiesDialog::on_qmlFileBrowseButton_clicked()
 {
+    // Init QML File Select Dialog
+    QFileDialog sDialog(NULL, "Select Main QML File");
 
+    // Set Name Filter
+    sDialog.setNameFilter(QString("*.%1").arg(DEFAULT_QML_SUFFIX));
+
+    // Set File Mode
+    sDialog.setFileMode(QFileDialog::ExistingFiles);
+
+    // Init Selection File Info
+    QFileInfo sFileInfo(ui->mainQmlFileEdit->text());
+
+    // Init Selection Directory
+    QString sDirectory = sFileInfo.absolutePath();
+
+    // Check Directory
+    if (!QFile::exists(sDirectory)) {
+        // Adjust Selection Directory
+        sDirectory = QDir::homePath();
+    }
+
+    // Set Directory
+    sDialog.setDirectory(sDirectory);
+
+    // Exec Project Dir Select Dialog
+    if (sDialog.exec()) {
+        // Set Text
+        ui->mainQmlFileEdit->setText(sDialog.selectedFiles()[0]);
+    }
 }
 
 //==============================================================================
@@ -401,7 +453,29 @@ void ProjectPropertiesDialog::on_qmlFileBrowseButton_clicked()
 //==============================================================================
 void ProjectPropertiesDialog::on_qmlDirBrowseButton_clicked()
 {
+    // Init Dir Select Dialog
+    QFileDialog sDialog(NULL, "Select QML Directory");
 
+    // Set File Mode
+    sDialog.setFileMode(QFileDialog::Directory);
+
+    // Init Selection Directory
+    QString sDirectory = ui->qmlDirEdit->text();
+
+    // Check Directory
+    if (!QFile::exists(sDirectory)) {
+        // Adjust Selection Directory
+        sDirectory = QDir::homePath();
+    }
+
+    // Set Directory
+    sDialog.setDirectory(sDirectory);
+
+    // Exec Project Dir Select Dialog
+    if (sDialog.exec()) {
+        // Set Text
+        ui->qmlDirEdit->setText(sDialog.selectedFiles()[0]);
+    }
 }
 
 //==============================================================================
@@ -409,7 +483,29 @@ void ProjectPropertiesDialog::on_qmlDirBrowseButton_clicked()
 //==============================================================================
 void ProjectPropertiesDialog::on_jsDirBrowseButton_clicked()
 {
+    // Init Dir Select Dialog
+    QFileDialog sDialog(NULL, "Select JS Directory");
 
+    // Set File Mode
+    sDialog.setFileMode(QFileDialog::Directory);
+
+    // Init Selection Directory
+    QString sDirectory = ui->jsDirEdit->text();
+
+    // Check Directory
+    if (!QFile::exists(sDirectory)) {
+        // Adjust Selection Directory
+        sDirectory = QDir::homePath();
+    }
+
+    // Set Directory
+    sDialog.setDirectory(sDirectory);
+
+    // Exec Project Dir Select Dialog
+    if (sDialog.exec()) {
+        // Set Text
+        ui->jsDirEdit->setText(sDialog.selectedFiles()[0]);
+    }
 }
 
 //==============================================================================
@@ -417,7 +513,29 @@ void ProjectPropertiesDialog::on_jsDirBrowseButton_clicked()
 //==============================================================================
 void ProjectPropertiesDialog::on_imagesDirBrowseButton_clicked()
 {
+    // Init Dir Select Dialog
+    QFileDialog sDialog(NULL, "Select Images Directory");
 
+    // Set File Mode
+    sDialog.setFileMode(QFileDialog::Directory);
+
+    // Init Selection Directory
+    QString sDirectory = ui->imagesDirEdit->text();
+
+    // Check Directory
+    if (!QFile::exists(sDirectory)) {
+        // Adjust Selection Directory
+        sDirectory = QDir::homePath();
+    }
+
+    // Set Directory
+    sDialog.setDirectory(sDirectory);
+
+    // Exec Project Dir Select Dialog
+    if (sDialog.exec()) {
+        // Set Text
+        ui->imagesDirEdit->setText(sDialog.selectedFiles()[0]);
+    }
 }
 
 //==============================================================================
@@ -425,7 +543,29 @@ void ProjectPropertiesDialog::on_imagesDirBrowseButton_clicked()
 //==============================================================================
 void ProjectPropertiesDialog::on_componentsDirBrowseButton_clicked()
 {
+    // Init Dir Select Dialog
+    QFileDialog sDialog(NULL, "Select Components Directory");
 
+    // Set File Mode
+    sDialog.setFileMode(QFileDialog::Directory);
+
+    // Init Selection Directory
+    QString sDirectory = ui->componentsDirEdit->text();
+
+    // Check Directory
+    if (!QFile::exists(sDirectory)) {
+        // Adjust Selection Directory
+        sDirectory = QDir::homePath();
+    }
+
+    // Set Directory
+    sDialog.setDirectory(sDirectory);
+
+    // Exec Project Dir Select Dialog
+    if (sDialog.exec()) {
+        // Set Text
+        ui->componentsDirEdit->setText(sDialog.selectedFiles()[0]);
+    }
 }
 
 //==============================================================================
@@ -433,7 +573,29 @@ void ProjectPropertiesDialog::on_componentsDirBrowseButton_clicked()
 //==============================================================================
 void ProjectPropertiesDialog::on_viewsDirBrowseButton_clicked()
 {
+    // Init Dir Select Dialog
+    QFileDialog sDialog(NULL, "Select Views Directory");
 
+    // Set File Mode
+    sDialog.setFileMode(QFileDialog::Directory);
+
+    // Init Selection Directory
+    QString sDirectory = ui->viewsDirEdit->text();
+
+    // Check Directory
+    if (!QFile::exists(sDirectory)) {
+        // Adjust Selection Directory
+        sDirectory = QDir::homePath();
+    }
+
+    // Set Directory
+    sDialog.setDirectory(sDirectory);
+
+    // Exec Project Dir Select Dialog
+    if (sDialog.exec()) {
+        // Set Text
+        ui->viewsDirEdit->setText(sDialog.selectedFiles()[0]);
+    }
 }
 
 //==============================================================================
