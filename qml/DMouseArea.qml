@@ -11,7 +11,7 @@ MouseArea {
     Behavior on opacity { NumberAnimation { duration: STYLE.animDuration } }
     visible: opacity > 0.0
 
-    propagateComposedEvents: true
+    //propagateComposedEvents: true
 
     //signal pressedForParent()
 

@@ -105,6 +105,7 @@ bool ProjectModel::loadProject(const QString& aFileName)
 
     // Open File For Reading
     if (jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "ProjectModel::loadProject - aFileName: " << aFileName;
         // Init JSON Content
         QString jsonContent;
         // Read All

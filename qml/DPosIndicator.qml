@@ -6,15 +6,18 @@ import "Style.js" as STYLE
 DRectangle {
     id: posIndicatorRoot
 
-    width: STYLE.posIndicatorWidth
-    height: STYLE.posIndicatorHeight
+    //width: STYLE.posIndicatorWidth
+    //height: STYLE.posIndicatorHeight
+    width: posOverlay.width + 12
+    height: posOverlay.height + 4
 
     property int posX: 0
     property int posY: 0
 
     property bool autoHide: true
 
-    border.color: STYLE.colorBorderNoFocus
+    border.color: STYLE.colorBorderTransparent
+    radius: 0
 
     opacity: 0.0
     Behavior on opacity { DFadeAnimation { } }

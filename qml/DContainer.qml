@@ -150,6 +150,10 @@ DMouseArea {
                 }
             break;
 
+            case Qt.Key_T:
+                settingsController.tracerVisible = !settingsController.tracerVisible;
+            break;
+
             // ...
         }
     }

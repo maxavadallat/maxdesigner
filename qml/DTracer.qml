@@ -9,7 +9,7 @@ Loader {
     visible: settingsController.tracerVisible
     sourceComponent: Rectangle {
         anchors.fill: parent
-        color: "transparent"
+        color: "transparent"//"#22FFFF00"
         border.color: STYLE.colorTrace
     }
 }

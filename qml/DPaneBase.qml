@@ -25,6 +25,22 @@ DContainer {
     property int lastShownX: 0
     property int lastShownY: 0
 
+    property int initialX: 0
+    property int initialY: 0
+
+    property int creationX: 0
+    property int creationY: 0
+
+    property int creationWidth: 0
+    property int creationHeight: 0
+
+    property int parentWidth: 0
+    property int parentHeight: 0
+
+    property int resetWidth: 0
+
+    property bool transitioning: false
+
     property int hiddenX: {
         switch (hideToSide) {
             case hideToLeft:    return -paneBaseRoot.width;
@@ -69,16 +85,16 @@ DContainer {
         onWidthChanged: {
             //console.log("DPane.Connections.onWidthChanged - parent.width: " + parent.width);
 
-            // Check State
-            if (paneBaseRoot.state === paneBaseRoot.stateHidden) {
-
-            } else {
-                // Check X Position
+            // Check Hide To Side
+            //if (paneBaseRoot.hideToSide === paneBaseRoot.hideToBottom) {
+                // Check Parent Width & X Position
                 if (parent.width > 0 && (paneBaseRoot.x + paneBaseRoot.width + STYLE.defaultMargin) > parent.width) {
                     // Adjust X Pos To Stay Visible
                     paneBaseRoot.x = parent.width - (paneBaseRoot.width + STYLE.defaultMargin);
+                    // Adjust Las Shown X
+                    paneBaseRoot.lastShownX = paneBaseRoot.x;
                 }
-            }
+            //}
 
             // ...
         }
@@ -86,10 +102,12 @@ DContainer {
         onHeightChanged: {
             //console.log("DPane.Connections.onHeightChanged - parent.height: " + parent.height);
 
-            // Check Y Position
+            // Check Parent Height & Y Position
             if (parent.height > 0 && (paneBaseRoot.y + paneBaseRoot.height + STYLE.defaultMargin) > parent.height) {
                 // Adjust Y Pos To Stay Visible
                 paneBaseRoot.y = parent.height - (paneBaseRoot.height + STYLE.defaultMargin);
+                // Adjust Las Shown Y
+                paneBaseRoot.lastShownY = paneBaseRoot.y;
             }
 
             // ...
@@ -97,16 +115,37 @@ DContainer {
     }
 
     onXChanged: {
-        if (paneBaseRoot.state !== stateHidden) {
+//        if (transitioning)
+//            return;
+
+        // Check State
+        if (paneBaseRoot.state !== stateHidden && paneBaseRoot.state !== stateClosed) {
+            //console.log("DPaneBase.onXChanged - x: " + x);
+
+            // Adjust Las Shown X
             paneBaseRoot.lastShownX = paneBaseRoot.x;
         }
     }
 
     onYChanged: {
-        if (paneBaseRoot.state !== stateHidden) {
+//        if (transitioning)
+//            return;
+
+        // Check State
+        if (paneBaseRoot.state !== stateHidden && paneBaseRoot.state !== stateClosed) {
+
+            //console.log("DPaneBase.onYChanged - y: " + y);
+
+            // Adjust Las Shown Y
             paneBaseRoot.lastShownY = paneBaseRoot.y;
         }
     }
+
+//    onWidthChanged: {
+//        if (!transitioning && state === stateShown) {
+//            console.log("DPaneBase.onWidthChanged - width: " + width);
+//        }
+//    }
 
     onPressed: {
         //console.log("DPaneBase.onPressed");
@@ -122,6 +161,27 @@ DContainer {
 
     onResizePressed: {
         paneBaseRoot.parent.setDragTarget(paneBaseRoot);
+    }
+
+//    onInitialYChanged: {
+//        console.log("DPaneBase.onInitialYChanged - initialY: " + initialY);
+//    }
+
+    // Reset To Create State
+    function reset() {
+        // Check Hide To Sie
+        if (paneBaseRoot.hideToSide === paneBaseRoot.hideToLeft || paneBaseRoot.hideToSide === paneBaseRoot.hideToBottom) {
+            // Set Reset Width
+            paneBaseRoot.resetWidth = paneBaseRoot.x + paneBaseRoot.width - paneBaseRoot.initialX;
+        } else {
+            // Set Reset Width
+            paneBaseRoot.resetWidth = paneBaseRoot.initialX - paneBaseRoot.x;
+        }
+
+        //console.log("DPaneBase.reset - resetWidth: " + resetWidth);
+
+        // Set State
+        paneBaseRoot.state = stateCreate;
     }
 
     // Show
@@ -190,7 +250,9 @@ DContainer {
         anchors.top: parent.top
         anchors.topMargin: STYLE.defaultMargin
         text: paneBaseRoot.title
-        visible: paneBaseRoot.showTitle
+        Behavior on opacity { DFadeAnimation { } }
+        opacity: 0.0
+        visible: paneBaseRoot.showTitle && opacity > 0.0
     }
 
     // Hide Indicator
@@ -223,7 +285,9 @@ DContainer {
             return undefined;
         }
 
-        visible: paneBaseRoot.hideToSide !== ""
+        Behavior on opacity { DFadeAnimation { } }
+        opacity: 0.0
+        visible: paneBaseRoot.hideToSide !== "" && opacity > 0.0
 
         DText {
             id: hideButtonText
@@ -261,17 +325,23 @@ DContainer {
         }
     }
 
+    Item {
+        id: dummy
+        visible: false
+    }
+
     states: [
         State {
             name: stateCreate
 
-            PropertyChanges { target: paneBaseRoot; width: 0; height: 0 }
+            PropertyChanges { target: paneBaseRoot; x: paneBaseRoot.initialX; y: paneBaseRoot.initialY; width: 0; height: 0 }
         },
 
         State {
             name: stateShown
 
             PropertyChanges { target: paneBaseRoot; x: paneBaseRoot.lastShownX; y: paneBaseRoot.lastShownY }
+            PropertyChanges { target: paneBaseRoot; width: paneBaseRoot.creationWidth; height: paneBaseRoot.creationHeight }
         },
 
         State {
@@ -294,6 +364,75 @@ DContainer {
 
             SequentialAnimation {
 
+                PropertyAction { target: paneBaseRoot; property: "transitioning"; value: true }
+
+                PauseAnimation { duration: 200 }
+
+                PropertyAction { target: paneBaseRoot; property: "focus"; value: true }
+
+                PropertyAction { target: paneBaseRoot; property: "height"; value: 1 }
+                PropertyAction { target: paneBaseRoot; property: "x"; value: paneBaseRoot.initialX }
+                PropertyAction { target: paneBaseRoot; property: "y"; value: paneBaseRoot.initialY }
+
+                ParallelAnimation {
+                    DAnimation { target: hideToSide === hideToLeft ? paneBaseRoot : dummy; property: "width"; to: paneBaseRoot.creationX + paneBaseRoot.creationWidth }
+
+                    DAnimation { target: hideToSide === hideToRight ? paneBaseRoot : dummy; property: "x"; to: paneBaseRoot.creationX }
+                    DAnimation { target: hideToSide === hideToRight ? paneBaseRoot : dummy; property: "width"; to: paneBaseRoot.parentWidth - paneBaseRoot.creationX }
+
+                    DAnimation { target: hideToSide === hideToBottom ? paneBaseRoot : dummy; property: "width"; to: paneBaseRoot.creationX + paneBaseRoot.creationWidth - paneBaseRoot.initialX }
+                }
+
+                ParallelAnimation {
+                    DAnimation { target: paneBaseRoot; property: "width"; to: paneBaseRoot.creationWidth }
+                    DAnimation { target: paneBaseRoot; property: "x"; to: paneBaseRoot.creationX }
+                }
+
+                ParallelAnimation {
+                    DAnimation { target: paneBaseRoot; property: "y"; to: paneBaseRoot.creationY }
+                    DAnimation { target: paneBaseRoot; property: "height"; to: paneBaseRoot.creationHeight }
+                }
+
+                PropertyAction { target: titleTextLabel; property: "opacity"; value: 1.0 }
+                PropertyAction { target: hideShowButton; property: "opacity"; value: 1.0 }
+
+                PropertyAction { target: paneBaseRoot; property: "transitioning"; value: false }
+            }
+        },
+
+        Transition {
+            from: stateShown
+            to: stateCreate
+            reversible: false
+
+            SequentialAnimation {
+
+                PropertyAction { target: paneBaseRoot; property: "transitioning"; value: true }
+
+                PropertyAction { target: titleTextLabel; property: "opacity"; value: 0.0 }
+                PropertyAction { target: hideShowButton; property: "opacity"; value: 0.0 }
+
+                ParallelAnimation {
+                    DAnimation { target: paneBaseRoot; property: "y"; to: paneBaseRoot.y + paneBaseRoot.height / 2 }
+                    DAnimation { target: paneBaseRoot; property: "height"; to: 1 }
+                }
+
+                ParallelAnimation {
+                    DAnimation { target: paneBaseRoot; property: "width"; to: paneBaseRoot.resetWidth }
+                    DAnimation { target: hideToSide === hideToLeft ? paneBaseRoot : dummy; property: "x"; to: paneBaseRoot.initialX }
+                    DAnimation { target: hideToSide === hideToBottom ? paneBaseRoot : dummy; property: "x"; to: paneBaseRoot.initialX }
+                }
+
+                ParallelAnimation {
+                    DAnimation { target: paneBaseRoot; property: "width"; to: 0 }
+                    DAnimation { target: paneBaseRoot; property: "x"; to: paneBaseRoot.initialX }
+                }
+
+                PropertyAction { target: paneBaseRoot; property: "height"; value: 0 }
+
+                // ...
+
+                PropertyAction { target: paneBaseRoot; property: "transitioning"; value: false }
             }
         },
 

@@ -8,8 +8,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "designereventfilter.h"
 #include "projectmodel.h"
 #include "componentinfo.h"
+#include "propertiescontroller.h"
 
 #include "constants.h"
 
@@ -20,6 +22,7 @@ MainWindow::MainWindow(QWidget* aParent)
     : QMainWindow(aParent)
     , ui(new Ui::MainWindow)
     , mSettings(SettingsControler::getInstance())
+    , mEventFilter(NULL)
 
     , mBaseComponents(NULL)
     , mComponents(NULL)
@@ -31,6 +34,8 @@ MainWindow::MainWindow(QWidget* aParent)
     , mPreferencesDialog(NULL)
     , mProjectPropertiesDiaog(NULL)
     , mDefineBaseComponentDialog(NULL)
+
+    , mPropertiesController(NULL)
 
     , mProjectModel(NULL)
     , mCurrentComponent(NULL)
@@ -51,6 +56,15 @@ MainWindow::MainWindow(QWidget* aParent)
 //==============================================================================
 void MainWindow::init()
 {
+    // Check Event Filter
+    if (!mEventFilter) {
+        // Create Event Filter
+        mEventFilter = new DesignerEventFilter();
+    }
+
+    // Install Event Filter
+    //installEventFilter(mEventFilter);
+
     // Check Open File Model
     if (!mOpenfiles) {
         // Create Open Files Model
@@ -84,6 +98,15 @@ void MainWindow::init()
     // Set Context Properties - Recent Projects List Model
     ctx->setContextProperty(MODEL_NAME_RECENT_PROJECTS, mRecentProjects);
 
+    // Check Properties Controller
+    if (!mPropertiesController) {
+        // Create Properties Controller
+        mPropertiesController = new PropertiesController();
+    }
+
+    // Set Context Properties - Properties Controller
+    ctx->setContextProperty(DEFAULT_PROPERTIES_CONTROLLER, mPropertiesController);
+
     // ...
 
     // Register Project Model
@@ -103,9 +126,6 @@ void MainWindow::init()
 
     // Set Resize Mode
     ui->mainQuickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
-
-//    // Register Singleton Type
-//    qmlRegisterSingletonType(QUrl("qrc:///qml/Style.qml"), "utils", 0, 1, "Style");
 
     // Set Source
     ui->mainQuickWidget->setSource(QUrl(DEFAULT_MAIN_QMLFILE_URL));
@@ -220,6 +240,8 @@ void MainWindow::openProject(const QString& aFilePath)
 
     // Load Project
     if (mProjectModel->loadProject(aFilePath)) {
+
+        qDebug() << "MainWindow::openProject - aFilePath: " << aFilePath;
         // Store recent Project
         mRecentProjects->storeRecentProject(aFilePath);
 
@@ -234,9 +256,12 @@ void MainWindow::openProject(const QString& aFilePath)
 
         // Emit Current Project Changed Signal
         emit currentProjectChanged(mProjectModel);
-    }
 
-    // ...
+        // ...
+
+    } else {
+        qWarning() << "MainWindow::openProject - aFilePath: " << aFilePath << " - ERROR LOADING PROJECT";
+    }
 }
 
 //==============================================================================
@@ -354,7 +379,6 @@ void MainWindow::launchSaveProjectAs()
 
     // Grab Keyboard Focus
     //grabKeyboard();
-
 }
 
 //==============================================================================
@@ -385,11 +409,11 @@ void MainWindow::launchProjectProperties()
     // Set Project Name
     mProjectPropertiesDiaog->setProjectName(mProjectModel->projectName());
     // Set Project Dir
-    mProjectPropertiesDiaog->setProjectDir(mProjectModel->projectDir());
-    // Set Main QML File
-    mProjectPropertiesDiaog->setMainQMLFile(mProjectModel->mainQMLFile());
+    //mProjectPropertiesDiaog->setProjectDir(mProjectModel->projectDir());
     // Set QML Directory
     mProjectPropertiesDiaog->setQMLDir(mProjectModel->qmlDir());
+    // Set Main QML File
+    mProjectPropertiesDiaog->setMainQMLFile(mProjectModel->mainQMLFile());
     // Set JS Directory
     mProjectPropertiesDiaog->setJSDir(mProjectModel->jsDir());
     // Set Images Directory
@@ -407,7 +431,7 @@ void MainWindow::launchProjectProperties()
     // Exec Dialog
     if (mProjectPropertiesDiaog->exec()) {
         // Set Project Properties
-
+        updateProject();
     }
 
     // Grab Keyboard Focus
@@ -499,24 +523,8 @@ void MainWindow::createNewProject()
     // Set Base Components Dir
     //mProjectModel->setBaseComponentsDir(mProjectPropertiesDiaog->projectDir() + "/" + mProjectPropertiesDiaog->projectName() + "/" + DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME);
 
-    // Set Main QML File
-    mProjectModel->setMainQMLFile(mProjectPropertiesDiaog->mainQMLFile());
-    // Set QML Dir
-    mProjectModel->setQmlDir(mProjectPropertiesDiaog->qmlDir());
-    // Set JS Dir
-    mProjectModel->setJsDir(mProjectPropertiesDiaog->jsDir());
-    // Set Images Dir
-    mProjectModel->setImagesDir(mProjectPropertiesDiaog->imagesDir());
-    // Set Components Dir
-    mProjectModel->setComponentsDir(mProjectPropertiesDiaog->componentsDir());
-    // Set Views Dir
-    mProjectModel->setViewsDir(mProjectPropertiesDiaog->viewsDir());
-
-    // Set Import Paths
-    mProjectModel->setImportPaths(mProjectPropertiesDiaog->importPaths());
-    // Set Plugin Paths
-    mProjectModel->setPluginPaths(mProjectPropertiesDiaog->pluginPaths());
-
+    // Update Project
+    updateProject();
     // ...
 
     // Enable Save Project Menu Item
@@ -572,6 +580,8 @@ void MainWindow::saveProject(const QString& aFilePath)
         return;
     }
 
+    qDebug() << "MainWindow::saveProject - aFilePath: " << aFilePath;
+
     // Save Project
     if (mProjectModel->saveProject(aFilePath)) {
         // Store Recent
@@ -610,6 +620,23 @@ void MainWindow::updateProject()
         return;
     }
 
+    // Set Main QML File
+    mProjectModel->setMainQMLFile(mProjectPropertiesDiaog->mainQMLFile());
+    // Set QML Dir
+    mProjectModel->setQmlDir(mProjectPropertiesDiaog->qmlDir());
+    // Set JS Dir
+    mProjectModel->setJsDir(mProjectPropertiesDiaog->jsDir());
+    // Set Images Dir
+    mProjectModel->setImagesDir(mProjectPropertiesDiaog->imagesDir());
+    // Set Components Dir
+    mProjectModel->setComponentsDir(mProjectPropertiesDiaog->componentsDir());
+    // Set Views Dir
+    mProjectModel->setViewsDir(mProjectPropertiesDiaog->viewsDir());
+
+    // Set Import Paths
+    mProjectModel->setImportPaths(mProjectPropertiesDiaog->importPaths());
+    // Set Plugin Paths
+    mProjectModel->setPluginPaths(mProjectPropertiesDiaog->pluginPaths());
 }
 
 //==============================================================================
@@ -629,33 +656,38 @@ void MainWindow::updateComponent()
 //==============================================================================
 void MainWindow::closeProject()
 {
+    // Save Project
+    saveProject();
+
     // Check Project Model
     if (!mProjectModel) {
         return;
     }
 
-    // Save Project
-    mProjectModel->saveProject();
+    qDebug() << "MainWindow::closeProject";
 
-    // Emit Current Project Changed Signal
-    emit currentProjectChanged(NULL);
+    // Save Project
+    //mProjectModel->saveProject();
 
     // Delete Project Model
     delete mProjectModel;
     mProjectModel = NULL;
 
+    // Emit Current Project Changed Signal
+    emit currentProjectChanged(mProjectModel);
+
     // ...
 
     // Enable Save Project Menu Item
-    ui->actionSaveProject->setEnabled(true);
+    ui->actionSaveProject->setEnabled(false);
     // Enable Save As Project Menu Item
-    ui->actionSaveProjectAs->setEnabled(true);
+    ui->actionSaveProjectAs->setEnabled(false);
     // Enable Project Properties Menu Item
-    ui->actionProjectProperties->setEnabled(true);
+    ui->actionProjectProperties->setEnabled(false);
     // Enable Close Project Menu Item
-    ui->actionCloseProject->setEnabled(true);
+    ui->actionCloseProject->setEnabled(false);
     // Enable Define Base Components Menu
-    ui->actionDefineBaseComponent->setEnabled(true);
+    ui->actionDefineBaseComponent->setEnabled(false);
 
     // ...
 }
@@ -665,6 +697,8 @@ void MainWindow::closeProject()
 //==============================================================================
 void MainWindow::closeComponent()
 {
+    qDebug() << "MainWindow::closeComponent";
+
     // ...
 }
 
@@ -680,6 +714,8 @@ void MainWindow::removeComponent(const QString& aName)
 
     // Check Name
     if (!aName.isEmpty()) {
+        qDebug() << "MainWindow::removeComponent - aName: " << aName;
+
         // ...
     }
 }
@@ -770,6 +806,8 @@ void MainWindow::importPathAdded(const QString& aImportPath)
 
     // Check Engine
     if (engine) {
+        qDebug() << "MainWindow::importPathAdded - aImportPath: " << aImportPath;
+
         // Add Import Path
         engine->addImportPath(aImportPath);
     }
@@ -793,6 +831,7 @@ void MainWindow::importPathRemoved(const QString& aImportPath)
         int ipIndex = ipList.indexOf(aImportPath);
         // Check Import Path Index
         if (ipIndex >= 0) {
+            qDebug() << "MainWindow::importPathRemoved - aImportPath: " << aImportPath;
             // Remove Import Path
             ipList.removeAt(ipIndex);
             // Set Import Path List
@@ -813,6 +852,7 @@ void MainWindow::importPathsChanged(const QStringList& aImportPaths)
 
     // Check Engine
     if (engine) {
+        qDebug() << "MainWindow::importPathsChanged - aImportPaths: " << aImportPaths;
         // Set Import Paths
         engine->setImportPathList(aImportPaths);
     }
@@ -830,6 +870,7 @@ void MainWindow::pluginPathAdded(const QString& aPluginPath)
 
     // Check Engine
     if (engine) {
+        qDebug() << "MainWindow::pluginPathAdded - aPluginPath: " << aPluginPath;
         // Add Plugin Path
         engine->addPluginPath(aPluginPath);
     }
@@ -853,6 +894,7 @@ void MainWindow::pluginPathRemoved(const QString& aPluginPath)
         int ppIndex = ppList.indexOf(aPluginPath);
         // Check Import Path Index
         if (ppIndex >= 0) {
+            qDebug() << "MainWindow::pluginPathRemoved - aPluginPath: " << aPluginPath;
             // Remove Import Path
             ppList.removeAt(ppIndex);
             // Set Plugin Path List
@@ -873,6 +915,7 @@ void MainWindow::pluginPathsChanged(const QStringList& aPluginPaths)
 
     // Check Engine
     if (engine) {
+        qDebug() << "MainWindow::pluginPathsChanged - aPluginPaths: " << aPluginPaths;
         // Set Plugin Paths
         engine->setPluginPathList(aPluginPaths);
     }
@@ -1060,6 +1103,10 @@ MainWindow::~MainWindow()
     // Release Settings
     mSettings->release();
 
+    if (mEventFilter) {
+        delete mEventFilter;
+        mEventFilter = NULL;
+    }
 
     if (mOpenfiles) {
         delete mOpenfiles;
@@ -1088,6 +1135,11 @@ MainWindow::~MainWindow()
         mDefineBaseComponentDialog = NULL;
     }
 
+    if (mPropertiesController) {
+        delete mPropertiesController;
+        mPropertiesController = NULL;
+    }
+
     // ...
 
     if (mProjectModel) {
@@ -1097,5 +1149,3 @@ MainWindow::~MainWindow()
 
     // ...
 }
-
-

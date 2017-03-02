@@ -33,7 +33,9 @@ SOURCES             += src/main.cpp \
                     src/viewsmodel.cpp \
                     src/createcomponentdialog.cpp \
                     src/createviewdialog.cpp \
-                    src/minimizedcomponents.cpp
+                    src/minimizedcomponents.cpp \
+                    src/propertiescontroller.cpp \
+                    src/designereventfilter.cpp
 
 # Headers
 HEADERS             += src/mainwindow.h \
@@ -62,7 +64,9 @@ HEADERS             += src/mainwindow.h \
                     src/viewsmodel.h \
                     src/createcomponentdialog.h \
                     src/createviewdialog.h \
-                    src/minimizedcomponents.h
+                    src/minimizedcomponents.h \
+                    src/propertiescontroller.h \
+                    src/designereventfilter.h
 
 # Forms
 FORMS               += ui/mainwindow.ui \

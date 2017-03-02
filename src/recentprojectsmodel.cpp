@@ -1,8 +1,10 @@
 #include <QFile>
 #include <QTextStream>
+#include <QDir>
 #include <QDebug>
 
 #include "recentprojectsmodel.h"
+#include "constants.h"
 
 //==============================================================================
 // Constructor
@@ -28,10 +30,17 @@ void RecentProjectsModel::init()
 //==============================================================================
 void RecentProjectsModel::storeRecentProject(const QString& aFilePath)
 {
+    qDebug() << "RecentProjectsModel::storeRecentProject - aFilePath: " << aFilePath;
+
     // Get Index Of File Path
     int fpIndex = mRecentProjectList.indexOf(aFilePath);
 
-    // Check Path
+    // Check Index
+    if (fpIndex == 0) {
+        return;
+    }
+
+    // Check Index
     if (fpIndex > 0) {
         // Begin Remove Rows
         beginRemoveRows(QModelIndex(), fpIndex, fpIndex);
@@ -47,6 +56,16 @@ void RecentProjectsModel::storeRecentProject(const QString& aFilePath)
     mRecentProjectList.insert(0, aFilePath);
     // End Insert Rows
     endInsertRows();
+
+    // Check Count
+    if (mRecentProjectList.count() > DEFAULT_RECENTPROJECTS_MAX) {
+        // Begin Remove Rows
+        beginRemoveRows(QModelIndex(), mRecentProjectList.count() - 1, mRecentProjectList.count() - 1);
+        // Remove Last
+        mRecentProjectList.removeLast();
+        // End Remove Rows
+        endRemoveRows();
+    }
 
     // Save Recent Projects
     saveRecentProjects();
@@ -70,7 +89,24 @@ void RecentProjectsModel::clear()
 //==============================================================================
 void RecentProjectsModel::loadRecentProjects()
 {
-    // ...
+    // Init Recent Projects List File
+    QFile rplFile(QDir::homePath() + "/" + DEFAULT_RECENTPROJECTLIST_FILE_NAME);
+
+    // Open File
+    if (rplFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        // Read All Content
+        QString rplContent = rplFile.readAll();
+        // Close File
+        rplFile.close();
+        // Begin Reset Model
+        beginResetModel();
+        // Set Recent Project List
+        mRecentProjectList = rplContent.split("\n");
+        // End Reset Model
+        endResetModel();
+    } else {
+        qWarning() << "RecentProjectsModel::loadRecentProjects - ERROR OPENING FILE! - rplFile: " << rplFile.fileName();
+    }
 }
 
 //==============================================================================
@@ -78,7 +114,22 @@ void RecentProjectsModel::loadRecentProjects()
 //==============================================================================
 void RecentProjectsModel::saveRecentProjects()
 {
-    // ...
+    // Init Recent Projects List File
+    QFile rplFile(QDir::homePath() + "/" + DEFAULT_RECENTPROJECTLIST_FILE_NAME);
+
+    // Open File
+    if (rplFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        // Init Text Stream
+        QTextStream rplStream(&rplFile);
+        // Write To Recent Project List Stream
+        rplStream << mRecentProjectList.join("\n");
+        // Flush
+        rplStream.flush();
+        // Close File
+        rplFile.close();
+    } else {
+        qWarning() << "RecentProjectsModel::saveRecentProjects - ERROR SAVING FILE! - rplFile: " << rplFile.fileName();
+    }
 }
 
 //==============================================================================

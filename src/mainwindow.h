@@ -23,8 +23,10 @@ namespace Ui {
 class MainWindow;
 }
 
+class DesignerEventFilter;
 class ProjectModel;
 class ComponentInfo;
+class PropertiesController;
 
 //==============================================================================
 // Main Window Class
@@ -185,7 +187,6 @@ private slots:
     void on_actionScreenshot_triggered();
 
 protected: // from QMainWindow
-
     // Key Release Event
     virtual void keyReleaseEvent(QKeyEvent* aEvent);
 
@@ -195,6 +196,9 @@ private:
 
     // Settings
     SettingsControler*          mSettings;
+
+    // Event Filter
+    DesignerEventFilter*        mEventFilter;
 
     // Base Components List Model
     BaseComponentsModel*        mBaseComponents;
@@ -215,8 +219,12 @@ private:
     // Define Base Component Dialog
     DefineBaseComponentDialog*  mDefineBaseComponentDialog;
 
+    // Properties Controller
+    PropertiesController*       mPropertiesController;
+
     // Project Model
     ProjectModel*               mProjectModel;
+
     // Current Component
     ComponentInfo*              mCurrentComponent;
     // Screen Shot Mode

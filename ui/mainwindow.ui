@@ -16,6 +16,9 @@
     <height>480</height>
    </size>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::StrongFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -172,6 +175,9 @@
    <property name="text">
     <string>Close Project</string>
    </property>
+   <property name="shortcut">
+    <string>F10</string>
+   </property>
   </action>
   <action name="actionProjectProperties">
    <property name="enabled">
@@ -222,6 +228,9 @@
    </property>
    <property name="text">
     <string>Create New View</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+N</string>
    </property>
   </action>
   <action name="actionViewProperties">
@@ -279,11 +288,14 @@
    </property>
   </action>
   <action name="actionScreenshot">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Screenshot</string>
    </property>
    <property name="shortcut">
-    <string>F10</string>
+    <string>F12</string>
    </property>
   </action>
  </widget>

@@ -8,6 +8,42 @@ import "Style.js" as STYLE
 Item {
     id: mainRoot
 
+    focus: true
+
+    Keys.onReleased: {
+        switch (event.key) {
+            case Qt.Key_T:
+                settingsController.tracerVisible = !settingsController.tracerVisible;
+            break;
+        }
+    }
+
+    // Connections - Main Controller
+    Connections {
+        target: mainController
+
+        onCurrentProjectChanged: {
+            console.log("main.Connections.mainController.onCurrentProjectChanged - currentProject: " + mainController.currentProject);
+
+            // Check Current Project
+            if (mainController.currentProject != null) {
+                // Hide Welcome Screen
+                welcomScreen.hide();
+                // Show Project Pane
+                projectPane.show();
+                // Show Properties Pane
+                propertiesPane.show();
+            } else {
+                // Reset Project Pane
+                projectPane.reset();
+                // Reset Properties Pane
+                propertiesPane.reset();
+                // Show Welcome Screen
+                welcomScreen.show();
+            }
+        }
+    }
+
     Rectangle {
         id: bgContainer
         anchors.fill: parent
@@ -31,12 +67,6 @@ Item {
         }
     }
 
-    DWelcome {
-        anchors.centerIn: parent
-        //opacity: mainController.currentProject ? 0.0 : 1.0
-        opacity: 0.0
-    }
-
 //    DPopupArea {
 //        id: mainPopupArea
 //        anchors.fill: parent
@@ -46,70 +76,24 @@ Item {
     MainGrabArea {
         id: mainGrabArea
 
-        property bool xInit: false
-        property bool yInit: false
-
-        //opacity: mainController.currentProject ? 1.0 : 0.0
-
-//        Component.onCompleted: {
-//            projectPane.x = STYLE.defaultMargin;
-//            projectPane.y = (mainRoot.height - projectPane.height) / 2;
-
-//            propertiesPane.x = mainRoot.width - width - STYLE.defaultMargin;
-//            propertiesPane.y = (mainRoot.height - propertiesPane.height) / 2;
-//        }
-
-        onWidthChanged: {
-            if (width > 0 && !xInit) {
-                xInit = true;
-                projectPane.x = STYLE.defaultMargin;
-                propertiesPane.x = mainGrabArea.width - propertiesPane.width - STYLE.defaultMargin;
-
-                //demoPane.x = (mainGrabArea.width - demoPane.width) / 2;
-
-                //demoContainer.x = (mainGrabArea.width - demoContainer.width) / 2;
-
-                //demoViewContainer.x = (mainGrabArea.width - demoViewContainer.width) / 2;
-
-                componentRootDemo.x = (mainGrabArea.width - componentRootDemo.width) / 2;
-
-                //componentItemDemo.x = (mainGrabArea.width - componentItemDemo.width) / 2;
-
-                //dropAreaDemo.x = (mainGrabArea.width - dropAreaDemo.width) / 2;
-            }
-        }
-
-        onHeightChanged: {
-            if (height > 0 && !yInit) {
-                yInit = true;
-                projectPane.y = (mainRoot.height - projectPane.height) / 2;
-                propertiesPane.y = (mainRoot.height - propertiesPane.height) / 2;
-
-                //demoPane.y = (mainRoot.height - demoPane.height) / 2;
-
-                //demoContainer.y = (mainRoot.height - demoContainer.height) / 2;
-
-                //demoViewContainer.y = (mainRoot.height - demoViewContainer.height) / 2;
-
-                componentRootDemo.y = (mainGrabArea.height - componentRootDemo.height) / 2;
-
-                //componentItemDemo.y = 100;
-
-                //dropAreaDemo.y = mainGrabArea.height - dropAreaDemo.height - 32;
-            }
-        }
-
-//        onClicked: {
-//            // Hide Popups
-//            //mainPopupArea.hidePopups();
-//        }
-
         // Project Pane
         ProjectPane {
             id: projectPane
             hideToSide: hideToLeft
 
-            //hidden: true
+            initialX: 0
+            initialY: mainGrabArea.height / 2
+
+            creationWidth: 360
+            creationHeight: 600
+
+            creationX: STYLE.defaultMargin * 2
+            creationY: mainGrabArea.height / 2 - creationHeight / 2
+
+            parentWidth: mainGrabArea.width
+            parentHeight: mainGrabArea.height
+
+            state: stateCreate
         }
 
         // Properties Pane
@@ -117,14 +101,49 @@ Item {
             id: propertiesPane
             hideToSide: hideToRight
 
-            //hidden: true
+            initialX: mainGrabArea.width
+            initialY: mainGrabArea.height / 2
+
+            creationWidth: 300
+            creationHeight: 600
+
+            creationX: mainGrabArea.width - creationWidth - STYLE.defaultMargin * 2
+            creationY: mainGrabArea.height / 2 - creationHeight / 2
+
+            parentWidth: mainGrabArea.width
+            parentHeight: mainGrabArea.height
+
+            state: stateCreate
         }
 
         DComponentRootContainer {
             id: componentRootDemo
-            width: 400
-            height: 300
+
+            initialX: projectPane.x + projectPane.width
+            initialY: Math.max(Math.min(mainGrabArea.height / 2, projectPane.y + projectPane.height - STYLE.defaultMargin), projectPane.y + STYLE.defaultMargin)
+
+            creationWidth: 600
+            creationHeight: 400
+
+            creationX: mainGrabArea.width / 2 - creationWidth / 2
+            //creationY: mainGrabArea.height / 2 - creationHeight / 2
+            creationY: initialY - creationHeight / 2
+
+            parentWidth: mainGrabArea.width
+            parentHeight: mainGrabArea.height
+
+            state: stateCreate
+
+            enableSizeOverlay: false
+            enablePosOverlay: false
         }
+    }
+
+    DWelcome {
+        id: welcomScreen
+        anchors.centerIn: parent
+        state: stateShown
+        //state: stateHidden
     }
 
     DMinimizedComponents {

@@ -4,9 +4,25 @@ import "Style.js" as STYLE
 
 Column {
     id: welcomeRoot
+
+    readonly property string stateShown: "shown"
+    readonly property string stateHidden: "hidden"
+
     opacity: 1.0
     Behavior on opacity { DFadeAnimation { } }
     visible: opacity > 0.0
+
+    // Show
+    function show() {
+        // Set State
+        welcomeRoot.state = welcomeRoot.stateShown;
+    }
+
+    // Hide
+    function hide() {
+        // Set State
+        welcomeRoot.state = welcomeRoot.stateHidden;
+    }
 
     DText {
         height: 48
@@ -78,15 +94,34 @@ Column {
 
         delegate: DMouseArea {
             id: delegateRoot
+
             width: rpListView.width
             height: rpListView.delegateHeight
 
+            property bool hovering: false
+
+            hoverEnabled: true
+
             DText {
+                id: titleText
                 width: parent.width
                 anchors.verticalCenter: parent.verticalCenter
                 elide: Text.ElideMiddle
+                horizontalAlignment: Text.AlignHCenter
                 text: filePath
-                color: delegateRoot.pressed && delegateRoot.containsMouse ? STYLE.colorBorder : STYLE.colorFontDark
+                color: delegateRoot.pressed && delegateRoot.hovering ? STYLE.colorBorder : STYLE.colorFontDark
+            }
+
+            onEntered: {
+                delegateRoot.hovering = true;
+            }
+
+            onExited: {
+                delegateRoot.hovering = false;
+            }
+
+            onCanceled: {
+                delegateRoot.hovering = false;
             }
 
             onClicked: {
@@ -95,4 +130,38 @@ Column {
             }
         }
     }
+
+    states: [
+        State {
+            name: welcomeRoot.stateShown
+
+            PropertyChanges { target: welcomeRoot; opacity: 1.0 }
+        },
+
+        State {
+            name: welcomeRoot.stateHidden
+
+            PropertyChanges { target: welcomeRoot; opacity: 0.0 }
+        }
+    ]
+
+    transitions: [
+        Transition {
+            to: welcomeRoot.stateShown
+
+            SequentialAnimation {
+                PauseAnimation { duration: 600 }
+                DFadeAnimation { target: welcomeRoot }
+            }
+        },
+
+        Transition {
+            to: welcomeRoot.stateHidden
+
+            SequentialAnimation {
+                //PauseAnimation { duration: 200 }
+                DFadeAnimation { target: welcomeRoot }
+            }
+        }
+    ]
 }

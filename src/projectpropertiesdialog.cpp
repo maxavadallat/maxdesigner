@@ -109,6 +109,9 @@ void ProjectPropertiesDialog::setNewProject(const bool& aNewProject)
 
     // Check If New Project
     if (mNewProject) {
+        ui->projectDirLabel->setVisible(true);
+        ui->projectDirEdit->setVisible(true);
+        ui->projectDirBrowseButton->setVisible(true);
         // Reset Edit Markers
         mProjectDirEdited = false;
         mMainQMLFileEdited = false;
@@ -117,6 +120,10 @@ void ProjectPropertiesDialog::setNewProject(const bool& aNewProject)
         mImagesDirEdited = false;
         mComponentsDirEdited = false;
         mViewsDirEdited = false;
+    } else {
+        ui->projectDirLabel->setVisible(false);
+        ui->projectDirEdit->setVisible(false);
+        ui->projectDirBrowseButton->setVisible(false);
     }
 }
 

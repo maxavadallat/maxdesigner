@@ -31,6 +31,8 @@
 #define DEFAULT_MAIN_CONTROLLER_NAME                        "mainController"
 // Settings Controller Name
 #define DEFAULT_GLOBAL_SETTINGS_CONTROLLER                  "settingsController"
+// Properties Controller Name
+#define DEFAULT_PROPERTIES_CONTROLLER                       "propertiesController"
 
 // Base Components Model
 #define MODEL_NAME_BASE_COMPONENTS                          "baseComponentsModel"
@@ -47,12 +49,21 @@
 // Open Project Model Name
 #define MODEL_NAME_RECENT_PROJECTS                          "recentProjectsModel"
 
-// JSON File Extensions
+// JSON File Extension
 #define DEFAULT_JSON_SUFFIX                                 "json"
+// AML File Extension
 #define DEFAULT_QML_PROJECT_SUFFIX                          "qmlproject"
+// IMAGE File Extensions
 #define DEFAULT_IMAGE_SUFFIXES                              "jpg jpeg png bmp gif tiff"
+// QML File Extension
 #define DEFAULT_QML_SUFFIX                                  "qml"
+// JS File Extension
 #define DEFAULT_JS_SUFFIX                                   "js"
+
+// Default Recent Open Projects List
+#define DEFAULT_RECENTPROJECTLIST_FILE_NAME                 ".designerrecent.list"
+// Max Recent Project File
+#define DEFAULT_RECENTPROJECTS_MAX                          10
 
 // Default Dirs & File Names
 #define DEFAULT_PROJECT_NAME                                "myproject"

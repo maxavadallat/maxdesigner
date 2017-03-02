@@ -43,8 +43,10 @@ Item {
         drag.target: componentItemRoot.grabbed ? dragContainer : undefined
 
         Drag.active: componentItemRoot.grabbed
-        Drag.hotSpot.x: hotSpotX / scale;
-        Drag.hotSpot.y: hotSpotY / scale;
+
+        Drag.hotSpot.x: hotSpotX  //((hotSpotX / scale - width / 2) * scale + width / 2 * scale) + (4 * scale)
+        Drag.hotSpot.y: hotSpotY / scale //((hotSpotY / scale - height / 2) * scale + height / 2 * scale) / scale
+
         Drag.source: componentItemRoot.componentInfo
         Drag.keys: [ CONSTS.newComponentDragKey ]
 

@@ -14,6 +14,8 @@ var colorBorder                                     = "#FF8ED5E1";
 var colorBorderNoFocus                              = "#FF57787F";
 // Default Focused Border Color
 var colorBorderSelected                             = "#FFEC6302";
+// Default Unfocused Transparent Border Color
+var colorBorderTransparent                          = "#7757787F";
 
 // Defaukt Shadow Color
 var colorShadow                                     = "#EE000000";
@@ -123,14 +125,14 @@ var popupItemHoverTimeout                           = 700;
 var flipDuration                                    = 700;
 
 // Default Size Indicator Width
-var sizeIndicatorWidth                              = 128;
+var sizeIndicatorWidth                              = 96;
 // Default Size Indicator Height
-var sizeIndicatorHeight                             = 32;
+var sizeIndicatorHeight                             = 24;
 
 // Default Position Indicator Width
-var posIndicatorWidth                               = 128;
+var posIndicatorWidth                               = sizeIndicatorWidth;
 // Default Position Indicator Height
-var posIndicatorHeight                              = 32;
+var posIndicatorHeight                              = sizeIndicatorHeight;
 
 // Default Formule Editor Width
 var formulaEdiorWidth                               = 218;

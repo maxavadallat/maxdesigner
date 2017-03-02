@@ -73,7 +73,7 @@ DPane {
                 width: 24
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Text.AlignRight
-                text: "x:"
+                text: "x: "
             }
 
             DSpinner {
@@ -125,6 +125,37 @@ DPane {
         title: "Anchors & Margins"
 
         state: stateOpen
+
+        Row {
+            //height: anchorTargetEditor.height
+            spacing: STYLE.defaultMargin * 0.25
+
+            DCheckBox {
+                id: anchorFillCheckBox
+                width: 40
+                rightAligned: true
+                text: "fill"
+                onClicked: checked = !checked
+            }
+
+            Item {
+                width: 8
+                height: parent.height
+            }
+
+            DText {
+                id: anchorTargetLabel
+                anchors.verticalCenter: parent.verticalCenter
+                text: "target:"
+
+            }
+
+            DTextInput {
+                width: propertiesPaneRoot.contentWidth - anchorTargetLabel.width - anchorFillCheckBox.width - STYLE.defaultMargin * 0.5 - 12
+                anchors.verticalCenter: parent.verticalCenter
+                text: "parent"
+            }
+        }
 
         Item {
             width: propertiesPaneRoot.contentWidth
@@ -188,16 +219,127 @@ DPane {
                 }
             }
         }
+
+        Item {
+            width: propertiesPaneRoot.contentWidth
+            height: STYLE.defaultMargin
+        }
+
+        Row {
+            DText {
+                width: propertiesPaneRoot.contentWidth - leftMarginSpinner.width - STYLE.defaultMargin / 2
+                text: "leftMargin: "
+            }
+
+            DSpinner {
+                id: leftMarginSpinner
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+
+        Row {
+            DText {
+                width: propertiesPaneRoot.contentWidth - rightMarginSpinner.width - STYLE.defaultMargin / 2
+                text: "rightMargin: "
+            }
+
+            DSpinner {
+                id: rightMarginSpinner
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+
+        Row {
+            DText {
+                width: propertiesPaneRoot.contentWidth - topMarginSpinner.width - STYLE.defaultMargin / 2
+                text: "topMargin: "
+            }
+
+            DSpinner {
+                id: topMarginSpinner
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+
+        Row {
+            DText {
+                width: propertiesPaneRoot.contentWidth - bottomMarginSpinner.width - STYLE.defaultMargin / 2
+                text: "bottomMargin: "
+            }
+
+            DSpinner {
+                id: bottomMarginSpinner
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+
+        Row {
+            DText {
+                width: propertiesPaneRoot.contentWidth - horizontalCenterOffsetSpinner.width - STYLE.defaultMargin / 2
+                text: "horizontal center offs: "
+            }
+
+            DSpinner {
+                id: horizontalCenterOffsetSpinner
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+
+        Row {
+            DText {
+                width: propertiesPaneRoot.contentWidth - verticalCenterOffsetSpinner.width - STYLE.defaultMargin / 2
+                text: "vertical center offs: "
+            }
+
+            DSpinner {
+                id: verticalCenterOffsetSpinner
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+
     }
 
     DSection {
         width: propertiesPaneRoot.contentWidth
         title: "States"
+        minHeight: statesContainer.height + addStateButton.height
+
+        // States
+        Item {
+            id: statesContainer
+            width: propertiesPaneRoot.contentWidth
+            height: 0
+
+            // ...
+        }
+
+        DButton {
+            id: addStateButton
+            width: propertiesPaneRoot.contentWidth
+            text: "Add State"
+        }
     }
 
     DSection {
         width: propertiesPaneRoot.contentWidth
         title: "Transitions"
+        minHeight: transitionsContainer.height + addTransitionButton.height
+
+        // Transitions
+        Item {
+            id: transitionsContainer
+            width: propertiesPaneRoot.contentWidth
+            height: 0
+
+            // ...
+        }
+
+        DButton {
+            id: addTransitionButton
+            width: propertiesPaneRoot.contentWidth
+            text: "Add Transition"
+        }
+
     }
 
     DSection {

@@ -29,11 +29,17 @@ DPaneBase {
         compoenntRootContainerRoot.focus = true;
     }
 
+    onWidthChanged: {
+        baseCanvas.requestPaint();
+    }
+
     property Component newComponent: Component {
+
         DComponentChildContainer {
             property alias title: titleLabel.text
             width: CONSTS.componentItemWidth
             height: CONSTS.componentItemHeight
+
             DText {
                 id: titleLabel
                 anchors.centerIn: parent
@@ -44,10 +50,13 @@ DPaneBase {
     Canvas {
         id: baseCanvas
         anchors.fill: parent
+
         opacity: 0.2
         onPaint: {
             // Get 2D Context
             var ctx = getContext("2d");
+
+            ctx.reset();
 
             ctx.lineWidth = 1;
             ctx.strokeStyle = STYLE.colorBorderNoFocus;
@@ -116,9 +125,8 @@ DPaneBase {
         Canvas {
             id: debugCanvas
             anchors.fill: parent
-            visible: dropArea.hovering
+            visible: settingsController.tracerVisible && dropArea.hovering
             onPaint: {
-
                 // Get 2D Context
                 var ctx = getContext("2d");
 
@@ -138,7 +146,6 @@ DPaneBase {
                 ctx.lineTo(dropArea.width, dropArea.hoverY);
                 ctx.closePath();
                 ctx.stroke();
-
             }
         }
     }

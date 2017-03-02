@@ -10,7 +10,7 @@ DPaneBase {
 
     readonly property int contentWidth: paneContent.width
 
-    property bool clipPaneContnet: true
+    property alias clipPaneContnet: paneContent.clip
 
     // Content Flickable
     DFlickable {
@@ -23,7 +23,7 @@ DPaneBase {
             bottomMargin: STYLE.defaultMargin
         }
 
-        clip: paneRoot.clipPaneContnet
+        clip: true
     }
 }
 
