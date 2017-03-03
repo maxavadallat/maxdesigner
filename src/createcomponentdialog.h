@@ -15,15 +15,15 @@ class BaseComponentsModel;
 class ComponentsModel;
 
 //==============================================================================
-// Define Base Component Dialog Class
+// Create Component Dialog Class
 //==============================================================================
-class DefineBaseComponentDialog : public QDialog
+class CreateComponentDialog : public QDialog
 {
     Q_OBJECT
 
 public:
     // Constructor
-    explicit DefineBaseComponentDialog(QWidget* aParent = NULL);
+    explicit CreateComponentDialog(QWidget* aParent = NULL);
 
     // Set Base Compoennts List Model
     void setBaseComponentsModel(BaseComponentsModel* aModel);
@@ -36,7 +36,7 @@ public:
     QString componentBaseName();
 
     // Destructor
-    ~DefineBaseComponentDialog();
+    ~CreateComponentDialog();
 
 private slots:
     // On Component Name Edit Text Changed Slot

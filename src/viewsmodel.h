@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QList>
 #include <QAbstractListModel>
-//#include <QJsonObject>
 
 class ProjectModel;
 class ComponentInfo;

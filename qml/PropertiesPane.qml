@@ -22,6 +22,8 @@ DPane {
 
     topMouseAreaVisible: true
 
+    hideToSide: hideToRight
+
     state: stateShown
 
     Row {

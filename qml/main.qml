@@ -33,6 +33,7 @@ Item {
                 projectPane.show();
                 // Show Properties Pane
                 propertiesPane.show();
+
             } else {
                 // Reset Project Pane
                 projectPane.reset();
@@ -79,7 +80,6 @@ Item {
         // Project Pane
         ProjectPane {
             id: projectPane
-            hideToSide: hideToLeft
 
             initialX: 0
             initialY: mainGrabArea.height / 2
@@ -99,7 +99,6 @@ Item {
         // Properties Pane
         PropertiesPane {
             id: propertiesPane
-            hideToSide: hideToRight
 
             initialX: mainGrabArea.width
             initialY: mainGrabArea.height / 2
@@ -117,7 +116,7 @@ Item {
         }
 
         DComponentRootContainer {
-            id: componentRootDemo
+            id: componentRootContainer
 
             initialX: projectPane.x + projectPane.width
             initialY: Math.max(Math.min(mainGrabArea.height / 2, projectPane.y + projectPane.height - STYLE.defaultMargin), projectPane.y + STYLE.defaultMargin)
@@ -126,16 +125,36 @@ Item {
             creationHeight: 400
 
             creationX: mainGrabArea.width / 2 - creationWidth / 2
-            //creationY: mainGrabArea.height / 2 - creationHeight / 2
             creationY: initialY - creationHeight / 2
+
+            lastShownX: creationX
+            lastShownY: creationY
 
             parentWidth: mainGrabArea.width
             parentHeight: mainGrabArea.height
 
             state: stateCreate
+        }
 
-            enableSizeOverlay: false
-            enablePosOverlay: false
+        DFormulaEditor {
+            id: formulaEditor
+
+            initialX: propertiesPane.x
+            initialY: Math.max(Math.min(mainGrabArea.height / 2, propertiesPane.y + propertiesPane.height - STYLE.defaultMargin), propertiesPane.y + STYLE.defaultMargin)
+
+            creationWidth: 400
+            creationHeight: 300
+
+            creationX: mainGrabArea.width / 2 - creationWidth / 2
+            creationY: initialY - creationHeight / 2
+
+            lastShownX: creationX
+            lastShownY: creationY
+
+            parentWidth: mainGrabArea.width
+            parentHeight: mainGrabArea.height
+
+            state: stateCreate
         }
     }
 

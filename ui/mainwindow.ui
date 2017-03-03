@@ -88,6 +88,8 @@
     <addaction name="actionPreferences"/>
     <addaction name="separator"/>
     <addaction name="actionGenerateQMLSources"/>
+    <addaction name="separator"/>
+    <addaction name="actionSwitchMode"/>
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
@@ -296,6 +298,11 @@
    </property>
    <property name="shortcut">
     <string>F12</string>
+   </property>
+  </action>
+  <action name="actionSwitchMode">
+   <property name="text">
+    <string>Switch Mode</string>
    </property>
   </action>
  </widget>

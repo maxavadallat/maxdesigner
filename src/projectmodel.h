@@ -175,6 +175,9 @@ signals:
     // Current Component Changed Signal
     void currentComponentChanged(ComponentInfo* aComponent);
 
+    // Project Properties Dirty State changed Signal
+    void dirtyChanged(const bool& aDirty);
+
 private:
     // Init
     void init();
@@ -185,6 +188,9 @@ private:
     void loadQMLProject(const QString& aFileName);
     // Save QML Project
     void saveQMLProject();
+
+    // Set Project Properties Dirty State
+    void setDirty(const bool& aDirty);
 
     // Create/register Base Components
     void createBaseComponents();

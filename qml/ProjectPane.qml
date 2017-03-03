@@ -19,6 +19,8 @@ DPane {
 
     topMouseAreaVisible: true
 
+    hideToSide: hideToLeft
+
     state: stateShown
 
     DSection {

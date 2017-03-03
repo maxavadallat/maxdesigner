@@ -256,7 +256,7 @@ DContainer {
     }
 
     // Hide Indicator
-    Item {
+    DControl {
         id: hideShowButton
 
         parent: paneBaseRoot
@@ -359,6 +359,21 @@ DContainer {
 
     transitions: [
         Transition {
+            //from: ""
+            to: stateCreate
+
+            SequentialAnimation {
+                ParallelAnimation {
+                    PropertyAction { target: paneBaseRoot; properties: "width, height"; value: 0 }
+                    PropertyAction { target: paneBaseRoot; property: "x"; value: paneBaseRoot.initialX }
+                    PropertyAction { target: paneBaseRoot; property: "y"; value: paneBaseRoot.initialY }
+                    DFadeAnimation { target: titleTextLabel; to: 0.0 }
+                    DFadeAnimation { target: hideShowButton; to: 0.0 }
+                }
+            }
+        },
+
+        Transition {
             from: stateCreate
             to: stateShown
 
@@ -403,7 +418,6 @@ DContainer {
         Transition {
             from: stateShown
             to: stateCreate
-            reversible: false
 
             SequentialAnimation {
 
@@ -439,6 +453,7 @@ DContainer {
         Transition {
             from: stateHidden
             to: stateShown
+
             SequentialAnimation {
                 ScriptAction {
                     script: {
@@ -458,6 +473,7 @@ DContainer {
         Transition {
             //from: stateShown
             to: stateHidden
+
             SequentialAnimation {
                 PropertyAnimation { target: paneBaseRoot; properties: "x, y"; easing.type: Easing.InOutBack; duration: paneBaseRoot.animDuration }
 
@@ -473,6 +489,9 @@ DContainer {
         Transition {
             to: stateClosed
 
+            SequentialAnimation {
+
+            }
         }
     ]
 }

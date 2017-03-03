@@ -2,7 +2,7 @@ import QtQuick 2.0
 
 import "Style.js" as STYLE
 
-DContainer {
+DPaneBase {
     id: formulaEditorRoot
 
     width: STYLE.formulaEdiorWidth
@@ -16,6 +16,18 @@ DContainer {
     minWidth: STYLE.formulaEdiorWidth
     minHeight: STYLE.formulaEditorHeight
 
+    enablePaneContent: true
+
+    setFocusOnResize: false
+
+    topMouseAreaVisible: true
+
+    hideToSide: hideToRight
+
+    state: stateShown
+
+    clipContent: true
+
     //border.color: textInput.editor.focus ? STYLE.colorBorder : STYLE.colorBorderNoFocus
     border.color: STYLE.colorBorderNoFocus
 
@@ -26,6 +38,7 @@ DContainer {
         anchors.top: parent.top
         anchors.topMargin: STYLE.defaultMargin
         text: "Formula:"
+        opacity: formulaEditorRoot.state === formulaEditorRoot.stateShown ? 1.0 : 0.0
     }
 
     DTextInput {

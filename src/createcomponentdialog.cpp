@@ -10,7 +10,7 @@
 //==============================================================================
 // Constructor
 //==============================================================================
-DefineBaseComponentDialog::DefineBaseComponentDialog(QWidget* aParent)
+CreateComponentDialog::CreateComponentDialog(QWidget* aParent)
     : QDialog(aParent)
     , ui(new Ui::CreateComponentDialog)
     , mBaseComponents(NULL)
@@ -21,7 +21,7 @@ DefineBaseComponentDialog::DefineBaseComponentDialog(QWidget* aParent)
 //==============================================================================
 // Set Base Compoennts List Model
 //==============================================================================
-void DefineBaseComponentDialog::setBaseComponentsModel(BaseComponentsModel* aModel)
+void CreateComponentDialog::setBaseComponentsModel(BaseComponentsModel* aModel)
 {
     // Set Base Compoennts Model
     mBaseComponents = aModel;
@@ -33,7 +33,7 @@ void DefineBaseComponentDialog::setBaseComponentsModel(BaseComponentsModel* aMod
 //==============================================================================
 // Set Components Model
 //==============================================================================
-void DefineBaseComponentDialog::setComponentsModel(ComponentsModel* aModel)
+void CreateComponentDialog::setComponentsModel(ComponentsModel* aModel)
 {
     // Set Components Model
     mComponents = aModel;
@@ -45,7 +45,7 @@ void DefineBaseComponentDialog::setComponentsModel(ComponentsModel* aModel)
 //==============================================================================
 // Get Base Component Name
 //==============================================================================
-QString DefineBaseComponentDialog::componentName()
+QString CreateComponentDialog::componentName()
 {
     return ui->componentNameEdit->text();
 }
@@ -53,7 +53,7 @@ QString DefineBaseComponentDialog::componentName()
 //==============================================================================
 // Get Base Component Base Class Name
 //==============================================================================
-QString DefineBaseComponentDialog::componentBaseName()
+QString CreateComponentDialog::componentBaseName()
 {
     return ui->baseTypeTab->currentIndex() == 0 ? ui->baseTypeComboBox->currentText() : ui->componentTypeComboBox->currentText();
 }
@@ -61,7 +61,7 @@ QString DefineBaseComponentDialog::componentBaseName()
 //==============================================================================
 // On Component Name Edit Text Changed Slot
 //==============================================================================
-void DefineBaseComponentDialog::on_componentNameEdit_textChanged(const QString& arg1)
+void CreateComponentDialog::on_componentNameEdit_textChanged(const QString& arg1)
 {
     // Check Component Name
 
@@ -71,7 +71,7 @@ void DefineBaseComponentDialog::on_componentNameEdit_textChanged(const QString& 
 //==============================================================================
 // Destructor
 //==============================================================================
-DefineBaseComponentDialog::~DefineBaseComponentDialog()
+CreateComponentDialog::~CreateComponentDialog()
 {
     // Delete UI
     delete ui;

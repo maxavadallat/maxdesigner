@@ -178,13 +178,15 @@ private slots:
     void on_actionRemoveComponent_triggered();
     // Action Remove View Triggered Slot
     void on_actionRemoveView_triggered();
+    // Action View Screenshot Triggered Slot
+    void on_actionScreenshot_triggered();
+    // Action Switch Mode Triggered Slot
+    void on_actionSwitchMode_triggered();
 
     // ...
 
     // Action Quit Triggered Slot
     void on_actionQuit_triggered();
-
-    void on_actionScreenshot_triggered();
 
 protected: // from QMainWindow
     // Key Release Event
@@ -217,7 +219,7 @@ private:
     // Project Properties Dialog
     ProjectPropertiesDialog*    mProjectPropertiesDiaog;
     // Define Base Component Dialog
-    DefineBaseComponentDialog*  mDefineBaseComponentDialog;
+    CreateComponentDialog*      mDefineBaseComponentDialog;
 
     // Properties Controller
     PropertiesController*       mPropertiesController;

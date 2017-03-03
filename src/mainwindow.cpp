@@ -253,6 +253,14 @@ void MainWindow::openProject(const QString& aFilePath)
         ui->actionProjectProperties->setEnabled(true);
         // Enable Close Project Menu Item
         ui->actionCloseProject->setEnabled(true);
+        // Set Enable Define Base Components Menu
+        ui->actionDefineBaseComponent->setEnabled(true);
+        // Set Enable Create Component Menu Item
+        ui->actionCreateComponent->setEnabled(true);
+        // Set Enable Create View Menu Item
+        ui->actionCreateView->setEnabled(true);
+
+        // ...
 
         // Emit Current Project Changed Signal
         emit currentProjectChanged(mProjectModel);
@@ -454,7 +462,7 @@ void MainWindow::launchDefineBaseComponent()
     // Check Define Base Component Dialog
     if (!mDefineBaseComponentDialog) {
         // Create Define Base Component Dialog
-        mDefineBaseComponentDialog = new DefineBaseComponentDialog();
+        mDefineBaseComponentDialog = new CreateComponentDialog();
     }
 
     // Exec Dialog
@@ -479,6 +487,18 @@ void MainWindow::launchCreateComponent()
 
     // Release Keyboard Focus
     //releaseKeyboard();
+
+    // Check Define Base Component Dialog
+    if (!mDefineBaseComponentDialog) {
+        // Create Define Base Component Dialog
+        mDefineBaseComponentDialog = new CreateComponentDialog();
+    }
+
+    // Exec Dialog
+    if (mDefineBaseComponentDialog->exec()) {
+        // Create Base Component
+
+    }
 
     // ...
 
@@ -535,8 +555,12 @@ void MainWindow::createNewProject()
     ui->actionProjectProperties->setEnabled(true);
     // Enable Close Project Menu Item
     ui->actionCloseProject->setEnabled(true);
-    // Enable Define Base Components Menu
+    // Set Enable Define Base Components Menu
     ui->actionDefineBaseComponent->setEnabled(true);
+    // Set Enable Create Component Menu Item
+    ui->actionCreateComponent->setEnabled(true);
+    // Set Enable Create View Menu Item
+    ui->actionCreateView->setEnabled(true);
 
     // Emit Current Project chnged Signal
     emit currentProjectChanged(mProjectModel);
@@ -678,16 +702,21 @@ void MainWindow::closeProject()
 
     // ...
 
-    // Enable Save Project Menu Item
+    // Set Enable Save Project Menu Item
     ui->actionSaveProject->setEnabled(false);
-    // Enable Save As Project Menu Item
+    // Set Enable Save As Project Menu Item
     ui->actionSaveProjectAs->setEnabled(false);
-    // Enable Project Properties Menu Item
+    // Set Enable Project Properties Menu Item
     ui->actionProjectProperties->setEnabled(false);
-    // Enable Close Project Menu Item
+    // Set Enable Close Project Menu Item
     ui->actionCloseProject->setEnabled(false);
-    // Enable Define Base Components Menu
+
+    // Set Enable Define Base Components Menu
     ui->actionDefineBaseComponent->setEnabled(false);
+    // Set Enable Create Component Menu Item
+    ui->actionCreateComponent->setEnabled(false);
+    // Set Enable Create View Menu Item
+    ui->actionCreateView->setEnabled(false);
 
     // ...
 }
@@ -1044,12 +1073,20 @@ void MainWindow::on_actionRemoveView_triggered()
 }
 
 //==============================================================================
-// Action View Screenshot triggered Slot
+// Action View Screenshot Triggered Slot
 //==============================================================================
 void MainWindow::on_actionScreenshot_triggered()
 {
     // Take Screen Shot
     takeScreenShot();
+}
+
+//==============================================================================
+// Action Switch Mode Triggered Slot
+//==============================================================================
+void MainWindow::on_actionSwitchMode_triggered()
+{
+
 }
 
 // ...
@@ -1149,3 +1186,4 @@ MainWindow::~MainWindow()
 
     // ...
 }
+

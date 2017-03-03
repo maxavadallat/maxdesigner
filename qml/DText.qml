@@ -8,4 +8,8 @@ Text {
     color: STYLE.colorFontDark
     font.pixelSize: STYLE.fontSizeM
     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+
+    opacity: enabled ? 1.0 : STYLE.disabledOpacity
+    Behavior on opacity { NumberAnimation { duration: STYLE.animDuration } }
+    visible: opacity > 0.0
 }

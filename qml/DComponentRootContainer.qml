@@ -13,7 +13,7 @@ DPaneBase {
     hideToSide: hideToBottom
 
     enablePosOverlay: false
-    enableSizeOverlay: true
+    enableSizeOverlay: false
 
     showTitle: false
     showBackground: false
@@ -44,6 +44,14 @@ DPaneBase {
                 id: titleLabel
                 anchors.centerIn: parent
             }
+        }
+    }
+
+    Keys.onReleased: {
+        switch (event.key) {
+            case Qt.Key_Space:
+
+            break;
         }
     }
 
@@ -113,10 +121,10 @@ DPaneBase {
             hovering = false;
 
             // Create New Object
-            newComponent.createObject(paneContainer, { "x": drop.x - CONSTS.componentItemWidth / 2,
-                                                       "y": drop.y - CONSTS.componentItemHeight / 2,
-                                                       "focus": true,
-                                                       "parentContainer": compoenntRootContainerRoot });
+            var newObject = newComponent.createObject(paneContainer, { "x": drop.x - CONSTS.componentItemWidth / 2,
+                                                                       "y": drop.y - CONSTS.componentItemHeight / 2,
+                                                                       "focus": true,
+                                                                       "parentContainer": compoenntRootContainerRoot });
 
             // ...
 
