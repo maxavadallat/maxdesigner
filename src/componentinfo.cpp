@@ -59,9 +59,10 @@ ComponentInfo* ComponentInfo::clone()
 ComponentInfo::ComponentInfo(const QString& aName, const QString& aType, ProjectModel* aProject, const QString& aBaseName, QObject* aParent)
     : QObject(aParent)
     , mProject(aProject)
+    , mProtoType(true)
+    , mDirty(false)
     , mInfoPath("")
     , mQMLPath("")
-    , mProtoType(true)
     , mName(aName)
     , mType(aType)
     , mBaseName(aBaseName)
@@ -69,6 +70,8 @@ ComponentInfo::ComponentInfo(const QString& aName, const QString& aType, Project
     , mBase(mProject ? mProject->getComponentByName(mBaseName) : NULL)
     , mParent(NULL)
 {
+    qDebug() << "ComponentInfo created.";
+
     // Init
     init();
 }
@@ -78,6 +81,38 @@ ComponentInfo::ComponentInfo(const QString& aName, const QString& aType, Project
 //==============================================================================
 void ComponentInfo::init()
 {
+    // Check Project
+    if (mProject) {
+        // Connect Signals
+//        connect(mProject, SIGNAL(baseComponentsDirChanged(QString)), this, SLOT(baseComponentsDirChanged(QString)));
+//        connect(mProject, SIGNAL(componentsDirChanged(QString)), this, SLOT(componentsDirChanged(QString)));
+//        connect(mProject, SIGNAL(viewsDirChanged(QString)), this, SLOT(viewsDirChanged(QString)));
+
+        // Check Type
+        if (mType == COMPONENT_TYPE_BASECOMPONENT) {
+            // Set Info Path
+            mInfoPath = mProject->baseComponentsDir();
+        } else if (mType == COMPONENT_TYPE_COMPONENT) {
+            // Set Info Path
+            mInfoPath = mProject->componentsDir();
+        } else if (mType == COMPONENT_TYPE_VIEW) {
+            // Set Info Path
+            mInfoPath = mProject->componentsDir();
+        } else {
+            qWarning() << "ComponentInfo::init - mType: " << mType << " - NOT SUPPORTED TYPE!!";
+
+            return;
+        }
+
+        // Add Component Name To Info Path
+        mInfoPath += QString("%1/%2.%3").arg(mInfoPath).arg(mName).arg(DEFAULT_JSON_SUFFIX);
+
+        qDebug() << "ComponentInfo::init - mInfoPath: " << mInfoPath;
+
+    } else {
+        qWarning() << "ComponentInfo::init - NO PROJECT!!";
+    }
+
     // ...
 }
 
@@ -86,6 +121,9 @@ void ComponentInfo::init()
 //==============================================================================
 void ComponentInfo::clear()
 {
+    qDebug() << "ComponentInfo::clear";
+
+
     // Clear Children
 }
 
@@ -108,6 +146,8 @@ void ComponentInfo::load(const QString& aFilePath)
     // Init Component Info File
     QFile ciFile(mInfoPath);
 
+    qDebug() << "ComponentInfo::load - fileName: " << ciFile.fileName();
+
     // Open File
     if (ciFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         // Read File Content
@@ -126,19 +166,43 @@ void ComponentInfo::load(const QString& aFilePath)
 //==============================================================================
 void ComponentInfo::save(const QString& aFilePath)
 {
+    // Check File Path
+    if (aFilePath.isEmpty() && !mDirty) {
+        // No Need to Save
+        return;
+    }
+
+    // Init File Info
+    QFileInfo fileInfo(aFilePath.isEmpty() ? mInfoPath : aFilePath);
+    // Init File Info Dir
+    QDir fileInfoDir(fileInfo.absolutePath());
+    // Check If Dir Exists
+    if (!fileInfoDir.exists()) {
+        // Try to Create Path
+        if (!fileInfoDir.mkpath(fileInfoDir.absolutePath())) {
+            qWarning() << "ComponentInfo::save - ERROR CREATING COMPONENT DIR!!";
+            return;
+        }
+    }
+
     // Init Component Info File
-    QFile ciFile(aFilePath.isEmpty() ? mInfoPath : aFilePath);
+    QFile ciFile(fileInfo.absoluteFilePath());
+
+    qDebug() << "ComponentInfo::save - fileName: " << ciFile.fileName();
 
     // Open File
     if (ciFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         // Init Text Stream
         QTextStream textStream(&ciFile);
         // Write To Text Stream
-        textStream << toJSON();
+        textStream << toJSONContent();
         // Flush Text Stream
         textStream.flush();
         // Close File
         ciFile.close();
+        // Reset Dirty
+        setDirty(false);
+
     } else {
         qWarning() << "ComponentInfo::load - mInfoPath: " << mInfoPath << " - ERROR LOADING COMPONENT INFO!";
     }
@@ -263,6 +327,54 @@ void ComponentInfo::setSourcePath(const QString& aPath)
 }
 
 //==============================================================================
+// Set Dirty State
+//==============================================================================
+void ComponentInfo::setDirty(const bool& aDirty)
+{
+    // Check Dirty
+    if (mDirty != aDirty) {
+        // Set Dirty
+        mDirty = aDirty;
+    }
+}
+
+//==============================================================================
+// Base Components Dir Changed Slot
+//==============================================================================
+void ComponentInfo::baseComponentsDirChanged(const QString& aBaseComponentsDir)
+{
+    // Check Type
+    if (mType == COMPONENT_TYPE_BASECOMPONENT) {
+        // Set Info Path
+        mInfoPath = aBaseComponentsDir;
+    }
+}
+
+//==============================================================================
+// Components Dir Changed Slot
+//==============================================================================
+void ComponentInfo::componentsDirChanged(const QString& aComponentsDir)
+{
+    // Check Type
+    if (mType == COMPONENT_TYPE_COMPONENT) {
+        // Set Info Path
+        mInfoPath = aComponentsDir;
+    }
+}
+
+//==============================================================================
+// Views Dir Changed Slot
+//==============================================================================
+void ComponentInfo::viewsDirChanged(const QString& aViewsDir)
+{
+    // Check Type
+    if (mType == COMPONENT_TYPE_VIEW) {
+        // Set Info Path
+        mInfoPath = aViewsDir;
+    }
+}
+
+//==============================================================================
 // Get Component Type Hierarchy
 //==============================================================================
 QStringList ComponentInfo::hierarchy()
@@ -296,9 +408,9 @@ void ComponentInfo::exportToQML(const QString& aFilePath)
 }
 
 //==============================================================================
-// Get JSON Content/Sting
+// Get JSON Object
 //==============================================================================
-QByteArray ComponentInfo::toJSON()
+QJsonObject ComponentInfo::toJSONObject()
 {
     // Init JSON Object
     QJsonObject ciObject;
@@ -312,16 +424,52 @@ QByteArray ComponentInfo::toJSON()
 
     // ...
 
-    // Save Own Properties
+    // Set Own Properties
+    ciObject[JSON_KEY_COMPONENT_OWN_PROPERTIES] = mOwnProperties;
+    // Set Properties
+    ciObject[JSON_KEY_COMPONENT_PROPERTIES]     = mProperties;
 
-    // Save Properties
+    // Check Parent Component
+    if (mParent) {
+        // Save Parent
+        ciObject[JSON_KEY_COMPONENT_PARENT]     = mParent->componentName();
+    }
 
-    // Save Parent
+    // Set States
 
-    // Save Children
+    // Set Transitions
 
+
+//    // Get Children Count
+//    int cCount = mChildren.count();
+
+//    // Check Children
+//    if (cCount > 0) {
+//        // Init Children Array
+//        QJsonArray cArray;
+
+//        // Iterate Through Children Array
+//        for (int i=0; i<cCount; i++) {
+//            // Append Child
+//            cArray << mChildren[i]->toJSONObject();
+//        }
+
+//        // Save Children
+//        ciObject[JSON_KEY_COMPONENT_CHILDREN] = cArray;
+//    }
+
+    // ...
+
+    return ciObject;
+}
+
+//==============================================================================
+// Get JSON Content/Sting
+//==============================================================================
+QByteArray ComponentInfo::toJSONContent()
+{
     // Init JSON Document
-    QJsonDocument ciDocument(ciObject);
+    QJsonDocument ciDocument(toJSONObject());
 
     return ciDocument.toJson();
 }
@@ -346,6 +494,7 @@ void ComponentInfo::fromJSON(const QByteArray& aContent)
     // ...
 
     // Set Own Properties
+
 
     // Set Properties
 
@@ -460,6 +609,8 @@ ComponentInfo::~ComponentInfo()
     save();
     // Clear
     clear();
+
+    qDebug() << "ComponentInfo deleted.";
 }
 
 

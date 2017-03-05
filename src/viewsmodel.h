@@ -14,9 +14,6 @@ class ComponentInfo;
 class ViewsModel : public QAbstractListModel
 {
 public:
-    // Constructor
-    explicit ViewsModel(ProjectModel* aProjectModel, QObject* aParent = NULL);
-
     // Set Views Dir
     void setViewsDir(const QString& aDirPath);
 
@@ -33,7 +30,11 @@ public:
     // Destructor
     ~ViewsModel();
 
-private:
+protected:
+    friend class ProjectModel;
+
+    // Constructor
+    explicit ViewsModel(ProjectModel* aProjectModel, QObject* aParent = NULL);
     // Init
     void init();
     // Clear

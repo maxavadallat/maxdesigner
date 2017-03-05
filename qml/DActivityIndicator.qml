@@ -1,13 +1,13 @@
 import QtQuick 2.0
 import QtGraphicalEffects 1.0
 
-import "Style.js" as STYLE
+import "style"
 
 DControl {
     id: activityIndicatorRoot
 
-    width: STYLE.activityIndicatorWidth
-    height: STYLE.activityIndicatorHeight
+    width: Style.activityIndicatorWidth
+    height: Style.activityIndicatorHeight
 
     property alias running: activityIndicatorTimer.running
 
@@ -32,7 +32,7 @@ DControl {
         width: Math.min(activityIndicatorRoot.width, activityIndicatorRoot.height)
         height: Math.min(activityIndicatorRoot.width, activityIndicatorRoot.height)
 
-        property real radius: width * 0.5 - STYLE.activityIndicatorLineWidth
+        property real radius: width * 0.5 - Style.activityIndicatorLineWidth
         property int centreX: width * 0.5
         property int centreY: height * 0.5
 
@@ -43,7 +43,7 @@ DControl {
 
             ctx.beginPath();
 
-            ctx.lineWidth = STYLE.activityIndicatorLineWidth;
+            ctx.lineWidth = Style.activityIndicatorLineWidth;
             ctx.strokeStyle = "white";
 
             ctx.arc(centreX, centreY, radius, 0, 2 * Math.PI);
@@ -62,13 +62,13 @@ DControl {
         gradient: Gradient {
             GradientStop { position: 0.0; color: "transparent" }
             GradientStop { position: 0.2; color: "transparent" }
-            GradientStop { position: 1.0; color: STYLE.colorBorder }
+            GradientStop { position: 1.0; color: Style.colorBorder }
         }
     }
 
     Timer {
         id: activityIndicatorTimer
-        interval: STYLE.activityIndicatorInterval
+        interval: Style.activityIndicatorInterval
         repeat: true
         onTriggered: {
             activityIndicatorGradient.visible = true;

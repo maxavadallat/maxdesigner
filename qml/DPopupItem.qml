@@ -1,12 +1,12 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 DMouseArea {
     id: popupItemRoot
 
-    width: STYLE.defaultPopupWidth + STYLE.defaultMargin * 2
-    height: itemTextLabel.text === "-" ? (STYLE.popupItemHeight * 0.5) : STYLE.popupItemHeight
+    width: Style.defaultPopupWidth + Style.defaultMargin * 2
+    height: itemTextLabel.text === "-" ? (Style.popupItemHeight * 0.5) : Style.popupItemHeight
 
     property int itemIndex: -1
 
@@ -16,7 +16,7 @@ DMouseArea {
 
     property bool selected: false
 
-    property int textWidth: itemTextLabel.text !== "-" ? itemTextLabel.width : STYLE.defaultPopupWidth
+    property int textWidth: itemTextLabel.text !== "-" ? itemTextLabel.width : Style.defaultPopupWidth
 
     hoverEnabled: true
 
@@ -50,13 +50,13 @@ DMouseArea {
 
     Rectangle {
         anchors.fill: parent
-        color: popupItemRoot.selected && itemTextLabel.text !== "-" ? STYLE.colorSelectedHighLight : "transparent"
+        color: popupItemRoot.selected && itemTextLabel.text !== "-" ? Style.colorSelectedHighLight : "transparent"
     }
 
     DText {
         id: itemTextLabel
         anchors.left: parent.left
-        anchors.leftMargin: STYLE.defaultMargin
+        anchors.leftMargin: Style.defaultMargin
         anchors.verticalCenter: parent.verticalCenter
         visible: text !== "-"
     }
@@ -64,7 +64,7 @@ DMouseArea {
     DText {
         id: subMenuItemIndicator
         anchors.right: parent.right
-        anchors.rightMargin: STYLE.defaultMargin
+        anchors.rightMargin: Style.defaultMargin
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: -1
         text: ">"
@@ -80,7 +80,7 @@ DMouseArea {
 
     Timer {
         id: hoverTimer
-        interval: STYLE.popupItemHoverTimeout
+        interval: Style.popupItemHoverTimeout
         onTriggered: {
             popupItemRoot.subMenuItemSelected(itemIndex);
         }

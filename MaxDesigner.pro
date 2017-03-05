@@ -11,62 +11,76 @@ QT                  += core gui widgets quickwidgets qml quick
 # Sources
 SOURCES             += src/main.cpp \
                     src/designerapplication.cpp \
-                    src/mainwindow.cpp \
-                    src/settingscontroler.cpp \
+                    src/qmlprojectparser.cpp \
+                    src/qmlparser.cpp \
+                    src/qmlgenerator.cpp \
+                    src/designereventfilter.cpp \
+                    src/designerimageprovider.cpp
+
+# Model Sources
+SOURCES             += src/settingscontroler.cpp \
+                    src/minimizedcomponents.cpp \
+                    src/propertiescontroller.cpp \
+                    src/basecomponentsmodel.cpp \
+                    src/openfilesmodel.cpp \
+                    src/projectmodel.cpp \
+                    src/componentinfo.cpp \
+                    src/propertiesmodel.cpp \
+                    src/recentprojectsmodel.cpp \
+                    src/projectitemmodel.cpp \
+                    src/componentsmodel.cpp \
+                    src/viewsmodel.cpp \
+                    src/designerfilesortproxy.cpp
+
+# Dialog Sources
+SOURCES             += src/mainwindow.cpp \
                     src/preferencesdialog.cpp \
                     src/aboutdialog.cpp \
                     src/confirmdialog.cpp \
                     src/infodialog.cpp \
                     src/projectpropertiesdialog.cpp \
-                    src/qmlprojectparser.cpp \
-                    src/qmleditorwindow.cpp \
-                    src/basecomponentsmodel.cpp \
-                    src/openfilesmodel.cpp \
-                    src/projectmodel.cpp \
-                    src/propertiesmodel.cpp \
-                    src/componentinfo.cpp \
-                    src/qmlparser.cpp \
-                    src/qmlgenerator.cpp \
-                    src/recentprojectsmodel.cpp \
-                    src/projectitemmodel.cpp \
-                    src/componentsmodel.cpp \
-                    src/viewsmodel.cpp \
                     src/createcomponentdialog.cpp \
                     src/createviewdialog.cpp \
-                    src/minimizedcomponents.cpp \
-                    src/propertiescontroller.cpp \
-                    src/designereventfilter.cpp
+                    src/qmleditorwindow.cpp \
+                    src/resourceviewerdialog.cpp
 
 # Headers
-HEADERS             += src/mainwindow.h \
-                    src/designerapplication.h \
+HEADERS             += src/designerapplication.h \
                     src/constants.h \
-                    src/settingscontroler.h \
                     src/settingskeys.h \
                     src/defaultsettings.h \
-                    src/preferencesdialog.h \
-                    src/aboutdialog.h \
-                    src/confirmdialog.h \
-                    src/infodialog.h \
-                    src/projectpropertiesdialog.h \
                     src/qmlprojectparser.h \
-                    src/qmleditorwindow.h \
+                    src/qmlparser.h \
+                    src/qmlgenerator.h \
+                    src/propertiescontroller.h \
+                    src/designereventfilter.h \
+                    src/designerimageprovider.h \
+                    src/designerfilesortproxy.h
+
+# Model Headers
+HEADERS             += src/settingscontroler.h \
                     src/basecomponentsmodel.h \
                     src/openfilesmodel.h \
                     src/projectmodel.h \
                     src/propertiesmodel.h \
                     src/componentinfo.h \
-                    src/qmlparser.h \
-                    src/qmlgenerator.h \
                     src/recentprojectsmodel.h \
                     src/projectitemmodel.h \
                     src/componentsmodel.h \
                     src/viewsmodel.h \
+                    src/minimizedcomponents.h
+
+# Dialog Headers
+HEADERS             += src/mainwindow.h \
+                    src/preferencesdialog.h \
+                    src/aboutdialog.h \
+                    src/confirmdialog.h \
+                    src/infodialog.h \
+                    src/projectpropertiesdialog.h \
                     src/createcomponentdialog.h \
                     src/createviewdialog.h \
-                    src/minimizedcomponents.h \
-                    src/propertiescontroller.h \
-                    src/designereventfilter.h
+                    src/qmleditorwindow.h \
+                    src/resourceviewerdialog.h
 
 # Forms
 FORMS               += ui/mainwindow.ui \
@@ -77,7 +91,8 @@ FORMS               += ui/mainwindow.ui \
                     ui/qmleditorwindow.ui \
                     ui/projectpropertiesdialog.ui \
                     ui/createcomponentdialog.ui \
-                    ui/createviewdialog.ui
+                    ui/createviewdialog.ui \
+                    ui/resourceviewerdialog.ui
 
 # Resources
 RESOURCES           += maxdesigner.qrc \

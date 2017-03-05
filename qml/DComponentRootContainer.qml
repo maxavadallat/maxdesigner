@@ -3,7 +3,7 @@ import QtQuick 2.0
 import enginecomponents 0.1
 
 import "Constants.js" as CONSTS
-import "Style.js" as STYLE
+import "style"
 
 DPaneBase {
     id: compoenntRootContainerRoot
@@ -22,7 +22,7 @@ DPaneBase {
 
     rootContainer: true
 
-    border.color: dropArea.hovering || compoenntRootContainerRoot.focus ? STYLE.colorBorder : STYLE.colorBorderNoFocus
+    border.color: dropArea.hovering || compoenntRootContainerRoot.focus ? Style.colorBorder : Style.colorBorderNoFocus
     radius: 0
 
     onPressed: {
@@ -55,27 +55,9 @@ DPaneBase {
         }
     }
 
-    Canvas {
+    DNoContent {
         id: baseCanvas
         anchors.fill: parent
-
-        opacity: 0.2
-        onPaint: {
-            // Get 2D Context
-            var ctx = getContext("2d");
-
-            ctx.reset();
-
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = STYLE.colorBorderNoFocus;
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(baseCanvas.width, baseCanvas.height);
-            ctx.moveTo(baseCanvas.width, 0);
-            ctx.lineTo(0, baseCanvas.height);
-            ctx.closePath();
-            ctx.stroke();
-        }
     }
 
     DropArea {

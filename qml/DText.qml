@@ -1,15 +1,15 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 Text {
     id: textRoot
     verticalAlignment: Text.AlignVCenter
-    color: STYLE.colorFontDark
-    font.pixelSize: STYLE.fontSizeM
+    color: Style.colorFontDark
+    font.pixelSize: Style.fontSizeM
     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
-    opacity: enabled ? 1.0 : STYLE.disabledOpacity
-    Behavior on opacity { NumberAnimation { duration: STYLE.animDuration } }
+    opacity: enabled ? 1.0 : Style.disabledOpacity
+    Behavior on opacity { NumberAnimation { duration: Style.animDuration } }
     visible: opacity > 0.0
 }

@@ -1,9 +1,9 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 Item {
-    opacity: enabled ? 1.0 : STYLE.disabledOpacity
-    Behavior on opacity { NumberAnimation { duration: STYLE.animDuration } }
+    opacity: enabled ? 1.0 : Style.disabledOpacity
+    Behavior on opacity { NumberAnimation { duration: Style.animDuration } }
     visible: opacity > 0.0
 }

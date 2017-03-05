@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 DMouseArea {
     id: flipableRoot
@@ -49,7 +49,7 @@ DMouseArea {
         ]
 
         transitions: Transition {
-            DAnimation { target: rotation; property: "angle"; duration: STYLE.flipDuration }
+            DAnimation { target: rotation; property: "angle"; duration: Style.flipDuration }
         }
     }
 }

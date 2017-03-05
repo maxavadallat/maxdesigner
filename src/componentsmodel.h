@@ -15,9 +15,6 @@ class ComponentInfo;
 class ComponentsModel : public QAbstractListModel
 {
 public:
-    // Constructor
-    explicit ComponentsModel(ProjectModel* aProjectModel, QObject* aParent = NULL);
-
     // Set Components Dir
     void setComponentsDir(const QString& aDirPath);
 
@@ -34,7 +31,11 @@ public:
     // Destructor
     ~ComponentsModel();
 
-private:
+protected:
+    friend class ProjectModel;
+
+    // Constructor
+    explicit ComponentsModel(ProjectModel* aProjectModel, QObject* aParent = NULL);
     // Init
     void init();
     // Clear

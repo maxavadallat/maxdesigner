@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 DSwipeGesture {
     id: propertyItemRoot
@@ -55,7 +55,7 @@ DSwipeGesture {
         // Set Mark For Deletion
         propertyItemRoot.markFordeletion = propertyItemRoot.swipeOn;
         // Set Behavior Duration
-        deleteButton.behaviorDuration = STYLE.animDuration;
+        deleteButton.behaviorDuration = Style.animDuration;
         // Bind Delete Button Pos X
         deleteButton.x = Qt.binding(function() {
             return propertyItemRoot.markFordeletion ? deleteButton.showPosX : deleteButton.hiddenPosX;
@@ -78,7 +78,7 @@ DSwipeGesture {
         anchors.fill: parent
         color: "transparent"
         border.color: swipeOn ? "orange" : "gray"
-        radius: STYLE.defaultRadius
+        radius: Style.defaultRadius
     }
 
     // Content Fade Curtain
@@ -98,16 +98,16 @@ DSwipeGesture {
 
         Behavior on x { DAnimation { duration: deleteButton.behaviorDuration } }
 
-        property real showPosX: propertyItemRoot.width - deleteButton.width - STYLE.defaultMargin
-        property real hiddenPosX: propertyItemRoot.width + STYLE.defaultMargin
-        property int behaviorDuration: STYLE.animDuration
+        property real showPosX: propertyItemRoot.width - deleteButton.width - Style.defaultMargin
+        property real hiddenPosX: propertyItemRoot.width + Style.defaultMargin
+        property int behaviorDuration: Style.animDuration
 
         anchors.verticalCenter: parent.verticalCenter
 
         preventStealing: true
 
-        bgColor: STYLE.colorCancel
-        highlightColor: STYLE.colorCancelHighLight
+        bgColor: Style.colorCancel
+        highlightColor: Style.colorCancelHighLight
         text: "Delete"
 
         onXChanged: {

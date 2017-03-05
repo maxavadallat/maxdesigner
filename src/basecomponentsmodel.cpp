@@ -106,6 +106,10 @@ void BaseComponentsModel::addBaseComponent(ComponentInfo* aComponent)
         if (bcIndex < 0) {
             // Begin Insert Rows
             beginInsertRows(QModelIndex(), bcCount, bcCount);
+            // Iterate Thur Base Components
+            for (int i=0; i<bcCount; i++) {
+
+            }
             // Append Base Component
             mBaseComponentList << aComponent;
             // End Insert Rows
@@ -139,6 +143,25 @@ void BaseComponentsModel::removeBaseComponent(ComponentInfo* aComponent, const b
             }
             // End Remove Rows
             endRemoveRows();
+        }
+    }
+}
+
+//==============================================================================
+// Set Base Component
+//==============================================================================
+void BaseComponentsModel::setBaseComponent(const int& aIndex, ComponentInfo* aComponent)
+{
+    // Check Component
+    if (aComponent) {
+        // Get Base Components Count
+        int bcCount = mBaseComponentList.count();
+        // Check Index
+        if (aIndex >= 0 && aIndex < bcCount) {
+            // Set Component Info
+            mBaseComponentList[aIndex] = aComponent;
+            // Emit Data Changed
+            emit dataChanged(index(aIndex), index(aIndex));
         }
     }
 }

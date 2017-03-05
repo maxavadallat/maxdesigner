@@ -15,8 +15,9 @@
 #include "basecomponentsmodel.h"
 #include "componentsmodel.h"
 #include "viewsmodel.h"
-#include "openfilesmodel.h"
 
+#include "projectitemmodel.h"
+#include "openfilesmodel.h"
 #include "recentprojectsmodel.h"
 
 namespace Ui {
@@ -77,6 +78,8 @@ private:
 
     // Take Screen Shot
     void takeScreenShot();
+    // Toggle Designer Mode
+    void toggleDesignerMode();
 
     // Set Screen Shot Mode
     void setScreenShotMode(const bool& aScreenShotMode);
@@ -182,6 +185,10 @@ private slots:
     void on_actionScreenshot_triggered();
     // Action Switch Mode Triggered Slot
     void on_actionSwitchMode_triggered();
+    // Action Save Compoennt Triggered Slot
+    void on_actionSaveComponent_triggered();
+    // Action Save View Triggered Slot
+    void on_actionSaveView_triggered();
 
     // ...
 
@@ -208,6 +215,10 @@ private:
     ComponentsModel*            mComponents;
     // Views List Model
     ViewsModel*                 mViews;
+
+    // Project Tree Model
+    ProjectTreeModel*           mProjectTreeModel;
+
     // Open Files List Model
     OpenFilesModel*             mOpenfiles;
 

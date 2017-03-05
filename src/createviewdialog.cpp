@@ -45,6 +45,8 @@ int CreateViewDialog::viewHeight()
 //==============================================================================
 void CreateViewDialog::on_viewNameEdit_textChanged(const QString& arg1)
 {
+    Q_UNUSED(arg1);
+
     // Check View Name
 }
 

@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 MouseArea {
     id: mouseAreaRoot

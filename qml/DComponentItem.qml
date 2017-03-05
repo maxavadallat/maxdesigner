@@ -2,7 +2,7 @@ import QtQuick 2.0
 
 import enginecomponents 0.1
 
-import "Style.js" as STYLE
+import "style"
 import "Constants.js" as CONSTS
 
 Item {
@@ -31,7 +31,7 @@ Item {
     DRectangle {
         anchors.fill: parent
         color: "transparent"
-        border.color: STYLE.colorBorderNoFocus
+        border.color: Style.colorBorderNoFocus
         opacity: componentItemRoot.grabbed ? 0.5 : 0.0
     }
 
@@ -99,7 +99,7 @@ Item {
         DRectangle {
             id: dragContainerBG
             anchors.fill: parent
-            border.color: dragContainer.focus ? STYLE.colorBorder : STYLE.colorBorderNoFocus
+            border.color: dragContainer.focus ? Style.colorBorder : Style.colorBorderNoFocus
         }
 
         Loader {
@@ -114,7 +114,7 @@ Item {
             id: componentTitleLabel
             width: parent.width
             anchors.centerIn: parent
-            font.pixelSize: STYLE.fontSizeS
+            font.pixelSize: Style.fontSizeS
             horizontalAlignment: Text.AlignHCenter
             text: "ComponentItem"
         }

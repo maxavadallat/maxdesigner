@@ -1,18 +1,18 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 Item {
     id: sectionRoot
 
     width: 200
-    height: STYLE.headerHeight
+    height: Style.headerHeight
 
     property string title: "Section"
 
     property int minHeight: 200
 
-    readonly property int openedHeight: Math.max(contentFlickable.contentHeight + sectionHeader.height + STYLE.defaultMargin * 2, minHeight)
+    readonly property int openedHeight: Math.max(contentFlickable.contentHeight + sectionHeader.height + Style.defaultMargin * 2, minHeight)
 
     default property alias contentContainer: contentFlickable.contentContainer
 
@@ -45,7 +45,7 @@ Item {
     DMouseArea {
         id: sectionHeader
         width: parent.width
-        height: STYLE.headerHeight
+        height: Style.headerHeight
 
         preventStealing: false
 
@@ -68,7 +68,7 @@ Item {
         DRectangle {
             id: titleBGRect
             anchors.fill: parent
-            color: STYLE.colorFontDark
+            color: Style.colorFontDark
             border.color: "transparent"
             opacity: 0.2
         }
@@ -80,20 +80,20 @@ Item {
             // Indicator
             DText {
                 id: indicator
-                width: STYLE.headerHeight
-                height: STYLE.headerHeight
+                width: Style.headerHeight
+                height: Style.headerHeight
                 horizontalAlignment: Text.AlignHCenter
                 text: sectionRoot.state === sectionRoot.stateOpen ? "-" : "+"
                 font.bold: true
-                color: sectionHeader.pressed ? STYLE.colorBorder : STYLE.colorFontDark
+                color: sectionHeader.pressed ? Style.colorBorder : Style.colorFontDark
             }
 
             // Title
             DText {
                 id: titleText
-                height: STYLE.headerHeight
+                height: Style.headerHeight
                 text: sectionRoot.title
-                color: sectionHeader.pressed ? STYLE.colorBorder : STYLE.colorFontDark
+                color: sectionHeader.pressed ? Style.colorBorder : Style.colorFontDark
             }
         }
     }
@@ -104,9 +104,9 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: sectionHeader.bottom
-        anchors.topMargin: STYLE.defaultMargin
+        anchors.topMargin: Style.defaultMargin
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: STYLE.defaultMargin
+        anchors.bottomMargin: Style.defaultMargin
         clip: true
     }
 
@@ -119,7 +119,7 @@ Item {
 
         State {
             name: sectionRoot.stateClosed
-            PropertyChanges { target: sectionRoot; height: STYLE.headerHeight }
+            PropertyChanges { target: sectionRoot; height: Style.headerHeight }
         },
 
         State {

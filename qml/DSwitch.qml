@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 DButtonBase {
     id: switchRoot
@@ -13,13 +13,13 @@ DButtonBase {
         anchors.right: switchRoot.rightAligned ? parent.right : undefined
         anchors.verticalCenter: parent.verticalCenter
         text: switchRoot.text
-        color: switchRoot.highlight ? STYLE.colorBorder : STYLE.colorFontDark
+        color: switchRoot.highlight ? Style.colorBorder : Style.colorFontDark
     }
 
     DEditorBackground {
         id: buttonBG
-        width: STYLE.switchWidth
-        height: parent.height - STYLE.defaultMargin
+        width: Style.switchWidth
+        height: parent.height - Style.defaultMargin
 
         anchors.left: switchRoot.rightAligned ? parent.left : undefined
         anchors.right: switchRoot.rightAligned ? undefined : parent.right
@@ -33,11 +33,11 @@ DButtonBase {
     DRectangle {
         anchors.fill: buttonBG
         anchors.margins: 2
-        color: STYLE.colorBorderNoFocus
+        color: Style.colorBorderNoFocus
         border.color: "transparent"
         radius: height / 2
         opacity: switchRoot.checked ? 0.5 : 0.0
-        Behavior on opacity { NumberAnimation { duration: STYLE.animDuration } }
+        Behavior on opacity { NumberAnimation { duration: Style.animDuration } }
         visible: opacity > 0.0
     }
 
@@ -47,8 +47,8 @@ DButtonBase {
         height: width
         anchors.verticalCenter: buttonBG.verticalCenter
         radius: height / 2
-        //border.color: switchRoot.highlight ? STYLE.colorBorder : STYLE.colorFontDark
-        border.color: STYLE.colorFontDark
+        //border.color: switchRoot.highlight ? Style.colorBorder : Style.colorFontDark
+        border.color: Style.colorFontDark
 
         states: [
             State {

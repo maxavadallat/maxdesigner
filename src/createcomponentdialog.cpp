@@ -64,8 +64,13 @@ QString CreateComponentDialog::componentBaseName()
 void CreateComponentDialog::on_componentNameEdit_textChanged(const QString& arg1)
 {
     // Check Component Name
+    if (!arg1.isEmpty()) {
 
-    // ...
+        // Get Main Window
+
+        // ...
+
+    }
 }
 
 //==============================================================================

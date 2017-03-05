@@ -104,6 +104,11 @@ void SettingsControler::loadSettings()
 //==============================================================================
 void SettingsControler::saveSettings()
 {
+    // Check Dirty
+    if (!mDirty) {
+        return;
+    }
+
     qDebug() << "SettingsControler::saveSettings";
 
     mSettings.setValue(SETTINGS_KEY_TRACER_VISIBLE, mTracerVisible);

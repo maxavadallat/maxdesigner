@@ -2,7 +2,7 @@ import QtQuick 2.0
 
 import enginecomponents 0.1
 
-import "Style.js" as STYLE
+import "style"
 import "Constants.js" as CONSTS
 
 DPane {
@@ -11,12 +11,12 @@ DPane {
     width: 300
     height: 600
 
-    title: "Properties"
+    title: "Properties" + (propertiesController.focusedCompoenent ? (" - " + propertiesController.focusedCompoenent.componentName) : "")
 
     minWidth: 300
     minHeight: 200
 
-    enablePaneContent: true
+    enablePaneContent: propertiesController.focusedCompoenent !== null
 
     setFocusOnResize: false
 
@@ -58,7 +58,7 @@ DPane {
 
     Item {
         width: 1
-        height: STYLE.defaultSpacing
+        height: Style.defaultSpacing
     }
 
     DSection {
@@ -69,7 +69,7 @@ DPane {
 
         Row {
             id: posRow
-            spacing: STYLE.defaultSpacing
+            spacing: Style.defaultSpacing
 
             DText {
                 width: 24
@@ -96,7 +96,7 @@ DPane {
 
         Row {
             id: sizeRow
-            spacing: STYLE.defaultSpacing
+            spacing: Style.defaultSpacing
 
             DText {
                 width: 24
@@ -130,7 +130,7 @@ DPane {
 
         Row {
             //height: anchorTargetEditor.height
-            spacing: STYLE.defaultMargin * 0.25
+            spacing: Style.defaultMargin * 0.25
 
             DCheckBox {
                 id: anchorFillCheckBox
@@ -153,7 +153,7 @@ DPane {
             }
 
             DTextInput {
-                width: propertiesPaneRoot.contentWidth - anchorTargetLabel.width - anchorFillCheckBox.width - STYLE.defaultMargin * 0.5 - 12
+                width: propertiesPaneRoot.contentWidth - anchorTargetLabel.width - anchorFillCheckBox.width - Style.defaultMargin * 0.5 - 12
                 anchors.verticalCenter: parent.verticalCenter
                 text: "parent"
             }
@@ -224,12 +224,12 @@ DPane {
 
         Item {
             width: propertiesPaneRoot.contentWidth
-            height: STYLE.defaultMargin
+            height: Style.defaultMargin
         }
 
         Row {
             DText {
-                width: propertiesPaneRoot.contentWidth - leftMarginSpinner.width - STYLE.defaultMargin / 2
+                width: propertiesPaneRoot.contentWidth - leftMarginSpinner.width - Style.defaultMargin / 2
                 text: "leftMargin: "
             }
 
@@ -241,7 +241,7 @@ DPane {
 
         Row {
             DText {
-                width: propertiesPaneRoot.contentWidth - rightMarginSpinner.width - STYLE.defaultMargin / 2
+                width: propertiesPaneRoot.contentWidth - rightMarginSpinner.width - Style.defaultMargin / 2
                 text: "rightMargin: "
             }
 
@@ -253,7 +253,7 @@ DPane {
 
         Row {
             DText {
-                width: propertiesPaneRoot.contentWidth - topMarginSpinner.width - STYLE.defaultMargin / 2
+                width: propertiesPaneRoot.contentWidth - topMarginSpinner.width - Style.defaultMargin / 2
                 text: "topMargin: "
             }
 
@@ -265,7 +265,7 @@ DPane {
 
         Row {
             DText {
-                width: propertiesPaneRoot.contentWidth - bottomMarginSpinner.width - STYLE.defaultMargin / 2
+                width: propertiesPaneRoot.contentWidth - bottomMarginSpinner.width - Style.defaultMargin / 2
                 text: "bottomMargin: "
             }
 
@@ -277,7 +277,7 @@ DPane {
 
         Row {
             DText {
-                width: propertiesPaneRoot.contentWidth - horizontalCenterOffsetSpinner.width - STYLE.defaultMargin / 2
+                width: propertiesPaneRoot.contentWidth - horizontalCenterOffsetSpinner.width - Style.defaultMargin / 2
                 text: "horizontal center offs: "
             }
 
@@ -289,7 +289,7 @@ DPane {
 
         Row {
             DText {
-                width: propertiesPaneRoot.contentWidth - verticalCenterOffsetSpinner.width - STYLE.defaultMargin / 2
+                width: propertiesPaneRoot.contentWidth - verticalCenterOffsetSpinner.width - Style.defaultMargin / 2
                 text: "vertical center offs: "
             }
 
@@ -299,6 +299,51 @@ DPane {
             }
         }
 
+    }
+
+    DSection {
+        width: propertiesPaneRoot.contentWidth
+        title: "Component(!)"
+        minHeight: ownPropertiesContainer.height + addOwnPropertyButton.height
+
+        // Own Properties
+        Item {
+            id: ownPropertiesContainer
+            width: propertiesPaneRoot.contentWidth
+            height: 0
+
+            // ...
+        }
+
+        DButton {
+            id: addOwnPropertyButton
+            width: propertiesPaneRoot.contentWidth
+            text: "Add Property"
+            onClicked: {
+
+            }
+        }
+    }
+
+    DSection {
+        width: propertiesPaneRoot.contentWidth
+        title: "Signals"
+        minHeight: signalsContainer.height + addSignalButton.height
+
+        // Signals
+        Item {
+            id: signalsContainer
+            width: propertiesPaneRoot.contentWidth
+            height: 0
+
+            // ...
+        }
+
+        DButton {
+            id: addSignalButton
+            width: propertiesPaneRoot.contentWidth
+            text: "Add Signal"
+        }
     }
 
     DSection {
@@ -341,7 +386,6 @@ DPane {
             width: propertiesPaneRoot.contentWidth
             text: "Add Transition"
         }
-
     }
 
     DSection {
@@ -427,7 +471,7 @@ DPane {
     Row {
         id: posRow
         height: CONSTS.defaultPaneItemHeight
-        spacing: STYLE.defaultSpacing
+        spacing: Style.defaultSpacing
 
         DText {
             width: 18
@@ -459,7 +503,7 @@ DPane {
     Row {
         id: sizeRow
         height: CONSTS.defaultPaneItemHeight
-        spacing: STYLE.defaultSpacing
+        spacing: Style.defaultSpacing
 
         DText {
             width: 18
@@ -491,7 +535,7 @@ DPane {
     Row {
         id: horizontalAnchoringRow
         height: CONSTS.defaultPaneItemHeight
-        spacing: STYLE.defaultSpacing
+        spacing: Style.defaultSpacing
 
 
     }

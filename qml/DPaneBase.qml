@@ -1,7 +1,7 @@
 import QtQuick 2.0
 
 import "Constants.js" as CONSTS
-import "Style.js" as STYLE
+import "style"
 
 DContainer {
     id: paneBaseRoot
@@ -88,9 +88,9 @@ DContainer {
             // Check Hide To Side
             //if (paneBaseRoot.hideToSide === paneBaseRoot.hideToBottom) {
                 // Check Parent Width & X Position
-                if (parent.width > 0 && (paneBaseRoot.x + paneBaseRoot.width + STYLE.defaultMargin) > parent.width) {
+                if (parent.width > 0 && (paneBaseRoot.x + paneBaseRoot.width + Style.defaultMargin) > parent.width) {
                     // Adjust X Pos To Stay Visible
-                    paneBaseRoot.x = parent.width - (paneBaseRoot.width + STYLE.defaultMargin);
+                    paneBaseRoot.x = parent.width - (paneBaseRoot.width + Style.defaultMargin);
                     // Adjust Las Shown X
                     paneBaseRoot.lastShownX = paneBaseRoot.x;
                 }
@@ -103,9 +103,9 @@ DContainer {
             //console.log("DPane.Connections.onHeightChanged - parent.height: " + parent.height);
 
             // Check Parent Height & Y Position
-            if (parent.height > 0 && (paneBaseRoot.y + paneBaseRoot.height + STYLE.defaultMargin) > parent.height) {
+            if (parent.height > 0 && (paneBaseRoot.y + paneBaseRoot.height + Style.defaultMargin) > parent.height) {
                 // Adjust Y Pos To Stay Visible
-                paneBaseRoot.y = parent.height - (paneBaseRoot.height + STYLE.defaultMargin);
+                paneBaseRoot.y = parent.height - (paneBaseRoot.height + Style.defaultMargin);
                 // Adjust Las Shown Y
                 paneBaseRoot.lastShownY = paneBaseRoot.y;
             }
@@ -246,9 +246,9 @@ DContainer {
     DText {
         id: titleTextLabel
         anchors.left: parent.left
-        anchors.leftMargin: STYLE.defaultMargin
+        anchors.leftMargin: Style.defaultMargin
         anchors.top: parent.top
-        anchors.topMargin: STYLE.defaultMargin
+        anchors.topMargin: Style.defaultMargin
         text: paneBaseRoot.title
         Behavior on opacity { DFadeAnimation { } }
         opacity: 0.0
@@ -291,8 +291,8 @@ DContainer {
 
         DText {
             id: hideButtonText
-            width: paneBaseRoot.hideToSide === paneBaseRoot.hideToBottom ? parent.width : parent.height
-            height: paneBaseRoot.hideToSide === paneBaseRoot.hideToBottom ? parent.height : parent.width
+//            width: paneBaseRoot.hideToSide === paneBaseRoot.hideToBottom ? parent.width : parent.height
+//            height: paneBaseRoot.hideToSide === paneBaseRoot.hideToBottom ? parent.height : parent.width
             anchors.centerIn: parent
             rotation: {
                 switch (paneBaseRoot.hideToSide) {
@@ -306,7 +306,7 @@ DContainer {
             text: "•••"
 
             horizontalAlignment: Text.AlignHCenter
-            color: buttonMouseArea.pressed ? STYLE.colorBorder : STYLE.colorFontDark
+            color: buttonMouseArea.pressed ? Style.colorBorder : Style.colorFontDark
         }
 
         DMouseArea {

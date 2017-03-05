@@ -1,8 +1,8 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 NumberAnimation {
-    duration: STYLE.animDuration
+    duration: Style.animDuration
     easing.type: Easing.InOutCubic
 }

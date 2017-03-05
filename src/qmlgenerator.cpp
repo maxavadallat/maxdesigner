@@ -13,6 +13,9 @@
 //==============================================================================
 void QMLGenerator::updateQML(const QString& aQMLPath, ComponentInfo* aComponent)
 {
+    Q_UNUSED(aQMLPath);
+    Q_UNUSED(aComponent);
+
     // ...
 }
 

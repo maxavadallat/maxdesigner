@@ -30,8 +30,6 @@ void RecentProjectsModel::init()
 //==============================================================================
 void RecentProjectsModel::storeRecentProject(const QString& aFilePath)
 {
-    qDebug() << "RecentProjectsModel::storeRecentProject - aFilePath: " << aFilePath;
-
     // Get Index Of File Path
     int fpIndex = mRecentProjectList.indexOf(aFilePath);
 
@@ -39,6 +37,8 @@ void RecentProjectsModel::storeRecentProject(const QString& aFilePath)
     if (fpIndex == 0) {
         return;
     }
+
+    qDebug() << "RecentProjectsModel::storeRecentProject - aFilePath: " << aFilePath;
 
     // Check Index
     if (fpIndex > 0) {

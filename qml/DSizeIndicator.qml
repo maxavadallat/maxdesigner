@@ -1,13 +1,13 @@
 import QtQuick 2.0
 //import QtGraphicalEffects 1.0
 
-import "Style.js" as STYLE
+import "style"
 
 DRectangle {
     id: sizeIndicatorRoot
 
-    //width: STYLE.sizeIndicatorWidth
-    //height: STYLE.sizeIndicatorHeight
+    //width: Style.sizeIndicatorWidth
+    //height: Style.sizeIndicatorHeight
 
     width: sizeOverlay.width + 12
     height: sizeOverlay.height + 4
@@ -17,7 +17,7 @@ DRectangle {
 
     property bool autoHide: true
 
-    border.color: STYLE.colorBorderTransparent
+    border.color: Style.colorBorderTransparent
     radius: 0
 
     opacity: 0.0
@@ -52,12 +52,12 @@ DRectangle {
 //        source: sizeOverlay
 //        radius: 4
 //        samples: 16
-//        color: STYLE.colorBorder
+//        color: Style.colorBorder
 //    }
 
     Timer {
         id: hideTimer
-        interval: STYLE.defaultHideTimeout
+        interval: Style.defaultHideTimeout
         onTriggered: {
             sizeIndicatorRoot.opacity = 0.0;
         }

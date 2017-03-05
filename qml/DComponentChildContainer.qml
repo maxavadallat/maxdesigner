@@ -3,7 +3,7 @@ import QtQuick 2.0
 import enginecomponents 0.1
 
 import "Constants.js" as CONSTS
-import "Style.js" as STYLE
+import "style"
 
 DContainer {
     id: cccRoot
@@ -11,7 +11,7 @@ DContainer {
     property bool grabbed: false
 
     backgroundColor: Qt.hsla(Math.random(), 0.5, 0.4, 0.2)
-    border.color: cccRoot.selected ? STYLE.colorBorderSelected : cccRoot.focus ? STYLE.colorBorder : STYLE.colorBorderNoFocus
+    border.color: cccRoot.selected ? Style.colorBorderSelected : cccRoot.focus ? Style.colorBorder : Style.colorBorderNoFocus
     radius: 0
 
     enablePosOverlay: true

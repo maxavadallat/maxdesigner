@@ -1,7 +1,7 @@
 import QtQuick 2.0
 
 import "Constants.js" as CONSTS
-import "Style.js" as STYLE
+import "style"
 
 DComponentRootContainer {
     id: viewContainerRoot

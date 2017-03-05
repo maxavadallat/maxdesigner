@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 DMouseArea {
     id: swipeGestureRoot
@@ -160,7 +160,7 @@ DMouseArea {
             anchors.right: swipeGestureRoot.swipeDirection < 0 ? parent.right : undefined
             anchors.left: swipeGestureRoot.swipeDirection > 0 ? parent.left : undefined
             color: "transparent"
-            border.color: STYLE.colorTrace
+            border.color: Style.colorTrace
         }
 
         Rectangle {
@@ -169,7 +169,7 @@ DMouseArea {
             anchors.right: swipeGestureRoot.swipeDirection < 0 ? parent.right : undefined
             anchors.left: swipeGestureRoot.swipeDirection > 0 ? parent.left : undefined
             color: "transparent"
-            border.color: STYLE.colorTrace
+            border.color: Style.colorTrace
         }
 
         Rectangle {
@@ -178,7 +178,7 @@ DMouseArea {
             anchors.right: swipeGestureRoot.swipeDirection < 0 ? parent.right : undefined
             anchors.left: swipeGestureRoot.swipeDirection > 0 ? parent.left : undefined
             anchors.verticalCenter: parent.verticalCenter
-            color: STYLE.colorTrace
+            color: Style.colorTrace
         }
     }
 }

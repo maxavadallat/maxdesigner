@@ -88,8 +88,10 @@ public:
     // Export To QML
     void exportToQML(const QString& aFilePath);
 
+    // Get JSON Object
+    QJsonObject toJSONObject();
     // Get JSON Content/Sting
-    QByteArray toJSON();
+    QByteArray toJSONContent();
 
     // Set Up Component From JSON Content/String
     void fromJSON(const QByteArray& aContent);
@@ -131,17 +133,32 @@ protected:
     // Set QML Source Path
     void setSourcePath(const QString& aPath);
 
+    // Set Dirty State
+    void setDirty(const bool& aDirty);
+
+protected slots:
+    // Base Components Dir Changed Slot
+    void baseComponentsDirChanged(const QString& aBaseComponentsDir);
+    // Components Dir Changed Slot
+    void componentsDirChanged(const QString& aComponentsDir);
+    // Views Dir Changed Slot
+    void viewsDirChanged(const QString& aViewsDir);
+
 private: // Data
     // Project Model
     ProjectModel*           mProject;
+
+    // ProtoType
+    bool                    mProtoType;
+
+    // Dirty
+    bool                    mDirty;
 
     // Component Info File Path
     QString                 mInfoPath;
     // QML File Path
     QString                 mQMLPath;
 
-    // ProtoType
-    bool                    mProtoType;
 
     // Name
     QString                 mName;

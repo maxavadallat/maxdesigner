@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 DButtonBase {
     id: radioButtonRoot
@@ -22,25 +22,25 @@ DButtonBase {
         anchors.right: radioButtonRoot.rightAligned ? parent.right : undefined
         anchors.verticalCenter: parent.verticalCenter
         text: radioButtonRoot.text
-        color: radioButtonRoot.highlight ? STYLE.colorBorder : STYLE.colorFontDark
+        color: radioButtonRoot.highlight ? Style.colorBorder : Style.colorFontDark
     }
 
     DEditorBackground {
         id: buttonBG
-        width: STYLE.radioButtonRadius * 2
-        height: STYLE.radioButtonRadius * 2
+        width: Style.radioButtonRadius * 2
+        height: Style.radioButtonRadius * 2
 
         anchors.left: radioButtonRoot.rightAligned ? parent.left : undefined
         anchors.right: radioButtonRoot.rightAligned ? undefined : parent.right
 
         anchors.verticalCenter: parent.verticalCenter
 
-        //bgColor: radioButtonRoot.pressed ? STYLE.colorHighLight : STYLE.colorEditorBG
+        //bgColor: radioButtonRoot.pressed ? Style.colorHighLight : Style.colorEditorBG
         //bgColor: "red"
         //highLight: radioButtonRoot.highlight
         editorFocus: radioButtonRoot.highlight
 
-        radius: STYLE.radioButtonRadius
+        radius: Style.radioButtonRadius
     }
 
     Rectangle {
@@ -48,8 +48,8 @@ DButtonBase {
         width: radius * 2
         height: radius * 2
         anchors.centerIn: buttonBG
-        color: STYLE.colorRadioButton
-        radius: STYLE.defaultRadius + 1
+        color: Style.colorRadioButton
+        radius: Style.defaultRadius + 1
         opacity: radioButtonRoot.checked ? 1.0 : 0.0
         Behavior on opacity { DFadeAnimation { } }
         visible: opacity > 0.0

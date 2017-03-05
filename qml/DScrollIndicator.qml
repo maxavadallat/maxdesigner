@@ -1,13 +1,13 @@
 import QtQuick 2.0
 
 import "Constants.js" as CONSTS
-import "Style.js" as STYLE
+import "style"
 
 DControl {
     id: scrollIndicatorRoot
 
-    width: vertical ? STYLE.scrollIndicatorWidth : viewSize
-    height: vertical ? viewSize : STYLE.scrollIndicatorWidth
+    width: vertical ? Style.scrollIndicatorWidth : viewSize
+    height: vertical ? viewSize : Style.scrollIndicatorWidth
 
     property bool vertical: true
 
@@ -49,7 +49,7 @@ DControl {
 
         color: "transparent"
         //border.color: "orange"
-        radius:  STYLE.scrollIndicatorWidth / 2
+        radius:  Style.scrollIndicatorWidth / 2
         //smooth: true
 
         Rectangle {
@@ -58,8 +58,8 @@ DControl {
             x: scrollIndicatorRoot.vertical ? 0 : (scrollIndicatorRoot.viewSize - width) * scrollIndicatorRoot.viewContentPos / (scrollIndicatorRoot.viewContentSize - scrollIndicatorRoot.viewSize)
             y: scrollIndicatorRoot.vertical ? (scrollIndicatorRoot.viewSize - height) * scrollIndicatorRoot.viewContentPos  / (scrollIndicatorRoot.viewContentSize - scrollIndicatorRoot.viewSize) : 0
 
-            color: STYLE.colorFontDark //STYLE.colorBorder
-            radius:  STYLE.scrollIndicatorWidth / 2
+            color: Style.colorFontDark //Style.colorBorder
+            radius:  Style.scrollIndicatorWidth / 2
             smooth: true
 
             width: {
@@ -90,7 +90,7 @@ DControl {
 
     Timer {
         id: hideTimer
-        interval: STYLE.scrollIndicatorTimeout
+        interval: Style.scrollIndicatorTimeout
         onTriggered: {
             // Set Auto Hide
             scrollIndicatorRoot.autoHide = true;

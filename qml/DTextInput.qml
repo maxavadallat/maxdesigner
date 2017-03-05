@@ -1,13 +1,13 @@
 import QtQuick 2.0
 import QtGraphicalEffects 1.0
 
-import "Style.js" as STYLE
+import "style"
 
 DControl {
     id: textInputRoot
 
-    width: STYLE.textInputWidth
-    height: STYLE.textInputHeight
+    width: Style.textInputWidth
+    height: Style.textInputHeight
 
     property alias editor: textInput
     property alias text: textInput.text
@@ -38,28 +38,28 @@ DControl {
 
         width: {
             if (text.length === 0 || !textInputRoot.showClearButton) {
-                return parent.width - STYLE.defaultMargin * 2;
+                return parent.width - Style.defaultMargin * 2;
             }
 
-            return parent.width - STYLE.defaultMargin * 2.5 - clearButton.width;
+            return parent.width - Style.defaultMargin * 2.5 - clearButton.width;
         }
 
-        height: parent.height - STYLE.defaultMargin
+        height: parent.height - Style.defaultMargin
 
         Behavior on width { DAnimation { } }
 
         anchors.left: parent.left
-        anchors.leftMargin: STYLE.defaultMargin
+        anchors.leftMargin: Style.defaultMargin
         anchors.verticalCenter: parent.verticalCenter
         //anchors.verticalCenterOffset: 1
 
         verticalAlignment: Text.AlignVCenter
 
-        font.pixelSize: fixTextSize ? STYLE.fontSizeL : textInput.height - 6
+        font.pixelSize: fixTextSize ? Style.fontSizeL : textInput.height - 6
 
         selectByMouse: true
 
-        color: STYLE.colorFontLight
+        color: Style.colorFontLight
 
 //        Rectangle {
 //            anchors.fill: parent
@@ -89,10 +89,10 @@ DControl {
 
     DButton {
         id: clearButton
-        width: STYLE.textInputHeight * 0.6
+        width: Style.textInputHeight * 0.6
         height: width
         anchors.right: parent.right
-        anchors.rightMargin: STYLE.defaultMargin * 0.7
+        anchors.rightMargin: Style.defaultMargin * 0.7
         anchors.verticalCenter: parent.verticalCenter
 
         opacity: (textInput.text.length > 0 && textInputRoot.showClearButton) ? 1.0 : 0.0
@@ -100,7 +100,7 @@ DControl {
         visible: opacity > 0.0
         text: "X"
         radius: height * 0.5 - 1
-        pixelSize: STYLE.fontSizeS
+        pixelSize: Style.fontSizeS
 
         onClicked: {
             // Clear Text

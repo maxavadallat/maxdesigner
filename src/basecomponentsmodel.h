@@ -14,9 +14,6 @@ class ComponentInfo;
 class BaseComponentsModel : public QAbstractListModel
 {
 public:
-    // Constructor
-    explicit BaseComponentsModel(ProjectModel* aProjectModel, QObject* aParent = NULL);
-
     // Set Base Components Dir
     void setBaseComponentsDir(const QString& aDirPath);
 
@@ -24,6 +21,9 @@ public:
     void addBaseComponent(ComponentInfo* aComponent);
     // Remove Base Compoennt
     void removeBaseComponent(ComponentInfo* aComponent, const bool& aDelete = true);
+
+    // Set Base Component
+    void setBaseComponent(const int& aIndex, ComponentInfo* aComponent);
 
     // Get Component Index By Name
     int getComponentIndex(const QString& aName);
@@ -33,12 +33,17 @@ public:
     // Destructor
     ~BaseComponentsModel();
 
-private:
+protected:
+    friend class ProjectModel;
+
+    // Constructor
+    explicit BaseComponentsModel(ProjectModel* aProjectModel, QObject* aParent = NULL);
     // Init
     void init();
     // Clear
     void clear();
 
+protected slots:
     // Load Base Components
     void loadBaseComponents();
 

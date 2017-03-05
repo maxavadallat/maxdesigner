@@ -1,14 +1,14 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 import "Constants.js" as CONSTS
 
 DButtonBase {
     id: buttonRoot
 
     property string bgColor: "transparent"
-    property string highlightColor: STYLE.colorHighLight
-    property string selectedColor: STYLE.colorSelected
+    property string highlightColor: Style.colorHighLight
+    property string selectedColor: Style.colorSelected
     property alias radius: buttonBg.radius
     property alias pixelSize: buttonText.font.pixelSize
 
@@ -16,8 +16,8 @@ DButtonBase {
         id: buttonBg
         anchors.fill: parent
         color: highlight ? buttonRoot.highlightColor : checked ? buttonRoot.selectedColor : buttonRoot.bgColor
-        border.color: highlight ? STYLE.colorBorder : STYLE.colorFontDark
-        radius: STYLE.defaultRadius
+        border.color: highlight ? Style.colorBorder : Style.colorFontDark
+        radius: Style.defaultRadius
     }
 
     DText {

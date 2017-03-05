@@ -1,7 +1,7 @@
 import QtQuick 2.0
 
 import "Constants.js" as CONSTS
-import "Style.js" as STYLE
+import "style"
 
 DPaneBase {
     id: paneRoot
@@ -17,13 +17,12 @@ DPaneBase {
         id: paneContent
         anchors.fill: parent
         anchors {
-            leftMargin: STYLE.defaultMargin
-            topMargin: titleLabel.height + STYLE.defaultMargin * 2
-            rightMargin: STYLE.defaultMargin
-            bottomMargin: STYLE.defaultMargin
+            leftMargin: Style.defaultMargin
+            topMargin: titleLabel.height + Style.defaultMargin * 2
+            rightMargin: Style.defaultMargin
+            bottomMargin: Style.defaultMargin
         }
 
         clip: true
     }
 }
-

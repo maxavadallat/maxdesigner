@@ -38,7 +38,6 @@ class ProjectModel : public QObject
     Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent NOTIFY currentComponentChanged)
 
 public:
-
     // Constructor
     explicit ProjectModel(QObject* aParent = NULL);
 
@@ -53,6 +52,13 @@ public:
 
     // Get Absolute Project File Path
     QString absoluteProjectFilePath();
+
+    // Create Base Component
+    ComponentInfo* createBaseComponent(const QString& aName, const QString& aBaseName);
+    // Create Component
+    ComponentInfo* createComponent(const QString& aName, const QString& aBaseName);
+    // Create View
+    ComponentInfo* createView(const QString& aName, const QString& aBaseName);
 
     // Get Project Name
     QString projectName();
@@ -128,7 +134,7 @@ public:
     ComponentInfo* currentComponent();
 
     // Get Component By Name
-    ComponentInfo* getComponentByName(const QString& aName);
+    Q_INVOKABLE ComponentInfo* getComponentByName(const QString& aName);
 
     // Destructor
     ~ProjectModel();
@@ -166,11 +172,11 @@ signals:
     void pluginPathRemoved(const QString& aPluginPath);
 
     // Base Components Model Changed Signal
-    void baseComponentsModelChanged();
+    void baseComponentsModelChanged(BaseComponentsModel* aBaseComponents);
     // Components Model Changed Signal
-    void componentsModelChanged();
+    void componentsModelChanged(ComponentsModel* aComponents);
     // Views Model Changed Signal
-    void viewsModelChanged();
+    void viewsModelChanged(ViewsModel* aViews);
 
     // Current Component Changed Signal
     void currentComponentChanged(ComponentInfo* aComponent);
@@ -191,6 +197,16 @@ private:
 
     // Set Project Properties Dirty State
     void setDirty(const bool& aDirty);
+
+    // Set Current Component
+    void setCurrentCompoennt(ComponentInfo* aComponent);
+
+    // Set Base Components Model
+    void setBaseComponentsModel(BaseComponentsModel* aBaseComponents);
+    // Set Components Model
+    void setComponentsModel(ComponentsModel* aComponents);
+    // Set Views Model
+    void setViewsModel(ViewsModel* aViews);
 
     // Create/register Base Components
     void createBaseComponents();

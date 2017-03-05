@@ -1,95 +1,142 @@
 
 #include <QDebug>
+#include <QDir>
+#include <QDirIterator>
 
-#include "src/projectitemmodel.h"
-
+#include "projectitemmodel.h"
+#include "constants.h"
 
 //==============================================================================
 // Constructor
 //==============================================================================
-ProjectItemModel::ProjectItemModel(QObject* aParent)
-    : QAbstractItemModel(aParent)
+ProjectTreeModel::ProjectTreeModel(QObject* aParent)
+    : QFileSystemModel(aParent)
+    //, mCurrentPath("/Users/max/Dev/MaxDesigner/assets")
+    , mCurrentPath(QDir::homePath())
 {
+    qDebug() << "ProjectTreeModel created.";
+
+    // Clear Filters
+    mFilters.clear();
+
+    // Add Filters
+    mFilters = QString(DEFAULT_IMAGE_SUFFIXES).split(" ");
+    mFilters << QString(DEFAULT_QML_SUFFIX);
+    mFilters << QString(DEFAULT_JS_SUFFIX);
+
+    // Iterate Throug hFilters
+    for (int i=0; i<mFilters.count(); i++) {
+        // Add File Name Mask
+        mFilters[i] = QString("%1%2").arg(DEFAULT_FILE_NAME_MASK).arg(mFilters[i]);
+    }
+
+    //qDebug() << "ProjectTreeModel::ProjectTreeModel - mFilters: " << mFilters;
+
     // Init
     init();
+
+//    // Start Worker Thread
+//    mWorker->start(QThread::LowestPriority);
 }
 
 //==============================================================================
 // Init
 //==============================================================================
-void ProjectItemModel::init()
+void ProjectTreeModel::init()
 {
-    // ...
+    // Set Root Path
+    setRootPath(mCurrentPath);
 }
 
 //==============================================================================
 // Clear
 //==============================================================================
-void ProjectItemModel::clear()
+void ProjectTreeModel::clear()
 {
-
+    // ...
 }
 
 //==============================================================================
-// Index
+// Get Current Path
 //==============================================================================
-QModelIndex ProjectItemModel::index(int row, int column, const QModelIndex &parent) const
+QString ProjectTreeModel::currentPath()
 {
-    return QModelIndex();
+    return mCurrentPath;
 }
 
 //==============================================================================
-// Parent
+// Set Current Path
 //==============================================================================
-QModelIndex ProjectItemModel::parent(const QModelIndex& child) const
+void ProjectTreeModel::setCurrentPath(const QString& aPath)
 {
-    return QModelIndex();
+    // Check Current Path
+    if (mCurrentPath != aPath) {
+        qDebug() << "ProjectTreeModel::setCurrentPath - aPath: " << aPath;
+        // Set Current Path
+        mCurrentPath = aPath;
+
+        // Set Root
+        setRootPath(mCurrentPath);
+        // Emit Current Path Changed Signal
+        emit currentPathChanged(mCurrentPath);
+        // Emit Root Index Changed Signal
+        emit rootIndexChanged();
+    }
 }
 
 //==============================================================================
-// Sibling
+// Get Root Index
 //==============================================================================
-QModelIndex ProjectItemModel::sibling(int row, int column, const QModelIndex& idx) const
+QModelIndex ProjectTreeModel::rootIndex()
 {
-    return QModelIndex();
-}
-
-//==============================================================================
-// Row Count
-//==============================================================================
-int ProjectItemModel::rowCount(const QModelIndex& parent) const
-{
-    return 0;
-}
-
-//==============================================================================
-// Column Count
-//==============================================================================
-int ProjectItemModel::columnCount(const QModelIndex& parent) const
-{
-    return 0;
-}
-
-//==============================================================================
-// Has Childrent
-//==============================================================================
-bool ProjectItemModel::hasChildren(const QModelIndex& parent) const
-{
-    return false;
+    return index(mCurrentPath);
 }
 
 //==============================================================================
 // Data
 //==============================================================================
-QVariant ProjectItemModel::data(const QModelIndex& index, int role) const
+QVariant ProjectTreeModel::data(const QModelIndex& index, int role) const
 {
-    return "";
+    // Check Index
+    if (!index.isValid()) {
+        return QVariant();
+    }
+
+    // Switch Role
+    switch (role) {
+        case FileIconRole:          return QString("image://%1/%2").arg(DEFAULT_IMAGE_PROVIDER_ID).arg(QFileSystemModel::data(index, FilePathRole).toString());
+        case (Qt::UserRole + 4):    return isDir(index);
+    }
+
+    return QFileSystemModel::data(index, role);
+}
+
+//==============================================================================
+// Get Role Names
+//==============================================================================
+QHash<int,QByteArray> ProjectTreeModel::roleNames() const
+{
+    // Init Role Names
+    QHash<int,QByteArray> rNames;
+
+    // Add Role Names
+    rNames[FileNameRole]        = "fileName";
+    rNames[FileIconRole]        = "fileIcon";
+    rNames[FilePathRole]        = "filePath";
+    rNames[Qt::UserRole + 4]    = "fileIsDir";
+
+    return rNames;
 }
 
 //==============================================================================
 // Destructor
 //==============================================================================
-ProjectItemModel::~ProjectItemModel()
+ProjectTreeModel::~ProjectTreeModel()
 {
+    // Clear
+    clear();
+
     // ...
+
+    qDebug() << "ProjectTreeModel deleted.";
 }

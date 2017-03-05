@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 Item {
     id: flickableRoot
@@ -26,7 +26,7 @@ Item {
         Column {
             id: contentContainerColumn
             width: parent.width
-            spacing: STYLE.defaultSpacing
+            spacing: Style.defaultSpacing
         }
     }
 

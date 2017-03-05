@@ -1,9 +1,9 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 Rectangle {
-    color: STYLE.colorBG
-    border.color: STYLE.colorBorder
-    radius: STYLE.defaultRadius
+    color: Style.colorBG
+    border.color: Style.colorBorder
+    radius: Style.defaultRadius
 }

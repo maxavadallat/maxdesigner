@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 Column {
     id: welcomeRoot
@@ -28,7 +28,7 @@ Column {
         height: 48
         anchors.horizontalCenter: parent.horizontalCenter
         text: "Welcome to Designer!"
-        font.pixelSize: STYLE.fontSizeXL
+        font.pixelSize: Style.fontSizeXL
     }
 
     DRectangle {
@@ -46,14 +46,14 @@ Column {
         width: 256
         anchors.horizontalCenter: parent.horizontalCenter
         text: "- Create a New Project: ⌘N"
-        font.pixelSize: STYLE.fontSizeL
+        font.pixelSize: Style.fontSizeL
     }
 
     DText {
         width: 256
         anchors.horizontalCenter: parent.horizontalCenter
         text: "- Open Project: ⌘O"
-        font.pixelSize: STYLE.fontSizeL
+        font.pixelSize: Style.fontSizeL
     }
 
     Item {
@@ -77,7 +77,7 @@ Column {
         //height: 48
         anchors.horizontalCenter: parent.horizontalCenter
         text: "Recent Projects"
-        //font.pixelSize: STYLE.fontSizeXL
+        //font.pixelSize: Style.fontSizeXL
         visible: rpListView.count > 0
     }
 
@@ -87,7 +87,7 @@ Column {
         width: 512
         height: Math.min(contentHeight, delegateHeight * 5)
 
-        property int delegateHeight: STYLE.fontSizeL
+        property int delegateHeight: Style.fontSizeL
 
         anchors.horizontalCenter: parent.horizontalCenter
         model: recentProjectsModel
@@ -109,7 +109,7 @@ Column {
                 elide: Text.ElideMiddle
                 horizontalAlignment: Text.AlignHCenter
                 text: filePath
-                color: delegateRoot.pressed && delegateRoot.hovering ? STYLE.colorBorder : STYLE.colorFontDark
+                color: delegateRoot.pressed && delegateRoot.hovering ? Style.colorBorder : Style.colorFontDark
             }
 
             onEntered: {

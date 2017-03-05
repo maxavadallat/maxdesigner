@@ -3,7 +3,7 @@ import QtQuick 2.0
 import enginecomponents 0.1
 
 import "Constants.js" as CONSTS
-import "Style.js" as STYLE
+import "style"
 
 Item {
     id: mainRoot
@@ -23,7 +23,7 @@ Item {
         target: mainController
 
         onCurrentProjectChanged: {
-            console.log("main.Connections.mainController.onCurrentProjectChanged - currentProject: " + mainController.currentProject);
+            //console.log("main.Connections.mainController.onCurrentProjectChanged - currentProject: " + mainController.currentProject);
 
             // Check Current Project
             if (mainController.currentProject != null) {
@@ -49,7 +49,7 @@ Item {
         id: bgContainer
         anchors.fill: parent
 
-        color: STYLE.colorMainBG
+        color: Style.colorMainBG
 
         Image {
             id: bgImage
@@ -61,7 +61,8 @@ Item {
 //            fillMode: Image.PreserveAspectFit
 //            source: "qrc:/assets/images/background02.png"
             anchors.fill: parent
-            source: "qrc:/assets/images/tron-wallpaper-23.jpeg"
+            source: settingsController.designerMode === "Developer" ? "qrc:/assets/images/tron-wallpaper-23.jpeg"
+                                                                    : "qrc:/assets/images/tron-wallpaper-27.jpeg"
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
             opacity: 0.1
@@ -87,8 +88,8 @@ Item {
             creationWidth: 360
             creationHeight: 600
 
-            creationX: STYLE.defaultMargin * 2
-            creationY: mainGrabArea.height / 2 - creationHeight / 2
+            creationX: Style.defaultMargin * 2
+            creationY: parentHeight / 2 - creationHeight / 2
 
             parentWidth: mainGrabArea.width
             parentHeight: mainGrabArea.height
@@ -106,8 +107,8 @@ Item {
             creationWidth: 300
             creationHeight: 600
 
-            creationX: mainGrabArea.width - creationWidth - STYLE.defaultMargin * 2
-            creationY: mainGrabArea.height / 2 - creationHeight / 2
+            creationX: parentWidth - creationWidth - Style.defaultMargin * 2
+            creationY: parentHeight / 2 - creationHeight / 2
 
             parentWidth: mainGrabArea.width
             parentHeight: mainGrabArea.height
@@ -119,12 +120,12 @@ Item {
             id: componentRootContainer
 
             initialX: projectPane.x + projectPane.width
-            initialY: Math.max(Math.min(mainGrabArea.height / 2, projectPane.y + projectPane.height - STYLE.defaultMargin), projectPane.y + STYLE.defaultMargin)
+            initialY: Math.max(Math.min(mainGrabArea.height / 2, projectPane.y + projectPane.height - Style.defaultMargin), projectPane.y + Style.defaultMargin)
 
             creationWidth: 600
             creationHeight: 400
 
-            creationX: mainGrabArea.width / 2 - creationWidth / 2
+            creationX: parentWidth / 2 - creationWidth / 2
             creationY: initialY - creationHeight / 2
 
             lastShownX: creationX
@@ -140,12 +141,12 @@ Item {
             id: formulaEditor
 
             initialX: propertiesPane.x
-            initialY: Math.max(Math.min(mainGrabArea.height / 2, propertiesPane.y + propertiesPane.height - STYLE.defaultMargin), propertiesPane.y + STYLE.defaultMargin)
+            initialY: Math.max(Math.min(mainGrabArea.height / 2, propertiesPane.y + propertiesPane.height - Style.defaultMargin), propertiesPane.y + Style.defaultMargin)
 
             creationWidth: 400
             creationHeight: 300
 
-            creationX: mainGrabArea.width / 2 - creationWidth / 2
+            creationX: parentWidth / 2 - creationWidth / 2
             creationY: initialY - creationHeight / 2
 
             lastShownX: creationX
@@ -169,5 +170,7 @@ Item {
         id: minimzedComponents
         anchors.horizontalCenter: parent.horizontalCenter
     }
+
+    //DColorTest { }
 }
 

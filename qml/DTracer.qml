@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 Loader {
     anchors.fill: parent
@@ -10,6 +10,6 @@ Loader {
     sourceComponent: Rectangle {
         anchors.fill: parent
         color: "transparent"//"#22FFFF00"
-        border.color: STYLE.colorTrace
+        border.color: Style.colorTrace
     }
 }

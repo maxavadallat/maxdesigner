@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import QtGraphicalEffects 1.0
 
-import "Style.js" as STYLE
+import "style"
 
 Item {
     id: editorBGRoot
@@ -13,11 +13,11 @@ Item {
 
 //    property bool highLight: false
 
-//    color: STYLE.colorEditorBG
-//    border.color: STYLE.colorBG
+//    color: Style.colorEditorBG
+//    border.color: Style.colorBG
 //    color: "transparent"
 
-    property int radius: STYLE.defaultRadius
+    property int radius: Style.defaultRadius
 
 //    smooth: true
 //    antialiasing: true
@@ -26,7 +26,7 @@ Item {
         id: shadowRectangle
         anchors.fill: parent
         anchors.margins: 1
-        color: STYLE.colorEditorBG
+        color: Style.colorEditorBG
         radius: parent.radius
         visible: false
 //        smooth: true
@@ -40,7 +40,7 @@ Item {
         samples: 16
         horizontalOffset: 3
         verticalOffset: 3
-        color: STYLE.colorShadow
+        color: Style.colorShadow
         source: shadowRectangle
         visible: !editorBGRoot.highLight
 //        smooth: true
@@ -52,7 +52,7 @@ Item {
 //        id: highlightShadowRectangle
 //        anchors.fill: parent
 //        anchors.margins: 1
-//        color: STYLE.colorBorder
+//        color: Style.colorBorder
 //        radius: parent.radius
 //        visible: false
 ////        smooth: true
@@ -66,7 +66,7 @@ Item {
 //        samples: 16
 //        horizontalOffset: 3
 //        verticalOffset: 3
-//        color: STYLE.colorShadow
+//        color: Style.colorShadow
 //        source: highlightShadowRectangle
 //        visible: editorBGRoot.highLight
 ////        smooth: true
@@ -76,7 +76,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         color: "transparent"
-        border.color: editorBGRoot.editorFocus ? STYLE.colorBorder : STYLE.colorBorderNoFocus
+        border.color: editorBGRoot.editorFocus ? Style.colorBorder : Style.colorBorderNoFocus
         radius: editorBGRoot.radius
         smooth: true
         antialiasing: true

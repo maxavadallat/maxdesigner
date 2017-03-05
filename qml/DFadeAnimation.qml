@@ -1,8 +1,8 @@
 import QtQuick 2.0
 
-import "Style.js" as STYLE
+import "style"
 
 NumberAnimation {
     property: "opacity"
-    duration: STYLE.animDuration * 0.5
+    duration: Style.animDuration * 0.5
 }

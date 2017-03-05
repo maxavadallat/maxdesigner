@@ -1,4 +1,3 @@
-
 // Default Pane Width
 var defaultPaneWidth                            = 300;
 // Default Pane Height

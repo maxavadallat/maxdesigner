@@ -12,7 +12,10 @@
 #include "projectmodel.h"
 #include "componentinfo.h"
 #include "propertiescontroller.h"
+#include "designerimageprovider.h"
+#include "designerfilesortproxy.h"
 
+#include "settingskeys.h"
 #include "constants.h"
 
 //==============================================================================
@@ -28,6 +31,7 @@ MainWindow::MainWindow(QWidget* aParent)
     , mComponents(NULL)
     , mViews(NULL)
 
+    , mProjectTreeModel(NULL)
     , mOpenfiles(NULL)
     , mRecentProjects(NULL)
 
@@ -43,6 +47,8 @@ MainWindow::MainWindow(QWidget* aParent)
 {
     // Setup UI
     ui->setupUi(this);
+
+    qDebug() << "MainWindow created.";
 
     // Init
     init();
@@ -64,6 +70,12 @@ void MainWindow::init()
 
     // Install Event Filter
     //installEventFilter(mEventFilter);
+
+    // Check Project Tree Model
+    if (!mProjectTreeModel) {
+        // Create Project Tree Model
+        mProjectTreeModel = new ProjectTreeModel();
+    }
 
     // Check Open File Model
     if (!mOpenfiles) {
@@ -93,6 +105,8 @@ void MainWindow::init()
 //    // Set Context Properties - Views List Model
 //    ctx->setContextProperty(DEFAULT_VIEWS_MODEL_NAME, mViews);
 
+    // Set Context Properties - Project Tree Model
+    ctx->setContextProperty(MODEL_NAME_PROJECT_TREE, mProjectTreeModel);
     // Set Context Properties - Open Files List Model
     ctx->setContextProperty(MODEL_NAME_OPEN_FILES, mOpenfiles);
     // Set Context Properties - Recent Projects List Model
@@ -121,8 +135,17 @@ void MainWindow::init()
     // Register Views Model
     qmlRegisterUncreatableType<ViewsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_COMPONENT_INFO, "");
 
+    // Register File Sort Filter Proxy
+    qmlRegisterType<DesignerFileSortProxy>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_FILE_SORT_FILTER);
+
     // Get Engine
-    //QQmlEngine* engine = ui->mainQuickWidget->engine();
+    QQmlEngine* engine = ui->mainQuickWidget->engine();
+
+//    // Create New Image Provider
+//    DesignerImageProvider* newImageProvider = new DesignerImageProvider();
+
+    // Add Image Provider
+    engine->addImageProvider(QLatin1String(DEFAULT_IMAGE_PROVIDER_ID), new DesignerImageProvider());
 
     // Set Resize Mode
     ui->mainQuickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
@@ -172,6 +195,21 @@ void MainWindow::takeScreenShot()
         // ...
 
 
+    }
+}
+
+//==============================================================================
+// Toggle Designer Mode
+//==============================================================================
+void MainWindow::toggleDesignerMode()
+{
+    // Check Designer Mode
+    if (mSettings->designerMode() == SETTINGS_VALUE_DESIGNER_MODE_DESIGNER) {
+        // Set Designer Mode
+        mSettings->setDesignerMode(SETTINGS_VALUE_DESIGNER_MODE_DEVELOPER);
+    } else {
+        // Set Designer Mode
+        mSettings->setDesignerMode(SETTINGS_VALUE_DESIGNER_MODE_DESIGNER);
     }
 }
 
@@ -232,6 +270,8 @@ bool MainWindow::screenshotMode()
 //==============================================================================
 void MainWindow::openProject(const QString& aFilePath)
 {
+    qDebug() << "MainWindow::openProject - aFilePath: " << aFilePath;
+
     // Check Project Model
     if (!mProjectModel) {
         // Create Project Model
@@ -240,8 +280,6 @@ void MainWindow::openProject(const QString& aFilePath)
 
     // Load Project
     if (mProjectModel->loadProject(aFilePath)) {
-
-        qDebug() << "MainWindow::openProject - aFilePath: " << aFilePath;
         // Store recent Project
         mRecentProjects->storeRecentProject(aFilePath);
 
@@ -292,7 +330,7 @@ void MainWindow::launchPreferences()
 //==============================================================================
 void MainWindow::launchCreateNewProject()
 {
-    qDebug() << "MainWindow::launchCreateNewProject";
+    //qDebug() << "MainWindow::launchCreateNewProject";
 
     // Check Project Properties Dialog
     if (!mProjectPropertiesDiaog) {
@@ -571,8 +609,15 @@ void MainWindow::createNewProject()
 //==============================================================================
 void MainWindow::createNewComponent(const QString& aName, const QString& aType)
 {
+    // Check Project Model
+    if (!mProjectModel) {
+        qWarning() << "MainWindow::createNewComponent - NO PROJECT MODEL!";
+        return;
+    }
+
     // Check Name
     if (!aName.isEmpty()) {
+        qDebug() << "MainWindow::createNewComponent - aName: " << aName << " - aType: " << aType;
         // Check Type
         if (aType == COMPONENT_TYPE_BASECOMPONENT) {
 
@@ -601,6 +646,7 @@ void MainWindow::saveProject(const QString& aFilePath)
 {
     // Check Project Model
     if (!mProjectModel) {
+        qWarning() << "MainWindow::saveProject - NO PROJECT MODEL!";
         return;
     }
 
@@ -620,11 +666,13 @@ void MainWindow::saveComponent(const QString& aFilePath)
 {
     // Check Project Model
     if (!mProjectModel) {
+        qWarning() << "MainWindow::saveComponent - NO PROJECT MODEL!";
         return;
     }
 
     // Check Current Component
     if (!mCurrentComponent) {
+        qWarning() << "MainWindow::saveComponent - NO CURRENT COMPONENT!";
         return;
     }
 
@@ -1086,6 +1134,23 @@ void MainWindow::on_actionScreenshot_triggered()
 //==============================================================================
 void MainWindow::on_actionSwitchMode_triggered()
 {
+    // Toggle Designer Mode
+    toggleDesignerMode();
+}
+
+//==============================================================================
+// Action Save Compoennt Triggered Slot
+//==============================================================================
+void MainWindow::on_actionSaveComponent_triggered()
+{
+
+}
+
+//==============================================================================
+// Action Save View Triggered Slot
+//==============================================================================
+void MainWindow::on_actionSaveView_triggered()
+{
 
 }
 
@@ -1145,6 +1210,11 @@ MainWindow::~MainWindow()
         mEventFilter = NULL;
     }
 
+    if (mProjectTreeModel) {
+        delete mProjectTreeModel;
+        mProjectTreeModel = NULL;
+    }
+
     if (mOpenfiles) {
         delete mOpenfiles;
         mOpenfiles = NULL;
@@ -1185,5 +1255,8 @@ MainWindow::~MainWindow()
     }
 
     // ...
+
+    qDebug() << "MainWindow deleted.";
 }
+
 
