@@ -37,7 +37,7 @@ ComponentInfo* QMLParser::parseQML(const QString& aFilePath, ProjectModel* aProj
         QFileInfo qmlInfo(aFilePath);
 
         // Create New Component Info
-        ComponentInfo* newComponentInfo = new ComponentInfo(qmlInfo.baseName(), "", aProjectModel);
+        ComponentInfo* newComponentInfo = new ComponentInfo(qmlInfo.baseName(), "", "", aProjectModel);
 
         // ...
 

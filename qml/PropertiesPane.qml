@@ -24,7 +24,7 @@ DPane {
 
     hideToSide: hideToRight
 
-    state: stateShown
+    borderColor: Style.colorBorder
 
     Row {
         spacing: 2

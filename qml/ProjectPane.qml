@@ -23,7 +23,7 @@ DPane {
 
     hideToSide: hideToLeft
 
-    state: stateShown
+    borderColor: Style.colorBorder
 
     DSection {
         id: baseComponentsSection

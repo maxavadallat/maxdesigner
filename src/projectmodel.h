@@ -54,9 +54,9 @@ public:
     QString absoluteProjectFilePath();
 
     // Create Base Component
-    ComponentInfo* createBaseComponent(const QString& aName, const QString& aBaseName);
+    ComponentInfo* createBaseComponent(const QString& aName, const QString& aBaseName, const QString& aCategory);
     // Create Component
-    ComponentInfo* createComponent(const QString& aName, const QString& aBaseName);
+    ComponentInfo* createComponent(const QString& aName, const QString& aBaseName, const QString& aCategory);
     // Create View
     ComponentInfo* createView(const QString& aName, const QString& aBaseName);
 

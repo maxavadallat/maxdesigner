@@ -30,7 +30,8 @@ SOURCES             += src/settingscontroler.cpp \
                     src/projectitemmodel.cpp \
                     src/componentsmodel.cpp \
                     src/viewsmodel.cpp \
-                    src/designerfilesortproxy.cpp
+                    src/designerfilesortproxy.cpp \
+                    src/componentcategorymodel.cpp
 
 # Dialog Sources
 SOURCES             += src/mainwindow.cpp \
@@ -68,7 +69,8 @@ HEADERS             += src/settingscontroler.h \
                     src/projectitemmodel.h \
                     src/componentsmodel.h \
                     src/viewsmodel.h \
-                    src/minimizedcomponents.h
+                    src/minimizedcomponents.h \
+                    src/componentcategorymodel.h
 
 # Dialog Headers
 HEADERS             += src/mainwindow.h \

@@ -273,6 +273,8 @@ void SettingsControler::setMainWindowState(const int& aWindowState)
         mMainWindowState = aWindowState;
         // Emit Main Window State changed Signal
         emit mainWindowStateChanged(mMainWindowState);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -295,6 +297,8 @@ void SettingsControler::setDesignerMode(const QString& aMode)
         mDesignerMode = aMode;
         // Emit Designer Mode Changed Signal
         emit designerModeChanged(mDesignerMode);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -317,6 +321,8 @@ void SettingsControler::setProjectPaneSticky(const bool& aSticky)
         mProjectPaneSticky = aSticky;
         // Emit Project Pane Sticky Changed Signal
         emit projectPaneStickyChanged(mProjectPaneSticky);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -339,6 +345,8 @@ void SettingsControler::setProjectPaneX(const int& aPosX)
         mProjectPaneX = aPosX;
         // Emit Project Pane Pos X Changed Signal
         emit projectPaneXChanged(mProjectPaneX);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -361,6 +369,8 @@ void SettingsControler::setProjectPaneY(const int& aPosY)
         mProjectPaneY = aPosY;
         // Emit Project Pane Y Changed Signal
         emit projectPaneYChanged(mProjectPaneY);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -383,6 +393,8 @@ void SettingsControler::setProjectPaneWidth(const int& aWidth)
         mProjectPaneWidth = aWidth;
         // Emit Project Pane Width Changed Signal
         emit projectPaneWidthChanged(mProjectPaneWidth);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -405,6 +417,8 @@ void SettingsControler::setProjectPaneHeight(const int& aHeight)
         mProjectPaneHeight = aHeight;
         // Emit Project Pane Height Changed Signal
         emit projectPaneHeightChanged(mProjectPaneHeight);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -427,6 +441,8 @@ void SettingsControler::setPropertiesPaneSticky(const bool& aSticky)
         mPropertiesPaneSticky = aSticky;
         // Emit Properties Pane Sticky Changed
         emit propertiesPaneStickyChanged(mPropertiesPaneSticky);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -449,6 +465,8 @@ void SettingsControler::setPropertiesPaneX(const int& aPosX)
         mPropertiesPaneX = aPosX;
         // Emit Properties Pane X Changed Signal
         emit propertiesPaneXChanged(mPropertiesPaneX);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -471,6 +489,8 @@ void SettingsControler::setPropertiesPaneY(const int& aPosY)
         mPropertiesPaneY = aPosY;
         // Emit Properties Pane Y Changed Signal
         emit propertiesPaneYChanged(mPropertiesPaneY);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -493,6 +513,8 @@ void SettingsControler::setPropertiesPaneWidth(const int& aWidth)
         mPropertiesPaneWidth = aWidth;
         // Emit Properties Pane Width Changed Signal
         emit propertiesPaneWidthChanged(mPropertiesPaneWidth);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -515,6 +537,8 @@ void SettingsControler::setPropertiesPaneHeight(const int& aHeight)
         mPropertiesPaneHeight = aHeight;
         // Emit Properties Pane Height Changed Signal
         emit propertiesPaneHeightChanged(mPropertiesPaneHeight);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -537,6 +561,8 @@ void SettingsControler::setEditorSyntaxHighlight(const bool& aHighlight)
         mEditorSyntaxHighlight = aHighlight;
         // Emit Editor Syntax Highlight changed Signal
         emit editorSyntaxHighlightChanged(mEditorSyntaxHighlight);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -559,6 +585,8 @@ void SettingsControler::setEditorLineNumbers(const bool& aShowLineNumbers)
         mEditorLineNumbers = aShowLineNumbers;
         // Emit Editor Show Line Numbers Changed Signal
         emit editorLineNumbersChanged(mEditorLineNumbers);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -581,6 +609,8 @@ void SettingsControler::setEditorFontSize(const int& aSize)
         mEditorFontSize = aSize;
         // Emit Editor Font Size Changed Signal
         emit editorFontSizeChanged(mEditorFontSize);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -601,7 +631,7 @@ void SettingsControler::setDirty(const bool& aDirty)
 {
     // Check Dirty State
     if (mDirty != aDirty) {
-        qDebug() << "SettingsControler::setDirty - aDirty: " << aDirty;
+        //qDebug() << "SettingsControler::setDirty - aDirty: " << aDirty;
 
         // Set Dirty State
         mDirty = aDirty;

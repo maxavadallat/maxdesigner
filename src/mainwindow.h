@@ -20,6 +20,8 @@
 #include "openfilesmodel.h"
 #include "recentprojectsmodel.h"
 
+#include "componentcategorymodel.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -106,7 +108,7 @@ private:
     // Create New Project
     void createNewProject();
     // Create New Component
-    void createNewComponent(const QString& aName, const QString& aType = "");
+    void createNewComponent(const QString& aName, const QString& aType, const QString& aBase, const QString& aCategory);
 
     // Save Project
     void saveProject(const QString& aFilePath = "");
@@ -215,6 +217,8 @@ private:
     ComponentsModel*            mComponents;
     // Views List Model
     ViewsModel*                 mViews;
+    // Components Categories Model
+    ComponentCategoryModel*     mCategories;
 
     // Project Tree Model
     ProjectTreeModel*           mProjectTreeModel;
@@ -229,8 +233,8 @@ private:
     PreferencesDialog*          mPreferencesDialog;
     // Project Properties Dialog
     ProjectPropertiesDialog*    mProjectPropertiesDiaog;
-    // Define Base Component Dialog
-    CreateComponentDialog*      mDefineBaseComponentDialog;
+    // Create Component Dialog
+    CreateComponentDialog*      mCreateComponentDialog;
 
     // Properties Controller
     PropertiesController*       mPropertiesController;

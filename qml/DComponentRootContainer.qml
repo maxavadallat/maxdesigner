@@ -8,12 +8,15 @@ import "style"
 DPaneBase {
     id: compoenntRootContainerRoot
 
+    width: 600
+    height: 400
+
     title: "Component"
 
     hideToSide: hideToBottom
 
     enablePosOverlay: false
-    enableSizeOverlay: false
+    enableSizeOverlay: true
 
     showTitle: false
     showBackground: false
@@ -22,7 +25,7 @@ DPaneBase {
 
     rootContainer: true
 
-    border.color: dropArea.hovering || compoenntRootContainerRoot.focus ? Style.colorBorder : Style.colorBorderNoFocus
+    borderColor: dropArea.hovering || compoenntRootContainerRoot.focus ? Style.colorBorder : Style.colorBorderNoFocus
     radius: 0
 
     onPressed: {

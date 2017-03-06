@@ -11,7 +11,7 @@ DContainer {
     property bool grabbed: false
 
     backgroundColor: Qt.hsla(Math.random(), 0.5, 0.4, 0.2)
-    border.color: cccRoot.selected ? Style.colorBorderSelected : cccRoot.focus ? Style.colorBorder : Style.colorBorderNoFocus
+    borderColor: cccRoot.selected ? Style.colorBorderSelected : cccRoot.focus ? Style.colorBorder : Style.colorBorderNoFocus
     radius: 0
 
     enablePosOverlay: true
@@ -19,6 +19,19 @@ DContainer {
 
     Component.onCompleted: {
 
+    }
+
+    Keys.onReleased: {
+        switch (event.key) {
+            case Qt.Key_Backspace:
+
+                // ...
+
+                // Destroy
+                cccRoot.destroy();
+
+            break;
+        }
     }
 
     MouseArea {

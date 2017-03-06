@@ -13,8 +13,8 @@ class PropertiesController : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(ProjectModel* currentProject READ currentProject WRITE setCurrentProject NOTIFY currentProjectChanged)
-    Q_PROPERTY(ComponentInfo* focusedCompoenent READ focusedCompoenent WRITE setFocusedCompoenent NOTIFY focusedCompoenentChanged)
+    Q_PROPERTY(ProjectModel* currentProject READ currentProject NOTIFY currentProjectChanged)
+    Q_PROPERTY(ComponentInfo* focusedComponent READ focusedComponent WRITE setFocusedCompoenent NOTIFY focusedCompoenentChanged)
 
     Q_PROPERTY(QString cID READ cID  NOTIFY cIDChanged)
     Q_PROPERTY(QString cObjectName READ cObjectName NOTIFY cObjectNameChanged)
@@ -47,7 +47,7 @@ public:
     void setCurrentProject(ProjectModel* aProjectModel);
 
     // Get Focused Component
-    ComponentInfo* focusedCompoenent();
+    ComponentInfo* focusedComponent();
     // Set Focused Component
     void setFocusedCompoenent(ComponentInfo* aComponent);
 
@@ -150,6 +150,7 @@ private:
 private: // Data
     // Project Model
     ProjectModel*   mProject;
+
     // Focused Component
     ComponentInfo*  mFocusedComponent;
 

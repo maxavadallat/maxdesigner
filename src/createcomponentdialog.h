@@ -13,6 +13,7 @@ class ProjectModel;
 class ComponentInfo;
 class BaseComponentsModel;
 class ComponentsModel;
+class ComponentCategoryModel;
 
 //==============================================================================
 // Create Component Dialog Class
@@ -29,11 +30,21 @@ public:
     void setBaseComponentsModel(BaseComponentsModel* aModel);
     // Set Components Model
     void setComponentsModel(ComponentsModel* aModel);
+    // Set Categories Model
+    void setCategoriesModel(ComponentCategoryModel* aModel);
 
     // Get Component Name
     QString componentName();
+    // Get Component Categroy
+    QString componentCategory();
     // Get Component Base Class Name
     QString componentBaseName();
+
+    // Set Component Category
+    void setComponentCategory(const QString& aCategory);
+
+    // Reset
+    void reset();
 
     // Destructor
     ~CreateComponentDialog();
@@ -50,7 +61,10 @@ private:
     BaseComponentsModel*            mBaseComponents;
     // Components Model
     ComponentsModel*                mComponents;
+    // Components Category Model
+    ComponentCategoryModel*         mCategories;
 };
+
 
 
 

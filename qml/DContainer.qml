@@ -26,9 +26,8 @@ DMouseArea {
     property bool enablePosOverlay: true
 
     property alias backgroundColor: containerBG.color
-    property alias border: containerBG.border
+    property string borderColor: Style.colorBorderNoFocus
     property alias radius: containerBG.radius
-    //property alias borderColor: containerBG.border.color
 
     property alias clipContent: contentContainer.clip
     property alias enableContent: contentContainer.enabled
@@ -163,6 +162,7 @@ DMouseArea {
         id: containerBG
         anchors.fill: parent
         visible: containerRoot.showBackground
+        border.color: containerRoot.borderColor
     }
 
     Item {

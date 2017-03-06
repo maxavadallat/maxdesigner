@@ -4,6 +4,7 @@
 #include "ui_createcomponentdialog.h"
 #include "basecomponentsmodel.h"
 #include "componentsmodel.h"
+#include "componentcategorymodel.h"
 #include "projectmodel.h"
 #include "constants.h"
 
@@ -14,6 +15,8 @@ CreateComponentDialog::CreateComponentDialog(QWidget* aParent)
     : QDialog(aParent)
     , ui(new Ui::CreateComponentDialog)
     , mBaseComponents(NULL)
+    , mComponents(NULL)
+    , mCategories(NULL)
 {
     ui->setupUi(this);
 }
@@ -43,6 +46,17 @@ void CreateComponentDialog::setComponentsModel(ComponentsModel* aModel)
 }
 
 //==============================================================================
+// Set Categories Model
+//==============================================================================
+void CreateComponentDialog::setCategoriesModel(ComponentCategoryModel* aModel)
+{
+    // Set Categories Model
+    mCategories = aModel;
+    // Set Categories Combo Box Model
+    ui->categoryComboBox->setModel(mCategories);
+}
+
+//==============================================================================
 // Get Base Component Name
 //==============================================================================
 QString CreateComponentDialog::componentName()
@@ -51,11 +65,51 @@ QString CreateComponentDialog::componentName()
 }
 
 //==============================================================================
+// Get Component Categroy
+//==============================================================================
+QString CreateComponentDialog::componentCategory()
+{
+    return ui->categoryComboBox->currentText();
+}
+
+//==============================================================================
 // Get Base Component Base Class Name
 //==============================================================================
 QString CreateComponentDialog::componentBaseName()
 {
     return ui->baseTypeTab->currentIndex() == 0 ? ui->baseTypeComboBox->currentText() : ui->componentTypeComboBox->currentText();
+}
+
+//==============================================================================
+// Set Component Category
+//==============================================================================
+void CreateComponentDialog::setComponentCategory(const QString& aCategory)
+{
+    // Check Categories Model
+    if (mCategories) {
+        // Get Index
+        int cIndex = mCategories->getIndex(aCategory);
+        // Check Index
+        if (cIndex >= 0) {
+            // Set Current Index
+            ui->categoryComboBox->setCurrentIndex(cIndex);
+        }
+    }
+}
+
+//==============================================================================
+// Reset
+//==============================================================================
+void CreateComponentDialog::reset()
+{
+    ui->componentNameEdit->clear();
+    ui->baseTypeTab->setCurrentIndex(0);
+    ui->baseTypeComboBox->setCurrentIndex(0);
+    ui->baseTypeComboBox->setCurrentText("");
+    ui->componentTypeComboBox->setCurrentIndex(0);
+    ui->componentTypeComboBox->setCurrentText("");
+    ui->categoryComboBox->setCurrentIndex(0);
+    ui->categoryComboBox->setCurrentText(ui->categoryComboBox->itemData(0).toString());
 }
 
 //==============================================================================

@@ -78,6 +78,8 @@ Item {
     MainGrabArea {
         id: mainGrabArea
 
+        anchors.fill: parent
+
         // Project Pane
         ProjectPane {
             id: projectPane
@@ -90,6 +92,9 @@ Item {
 
             creationX: Style.defaultMargin * 2
             creationY: parentHeight / 2 - creationHeight / 2
+
+            lastShownX: projectPane.creationX
+            lastShownY: projectPane.creationY
 
             parentWidth: mainGrabArea.width
             parentHeight: mainGrabArea.height
@@ -110,6 +115,9 @@ Item {
             creationX: parentWidth - creationWidth - Style.defaultMargin * 2
             creationY: parentHeight / 2 - creationHeight / 2
 
+            lastShownX: propertiesPane.creationX
+            lastShownY: propertiesPane.creationY
+
             parentWidth: mainGrabArea.width
             parentHeight: mainGrabArea.height
 
@@ -128,8 +136,8 @@ Item {
             creationX: parentWidth / 2 - creationWidth / 2
             creationY: initialY - creationHeight / 2
 
-            lastShownX: creationX
-            lastShownY: creationY
+            lastShownX: componentRootContainer.creationX
+            lastShownY: componentRootContainer.creationY
 
             parentWidth: mainGrabArea.width
             parentHeight: mainGrabArea.height
@@ -143,14 +151,14 @@ Item {
             initialX: propertiesPane.x
             initialY: Math.max(Math.min(mainGrabArea.height / 2, propertiesPane.y + propertiesPane.height - Style.defaultMargin), propertiesPane.y + Style.defaultMargin)
 
-            creationWidth: 400
-            creationHeight: 300
+            creationWidth: 320
+            creationHeight: 200
 
-            creationX: parentWidth / 2 - creationWidth / 2
-            creationY: initialY - creationHeight / 2
+            creationX: parentWidth / 2 - creationWidth / 2 + 100
+            creationY: initialY - creationHeight / 2 + 150
 
-            lastShownX: creationX
-            lastShownY: creationY
+            lastShownX: formulaEditor.creationX
+            lastShownY: formulaEditor.creationY
 
             parentWidth: mainGrabArea.width
             parentHeight: mainGrabArea.height
@@ -171,6 +179,8 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
-    //DColorTest { }
+//    DColorTest {
+//        id: colorTest
+//    }
 }
 

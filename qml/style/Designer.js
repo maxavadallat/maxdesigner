@@ -10,7 +10,7 @@ var colorBG                                         = "#AA000000";
 // Default Border Color
 var colorBorder                                     = "#FFFD7C00";
 // Default Unfocused Border Color
-var colorBorderNoFocus                              = "#FFEB5002";
+var colorBorderNoFocus                              = "#FFCB4000";
 // Default Focused Border Color
 var colorBorderSelected                             = "yellow"//"#FFEC6302";
 // Default Unfocused Transparent Border Color

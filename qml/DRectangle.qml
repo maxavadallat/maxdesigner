@@ -4,6 +4,6 @@ import "style"
 
 Rectangle {
     color: Style.colorBG
-    border.color: Style.colorBorder
+    border.color: Style.colorBorderNoFocus
     radius: Style.defaultRadius
 }

@@ -59,6 +59,8 @@ MouseArea {
         //console.log("#### MaingrabArea.setDragTarget");
         // Set Drag Target
         mainGrabAreaRoot.dragTarget = item;
+        // Set Drag Active
+        mainGrabAreaRoot.dragTarget.dragActive = true;
         // Bring To Front
         bringToFront(item);
     }
@@ -68,6 +70,8 @@ MouseArea {
         // Check Drag Target
         if (mainGrabAreaRoot.dragTarget !== undefined) {
             //console.log("#### MaingrabArea.clearDragTarget");
+            // Reset Drag Active
+            mainGrabAreaRoot.dragTarget.dragActive = false;
             // Clear Drag Target
             mainGrabAreaRoot.dragTarget = undefined;
         }

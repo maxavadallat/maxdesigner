@@ -6,8 +6,8 @@ import "style"
 DContainer {
     id: paneBaseRoot
 
-    width: CONSTS.defaultPaneWidth
-    height: CONSTS.defaultPaneHeight
+    width: creationWidth
+    height: creationHeight
 
     property string title: ""
 
@@ -21,6 +21,8 @@ DContainer {
     readonly property string stateShown: "shown"
     readonly property string stateHidden: "hidden"
     readonly property string stateClosed: "closed"
+
+    property bool dragActive: false
 
     property int lastShownX: 0
     property int lastShownY: 0
@@ -83,32 +85,11 @@ DContainer {
         target: parent
 
         onWidthChanged: {
-            //console.log("DPane.Connections.onWidthChanged - parent.width: " + parent.width);
-
-            // Check Hide To Side
-            //if (paneBaseRoot.hideToSide === paneBaseRoot.hideToBottom) {
-                // Check Parent Width & X Position
-                if (parent.width > 0 && (paneBaseRoot.x + paneBaseRoot.width + Style.defaultMargin) > parent.width) {
-                    // Adjust X Pos To Stay Visible
-                    paneBaseRoot.x = parent.width - (paneBaseRoot.width + Style.defaultMargin);
-                    // Adjust Las Shown X
-                    paneBaseRoot.lastShownX = paneBaseRoot.x;
-                }
-            //}
 
             // ...
         }
 
         onHeightChanged: {
-            //console.log("DPane.Connections.onHeightChanged - parent.height: " + parent.height);
-
-            // Check Parent Height & Y Position
-            if (parent.height > 0 && (paneBaseRoot.y + paneBaseRoot.height + Style.defaultMargin) > parent.height) {
-                // Adjust Y Pos To Stay Visible
-                paneBaseRoot.y = parent.height - (paneBaseRoot.height + Style.defaultMargin);
-                // Adjust Las Shown Y
-                paneBaseRoot.lastShownY = paneBaseRoot.y;
-            }
 
             // ...
         }
@@ -119,11 +100,15 @@ DContainer {
 //            return;
 
         // Check State
-        if (paneBaseRoot.state !== stateHidden && paneBaseRoot.state !== stateClosed) {
+        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
             //console.log("DPaneBase.onXChanged - x: " + x);
 
-            // Adjust Las Shown X
-            paneBaseRoot.lastShownX = paneBaseRoot.x;
+            if (paneBaseRoot.dragActive) {
+                //console.log("DPaneBase.onXChanged - x: " + x);
+
+                // Adjust Las Shown X
+                paneBaseRoot.lastShownX = paneBaseRoot.x;
+            }
         }
     }
 
@@ -132,20 +117,34 @@ DContainer {
 //            return;
 
         // Check State
-        if (paneBaseRoot.state !== stateHidden && paneBaseRoot.state !== stateClosed) {
+        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
 
             //console.log("DPaneBase.onYChanged - y: " + y);
 
-            // Adjust Las Shown Y
-            paneBaseRoot.lastShownY = paneBaseRoot.y;
+            if (paneBaseRoot.dragActive) {
+                //console.log("DPaneBase.onYChanged - y: " + y);
+
+                // Adjust Las Shown Y
+                paneBaseRoot.lastShownY = paneBaseRoot.y;
+            }
         }
     }
 
-//    onWidthChanged: {
-//        if (!transitioning && state === stateShown) {
-//            console.log("DPaneBase.onWidthChanged - width: " + width);
-//        }
-//    }
+    onWidthChanged: {
+        // Check State
+        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
+            // Update Creation Width
+            paneBaseRoot.creationWidth = paneBaseRoot.width;
+        }
+    }
+
+    onHeightChanged: {
+        // Check State
+        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
+            // Update Creation Height
+            paneBaseRoot.creationHeight = paneBaseRoot.height;
+        }
+    }
 
     onPressed: {
         //console.log("DPaneBase.onPressed");
@@ -162,10 +161,6 @@ DContainer {
     onResizePressed: {
         paneBaseRoot.parent.setDragTarget(paneBaseRoot);
     }
-
-//    onInitialYChanged: {
-//        console.log("DPaneBase.onInitialYChanged - initialY: " + initialY);
-//    }
 
     // Reset To Create State
     function reset() {
@@ -199,15 +194,6 @@ DContainer {
     function close() {
         // Set State
         paneBaseRoot.state = stateClosed;
-
-        // ...
-    }
-
-    // Background
-    DRectangle {
-        id: paneBG
-        anchors.fill: parent
-        visible: paneBaseRoot.showBackground
     }
 
     // Content Container
@@ -235,11 +221,6 @@ DContainer {
             paneBaseRoot.parent.clearDragTarget();
             mouse.accepted = false;
         }
-
-//        Rectangle {
-//            anchors.fill: parent
-//            color: "#22FF0000"
-//        }
     }
 
     // Title
@@ -332,9 +313,15 @@ DContainer {
 
     states: [
         State {
+            name: ""
+        },
+
+        State {
             name: stateCreate
 
             PropertyChanges { target: paneBaseRoot; x: paneBaseRoot.initialX; y: paneBaseRoot.initialY; width: 0; height: 0 }
+            PropertyChanges { target: titleTextLabel; opacity: 0.0 }
+            PropertyChanges { target: hideShowButton; opacity: 0.0 }
         },
 
         State {
@@ -342,18 +329,25 @@ DContainer {
 
             PropertyChanges { target: paneBaseRoot; x: paneBaseRoot.lastShownX; y: paneBaseRoot.lastShownY }
             PropertyChanges { target: paneBaseRoot; width: paneBaseRoot.creationWidth; height: paneBaseRoot.creationHeight }
+            PropertyChanges { target: titleTextLabel; opacity: 1.0 }
+            PropertyChanges { target: hideShowButton; opacity: 1.0 }
         },
 
         State {
             name: stateHidden
 
             PropertyChanges { target: paneBaseRoot; x: paneBaseRoot.hiddenX; y: paneBaseRoot.hiddenY }
+            PropertyChanges { target: paneBaseRoot; width: paneBaseRoot.creationWidth; height: paneBaseRoot.creationHeight }
+            PropertyChanges { target: titleTextLabel; opacity: 1.0 }
+            PropertyChanges { target: hideShowButton; opacity: 1.0 }
         },
 
         State {
             name: stateClosed
 
             PropertyChanges { target: paneBaseRoot; width: 0; height: 0 }
+            PropertyChanges { target: titleTextLabel; opacity: 0.0 }
+            PropertyChanges { target: hideShowButton; opacity: 0.0 }
         }
     ]
 

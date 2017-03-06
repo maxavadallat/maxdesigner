@@ -5,10 +5,7 @@ import "style"
 DPaneBase {
     id: formulaEditorRoot
 
-    width: Style.formulaEdiorWidth
-    height: Style.formulaEditorHeight
-
-    property alias title: label.text
+    title: "Formula" // Id
 
     enablePosOverlay: false
     enableSizeOverlay: false
@@ -24,12 +21,7 @@ DPaneBase {
 
     hideToSide: hideToRight
 
-    state: stateShown
-
     clipContent: true
-
-    //border.color: textInput.editor.focus ? Style.colorBorder : Style.colorBorderNoFocus
-    border.color: Style.colorBorderNoFocus
 
     DText {
         id: label
@@ -37,7 +29,7 @@ DPaneBase {
         anchors.leftMargin: Style.defaultMargin
         anchors.top: parent.top
         anchors.topMargin: Style.defaultMargin
-        text: "Formula:"
+        text: formulaEditorRoot.title
         opacity: formulaEditorRoot.state === formulaEditorRoot.stateShown ? 1.0 : 0.0
     }
 

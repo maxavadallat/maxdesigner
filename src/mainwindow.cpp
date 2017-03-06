@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget* aParent)
     , mBaseComponents(NULL)
     , mComponents(NULL)
     , mViews(NULL)
+    , mCategories(NULL)
 
     , mProjectTreeModel(NULL)
     , mOpenfiles(NULL)
@@ -37,7 +38,7 @@ MainWindow::MainWindow(QWidget* aParent)
 
     , mPreferencesDialog(NULL)
     , mProjectPropertiesDiaog(NULL)
-    , mDefineBaseComponentDialog(NULL)
+    , mCreateComponentDialog(NULL)
 
     , mPropertiesController(NULL)
 
@@ -87,6 +88,12 @@ void MainWindow::init()
     if (!mRecentProjects) {
         // Create Recent Projects Model
         mRecentProjects = new RecentProjectsModel();
+    }
+
+    // Check Component Categories Model
+    if (!mCategories) {
+        // Create Component Categories Model
+        mCategories = new ComponentCategoryModel();
     }
 
     // Set Context Properties
@@ -498,13 +505,20 @@ void MainWindow::launchDefineBaseComponent()
     //releaseKeyboard();
 
     // Check Define Base Component Dialog
-    if (!mDefineBaseComponentDialog) {
-        // Create Define Base Component Dialog
-        mDefineBaseComponentDialog = new CreateComponentDialog();
+    if (!mCreateComponentDialog) {
+        // Create Create Component Dialog
+        mCreateComponentDialog = new CreateComponentDialog();
+
+        // Set Base Components Model
+        mCreateComponentDialog->setBaseComponentsModel(mProjectModel->baseComponentsModel());
+        // Set Components Model
+        mCreateComponentDialog->setComponentsModel(mProjectModel->componentsModel());
+        // Set Categories Model
+        mCreateComponentDialog->setCategoriesModel(mCategories);
     }
 
     // Exec Dialog
-    if (mDefineBaseComponentDialog->exec()) {
+    if (mCreateComponentDialog->exec()) {
         // Create Base Component
 
     }
@@ -526,16 +540,26 @@ void MainWindow::launchCreateComponent()
     // Release Keyboard Focus
     //releaseKeyboard();
 
-    // Check Define Base Component Dialog
-    if (!mDefineBaseComponentDialog) {
-        // Create Define Base Component Dialog
-        mDefineBaseComponentDialog = new CreateComponentDialog();
+    // Check Create Component Dialog
+    if (!mCreateComponentDialog) {
+        // Create Create Component Dialog
+        mCreateComponentDialog = new CreateComponentDialog();
+
+        // Set Base Components Model
+        mCreateComponentDialog->setBaseComponentsModel(mProjectModel->baseComponentsModel());
+        // Set Components Model
+        mCreateComponentDialog->setComponentsModel(mProjectModel->componentsModel());
+        // Set Categories Model
+        mCreateComponentDialog->setCategoriesModel(mCategories);
     }
 
     // Exec Dialog
-    if (mDefineBaseComponentDialog->exec()) {
+    if (mCreateComponentDialog->exec()) {
         // Create Base Component
-
+        createNewComponent(mCreateComponentDialog->componentName(),
+                           COMPONENT_TYPE_COMPONENT,
+                           mCreateComponentDialog->componentBaseName(),
+                           mCreateComponentDialog->componentCategory());
     }
 
     // ...
@@ -578,11 +602,10 @@ void MainWindow::createNewProject()
 
     // Set Project Name
     mProjectModel->initProject(mProjectPropertiesDiaog->projectName(), mProjectPropertiesDiaog->projectDir());
-    // Set Base Components Dir
-    //mProjectModel->setBaseComponentsDir(mProjectPropertiesDiaog->projectDir() + "/" + mProjectPropertiesDiaog->projectName() + "/" + DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME);
 
     // Update Project
     updateProject();
+
     // ...
 
     // Enable Save Project Menu Item
@@ -607,7 +630,7 @@ void MainWindow::createNewProject()
 //==============================================================================
 // Create New Component
 //==============================================================================
-void MainWindow::createNewComponent(const QString& aName, const QString& aType)
+void MainWindow::createNewComponent(const QString& aName, const QString& aType, const QString& aBase, const QString& aCategory)
 {
     // Check Project Model
     if (!mProjectModel) {
@@ -617,19 +640,26 @@ void MainWindow::createNewComponent(const QString& aName, const QString& aType)
 
     // Check Name
     if (!aName.isEmpty()) {
-        qDebug() << "MainWindow::createNewComponent - aName: " << aName << " - aType: " << aType;
+        qDebug() << "MainWindow::createNewComponent - aName: " << aName << " - aType: " << aType << " - aBase: " << aBase << " - aCategory: " << aCategory;
+
+        // Init New Component
+        ComponentInfo* newComponent = NULL;
+
         // Check Type
         if (aType == COMPONENT_TYPE_BASECOMPONENT) {
 
-            // ...
+            // Create New Base Component
+            newComponent = mProjectModel->createBaseComponent(aName, aBase, aCategory);
 
         } else if (aType == COMPONENT_TYPE_COMPONENT) {
 
-            // ...
+            // Create New Component
+            newComponent = mProjectModel->createComponent(aName, aBase, aCategory);
 
         } else if (aType == COMPONENT_TYPE_VIEW) {
 
-            // ...
+            // Create New View
+            newComponent = mProjectModel->createView(aName, aBase);
 
         } else {
             qWarning() << "MainWindow::createNewComponent - UNSUPPORTED COMPONENT TYPE!";
@@ -1225,6 +1255,11 @@ MainWindow::~MainWindow()
         mRecentProjects = NULL;
     }
 
+    if (mCategories) {
+        delete mCategories;
+        mCategories = NULL;
+    }
+
     // ...
 
     if (mPreferencesDialog) {
@@ -1237,9 +1272,9 @@ MainWindow::~MainWindow()
         mProjectPropertiesDiaog = NULL;
     }
 
-    if (mDefineBaseComponentDialog) {
-        delete mDefineBaseComponentDialog;
-        mDefineBaseComponentDialog = NULL;
+    if (mCreateComponentDialog) {
+        delete mCreateComponentDialog;
+        mCreateComponentDialog = NULL;
     }
 
     if (mPropertiesController) {

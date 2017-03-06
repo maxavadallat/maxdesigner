@@ -22,6 +22,7 @@ class ComponentInfo : public QObject
 
     Q_PROPERTY(QString componentName READ componentName WRITE setComponentName NOTIFY componentNameChanged)
     Q_PROPERTY(QString componentType READ componentType WRITE setComponentType NOTIFY componentTypeChanged)
+    Q_PROPERTY(QString componentCategory READ componentCategory WRITE setComponentCategory NOTIFY componentCategoryChanged)
     Q_PROPERTY(QString componentBase READ componentBase WRITE setComponentBase NOTIFY componentBaseChanged)
 
     Q_PROPERTY(bool focused READ focused WRITE setFocused NOTIFY focusedChanged)
@@ -50,6 +51,11 @@ public:
     QString componentType();
     // Set Component Type
     void setComponentType(const QString& aType);
+
+    // Get Component Category
+    QString componentCategory();
+    // Set Component Category
+    void setComponentCategory(const QString& aCategory);
 
     // Get Component Base Name
     QString componentBase();
@@ -106,6 +112,8 @@ signals:
     void componentNameChanged(const QString& aName);
     // Component Type Changed Signal
     void componentTypeChanged(const QString& aType);
+    // Component Category Changed Signal
+    void componentCategoryChanged(const QString& aCategory);
     // Component Base Name Changed
     void componentBaseChanged(const QString& aBaseName);
     // Focused State Changed Signal
@@ -119,7 +127,12 @@ protected:
     friend class QMLParser;
 
     // Constructor
-    explicit ComponentInfo(const QString& aName, const QString& aType, ProjectModel* aProject = NULL, const QString& aBaseName = "", QObject* aParent = NULL);
+    explicit ComponentInfo(const QString& aName,
+                           const QString& aType,
+                           const QString& aCategory,
+                           ProjectModel* aProject,
+                           const QString& aBaseName = "",
+                           QObject* aParent = NULL);
 
     // Init
     void init();
@@ -164,6 +177,8 @@ private: // Data
     QString                 mName;
     // Type
     QString                 mType;
+    // Category
+    QString                 mCategory;
     // Base Component Name
     QString                 mBaseName;
 

@@ -60,7 +60,7 @@ void PropertiesController::setCurrentProject(ProjectModel* aProjectModel)
 //==============================================================================
 // Get Focused Component
 //==============================================================================
-ComponentInfo* PropertiesController::focusedCompoenent()
+ComponentInfo* PropertiesController::focusedComponent()
 {
     return mFocusedComponent;
 }
@@ -81,84 +81,113 @@ void PropertiesController::setFocusedCompoenent(ComponentInfo* aComponent)
     }
 }
 
+//==============================================================================
 // Get Component ID
+//==============================================================================
 QString PropertiesController::cID()
 {
-
+    return mFocusedComponent ? mFocusedComponent->property(JSON_KEY_COMPONENT_PROPERTY_ID).toString() : "";
 }
 
+//==============================================================================
 // Request Component ID
+//==============================================================================
 void PropertiesController::requestCID(const QString& aID)
 {
+
 }
 
+//==============================================================================
 // Get Component Object Name
+//==============================================================================
 QString PropertiesController::cObjectName()
 {
-
+    return mFocusedComponent ? mFocusedComponent->property(JSON_KEY_COMPONENT_PROPERTY_OBJECT_NAME).toString() : "";
 }
 
+//==============================================================================
 // Request Component Object Name
+//==============================================================================
 void PropertiesController::requestCObjectName(const QString& aObjectName)
 {
 
 }
 
+//==============================================================================
 // Get Component X
+//==============================================================================
 QString PropertiesController::cX()
 {
-
+    return mFocusedComponent ? mFocusedComponent->property(JSON_KEY_COMPONENT_PROPERTY_X).toString() : "";
 }
 
+//==============================================================================
 // Request Component X
+//==============================================================================
 void PropertiesController::requestCX(const QString& aX)
 {
 
 }
 
+//==============================================================================
 // Get Component Y
+//==============================================================================
 QString PropertiesController::cY()
 {
-
+    return mFocusedComponent ? mFocusedComponent->property(JSON_KEY_COMPONENT_PROPERTY_Y).toString() : "";
 }
 
+//==============================================================================
 // Request Component Y
+//==============================================================================
 void PropertiesController::requestCY(const QString& aY)
 {
 
 }
 
+//==============================================================================
 // Get Component Z
+//==============================================================================
 QString PropertiesController::cZ()
 {
-
+    return mFocusedComponent ? mFocusedComponent->property(JSON_KEY_COMPONENT_PROPERTY_Z).toString() : "";
 }
 
+//==============================================================================
 // Request Component Z
+//==============================================================================
 void PropertiesController::requestCZ(const QString& aZ)
 {
 
 }
 
+//==============================================================================
 // Get Component Width
+//==============================================================================
 QString PropertiesController::cWidth()
 {
-
+    return mFocusedComponent ? mFocusedComponent->property(JSON_KEY_COMPONENT_PROPERTY_WIDTH).toString() : "";
 }
 
+//==============================================================================
 // Request Component Width
+//==============================================================================
 void PropertiesController::requestCWidth(const QString& aWidth)
 {
 
 }
 
+//==============================================================================
 // Get Component Height
+//==============================================================================
 QString PropertiesController::cHeight()
 {
-
+    return mFocusedComponent ? mFocusedComponent->property(JSON_KEY_COMPONENT_PROPERTY_HEIGHT).toString() : "";
 }
 
+//==============================================================================
 // Request Component Height
+//==============================================================================
 void PropertiesController::requestCHeight(const QString& aHeight)
 {
 
@@ -171,7 +200,11 @@ void PropertiesController::requestCHeight(const QString& aHeight)
 //==============================================================================
 void PropertiesController::addOwnProperty(const QString& aKey, PropertiesController::EPropertyType aType)
 {
+    // Check Focused Component
+    if (!mFocusedComponent)
+        return;
 
+    // ...
 }
 
 //==============================================================================
@@ -179,7 +212,11 @@ void PropertiesController::addOwnProperty(const QString& aKey, PropertiesControl
 //==============================================================================
 void PropertiesController::removeOwnProperty(const QString& aKey)
 {
+    // Check Focused Component
+    if (!mFocusedComponent)
+        return;
 
+    // ...
 }
 
 //==============================================================================
@@ -187,7 +224,11 @@ void PropertiesController::removeOwnProperty(const QString& aKey)
 //==============================================================================
 void PropertiesController::setProperty(const QString& aKey, const QString& aValue)
 {
+    // Check Focused Component
+    if (!mFocusedComponent)
+        return;
 
+    // ...
 }
 
 //==============================================================================
@@ -195,7 +236,11 @@ void PropertiesController::setProperty(const QString& aKey, const QString& aValu
 //==============================================================================
 void PropertiesController::clearProperty(const QString& aKey)
 {
+    // Check Focused Component
+    if (!mFocusedComponent)
+        return;
 
+    // ...
 }
 
 //==============================================================================
@@ -203,7 +248,11 @@ void PropertiesController::clearProperty(const QString& aKey)
 //==============================================================================
 void PropertiesController::addSignal(const QString& aSignalDef)
 {
+    // Check Focused Component
+    if (!mFocusedComponent)
+        return;
 
+    // ...
 }
 
 //==============================================================================
@@ -211,7 +260,11 @@ void PropertiesController::addSignal(const QString& aSignalDef)
 //==============================================================================
 void PropertiesController::removeSignal(const QString& aSignalDef)
 {
+    // Check Focused Component
+    if (!mFocusedComponent)
+        return;
 
+    // ...
 }
 
 //==============================================================================
@@ -219,7 +272,11 @@ void PropertiesController::removeSignal(const QString& aSignalDef)
 //==============================================================================
 void PropertiesController::addState(const QString& aName)
 {
+    // Check Focused Component
+    if (!mFocusedComponent)
+        return;
 
+    // ...
 }
 
 //==============================================================================
@@ -227,7 +284,11 @@ void PropertiesController::addState(const QString& aName)
 //==============================================================================
 void PropertiesController::removeState(const QString& aName)
 {
+    // Check Focused Component
+    if (!mFocusedComponent)
+        return;
 
+    // ...
 }
 
 //==============================================================================
@@ -235,7 +296,11 @@ void PropertiesController::removeState(const QString& aName)
 //==============================================================================
 void PropertiesController::addTransition(const QString& aFrom, const QString& aTo)
 {
+    // Check Focused Component
+    if (!mFocusedComponent)
+        return;
 
+    // ...
 }
 
 //==============================================================================
@@ -243,7 +308,11 @@ void PropertiesController::addTransition(const QString& aFrom, const QString& aT
 //==============================================================================
 void PropertiesController::removeTransition(const QString& aFrom, const QString& aTo)
 {
+    // Check Focused Component
+    if (!mFocusedComponent)
+        return;
 
+    // ...
 }
 
 // ...

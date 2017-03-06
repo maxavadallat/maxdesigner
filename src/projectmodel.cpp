@@ -345,17 +345,17 @@ QString ProjectModel::absoluteProjectFilePath()
 //==============================================================================
 // Create Base Component
 //==============================================================================
-ComponentInfo* ProjectModel::createBaseComponent(const QString& aName, const QString& aBaseName)
+ComponentInfo* ProjectModel::createBaseComponent(const QString& aName, const QString& aBaseName, const QString& aCategory)
 {
     // Check Current Compoennt
     if (mCurrentComponent) {
         // ...
     }
 
-    qDebug() << "ProjectModel::createBaseComponent - aName: " << aName << " - aBaseName: " << aBaseName;
+    qDebug() << "ProjectModel::createBaseComponent - aName: " << aName << " - aBaseName: " << aBaseName << " - aCategory: " << aCategory;
 
     // Create New Component
-    ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_BASECOMPONENT, this, aBaseName);
+    ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_BASECOMPONENT, aCategory, this, aBaseName);
 
     // Check Base Components Model
     if (!mBaseComponents) {
@@ -375,17 +375,17 @@ ComponentInfo* ProjectModel::createBaseComponent(const QString& aName, const QSt
 //==============================================================================
 // Create Component
 //==============================================================================
-ComponentInfo* ProjectModel::createComponent(const QString& aName, const QString& aBaseName)
+ComponentInfo* ProjectModel::createComponent(const QString& aName, const QString& aBaseName, const QString& aCategory)
 {
     // Check Current Compoennt
     if (mCurrentComponent) {
         // ...
     }
 
-    qDebug() << "ProjectModel::createComponent - aName: " << aName << " - aBaseName: " << aBaseName;
+    qDebug() << "ProjectModel::createComponent - aName: " << aName << " - aBaseName: " << aBaseName << " - aCategory: " << aCategory;
 
     // Create New Component
-    ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_COMPONENT, this, aBaseName);
+    ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_COMPONENT, aCategory, this, aBaseName);
 
     // Check Components Model
     if (!mComponents) {
@@ -415,7 +415,7 @@ ComponentInfo* ProjectModel::createView(const QString& aName, const QString& aBa
     qDebug() << "ProjectModel::createView - aName: " << aName << " - aBaseName: " << aBaseName;
 
     // Create New Component
-    ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_VIEW, this, aBaseName);
+    ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_VIEW, COMPONENT_CATEGORY_VISUAL, this, aBaseName);
 
     // Check Views Model
     if (!mViews) {

@@ -28,7 +28,7 @@ ComponentInfo* ComponentInfo::fromQML(const QString& aFilePath, ProjectModel* aP
 ComponentInfo* ComponentInfo::fromInfoFile(const QString& aFilePath, ProjectModel* aProject)
 {
     // Create Component Info
-    ComponentInfo* newComponent = new ComponentInfo("", "", aProject);
+    ComponentInfo* newComponent = new ComponentInfo("", "", "", aProject);
     // Set Info File Path
     newComponent->mInfoPath = aFilePath;
     // Load Component
@@ -43,7 +43,7 @@ ComponentInfo* ComponentInfo::fromInfoFile(const QString& aFilePath, ProjectMode
 ComponentInfo* ComponentInfo::clone()
 {
     // Create Component Info
-    ComponentInfo* newComponent = new ComponentInfo(mName, mType, mProject, mBaseName);
+    ComponentInfo* newComponent = new ComponentInfo(mName, mType, mCategory, mProject, mBaseName);
 
     // Set ProtoType
     newComponent->mProtoType = false;
@@ -56,7 +56,12 @@ ComponentInfo* ComponentInfo::clone()
 //==============================================================================
 // Constructor
 //==============================================================================
-ComponentInfo::ComponentInfo(const QString& aName, const QString& aType, ProjectModel* aProject, const QString& aBaseName, QObject* aParent)
+ComponentInfo::ComponentInfo(const QString& aName,
+                             const QString& aType,
+                             const QString& aCategory,
+                             ProjectModel* aProject,
+                             const QString& aBaseName,
+                             QObject* aParent)
     : QObject(aParent)
     , mProject(aProject)
     , mProtoType(true)
@@ -65,6 +70,7 @@ ComponentInfo::ComponentInfo(const QString& aName, const QString& aType, Project
     , mQMLPath("")
     , mName(aName)
     , mType(aType)
+    , mCategory(aCategory)
     , mBaseName(aBaseName)
     , mFocused(false)
     , mBase(mProject ? mProject->getComponentByName(mBaseName) : NULL)
@@ -257,6 +263,28 @@ void ComponentInfo::setComponentType(const QString& aType)
         mType = aType;
         // Emit Component Type Changed Signal
         emit componentTypeChanged(mType);
+    }
+}
+
+//==============================================================================
+// Get Component Category
+//==============================================================================
+QString ComponentInfo::componentCategory()
+{
+    return mCategory;
+}
+
+//==============================================================================
+// Set Component Category
+//==============================================================================
+void ComponentInfo::setComponentCategory(const QString& aCategory)
+{
+    // Check Category
+    if (mCategory != aCategory) {
+        // Set Category
+        mCategory = aCategory;
+        // Emit Component category Changed Signal
+        emit componentCategoryChanged(mCategory);
     }
 }
 
