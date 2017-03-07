@@ -3,33 +3,31 @@
 
 #include <QMainWindow>
 
-#include "settingscontroler.h"
-#include "preferencesdialog.h"
-#include "confirmdialog.h"
-#include "infodialog.h"
-#include "aboutdialog.h"
-
-#include "projectpropertiesdialog.h"
-#include "createcomponentdialog.h"
-
-#include "basecomponentsmodel.h"
-#include "componentsmodel.h"
-#include "viewsmodel.h"
-
-#include "projectitemmodel.h"
-#include "openfilesmodel.h"
-#include "recentprojectsmodel.h"
-
-#include "componentcategorymodel.h"
-
 namespace Ui {
 class MainWindow;
 }
 
+class SettingsController;
+class PreferencesDialog;
+class ConfirmDialog;
+class InfoDialog;
+class AboutDialog;
+class ProjctPropertiesDialog;
 class DesignerEventFilter;
 class ProjectModel;
+class BaseComponentsModel;
+class ComponentsModel;
+class ViewsModel;
+class ComponentCategoryModel;
 class ComponentInfo;
 class PropertiesController;
+class ProjectTreeModel;
+class OpenFilesModel;
+class RecentProjectsModel;
+class ProjectPropertiesDialog;
+class CreateComponentDialog;
+class CreateViewDialog;
+
 
 //==============================================================================
 // Main Window Class
@@ -40,6 +38,10 @@ class MainWindow : public QMainWindow
 
     Q_PROPERTY(ProjectModel* currentProject READ currentProject NOTIFY currentProjectChanged)
     Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent WRITE setCurrentComponent NOTIFY currentComponentChanged)
+
+    Q_PROPERTY(BaseComponentsModel* baseComponentsModel READ baseComponentsModel NOTIFY baseComponentsModelChanged)
+    Q_PROPERTY(ComponentsModel* componentsModel READ componentsModel NOTIFY componentsModelChanged)
+    Q_PROPERTY(ViewsModel* viewsModel READ viewsModel NOTIFY viewsModelChanged)
 
     Q_PROPERTY(bool screenshotMode READ screenshotMode NOTIFY screenshotModeChanged)
 
@@ -55,6 +57,13 @@ public:
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
 
+    // Get Base Components Model
+    BaseComponentsModel* baseComponentsModel();
+    // Get Components Model
+    ComponentsModel* componentsModel();
+    // Get Views Model
+    ViewsModel* viewsModel();
+
     // Get Screen Shot Mode
     bool screenshotMode();
 
@@ -69,6 +78,14 @@ signals:
     void currentProjectChanged(ProjectModel* aProject);
     // Current Component Changed Signal
     void currentComponentChanged(ComponentInfo* aCOmponent);
+
+    // Base Components Model Changed Signal
+    void baseComponentsModelChanged(BaseComponentsModel* aBaseComponents);
+    // Components Model Changed Signal
+    void componentsModelChanged(ComponentsModel* aComponents);
+    // Views Model Changed Signal
+    void viewsModelChanged(ViewsModel* aViews);
+
     // Screen Shot Mode Changed Signal
     void screenshotModeChanged(const bool& aScreenShotMode);
 
@@ -108,7 +125,12 @@ private:
     // Create New Project
     void createNewProject();
     // Create New Component
-    void createNewComponent(const QString& aName, const QString& aType, const QString& aBase, const QString& aCategory);
+    void createNewComponent(const QString& aName,
+                            const QString& aType,
+                            const QString& aBase,
+                            const QString& aCategory,
+                            const int& aWidth = 0,
+                            const int& aHeight = 0);
 
     // Save Project
     void saveProject(const QString& aFilePath = "");
@@ -155,6 +177,13 @@ private slots:
     void pluginPathRemoved(const QString& aPluginPath);
     // Plugin Paths Changed Slot
     void pluginPathsChanged(const QStringList& aPluginPaths);
+
+    // Base Component Created Slot
+    void baseComponentCreated(ComponentInfo* aComponent);
+    // Component Created Slot
+    void componentCreated(ComponentInfo* aComponent);
+    // View Creaeted Slot
+    void viewCreated(ComponentInfo* aComponent);
 
 
     // Action About Triggered Slot
@@ -206,19 +235,10 @@ private:
     Ui::MainWindow*             ui;
 
     // Settings
-    SettingsControler*          mSettings;
+    SettingsController*         mSettings;
 
     // Event Filter
     DesignerEventFilter*        mEventFilter;
-
-    // Base Components List Model
-    BaseComponentsModel*        mBaseComponents;
-    // Components List Model
-    ComponentsModel*            mComponents;
-    // Views List Model
-    ViewsModel*                 mViews;
-    // Components Categories Model
-    ComponentCategoryModel*     mCategories;
 
     // Project Tree Model
     ProjectTreeModel*           mProjectTreeModel;
@@ -235,15 +255,27 @@ private:
     ProjectPropertiesDialog*    mProjectPropertiesDiaog;
     // Create Component Dialog
     CreateComponentDialog*      mCreateComponentDialog;
+    // Create View Dialog
+    CreateViewDialog*           mCreateViewDialog;
 
     // Properties Controller
     PropertiesController*       mPropertiesController;
 
     // Project Model
     ProjectModel*               mProjectModel;
+    // Base Components List Model
+    BaseComponentsModel*        mBaseComponents;
+    // Components List Model
+    ComponentsModel*            mComponents;
+    // Views List Model
+    ViewsModel*                 mViews;
+
+    // Components Categories Model
+    ComponentCategoryModel*     mCategories;
 
     // Current Component
     ComponentInfo*              mCurrentComponent;
+
     // Screen Shot Mode
     bool                        mScreenShotMode;
 };

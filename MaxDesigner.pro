@@ -18,7 +18,7 @@ SOURCES             += src/main.cpp \
                     src/designerimageprovider.cpp
 
 # Model Sources
-SOURCES             += src/settingscontroler.cpp \
+SOURCES             += src/settingscontroller.cpp \
                     src/minimizedcomponents.cpp \
                     src/propertiescontroller.cpp \
                     src/basecomponentsmodel.cpp \
@@ -59,7 +59,7 @@ HEADERS             += src/designerapplication.h \
                     src/designerfilesortproxy.h
 
 # Model Headers
-HEADERS             += src/settingscontroler.h \
+HEADERS             += src/settingscontroller.h \
                     src/basecomponentsmodel.h \
                     src/openfilesmodel.h \
                     src/projectmodel.h \

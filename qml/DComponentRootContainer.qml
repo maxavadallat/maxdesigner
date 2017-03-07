@@ -11,6 +11,8 @@ DPaneBase {
     width: 600
     height: 400
 
+    property bool explodingMode: false
+
     title: "Component"
 
     hideToSide: hideToBottom
@@ -36,6 +38,7 @@ DPaneBase {
         baseCanvas.requestPaint();
     }
 
+    // New Child Component
     property Component newComponent: Component {
 
         DComponentChildContainer {
@@ -47,6 +50,20 @@ DPaneBase {
                 id: titleLabel
                 anchors.centerIn: parent
             }
+        }
+    }
+
+    // New State Component
+    property Component newState: Component {
+        State {
+
+        }
+    }
+
+    // New Transition Component
+    property Component newTransition: Component {
+        Transition {
+
         }
     }
 

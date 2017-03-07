@@ -14,6 +14,25 @@
 #include "propertiescontroller.h"
 #include "designerimageprovider.h"
 #include "designerfilesortproxy.h"
+#include "settingscontroller.h"
+#include "preferencesdialog.h"
+#include "confirmdialog.h"
+#include "infodialog.h"
+#include "aboutdialog.h"
+
+#include "projectpropertiesdialog.h"
+#include "createcomponentdialog.h"
+#include "createviewdialog.h"
+
+#include "basecomponentsmodel.h"
+#include "componentsmodel.h"
+#include "viewsmodel.h"
+
+#include "projectitemmodel.h"
+#include "openfilesmodel.h"
+#include "recentprojectsmodel.h"
+
+#include "componentcategorymodel.h"
 
 #include "settingskeys.h"
 #include "constants.h"
@@ -24,25 +43,28 @@
 MainWindow::MainWindow(QWidget* aParent)
     : QMainWindow(aParent)
     , ui(new Ui::MainWindow)
-    , mSettings(SettingsControler::getInstance())
+    , mSettings(SettingsController::getInstance())
     , mEventFilter(NULL)
+
+    , mProjectTreeModel(NULL)
+    , mOpenfiles(NULL)
+
+    , mRecentProjects(NULL)
+
+    , mPreferencesDialog(NULL)
+    , mProjectPropertiesDiaog(NULL)
+    , mCreateComponentDialog(NULL)
+    , mCreateViewDialog(NULL)
+
+    , mPropertiesController(NULL)
+
+    , mProjectModel(NULL)
 
     , mBaseComponents(NULL)
     , mComponents(NULL)
     , mViews(NULL)
     , mCategories(NULL)
 
-    , mProjectTreeModel(NULL)
-    , mOpenfiles(NULL)
-    , mRecentProjects(NULL)
-
-    , mPreferencesDialog(NULL)
-    , mProjectPropertiesDiaog(NULL)
-    , mCreateComponentDialog(NULL)
-
-    , mPropertiesController(NULL)
-
-    , mProjectModel(NULL)
     , mCurrentComponent(NULL)
     , mScreenShotMode(false)
 {
@@ -130,17 +152,17 @@ void MainWindow::init()
 
     // ...
 
-    // Register Project Model
-    qmlRegisterUncreatableType<ProjectModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_PROJECT_MODEL, "");
-    // Register Component Info
-    qmlRegisterUncreatableType<ComponentInfo>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_COMPONENT_INFO, "");
-
     // Register Base Components Model
     qmlRegisterUncreatableType<BaseComponentsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_BASECOMPONENTS_MODEL, "");
     // Register Components Model
     qmlRegisterUncreatableType<ComponentsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_COMPONENTS_MODEL, "");
     // Register Views Model
-    qmlRegisterUncreatableType<ViewsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_COMPONENT_INFO, "");
+    qmlRegisterUncreatableType<ViewsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_VIEWS_MODEL, "");
+
+    // Register Project Model
+    qmlRegisterUncreatableType<ProjectModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_PROJECT_MODEL, "");
+    // Register Component Info
+    qmlRegisterUncreatableType<ComponentInfo>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_COMPONENT_INFO, "");
 
     // Register File Sort Filter Proxy
     qmlRegisterType<DesignerFileSortProxy>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_FILE_SORT_FILTER);
@@ -265,6 +287,30 @@ void MainWindow::setCurrentComponent(ComponentInfo* aComponent)
 }
 
 //==============================================================================
+// Get Base Components Model
+//==============================================================================
+BaseComponentsModel* MainWindow::baseComponentsModel()
+{
+    return mProjectModel ? mProjectModel->baseComponentsModel() : NULL;
+}
+
+//==============================================================================
+// Get Components Model
+//==============================================================================
+ComponentsModel* MainWindow::componentsModel()
+{
+    return mProjectModel ? mProjectModel->componentsModel() : NULL;
+}
+
+//==============================================================================
+// Get Views Model
+//==============================================================================
+ViewsModel* MainWindow::viewsModel()
+{
+    return mProjectModel ? mProjectModel->viewsModel() : NULL;
+}
+
+//==============================================================================
 // Get Screen Shot Mode
 //==============================================================================
 bool MainWindow::screenshotMode()
@@ -283,6 +329,15 @@ void MainWindow::openProject(const QString& aFilePath)
     if (!mProjectModel) {
         // Create Project Model
         mProjectModel = new ProjectModel();
+
+        // Connect Signal
+        connect(mProjectModel, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)), this, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)));
+        connect(mProjectModel, SIGNAL(componentsModelChanged(ComponentsModel*)), this, SIGNAL(componentsModelChanged(ComponentsModel*)));
+        connect(mProjectModel, SIGNAL(viewsModelChanged(ViewsModel*)), this, SIGNAL(viewsModelChanged(ViewsModel*)));
+
+        connect(mProjectModel, SIGNAL(baseComponentCreated(ComponentInfo*)), this, SLOT(baseComponentCreated(ComponentInfo*)));
+        connect(mProjectModel, SIGNAL(componentCreated(ComponentInfo*)), this, SLOT(componentCreated(ComponentInfo*)));
+        connect(mProjectModel, SIGNAL(viewCreated(ComponentInfo*)), this, SLOT(viewCreated(ComponentInfo*)));
     }
 
     // Load Project
@@ -517,10 +572,16 @@ void MainWindow::launchDefineBaseComponent()
         mCreateComponentDialog->setCategoriesModel(mCategories);
     }
 
+    // Reset Dialog
+    mCreateComponentDialog->reset();
+
     // Exec Dialog
     if (mCreateComponentDialog->exec()) {
         // Create Base Component
-
+        createNewComponent(mCreateComponentDialog->componentName(),
+                           COMPONENT_TYPE_BASECOMPONENT,
+                           mCreateComponentDialog->componentBaseName(),
+                           mCreateComponentDialog->componentCategory());
     }
 
     // Grab Keyboard Focus
@@ -553,6 +614,9 @@ void MainWindow::launchCreateComponent()
         mCreateComponentDialog->setCategoriesModel(mCategories);
     }
 
+    // Reset Dialog
+    mCreateComponentDialog->reset();
+
     // Exec Dialog
     if (mCreateComponentDialog->exec()) {
         // Create Base Component
@@ -578,8 +642,30 @@ void MainWindow::launchCreateView()
         return;
     }
 
+    // Check Create View Dialog
+    if (!mCreateViewDialog) {
+        // Create View Dialog
+        mCreateViewDialog = new CreateViewDialog();
+        // Set Base Components Model
+        mCreateViewDialog->setBaseComponentsModel(mProjectModel->baseComponentsModel());
+        // Set Components Model
+        mCreateViewDialog->setComponentsModel(mProjectModel->componentsModel());
+    }
+
+    // Reset Dialog
+    mCreateViewDialog->reset();
+
     // Release Keyboard Focus
     //releaseKeyboard();
+
+    // Exec Create View Dialog
+    if (mCreateViewDialog->exec()) {
+        // Create Base Component
+        createNewComponent(mCreateViewDialog->viewName(),
+                           COMPONENT_TYPE_VIEW,
+                           mCreateViewDialog->viewBaseName(),
+                           COMPONENT_CATEGORY_VISUAL);
+    }
 
     // ...
 
@@ -598,6 +684,14 @@ void MainWindow::createNewProject()
     if (!mProjectModel) {
         // Create Project Model
         mProjectModel = new ProjectModel();
+        // Connect Signal
+        connect(mProjectModel, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)), this, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)));
+        connect(mProjectModel, SIGNAL(componentsModelChanged(ComponentsModel*)), this, SIGNAL(componentsModelChanged(ComponentsModel*)));
+        connect(mProjectModel, SIGNAL(viewsModelChanged(ViewsModel*)), this, SIGNAL(viewsModelChanged(ViewsModel*)));
+
+        connect(mProjectModel, SIGNAL(baseComponentCreated(ComponentInfo*)), this, SLOT(baseComponentCreated(ComponentInfo*)));
+        connect(mProjectModel, SIGNAL(componentCreated(ComponentInfo*)), this, SLOT(componentCreated(ComponentInfo*)));
+        connect(mProjectModel, SIGNAL(viewCreated(ComponentInfo*)), this, SLOT(viewCreated(ComponentInfo*)));
     }
 
     // Set Project Name
@@ -630,7 +724,12 @@ void MainWindow::createNewProject()
 //==============================================================================
 // Create New Component
 //==============================================================================
-void MainWindow::createNewComponent(const QString& aName, const QString& aType, const QString& aBase, const QString& aCategory)
+void MainWindow::createNewComponent(const QString& aName,
+                                    const QString& aType,
+                                    const QString& aBase,
+                                    const QString& aCategory,
+                                    const int& aWidth,
+                                    const int& aHeight)
 {
     // Check Project Model
     if (!mProjectModel) {
@@ -659,7 +758,7 @@ void MainWindow::createNewComponent(const QString& aName, const QString& aType, 
         } else if (aType == COMPONENT_TYPE_VIEW) {
 
             // Create New View
-            newComponent = mProjectModel->createView(aName, aBase);
+            newComponent = mProjectModel->createView(aName, aBase, aWidth, aHeight);
 
         } else {
             qWarning() << "MainWindow::createNewComponent - UNSUPPORTED COMPONENT TYPE!";
@@ -770,6 +869,14 @@ void MainWindow::closeProject()
 
     // Save Project
     //mProjectModel->saveProject();
+
+    disconnect(mProjectModel, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)), this, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)));
+    disconnect(mProjectModel, SIGNAL(componentsModelChanged(ComponentsModel*)), this, SIGNAL(componentsModelChanged(ComponentsModel*)));
+    disconnect(mProjectModel, SIGNAL(viewsModelChanged(ViewsModel*)), this, SIGNAL(viewsModelChanged(ViewsModel*)));
+
+    disconnect(mProjectModel, SIGNAL(baseComponentCreated(ComponentInfo*)), this, SLOT(baseComponentCreated(ComponentInfo*)));
+    disconnect(mProjectModel, SIGNAL(componentCreated(ComponentInfo*)), this, SLOT(componentCreated(ComponentInfo*)));
+    disconnect(mProjectModel, SIGNAL(viewCreated(ComponentInfo*)), this, SLOT(viewCreated(ComponentInfo*)));
 
     // Delete Project Model
     delete mProjectModel;
@@ -1029,6 +1136,36 @@ void MainWindow::pluginPathsChanged(const QStringList& aPluginPaths)
 }
 
 //==============================================================================
+// Base Component Created Slot
+//==============================================================================
+void MainWindow::baseComponentCreated(ComponentInfo* aComponent)
+{
+    qDebug() << "MainWindow::baseComponentCreated - aComponent: " << aComponent;
+
+    // ...
+}
+
+//==============================================================================
+// Component Created Slot
+//==============================================================================
+void MainWindow::componentCreated(ComponentInfo* aComponent)
+{
+    qDebug() << "MainWindow::componentCreated - aComponent: " << aComponent;
+
+    // ...
+}
+
+//==============================================================================
+// View Creaeted Slot
+//==============================================================================
+void MainWindow::viewCreated(ComponentInfo* aComponent)
+{
+    qDebug() << "MainWindow::viewCreated - aComponent: " << aComponent;
+
+    // ...
+}
+
+//==============================================================================
 // Action About Triggered Slot
 //==============================================================================
 void MainWindow::on_actionAbout_triggered()
@@ -1235,6 +1372,14 @@ MainWindow::~MainWindow()
     // Release Settings
     mSettings->release();
 
+    // Close Project
+    closeProject();
+
+//    if (mProjectModel) {
+//        delete mProjectModel;
+//        mProjectModel = NULL;
+//    }
+
     if (mEventFilter) {
         delete mEventFilter;
         mEventFilter = NULL;
@@ -1282,11 +1427,14 @@ MainWindow::~MainWindow()
         mPropertiesController = NULL;
     }
 
-    // ...
+    if (mCreateComponentDialog) {
+        delete mCreateComponentDialog;
+        mCreateComponentDialog = NULL;
+    }
 
-    if (mProjectModel) {
-        delete mProjectModel;
-        mProjectModel = NULL;
+    if (mCreateViewDialog) {
+        delete mCreateViewDialog;
+        mCreateViewDialog = NULL;
     }
 
     // ...

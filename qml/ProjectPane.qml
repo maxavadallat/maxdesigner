@@ -25,21 +25,48 @@ DPane {
 
     borderColor: Style.colorBorder
 
+    property QtObject currentProjectConnection: Connections {
+        target: mainController.currentProject
+
+        onBaseComponentCreated: {
+            console.log("ProjectPane.currentProjectConnection.onBaseComponentCreated - aComponent: " + aComponent);
+
+            // Open Base Compoennts Section
+            baseComponentsSection.open();
+        }
+
+        onComponentCreated: {
+            console.log("ProjectPane.currentProjectConnection.onComponentCreated - aComponent: " + aComponent);
+
+            // Open Components Section
+            ownComponentsSection.open();
+        }
+
+        onViewCreated: {
+            console.log("ProjectPane.currentProjectConnection.onViewCreated - aComponent: " + aComponent);
+
+            // Open Views Section
+            viewsSection.open();
+        }
+    }
+
     DSection {
         id: baseComponentsSection
         width: projectPaneRoot.contentWidth
         title: "Base Components"
         state: stateClosed
 
-        Flow {
+        DFlow {
             width: projectPaneRoot.contentWidth
             spacing: Style.defaultSpacing
             opacity: baseComponentsRepeater.count > 0 ? 1.0 : 0.0
+
             Repeater {
                 id: baseComponentsRepeater
+                model: mainController.currentProject ? mainController.currentProject.baseComponentsModel : undefined
                 delegate: DComponentItem {
                     id: baseComponentItemDelegateRoot
-                    title: model.componentName //"QtObject"
+                    title: componentName
                     onGrabbedChanged: {
                         // Bring Section To Top
                         baseComponentsSection.z = grabbed ? 0.1 : 0.0;
@@ -53,7 +80,7 @@ DPane {
         DNoContent {
             width: projectPaneRoot.contentWidth
             height: baseComponentsSection.minHeight
-            opacity: openFilesListView.count === 0 ? 0.2 : 0.0
+            opacity: baseComponentsRepeater.count === 0 ? 0.2 : 0.0
 
             DText {
                 id: noBaseComponentsLabel
@@ -68,18 +95,19 @@ DPane {
         id: ownComponentsSection
         width: projectPaneRoot.contentWidth
         title: "Components"
-        state: stateClosed
+        //state: stateOpen
 
-        Flow {
+        DFlow {
             width: projectPaneRoot.contentWidth
             spacing: Style.defaultSpacing
             opacity: componentsRepeater.count > 0 ? 1.0 : 0.0
 
             Repeater {
                 id: componentsRepeater
+                model: mainController.currentProject ? mainController.currentProject.componentsModel : undefined
                 delegate: DComponentItem {
                     id: componentItemDelegateRoot
-                    title: model.componentName //"Label"
+                    title: componentName
                     onGrabbedChanged: {
                         // Bring Section To Top
                         ownComponentsSection.z = grabbed ? 0.1 : 0.0;
@@ -93,7 +121,7 @@ DPane {
         DNoContent {
             width: projectPaneRoot.contentWidth
             height: ownComponentsSection.minHeight
-            opacity: openFilesListView.count === 0 ? 0.2 : 0.0
+            opacity: componentsRepeater.count === 0 ? 0.2 : 0.0
 
             DText {
                 id: noComponentsLabel
@@ -110,16 +138,17 @@ DPane {
         title: "Views"
         state: stateClosed
 
-        Flow {
+        DFlow {
             width: projectPaneRoot.contentWidth
             spacing: Style.defaultSpacing
             opacity: viewsRepeater.count > 0 ? 1.0 : 0.0
 
             Repeater {
                 id: viewsRepeater
+                model: mainController.currentProject ? mainController.currentProject.viewsModel : undefined
                 delegate: DComponentItem {
                     id: viewItemDelegateRoot
-                    title: model.viewName//"TopStatusBar"
+                    title: viewName
                     onGrabbedChanged: {
                         // Bring Section To Top
                         viewsSection.z = grabbed ? 0.1 : 0.0;
@@ -133,7 +162,7 @@ DPane {
         DNoContent {
             width: projectPaneRoot.contentWidth
             height: viewsSection.minHeight
-            opacity: openFilesListView.count === 0 ? 0.2 : 0.0
+            opacity: viewsRepeater.count === 0 ? 0.2 : 0.0
 
             DText {
                 id: noViewsLabel

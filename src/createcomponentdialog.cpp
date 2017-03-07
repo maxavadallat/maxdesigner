@@ -28,7 +28,6 @@ void CreateComponentDialog::setBaseComponentsModel(BaseComponentsModel* aModel)
 {
     // Set Base Compoennts Model
     mBaseComponents = aModel;
-
     // Set Model For Base Components Drop Down Combo Box
     ui->baseTypeComboBox->setModel(mBaseComponents);
 }
@@ -40,7 +39,6 @@ void CreateComponentDialog::setComponentsModel(ComponentsModel* aModel)
 {
     // Set Components Model
     mComponents = aModel;
-
     // Set Model For Components Drop Down Combo Box
     ui->componentTypeComboBox->setModel(mComponents);
 }
@@ -104,9 +102,9 @@ void CreateComponentDialog::reset()
 {
     ui->componentNameEdit->clear();
     ui->baseTypeTab->setCurrentIndex(0);
-    ui->baseTypeComboBox->setCurrentIndex(0);
+    ui->baseTypeComboBox->setCurrentIndex(-1);
     ui->baseTypeComboBox->setCurrentText("");
-    ui->componentTypeComboBox->setCurrentIndex(0);
+    ui->componentTypeComboBox->setCurrentIndex(-1);
     ui->componentTypeComboBox->setCurrentText("");
     ui->categoryComboBox->setCurrentIndex(0);
     ui->categoryComboBox->setCurrentText(ui->categoryComboBox->itemData(0).toString());

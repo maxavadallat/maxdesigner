@@ -25,6 +25,8 @@ ProjectModel::ProjectModel(QObject* parent)
     , mViews(NULL)
     , mCurrentComponent(NULL)
 {
+    qDebug() << "ProjectModel created.";
+
     // Init
     init();
 }
@@ -34,6 +36,7 @@ ProjectModel::ProjectModel(QObject* parent)
 //==============================================================================
 void ProjectModel::init()
 {
+
     // ...
 }
 
@@ -80,7 +83,7 @@ void ProjectModel::setDirty(const bool& aDirty)
 //==============================================================================
 // Set Current Component
 //==============================================================================
-void ProjectModel::setCurrentCompoennt(ComponentInfo* aComponent)
+void ProjectModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Compoennt
     if (mCurrentComponent != aComponent) {
@@ -88,6 +91,54 @@ void ProjectModel::setCurrentCompoennt(ComponentInfo* aComponent)
         mCurrentComponent = aComponent;
         // Emit Current Component Changed Signal
         emit currentComponentChanged(mCurrentComponent);
+    }
+}
+
+//==============================================================================
+// Create Base Components Model
+//==============================================================================
+void ProjectModel::createBaseComponentsModel()
+{
+    // Check Base Compoennts Model
+    if (!mBaseComponents) {
+        // Create Base Compoennts Model
+        BaseComponentsModel* newModel = new BaseComponentsModel(this);
+//        // Set Bae Components Dir
+//        newModel->setBaseComponentsDir(baseComponentsDir());
+        // Set Base Components Model
+        setBaseComponentsModel(newModel);
+    }
+}
+
+//==============================================================================
+// Create Components Model
+//==============================================================================
+void ProjectModel::createComponentsModel()
+{
+    // Check Components Model
+    if (!mComponents) {
+        // Create New Components Model
+        ComponentsModel* newModel = new ComponentsModel(this);
+//        // Set Components Dir
+//        newModel->setComponentsDir(componentsDir());
+        // Set Components Model
+        setComponentsModel(newModel);
+    }
+}
+
+//==============================================================================
+// Create Views Model
+//==============================================================================
+void ProjectModel::createViewsModel()
+{
+    // Check Views Model
+    if (!mViews) {
+        // Create New Views Model
+        ViewsModel* newModel = new ViewsModel(this);
+//        // Set Views Dir
+//        newModel->setViewsDir(viewsDir());
+        // Set Views Model
+        setViewsModel(newModel);
     }
 }
 
@@ -202,21 +253,14 @@ bool ProjectModel::loadProject(const QString& aFileName)
         emit importPathsChanged(importPaths());
         emit pluginPathsChanged(pluginPaths());
 
-        // Check Base Compoennts Model
-        if (!mBaseComponents) {
-            // Create Base Components Model
-            setBaseComponentsModel(new BaseComponentsModel(this));
-        }
+        // Create Base Components Model
+        createBaseComponentsModel();
 
-        // Check Components Model
-        if (!mComponents) {
-            setComponentsModel(new ComponentsModel(this));
-        }
+        // Create Components Model
+        createComponentsModel();
 
-        // Check Views Model
-        if (!mViews) {
-            setViewsModel(new ViewsModel(this));
-        }
+        // Create Views Model
+        createViewsModel();
 
         return true;
     }
@@ -357,17 +401,17 @@ ComponentInfo* ProjectModel::createBaseComponent(const QString& aName, const QSt
     // Create New Component
     ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_BASECOMPONENT, aCategory, this, aBaseName);
 
-    // Check Base Components Model
-    if (!mBaseComponents) {
-        // Create Base Components Model
-        setBaseComponentsModel(new BaseComponentsModel(this));
-    }
+    // Create Base Components Model
+    createBaseComponentsModel();
 
     // Add To Base Components
     mBaseComponents->addBaseComponent(newComponent);
 
     // Set Current Component
-    setCurrentCompoennt(newComponent);
+    setCurrentComponent(newComponent);
+
+    // Emit Base Compoennt Created Signal
+    emit baseComponentCreated(newComponent);
 
     return newComponent;
 }
@@ -387,17 +431,17 @@ ComponentInfo* ProjectModel::createComponent(const QString& aName, const QString
     // Create New Component
     ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_COMPONENT, aCategory, this, aBaseName);
 
-    // Check Components Model
-    if (!mComponents) {
-        // Create Components Model
-        setComponentsModel(new ComponentsModel(this));
-    }
+    // Create Components Model
+    createComponentsModel();
 
     // Add To Components
     mComponents->addComponent(newComponent);
 
     // Set Current Component
-    setCurrentCompoennt(newComponent);
+    setCurrentComponent(newComponent);
+
+    // Emit Component Created Signal
+    emit componentCreated(newComponent);
 
     return newComponent;
 }
@@ -405,7 +449,7 @@ ComponentInfo* ProjectModel::createComponent(const QString& aName, const QString
 //==============================================================================
 // Create View
 //==============================================================================
-ComponentInfo* ProjectModel::createView(const QString& aName, const QString& aBaseName)
+ComponentInfo* ProjectModel::createView(const QString& aName, const QString& aBaseName, const int& aWidth, const int& aHeight)
 {
     // Check Current Compoennt
     if (mCurrentComponent) {
@@ -417,17 +461,21 @@ ComponentInfo* ProjectModel::createView(const QString& aName, const QString& aBa
     // Create New Component
     ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_VIEW, COMPONENT_CATEGORY_VISUAL, this, aBaseName);
 
-    // Check Views Model
-    if (!mViews) {
-        // Create Views Model
-        setViewsModel(new ViewsModel(this));
-    }
+    // Set Width & Height
+    newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
+    newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
+
+    // Create Views Model
+    createViewsModel();
 
     // Add To Views
     mViews->addView(newComponent);
 
     // Set Current Component
-    setCurrentCompoennt(newComponent);
+    setCurrentComponent(newComponent);
+
+    // Emit View Created Signal
+    emit viewCreated(newComponent);
 
     return newComponent;
 }
@@ -596,6 +644,13 @@ void ProjectModel::setBaseComponentsDir(const QString& aBaseComponentsDir)
         qDebug() << "ProjectModel::setBaseComponentsDir - aBaseComponentsDir: " << aBaseComponentsDir;
         // Set Base Components Dir
         mProperties[JSON_KEY_PROJECT_BASECOMPONENTS_DIR] = aBaseComponentsDir;
+
+        // Check Base Components Model
+        if (mBaseComponents) {
+            // Set Base Components Dir
+            mBaseComponents->setBaseComponentsDir(aBaseComponentsDir);
+        }
+
         // Emit Base Components Dir Changed Signal
         emit baseComponentsDirChanged(mProperties[JSON_KEY_PROJECT_BASECOMPONENTS_DIR].toString());
         // Set Dirty Properties
@@ -620,6 +675,13 @@ void ProjectModel::setComponentsDir(const QString& aComponentsDir)
     if (aComponentsDir != componentsDir()) {
         // Set Components Dir
         mProperties[JSON_KEY_PROJECT_COMPONENTS_DIR] = aComponentsDir;
+
+        // Check Components Model
+        if (mComponents) {
+            // Set Components Dir
+            mComponents->setComponentsDir(aComponentsDir);
+        }
+
         // Emit Components Dir Changed Signal
         emit componentsDirChanged(mProperties[JSON_KEY_PROJECT_COMPONENTS_DIR].toString());
         // Set Dirty Properties
@@ -644,6 +706,13 @@ void ProjectModel::setViewsDir(const QString& aViewsDir)
     if (aViewsDir != viewsDir()) {
         // Set Views Dir
         mProperties[JSON_KEY_PROJECT_VIEWS_DIR] = aViewsDir;
+
+        //Check Views Model
+        if (mViews) {
+            // Set Views Dir
+            mViews->setViewsDir(aViewsDir);
+        }
+
         // Emit Views Dir Changed Signal
         emit viewsDirChanged(mProperties[JSON_KEY_PROJECT_VIEWS_DIR].toString());
         // Set Dirty Properties
@@ -869,23 +938,6 @@ ProjectModel::~ProjectModel()
 {
     // Close Project
     closeProject();
-
-    if (mBaseComponents) {
-        delete mBaseComponents;
-        mBaseComponents = NULL;
-    }
-
-    if (mComponents) {
-        delete mComponents;
-        mComponents = NULL;
-    }
-
-    if (mViews) {
-        delete mViews;
-        mViews = NULL;
-    }
-
-    // ...
 
     qDebug() << "ProjectModel deleted.";
 }

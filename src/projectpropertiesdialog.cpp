@@ -13,7 +13,7 @@
 ProjectPropertiesDialog::ProjectPropertiesDialog(QWidget* aParent)
     : QDialog(aParent)
     , ui(new Ui::ProjectPropertiesDialog)
-    , mSettings(SettingsControler::getInstance())
+    , mSettings(SettingsController::getInstance())
     , mImportPathsModel(NULL)
     , mPluginPathsModel(NULL)
     , mIPLCurrentIndex(-1)

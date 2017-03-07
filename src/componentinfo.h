@@ -81,10 +81,10 @@ public:
     // Remove Own Property
     void removeProperty(const QString& aName);
 
-    // Get Property
-    QVariant property(const QString& aName);
-    // Set Property
-    void setProperty(const QString& aName, const QVariant& aValue);
+    // Get Component Property
+    QVariant componentProperty(const QString& aName);
+    // Set Component Property
+    void setComponentProperty(const QString& aName, const QVariant& aValue);
 
     // Add Child
     void addChild(ComponentInfo* aChild);

@@ -54,5 +54,9 @@
         <file>qml/DTreeView.qml</file>
         <file>qml/DNoContent.qml</file>
         <file>qml/style/DColorTest.qml</file>
+        <file>qml/DStateEditor.qml</file>
+        <file>qml/DTransitionEditor.qml</file>
+        <file>qml/DFlow.qml</file>
+        <file>qml/DGrid.qml</file>
     </qresource>
 </RCC>

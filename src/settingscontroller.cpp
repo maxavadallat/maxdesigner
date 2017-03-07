@@ -1,22 +1,22 @@
 #include <QDebug>
 
-#include "settingscontroler.h"
+#include "settingscontroller.h"
 #include "settingskeys.h"
 #include "defaultsettings.h"
 #include "constants.h"
 
 // Settings Controller Singleton Instance
-static SettingsControler* settingsSingleton = NULL;
+static SettingsController* settingsSingleton = NULL;
 
 //==============================================================================
 // Get Instance
 //==============================================================================
-SettingsControler* SettingsControler::getInstance()
+SettingsController* SettingsController::getInstance()
 {
     // Check Singleton Instance
     if (!settingsSingleton) {
         // Create Singleton Instance
-        settingsSingleton = new SettingsControler();
+        settingsSingleton = new SettingsController();
     } else {
         // Inc ref Counter
         settingsSingleton->mRefCounter++;
@@ -28,7 +28,7 @@ SettingsControler* SettingsControler::getInstance()
 //==============================================================================
 // Constructor
 //==============================================================================
-SettingsControler::SettingsControler(QObject* aParent)
+SettingsController::SettingsController(QObject* aParent)
     : QObject(aParent)
     , mRefCounter(1)
     , mTracerVisible(DEFAULT_SETTINGS_VALUE_TRACER_VISIBLE)
@@ -62,7 +62,7 @@ SettingsControler::SettingsControler(QObject* aParent)
 //==============================================================================
 // Load Settings
 //==============================================================================
-void SettingsControler::loadSettings()
+void SettingsController::loadSettings()
 {
     qDebug() << "SettingsControler::loadSettings";
 
@@ -102,7 +102,7 @@ void SettingsControler::loadSettings()
 //==============================================================================
 // Save Settings
 //==============================================================================
-void SettingsControler::saveSettings()
+void SettingsController::saveSettings()
 {
     // Check Dirty
     if (!mDirty) {
@@ -143,7 +143,7 @@ void SettingsControler::saveSettings()
 //==============================================================================
 // Restore Defaults
 //==============================================================================
-void SettingsControler::restoreDefaults()
+void SettingsController::restoreDefaults()
 {
     qDebug() << "SettingsControler::restoreDefaults";
 
@@ -185,7 +185,7 @@ void SettingsControler::restoreDefaults()
 //==============================================================================
 // Get Value
 //==============================================================================
-QVariant SettingsControler::value(const QString& aKey)
+QVariant SettingsController::value(const QString& aKey)
 {
     return mSettings.value(aKey);
 }
@@ -193,7 +193,7 @@ QVariant SettingsControler::value(const QString& aKey)
 //==============================================================================
 // Set Value
 //==============================================================================
-void SettingsControler::setValue(const QString& aKey, const QVariant& aValue)
+void SettingsController::setValue(const QString& aKey, const QVariant& aValue)
 {
     qDebug() << "SettingsControler::setValue - aKey: " << aKey << " - aValue: " << aValue;
 
@@ -206,7 +206,7 @@ void SettingsControler::setValue(const QString& aKey, const QVariant& aValue)
 //==============================================================================
 // Clear Value
 //==============================================================================
-void SettingsControler::clearValue(const QString& aKey)
+void SettingsController::clearValue(const QString& aKey)
 {
     qDebug() << "SettingsControler::clearValue - aKey: " << aKey;
 
@@ -217,7 +217,7 @@ void SettingsControler::clearValue(const QString& aKey)
 //==============================================================================
 // Release
 //==============================================================================
-void SettingsControler::release()
+void SettingsController::release()
 {
     // Dec Ref Counter
     mRefCounter--;
@@ -233,7 +233,7 @@ void SettingsControler::release()
 //==============================================================================
 // Get Tracer Visible
 //==============================================================================
-bool SettingsControler::tracerVisible()
+bool SettingsController::tracerVisible()
 {
     return mTracerVisible;
 }
@@ -241,7 +241,7 @@ bool SettingsControler::tracerVisible()
 //==============================================================================
 // Set Tracer Visible
 //==============================================================================
-void SettingsControler::setTracerVisible(const bool& aVisible)
+void SettingsController::setTracerVisible(const bool& aVisible)
 {
     // Check Tracer Visible
     if (mTracerVisible != aVisible) {
@@ -257,7 +257,7 @@ void SettingsControler::setTracerVisible(const bool& aVisible)
 //==============================================================================
 // Get Main Window State
 //==============================================================================
-int SettingsControler::mainWindowState()
+int SettingsController::mainWindowState()
 {
     return mMainWindowState;
 }
@@ -265,7 +265,7 @@ int SettingsControler::mainWindowState()
 //==============================================================================
 // Set Main Window State
 //==============================================================================
-void SettingsControler::setMainWindowState(const int& aWindowState)
+void SettingsController::setMainWindowState(const int& aWindowState)
 {
     // Check Main Window State
     if (mMainWindowState != aWindowState) {
@@ -281,7 +281,7 @@ void SettingsControler::setMainWindowState(const int& aWindowState)
 //==============================================================================
 // Get Designer Mode
 //==============================================================================
-QString SettingsControler::designerMode()
+QString SettingsController::designerMode()
 {
     return mDesignerMode;
 }
@@ -289,7 +289,7 @@ QString SettingsControler::designerMode()
 //==============================================================================
 // Set Designer Mode
 //==============================================================================
-void SettingsControler::setDesignerMode(const QString& aMode)
+void SettingsController::setDesignerMode(const QString& aMode)
 {
     // Check Designer Mode
     if (mDesignerMode != aMode) {
@@ -305,7 +305,7 @@ void SettingsControler::setDesignerMode(const QString& aMode)
 //==============================================================================
 // Get Project Pane Sticky
 //==============================================================================
-bool SettingsControler::projectPaneSticky()
+bool SettingsController::projectPaneSticky()
 {
     return mProjectPaneSticky;
 }
@@ -313,7 +313,7 @@ bool SettingsControler::projectPaneSticky()
 //==============================================================================
 // Set Project Pane Sticky
 //==============================================================================
-void SettingsControler::setProjectPaneSticky(const bool& aSticky)
+void SettingsController::setProjectPaneSticky(const bool& aSticky)
 {
     // Check Project Pane Sticky
     if (mProjectPaneSticky != aSticky) {
@@ -329,7 +329,7 @@ void SettingsControler::setProjectPaneSticky(const bool& aSticky)
 //==============================================================================
 // Get Project Pane Pos X
 //==============================================================================
-int SettingsControler::projectPaneX()
+int SettingsController::projectPaneX()
 {
     return mProjectPaneX;
 }
@@ -337,7 +337,7 @@ int SettingsControler::projectPaneX()
 //==============================================================================
 // Set Project Pane Pos X
 //==============================================================================
-void SettingsControler::setProjectPaneX(const int& aPosX)
+void SettingsController::setProjectPaneX(const int& aPosX)
 {
     // Check Project Pane X
     if (mProjectPaneX != aPosX) {
@@ -353,7 +353,7 @@ void SettingsControler::setProjectPaneX(const int& aPosX)
 //==============================================================================
 // Get Project Pane Pos Y
 //==============================================================================
-int SettingsControler::projectPaneY()
+int SettingsController::projectPaneY()
 {
     return mProjectPaneY;
 }
@@ -361,7 +361,7 @@ int SettingsControler::projectPaneY()
 //==============================================================================
 // Set Project Pane Pos Y
 //==============================================================================
-void SettingsControler::setProjectPaneY(const int& aPosY)
+void SettingsController::setProjectPaneY(const int& aPosY)
 {
     // Check Project Pane Y
     if (mProjectPaneY != aPosY) {
@@ -377,7 +377,7 @@ void SettingsControler::setProjectPaneY(const int& aPosY)
 //==============================================================================
 // Get Project Pane Width
 //==============================================================================
-int SettingsControler::projectPaneWidth()
+int SettingsController::projectPaneWidth()
 {
     return mProjectPaneWidth;
 }
@@ -385,7 +385,7 @@ int SettingsControler::projectPaneWidth()
 //==============================================================================
 // Set Project Pane Width
 //==============================================================================
-void SettingsControler::setProjectPaneWidth(const int& aWidth)
+void SettingsController::setProjectPaneWidth(const int& aWidth)
 {
     // Check Project Pane Width
     if (mProjectPaneWidth != aWidth) {
@@ -401,7 +401,7 @@ void SettingsControler::setProjectPaneWidth(const int& aWidth)
 //==============================================================================
 // Get Project Pane Height
 //==============================================================================
-int SettingsControler::projectPaneHeight()
+int SettingsController::projectPaneHeight()
 {
     return mProjectPaneHeight;
 }
@@ -409,7 +409,7 @@ int SettingsControler::projectPaneHeight()
 //==============================================================================
 // Set Project Pane Height
 //==============================================================================
-void SettingsControler::setProjectPaneHeight(const int& aHeight)
+void SettingsController::setProjectPaneHeight(const int& aHeight)
 {
     // Check Project Pane Height
     if (mProjectPaneHeight != aHeight) {
@@ -425,7 +425,7 @@ void SettingsControler::setProjectPaneHeight(const int& aHeight)
 //==============================================================================
 // Get Properties Pane Sticky
 //==============================================================================
-bool SettingsControler::propertiesPaneSticky()
+bool SettingsController::propertiesPaneSticky()
 {
     return mPropertiesPaneSticky;
 }
@@ -433,7 +433,7 @@ bool SettingsControler::propertiesPaneSticky()
 //==============================================================================
 // Set Properties Pane Sticky
 //==============================================================================
-void SettingsControler::setPropertiesPaneSticky(const bool& aSticky)
+void SettingsController::setPropertiesPaneSticky(const bool& aSticky)
 {
     // Check Properties Pane Sticky
     if (mPropertiesPaneSticky != aSticky) {
@@ -449,7 +449,7 @@ void SettingsControler::setPropertiesPaneSticky(const bool& aSticky)
 //==============================================================================
 // Get Properties Pane Pos X
 //==============================================================================
-int SettingsControler::propertiesPaneX()
+int SettingsController::propertiesPaneX()
 {
     return mPropertiesPaneX;
 }
@@ -457,7 +457,7 @@ int SettingsControler::propertiesPaneX()
 //==============================================================================
 // Set Properties Pane Pos X
 //==============================================================================
-void SettingsControler::setPropertiesPaneX(const int& aPosX)
+void SettingsController::setPropertiesPaneX(const int& aPosX)
 {
     // Check Properties Pane X
     if (mPropertiesPaneX != aPosX) {
@@ -473,7 +473,7 @@ void SettingsControler::setPropertiesPaneX(const int& aPosX)
 //==============================================================================
 // Get Properties Pane Pos Y
 //==============================================================================
-int SettingsControler::propertiesPaneY()
+int SettingsController::propertiesPaneY()
 {
     return mPropertiesPaneY;
 }
@@ -481,7 +481,7 @@ int SettingsControler::propertiesPaneY()
 //==============================================================================
 // Set Properties Pane Pos Y
 //==============================================================================
-void SettingsControler::setPropertiesPaneY(const int& aPosY)
+void SettingsController::setPropertiesPaneY(const int& aPosY)
 {
     // Check Properties Pane Y
     if (mPropertiesPaneY != aPosY) {
@@ -497,7 +497,7 @@ void SettingsControler::setPropertiesPaneY(const int& aPosY)
 //==============================================================================
 // Get Properties Pane Width
 //==============================================================================
-int SettingsControler::propertiesPaneWidth()
+int SettingsController::propertiesPaneWidth()
 {
     return mPropertiesPaneWidth;
 }
@@ -505,7 +505,7 @@ int SettingsControler::propertiesPaneWidth()
 //==============================================================================
 // Set Properties Pane Width
 //==============================================================================
-void SettingsControler::setPropertiesPaneWidth(const int& aWidth)
+void SettingsController::setPropertiesPaneWidth(const int& aWidth)
 {
     // Check Properties Pane Width
     if (mPropertiesPaneWidth != aWidth) {
@@ -521,7 +521,7 @@ void SettingsControler::setPropertiesPaneWidth(const int& aWidth)
 //==============================================================================
 // Get Properties Pane Height
 //==============================================================================
-int SettingsControler::propertiesPaneHeight()
+int SettingsController::propertiesPaneHeight()
 {
     return mPropertiesPaneHeight;
 }
@@ -529,7 +529,7 @@ int SettingsControler::propertiesPaneHeight()
 //==============================================================================
 // Set Properties Pane Height
 //==============================================================================
-void SettingsControler::setPropertiesPaneHeight(const int& aHeight)
+void SettingsController::setPropertiesPaneHeight(const int& aHeight)
 {
     // Check Properties Pane Height
     if (mPropertiesPaneHeight != aHeight) {
@@ -545,7 +545,7 @@ void SettingsControler::setPropertiesPaneHeight(const int& aHeight)
 //==============================================================================
 // Get Editor Syntax Highlight
 //==============================================================================
-bool SettingsControler::editorSyntaxHighlight()
+bool SettingsController::editorSyntaxHighlight()
 {
     return mEditorSyntaxHighlight;
 }
@@ -553,7 +553,7 @@ bool SettingsControler::editorSyntaxHighlight()
 //==============================================================================
 // Set Editor Syntax Highlight
 //==============================================================================
-void SettingsControler::setEditorSyntaxHighlight(const bool& aHighlight)
+void SettingsController::setEditorSyntaxHighlight(const bool& aHighlight)
 {
     // Check Editor Syntax Highlight
     if (mEditorSyntaxHighlight != aHighlight) {
@@ -569,7 +569,7 @@ void SettingsControler::setEditorSyntaxHighlight(const bool& aHighlight)
 //==============================================================================
 // Get Editor Show Line Numbers
 //==============================================================================
-bool SettingsControler::editorLineNumbers()
+bool SettingsController::editorLineNumbers()
 {
     return mEditorLineNumbers;
 }
@@ -577,7 +577,7 @@ bool SettingsControler::editorLineNumbers()
 //==============================================================================
 // Set Editor Show Line Numbers
 //==============================================================================
-void SettingsControler::setEditorLineNumbers(const bool& aShowLineNumbers)
+void SettingsController::setEditorLineNumbers(const bool& aShowLineNumbers)
 {
     // Check Editor Show Line Numbers
     if (mEditorLineNumbers != aShowLineNumbers) {
@@ -593,7 +593,7 @@ void SettingsControler::setEditorLineNumbers(const bool& aShowLineNumbers)
 //==============================================================================
 // Get Editor Font Size
 //==============================================================================
-int SettingsControler::editorFontSize()
+int SettingsController::editorFontSize()
 {
     return mEditorFontSize;
 }
@@ -601,7 +601,7 @@ int SettingsControler::editorFontSize()
 //==============================================================================
 // Set Editor Font Size
 //==============================================================================
-void SettingsControler::setEditorFontSize(const int& aSize)
+void SettingsController::setEditorFontSize(const int& aSize)
 {
     // Check Editor Font Size
     if (mEditorFontSize != aSize) {
@@ -619,7 +619,7 @@ void SettingsControler::setEditorFontSize(const int& aSize)
 //==============================================================================
 // Get Dirty State
 //==============================================================================
-bool SettingsControler::dirty()
+bool SettingsController::dirty()
 {
     return mDirty;
 }
@@ -627,7 +627,7 @@ bool SettingsControler::dirty()
 //==============================================================================
 // Set Dirty State
 //==============================================================================
-void SettingsControler::setDirty(const bool& aDirty)
+void SettingsController::setDirty(const bool& aDirty)
 {
     // Check Dirty State
     if (mDirty != aDirty) {
@@ -643,7 +643,7 @@ void SettingsControler::setDirty(const bool& aDirty)
 //==============================================================================
 // Destructor
 //==============================================================================
-SettingsControler::~SettingsControler()
+SettingsController::~SettingsController()
 {
     // Save Settings
     saveSettings();

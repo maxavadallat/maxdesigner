@@ -10,6 +10,33 @@ Item {
 
     focus: true
 
+    // Create New Component Root
+    function createNewComponentRoot() {
+        // Incubate Object
+        var incubator = componentRootFactory.incubateObject(mainGrabArea, { state: DComponentRootContainer.stateCreate });
+        // Check Status
+        if (incubator.status !== Component.Ready) {
+            // Connect To Status Changed
+            incubator.onStatusChanged = function(status) {
+                // Check Status
+                if (status === Component.Ready) {
+                    console.log("componentRootFactory - object: ", incubator.object, " ready!");
+
+                    // Show
+                    incubator.object.show();
+
+                    // ...
+                } else if (status === Component.Error) {
+
+                    console.log("componentRootFactory - object: ", incubator.object, " ERROR: " + componentRootFactory.errorString());
+
+                }
+            }
+        } else {
+            console.log("componentRootFactory - object: ", incubator.object, " ready!");
+        }
+    }
+
     Keys.onReleased: {
         switch (event.key) {
             case Qt.Key_T:
@@ -43,6 +70,30 @@ Item {
                 welcomScreen.show();
             }
         }
+
+        // ...
+    }
+
+    // Connections - Current Project
+    Connections {
+        target: mainController.currentProject
+
+        onBaseComponentCreated: {
+            console.log("mainController.currentProject.onBaseComponentCreated - aComponent: " + aComponent);
+
+        }
+
+        onComponentCreated: {
+            console.log("mainController.currentProject.onComponentCreated - aComponent: " + aComponent);
+
+        }
+
+        onViewCreated: {
+            console.log("mainController.currentProject.onViewCreated - aComponent: " + aComponent);
+
+        }
+
+        // ...
     }
 
     Rectangle {
@@ -53,13 +104,6 @@ Item {
 
         Image {
             id: bgImage
-//            width: 1024
-//            height: 640
-//            anchors.right: parent.right
-//            anchors.bottom: parent.bottom
-//            anchors.bottomMargin: -256
-//            fillMode: Image.PreserveAspectFit
-//            source: "qrc:/assets/images/background02.png"
             anchors.fill: parent
             source: settingsController.designerMode === "Developer" ? "qrc:/assets/images/tron-wallpaper-23.jpeg"
                                                                     : "qrc:/assets/images/tron-wallpaper-27.jpeg"
@@ -75,10 +119,36 @@ Item {
 //        // ...
 //    }
 
+    Component {
+        id: componentRootFactory
+
+        DComponentRootContainer {
+
+            initialX: projectPane.x + projectPane.width
+            initialY: Math.max(Math.min(mainGrabArea.height / 2, projectPane.y + projectPane.height - Style.defaultMargin), projectPane.y + Style.defaultMargin)
+
+            creationWidth: 600
+            creationHeight: 400
+
+            creationX: parentWidth / 2 - creationWidth / 2
+            creationY: initialY - creationHeight / 2
+
+            lastShownX: componentRootContainer.creationX
+            lastShownY: componentRootContainer.creationY
+
+            parentWidth: mainGrabArea.width
+            parentHeight: mainGrabArea.height
+
+            state: stateCreate
+        }
+    }
+
+
     MainGrabArea {
         id: mainGrabArea
 
         anchors.fill: parent
+        //visible: false
 
         // Project Pane
         ProjectPane {
@@ -100,6 +170,7 @@ Item {
             parentHeight: mainGrabArea.height
 
             state: stateCreate
+            //state: stateShown
         }
 
         // Properties Pane
@@ -122,27 +193,7 @@ Item {
             parentHeight: mainGrabArea.height
 
             state: stateCreate
-        }
-
-        DComponentRootContainer {
-            id: componentRootContainer
-
-            initialX: projectPane.x + projectPane.width
-            initialY: Math.max(Math.min(mainGrabArea.height / 2, projectPane.y + projectPane.height - Style.defaultMargin), projectPane.y + Style.defaultMargin)
-
-            creationWidth: 600
-            creationHeight: 400
-
-            creationX: parentWidth / 2 - creationWidth / 2
-            creationY: initialY - creationHeight / 2
-
-            lastShownX: componentRootContainer.creationX
-            lastShownY: componentRootContainer.creationY
-
-            parentWidth: mainGrabArea.width
-            parentHeight: mainGrabArea.height
-
-            state: stateCreate
+            //state: stateShown
         }
 
         DFormulaEditor {
@@ -164,6 +215,7 @@ Item {
             parentHeight: mainGrabArea.height
 
             state: stateCreate
+            //state: stateShown
         }
     }
 
@@ -178,9 +230,5 @@ Item {
         id: minimzedComponents
         anchors.horizontalCenter: parent.horizontalCenter
     }
-
-//    DColorTest {
-//        id: colorTest
-//    }
 }
 

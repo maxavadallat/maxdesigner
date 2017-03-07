@@ -11,12 +11,12 @@ DPane {
     width: 300
     height: 600
 
-    title: "Properties" + (propertiesController.focusedCompoenent ? (" - " + propertiesController.focusedCompoenent.componentName) : "")
+    title: "Properties" + (propertiesController.focusedComponent ? (" - " + propertiesController.focusedComponent.componentName) : "")
 
     minWidth: 300
     minHeight: 200
 
-    enablePaneContent: propertiesController.focusedCompoenent !== null
+    enablePaneContent: propertiesController.focusedComponent !== null
 
     setFocusOnResize: false
 
@@ -25,6 +25,14 @@ DPane {
     hideToSide: hideToRight
 
     borderColor: Style.colorBorder
+
+    //state: stateShown
+
+    property QtObject propertiesControllerConnection: Connections {
+        target: propertiesController
+
+        // ...
+    }
 
     Row {
         spacing: 2

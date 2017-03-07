@@ -1,5 +1,5 @@
 #include <QDebug>
-#include "src/propertiesmodel.h"
+#include "propertiesmodel.h"
 
 //==============================================================================
 // Constructor

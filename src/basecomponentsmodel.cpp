@@ -16,6 +16,8 @@ BaseComponentsModel::BaseComponentsModel(ProjectModel* aProjectModel, QObject* a
     , mProjectModel(aProjectModel)
     , mBaseComponentsDir(mProjectModel ? mProjectModel->baseComponentsDir() : "")
 {
+    qDebug() << "BaseComponentsModel created.";
+
     // Init
     init();
 }
@@ -56,8 +58,13 @@ void BaseComponentsModel::loadBaseComponents()
         return;
     }
 
+    qDebug() << "BaseComponentsModel::loadBaseComponents - mBaseComponentsDir: " << mBaseComponentsDir;
+
+    // Init Info Filter
+    QString infoFilter = QString("*.%1").arg(DEFAULT_JSON_SUFFIX);
+
     // Init Base Components Dir Iterator
-    QDirIterator bcIterator(mBaseComponentsDir, QStringList(DEFAULT_JSON_SUFFIX), QDir::Files | QDir::NoDotAndDotDot);
+    QDirIterator bcIterator(mBaseComponentsDir, QStringList(infoFilter), QDir::Files | QDir::NoDotAndDotDot);
 
     // Iterate Through Base Components Dir
     while (bcIterator.hasNext()) {
@@ -225,8 +232,9 @@ QVariant BaseComponentsModel::data(const QModelIndex& index, int role) const
     if (row >= 0 && row < mBaseComponentList.count()) {
         // Switch Role
         switch (role) {
+            case Qt::DisplayRole:
             case Qt::UserRole:
-            case ComponentNameRole: return mBaseComponentList[row]->property(JSON_KEY_COMPONENT_NAME).toString();
+            case ComponentNameRole: return mBaseComponentList[row]->componentName();
         }
     }
 
@@ -256,105 +264,6 @@ BaseComponentsModel::~BaseComponentsModel()
     clear();
 
     // ...
+
+    qDebug() << "BaseComponentsModel deleted.";
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-//==============================================================================
-// Constructor
-//==============================================================================
-BaseComponentInfo::BaseComponentInfo(const QString& aName, QObject* aParent)
-    : QObject(aParent)
-    , mName(aName)
-{
-    // Init
-    init();
-
-    // ...
-}
-
-//==============================================================================
-// Init
-//==============================================================================
-void BaseComponentInfo::init()
-{
-    // Init JSON File
-    QFile infoFile(mName);
-
-    // Open File
-    if (infoFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        // Read All
-        QString infoText = infoFile.readAll();
-        // Close File
-        infoFile.close();
-        // Init JSON Document
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(infoText.toUtf8());
-        // Set JSON Object
-        mInfo = jsonDoc.object();
-    } else {
-        qWarning() << "BaseComponentInfo::init - FILE OPEN ERROR - mName: " << mName;
-    }
-}
-
-//==============================================================================
-// Get Component Name
-//==============================================================================
-QString BaseComponentInfo::name()
-{
-    return mName;
-}
-
-//==============================================================================
-// Save Info
-//==============================================================================
-void BaseComponentInfo::save()
-{
-    // Init Info File
-    QFile infoFile(mName);
-
-    // Open File For Save
-    if (infoFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        // Init JSON Document
-        QJsonDocument jsonDoc(mInfo);
-        // Init JSON Text
-        QString infoText = jsonDoc.toJson();
-        // Init Text Stream
-        QTextStream textStream(&infoFile);
-        // Write Info Text
-        textStream << infoText;
-        // Flush
-        textStream.flush();
-        // Close File
-        infoFile.close();
-    } else {
-        qWarning() << "BaseComponentInfo::save - FILE OPEN ERROR - mName: " << mName;
-    }
-}
-
-//==============================================================================
-// Destructor
-//==============================================================================
-BaseComponentInfo::~BaseComponentInfo()
-{
-    // ...
-}
-*/

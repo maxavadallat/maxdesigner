@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QAbstractListModel>
 
-#include "settingscontroler.h"
+#include "settingscontroller.h"
 
 namespace Ui {
 class ProjectPropertiesDialog;
@@ -180,7 +180,7 @@ private: // Data
     // UI
     Ui::ProjectPropertiesDialog*    ui;
     // Settings Controller
-    SettingsControler*              mSettings;
+    SettingsController*              mSettings;
     // Import Paths Model
     ImportPathsModel*               mImportPathsModel;
     // Plugin Paths Model

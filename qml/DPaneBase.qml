@@ -83,67 +83,51 @@ DContainer {
 
     property Connections parentConnections: Connections {
         target: parent
-
-        onWidthChanged: {
-
-            // ...
-        }
-
-        onHeightChanged: {
-
-            // ...
-        }
     }
 
     onXChanged: {
-//        if (transitioning)
-//            return;
+//        // Check State
+//        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
+//            //console.log("DPaneBase.onXChanged - x: " + x);
 
-        // Check State
-        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
-            //console.log("DPaneBase.onXChanged - x: " + x);
+//            if (paneBaseRoot.dragActive) {
+//                //console.log("DPaneBase.onXChanged - x: " + x);
 
-            if (paneBaseRoot.dragActive) {
-                //console.log("DPaneBase.onXChanged - x: " + x);
-
-                // Adjust Las Shown X
-                paneBaseRoot.lastShownX = paneBaseRoot.x;
-            }
-        }
+//                // Adjust Las Shown X
+//                paneBaseRoot.lastShownX = paneBaseRoot.x;
+//            }
+//        }
     }
 
     onYChanged: {
-//        if (transitioning)
-//            return;
+//        // Check State
+//        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
 
-        // Check State
-        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
+//            //console.log("DPaneBase.onYChanged - y: " + y);
 
-            //console.log("DPaneBase.onYChanged - y: " + y);
+//            if (paneBaseRoot.dragActive) {
+//                //console.log("DPaneBase.onYChanged - y: " + y);
 
-            if (paneBaseRoot.dragActive) {
-                //console.log("DPaneBase.onYChanged - y: " + y);
-
-                // Adjust Las Shown Y
-                paneBaseRoot.lastShownY = paneBaseRoot.y;
-            }
-        }
+//                // Adjust Las Shown Y
+//                paneBaseRoot.lastShownY = paneBaseRoot.y;
+//            }
+//        }
     }
 
     onWidthChanged: {
-        // Check State
-        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
-            // Update Creation Width
-            paneBaseRoot.creationWidth = paneBaseRoot.width;
-        }
+//        // Check State
+//        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
+//            // Update Creation Width
+//            paneBaseRoot.creationWidth = paneBaseRoot.width;
+//        }
     }
 
     onHeightChanged: {
-        // Check State
-        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
-            // Update Creation Height
-            paneBaseRoot.creationHeight = paneBaseRoot.height;
-        }
+//        // Check State
+//        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
+//            // Update Creation Height
+//            paneBaseRoot.creationHeight = paneBaseRoot.height;
+//        }
     }
 
     onPressed: {

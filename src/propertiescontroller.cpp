@@ -68,7 +68,7 @@ ComponentInfo* PropertiesController::focusedComponent()
 //==============================================================================
 // Set Focused Component
 //==============================================================================
-void PropertiesController::setFocusedCompoenent(ComponentInfo* aComponent)
+void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
 {
     // Check Focused Component
     if (mFocusedComponent != aComponent) {
@@ -77,7 +77,7 @@ void PropertiesController::setFocusedCompoenent(ComponentInfo* aComponent)
         // Set Focused Component
         mFocusedComponent = aComponent;
         // Emit Focused Component Changed Signal
-        emit focusedCompoenentChanged(mFocusedComponent);
+        emit focusedComponentChanged(mFocusedComponent);
     }
 }
 
@@ -86,7 +86,7 @@ void PropertiesController::setFocusedCompoenent(ComponentInfo* aComponent)
 //==============================================================================
 QString PropertiesController::cID()
 {
-    return mFocusedComponent ? mFocusedComponent->property(JSON_KEY_COMPONENT_PROPERTY_ID).toString() : "";
+    return mFocusedComponent ? mFocusedComponent->componentProperty(JSON_KEY_COMPONENT_PROPERTY_ID).toString() : "";
 }
 
 //==============================================================================
@@ -102,7 +102,7 @@ void PropertiesController::requestCID(const QString& aID)
 //==============================================================================
 QString PropertiesController::cObjectName()
 {
-    return mFocusedComponent ? mFocusedComponent->property(JSON_KEY_COMPONENT_PROPERTY_OBJECT_NAME).toString() : "";
+    return mFocusedComponent ? mFocusedComponent->componentProperty(JSON_KEY_COMPONENT_PROPERTY_OBJECT_NAME).toString() : "";
 }
 
 //==============================================================================
@@ -118,7 +118,7 @@ void PropertiesController::requestCObjectName(const QString& aObjectName)
 //==============================================================================
 QString PropertiesController::cX()
 {
-    return mFocusedComponent ? mFocusedComponent->property(JSON_KEY_COMPONENT_PROPERTY_X).toString() : "";
+    return mFocusedComponent ? mFocusedComponent->componentProperty(JSON_KEY_COMPONENT_PROPERTY_X).toString() : "";
 }
 
 //==============================================================================
@@ -134,7 +134,7 @@ void PropertiesController::requestCX(const QString& aX)
 //==============================================================================
 QString PropertiesController::cY()
 {
-    return mFocusedComponent ? mFocusedComponent->property(JSON_KEY_COMPONENT_PROPERTY_Y).toString() : "";
+    return mFocusedComponent ? mFocusedComponent->componentProperty(JSON_KEY_COMPONENT_PROPERTY_Y).toString() : "";
 }
 
 //==============================================================================
@@ -150,7 +150,7 @@ void PropertiesController::requestCY(const QString& aY)
 //==============================================================================
 QString PropertiesController::cZ()
 {
-    return mFocusedComponent ? mFocusedComponent->property(JSON_KEY_COMPONENT_PROPERTY_Z).toString() : "";
+    return mFocusedComponent ? mFocusedComponent->componentProperty(JSON_KEY_COMPONENT_PROPERTY_Z).toString() : "";
 }
 
 //==============================================================================
@@ -166,7 +166,7 @@ void PropertiesController::requestCZ(const QString& aZ)
 //==============================================================================
 QString PropertiesController::cWidth()
 {
-    return mFocusedComponent ? mFocusedComponent->property(JSON_KEY_COMPONENT_PROPERTY_WIDTH).toString() : "";
+    return mFocusedComponent ? mFocusedComponent->componentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH).toString() : "";
 }
 
 //==============================================================================
@@ -182,7 +182,7 @@ void PropertiesController::requestCWidth(const QString& aWidth)
 //==============================================================================
 QString PropertiesController::cHeight()
 {
-    return mFocusedComponent ? mFocusedComponent->property(JSON_KEY_COMPONENT_PROPERTY_HEIGHT).toString() : "";
+    return mFocusedComponent ? mFocusedComponent->componentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT).toString() : "";
 }
 
 //==============================================================================

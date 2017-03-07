@@ -14,6 +14,8 @@ class ComponentInfo;
 //==============================================================================
 class ComponentsModel : public QAbstractListModel
 {
+    Q_OBJECT
+
 public:
     // Set Components Dir
     void setComponentsDir(const QString& aDirPath);
@@ -66,47 +68,5 @@ private: // Data
     // Components Dir
     QString                 mComponentsDir;
 };
-
-
-
-
-
-
-
-
-
-
-
-/*
-//==============================================================================
-// Component Info Class
-//==============================================================================
-class ComponentInfo : public QObject
-{
-public:
-    // Constructor
-    explicit ComponentInfo(const QString& aName, QObject* aParent = NULL);
-
-    // Get Component Name
-    QString name();
-
-    // Save Info
-    void save();
-
-    // Destructor
-    ~ComponentInfo();
-
-private:
-
-    // Init
-    void init();
-
-private: // Data
-    // Name
-    QString     mName;
-    // Component Info
-    QJsonObject mInfo;
-};
-*/
 
 #endif // COMPONENTSLISTMODEL_H

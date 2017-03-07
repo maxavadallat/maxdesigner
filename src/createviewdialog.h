@@ -24,18 +24,23 @@ public:
     // Constructor
     explicit CreateViewDialog(QWidget* aParent = NULL);
 
-//    // Set Base Compoennts List Model
-//    void setBaseComponentsModel(BaseComponentsModel* aModel);
-//    // Set Components Model
-//    void setComponentsModel(ComponentsModel* aModel);
+    // Set Base Compoennts List Model
+    void setBaseComponentsModel(BaseComponentsModel* aModel);
+    // Set Components Model
+    void setComponentsModel(ComponentsModel* aModel);
 
     // Get View Name
     QString viewName();
+    // Get View Base Name
+    QString viewBaseName();
 
     // Get View Width
     int viewWidth();
     // Get View Height
     int viewHeight();
+
+    // Reset
+    void reset();
 
     // Destructor
     ~CreateViewDialog();
@@ -47,6 +52,11 @@ private slots:
 private: // Data
     // UI
     Ui::CreateViewDialog*   ui;
+
+    // Base Components Model
+    BaseComponentsModel*    mBaseComponents;
+    // Components Model
+    ComponentsModel*        mComponents;
 };
 
 #endif // CREATEVIEWDIALOG_H

@@ -15,6 +15,8 @@ ComponentsModel::ComponentsModel(ProjectModel* aProjectModel, QObject* aParent)
     , mProjectModel(aProjectModel)
     , mComponentsDir(mProjectModel ? mProjectModel->componentsDir() : "")
 {
+    qDebug() << "ComponentsModel created.";
+
     // Init
     init();
 }
@@ -56,8 +58,13 @@ void ComponentsModel::loadComponents()
         return;
     }
 
+    qDebug() << "ComponentsModel::loadComponents - mComponentsDir: " << mComponentsDir;
+
+    // Init Info Filter
+    QString infoFilter = QString("*.%1").arg(DEFAULT_JSON_SUFFIX);
+
     // Init Components Dir Iterator
-    QDirIterator cIterator(mComponentsDir, QStringList(DEFAULT_JSON_SUFFIX), QDir::Files | QDir::NoDotAndDotDot);
+    QDirIterator cIterator(mComponentsDir, QStringList(infoFilter), QDir::Files | QDir::NoDotAndDotDot);
 
     // Iterate Through Components Dir
     while (cIterator.hasNext()) {
@@ -203,8 +210,9 @@ QVariant ComponentsModel::data(const QModelIndex& index, int role) const
     if (row >= 0 && row < mComponentList.count()) {
         // Switch Role
         switch (role) {
+            case Qt::DisplayRole:
             case Qt::UserRole:
-            case ComponentNameRole: return mComponentList[row]->property(JSON_KEY_COMPONENT_NAME).toString();
+            case ComponentNameRole: return mComponentList[row]->componentName();
         }
     }
 
@@ -232,102 +240,7 @@ ComponentsModel::~ComponentsModel()
 {
     // Clear
     clear();
+
+    qDebug() << "ComponentsModel deleted.";
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-//==============================================================================
-// Constructor
-//==============================================================================
-ComponentInfo::ComponentInfo(const QString& aName, QObject* aParent)
-    : QObject(aParent)
-    , mName(aName)
-{
-    // Init
-    init();
-
-    // ...
-}
-
-//==============================================================================
-// Init
-//==============================================================================
-void ComponentInfo::init()
-{
-    // Init JSON File
-    QFile infoFile(mName);
-
-    // Open File
-    if (infoFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        // Read All
-        QString infoText = infoFile.readAll();
-        // Close File
-        infoFile.close();
-        // Init JSON Document
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(infoText.toUtf8());
-        // Set JSON Object
-        mInfo = jsonDoc.object();
-    } else {
-        qWarning() << "ComponentInfo::init - FILE OPEN ERROR - mName: " << mName;
-    }
-}
-
-//==============================================================================
-// Get Component Name
-//==============================================================================
-QString ComponentInfo::name()
-{
-    return mName;
-}
-
-//==============================================================================
-// Save Info
-//==============================================================================
-void ComponentInfo::save()
-{
-    // Init Info File
-    QFile infoFile(mName);
-
-    // Open File For Save
-    if (infoFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        // Init JSON Document
-        QJsonDocument jsonDoc(mInfo);
-        // Init JSON Text
-        QString infoText = jsonDoc.toJson();
-        // Init Text Stream
-        QTextStream textStream(&infoFile);
-        // Write Info Text
-        textStream << infoText;
-        // Flush
-        textStream.flush();
-        // Close File
-        infoFile.close();
-    } else {
-        qWarning() << "ComponentInfo::save - FILE OPEN ERROR - mName: " << mName;
-    }
-}
-
-//==============================================================================
-// Destructor
-//==============================================================================
-ComponentInfo::~ComponentInfo()
-{
-    // ...
-}
-*/

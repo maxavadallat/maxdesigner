@@ -1,6 +1,8 @@
 #include <QApplication>
 #include <QJsonDocument>
 #include <QFile>
+#include <QFileInfo>
+#include <QDir>
 #include <QTextStream>
 #include <QDebug>
 
@@ -29,10 +31,8 @@ ComponentInfo* ComponentInfo::fromInfoFile(const QString& aFilePath, ProjectMode
 {
     // Create Component Info
     ComponentInfo* newComponent = new ComponentInfo("", "", "", aProject);
-    // Set Info File Path
-    newComponent->mInfoPath = aFilePath;
     // Load Component
-    newComponent->load();
+    newComponent->load(aFilePath);
 
     return newComponent;
 }
@@ -65,7 +65,7 @@ ComponentInfo::ComponentInfo(const QString& aName,
     : QObject(aParent)
     , mProject(aProject)
     , mProtoType(true)
-    , mDirty(false)
+    , mDirty(true)
     , mInfoPath("")
     , mQMLPath("")
     , mName(aName)
@@ -89,11 +89,6 @@ void ComponentInfo::init()
 {
     // Check Project
     if (mProject) {
-        // Connect Signals
-//        connect(mProject, SIGNAL(baseComponentsDirChanged(QString)), this, SLOT(baseComponentsDirChanged(QString)));
-//        connect(mProject, SIGNAL(componentsDirChanged(QString)), this, SLOT(componentsDirChanged(QString)));
-//        connect(mProject, SIGNAL(viewsDirChanged(QString)), this, SLOT(viewsDirChanged(QString)));
-
         // Check Type
         if (mType == COMPONENT_TYPE_BASECOMPONENT) {
             // Set Info Path
@@ -103,15 +98,15 @@ void ComponentInfo::init()
             mInfoPath = mProject->componentsDir();
         } else if (mType == COMPONENT_TYPE_VIEW) {
             // Set Info Path
-            mInfoPath = mProject->componentsDir();
-        } else {
+            mInfoPath = mProject->viewsDir();
+        } else if (mType != "") {
             qWarning() << "ComponentInfo::init - mType: " << mType << " - NOT SUPPORTED TYPE!!";
 
             return;
         }
 
         // Add Component Name To Info Path
-        mInfoPath += QString("%1/%2.%3").arg(mInfoPath).arg(mName).arg(DEFAULT_JSON_SUFFIX);
+        mInfoPath += QString("/%2.%3").arg(mName).arg(DEFAULT_JSON_SUFFIX);
 
         qDebug() << "ComponentInfo::init - mInfoPath: " << mInfoPath;
 
@@ -447,6 +442,8 @@ QJsonObject ComponentInfo::toJSONObject()
     ciObject[JSON_KEY_COMPONENT_NAME] = QJsonValue(mName);
     // Set Component Type
     ciObject[JSON_KEY_COMPONENT_TYPE] = QJsonValue(mType);
+    // Set Category
+    ciObject[JSON_KEY_COMPONENT_CATEGORY] = QJsonValue(mCategory);
     // Set Component Base Name
     ciObject[JSON_KEY_COMPONENT_BASE] = QJsonValue(mBaseName);
 
@@ -516,23 +513,27 @@ void ComponentInfo::fromJSON(const QByteArray& aContent)
     setComponentName(ciObject[JSON_KEY_COMPONENT_NAME].toString());
     // Set Component Type
     setComponentType(ciObject[JSON_KEY_COMPONENT_TYPE].toString());
+    // Set Component Category
+    setComponentCategory(ciObject[JSON_KEY_COMPONENT_CATEGORY].toString());
     // Set Component Base Name
     setComponentBase(ciObject[JSON_KEY_COMPONENT_BASE].toString());
 
     // ...
 
     // Set Own Properties
-
-
+    mOwnProperties = ciObject[JSON_KEY_COMPONENT_OWN_PROPERTIES].toObject();
     // Set Properties
+    mProperties = ciObject[JSON_KEY_COMPONENT_PROPERTIES].toObject();
 
     // Set Base
     mBase = mProject->getComponentByName(mBaseName);
 
     // Set Parent
+    mParent = mProject->getComponentByName(ciObject[JSON_KEY_COMPONENT_PARENT].toString());
 
     // Set Children
 
+    // ...
 }
 
 //==============================================================================
@@ -562,7 +563,7 @@ void ComponentInfo::removeProperty(const QString& aName)
 //==============================================================================
 // Get Property
 //==============================================================================
-QVariant ComponentInfo::property(const QString& aName)
+QVariant ComponentInfo::componentProperty(const QString& aName)
 {
     // Check Own Properties First
     if (mOwnProperties.keys().indexOf(aName) >= 0) {
@@ -575,7 +576,7 @@ QVariant ComponentInfo::property(const QString& aName)
 //==============================================================================
 // Set Property
 //==============================================================================
-void ComponentInfo::setProperty(const QString& aName, const QVariant& aValue)
+void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& aValue)
 {
     // Check Own Properties
     if (mOwnProperties.keys().indexOf(aName) >= 0) {

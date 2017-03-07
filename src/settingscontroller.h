@@ -1,5 +1,5 @@
-#ifndef SETTINGSCONTROLER_H
-#define SETTINGSCONTROLER_H
+#ifndef SETTINGSCONTROLLER_H
+#define SETTINGSCONTROLLER_H
 
 #include <QObject>
 #include <QVariant>
@@ -8,7 +8,7 @@
 //==============================================================================
 // Settings Controller Class
 //==============================================================================
-class SettingsControler : public QObject
+class SettingsController : public QObject
 {
     Q_OBJECT
 
@@ -40,13 +40,13 @@ class SettingsControler : public QObject
 
 public:
     // Get Instance
-    static SettingsControler* getInstance();
+    static SettingsController* getInstance();
 
 protected:
     // Constructor
-    explicit SettingsControler(QObject* aParent = NULL);
+    explicit SettingsController(QObject* aParent = NULL);
     // Destructor
-    ~SettingsControler();
+    ~SettingsController();
 
 public:
     // Release
@@ -247,4 +247,4 @@ private:
     bool            mDirty;
 };
 
-#endif // SETTINGSCONTROLER_H
+#endif // SETTINGSCONTROLLER_H

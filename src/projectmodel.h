@@ -58,7 +58,7 @@ public:
     // Create Component
     ComponentInfo* createComponent(const QString& aName, const QString& aBaseName, const QString& aCategory);
     // Create View
-    ComponentInfo* createView(const QString& aName, const QString& aBaseName);
+    ComponentInfo* createView(const QString& aName, const QString& aBaseName, const int& aWidth, const int& aHeight);
 
     // Get Project Name
     QString projectName();
@@ -178,6 +178,13 @@ signals:
     // Views Model Changed Signal
     void viewsModelChanged(ViewsModel* aViews);
 
+    // Base Component Created Signal
+    void baseComponentCreated(ComponentInfo* aComponent);
+    // Component Created Signal
+    void componentCreated(ComponentInfo* aComponent);
+    // View Creaeted Signal
+    void viewCreated(ComponentInfo* aComponent);
+
     // Current Component Changed Signal
     void currentComponentChanged(ComponentInfo* aComponent);
 
@@ -199,7 +206,14 @@ private:
     void setDirty(const bool& aDirty);
 
     // Set Current Component
-    void setCurrentCompoennt(ComponentInfo* aComponent);
+    void setCurrentComponent(ComponentInfo* aComponent);
+
+    // Create Base Components Model
+    void createBaseComponentsModel();
+    // Create Components Model
+    void createComponentsModel();
+    // Create Views Model
+    void createViewsModel();
 
     // Set Base Components Model
     void setBaseComponentsModel(BaseComponentsModel* aBaseComponents);

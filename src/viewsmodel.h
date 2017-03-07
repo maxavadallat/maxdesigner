@@ -13,6 +13,8 @@ class ComponentInfo;
 //==============================================================================
 class ViewsModel : public QAbstractListModel
 {
+    Q_OBJECT
+
 public:
     // Set Views Dir
     void setViewsDir(const QString& aDirPath);
@@ -65,44 +67,5 @@ private: // Data
     // Views Dir
     QString                 mViewsDir;
 };
-
-
-
-
-
-
-
-
-/*
-//==============================================================================
-// View Info Class
-//==============================================================================
-class ViewInfo : public QObject
-{
-public:
-    // Constructor
-    explicit ViewInfo(const QString& aName, QObject* aParent = NULL);
-
-    // Get Component Name
-    QString name();
-
-    // Save Info
-    void save();
-
-    // Destructor
-    ~ViewInfo();
-
-private:
-
-    // Init
-    void init();
-
-private: // Data
-    // Name
-    QString     mName;
-    // Component Info
-    QJsonObject mInfo;
-};
-*/
 
 #endif // VIEWSLISTMODEL_H

@@ -15,15 +15,15 @@
 
 // Custom Component Name - Project Model
 #define DEFAULT_MAIN_QML_COMPONENTS_PROJECT_MODEL           "ProjectModel"
+// Custom Component Name - Component Info
+#define DEFAULT_MAIN_QML_COMPONENTS_COMPONENT_INFO          "ComponentInfo"
+
 // Custom Component Name - Base Components Model
 #define DEFAULT_MAIN_QML_COMPONENTS_BASECOMPONENTS_MODEL    "BaseComponentsModel"
 // Custom Component Name - Components Model
 #define DEFAULT_MAIN_QML_COMPONENTS_COMPONENTS_MODEL        "ComponentsModel"
 // Custom Compoents Name - Views List Model
 #define DEFAULT_MAIN_QML_COMPONENTS_VIEWS_MODEL             "ViewsModel"
-
-// Custom Component Name - Component Info
-#define DEFAULT_MAIN_QML_COMPONENTS_COMPONENT_INFO          "ComponentInfo"
 
 // File Sort Filter Proxy
 #define DEFAULT_MAIN_QML_COMPONENTS_FILE_SORT_FILTER        "FileSortFilterProxy"
@@ -111,9 +111,9 @@
 #define COMPONENT_CATEGORY_DELEGATE                         "Container"
 
 // JSON Keys for Component Info
-#define JSON_KEY_COMPONENT_NAME                             "compoenntName"
-#define JSON_KEY_COMPONENT_TYPE                             "compoenntType"
-#define JSON_KEY_COMPONENT_CATEGORY                         "compoenntCategory"
+#define JSON_KEY_COMPONENT_NAME                             "componentName"
+#define JSON_KEY_COMPONENT_TYPE                             "componentType"
+#define JSON_KEY_COMPONENT_CATEGORY                         "componentCategory"
 #define JSON_KEY_COMPONENT_BASE                             "componentBase"
 #define JSON_KEY_COMPONENT_OWN_PROPERTIES                   "componentOwnProperties"
 #define JSON_KEY_COMPONENT_PROPERTIES                       "componentProperties"
