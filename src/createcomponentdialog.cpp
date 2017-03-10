@@ -126,6 +126,24 @@ void CreateComponentDialog::on_componentNameEdit_textChanged(const QString& arg1
 }
 
 //==============================================================================
+// Base Type Compo Box Current Index Changed Slot
+//==============================================================================
+void CreateComponentDialog::on_baseTypeComboBox_currentIndexChanged(int index)
+{
+    // Set Current Text
+    ui->baseTypeComboBox->setCurrentText(mBaseComponents->data(mBaseComponents->index(index)).toString());
+}
+
+//==============================================================================
+// Base Type Compo Box Current Index Changed Slot
+//==============================================================================
+void CreateComponentDialog::on_componentTypeComboBox_currentIndexChanged(int index)
+{
+    // Set Current Text
+    ui->componentTypeComboBox->setCurrentText(mComponents->data(mComponents->index(index)).toString());
+}
+
+//==============================================================================
 // Destructor
 //==============================================================================
 CreateComponentDialog::~CreateComponentDialog()

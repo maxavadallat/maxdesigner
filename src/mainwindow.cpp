@@ -23,6 +23,7 @@
 #include "projectpropertiesdialog.h"
 #include "createcomponentdialog.h"
 #include "createviewdialog.h"
+#include "livewindow.h"
 
 #include "basecomponentsmodel.h"
 #include "componentsmodel.h"
@@ -55,6 +56,7 @@ MainWindow::MainWindow(QWidget* aParent)
     , mProjectPropertiesDiaog(NULL)
     , mCreateComponentDialog(NULL)
     , mCreateViewDialog(NULL)
+    , mLiveWindow(NULL)
 
     , mPropertiesController(NULL)
 
@@ -85,6 +87,8 @@ MainWindow::MainWindow(QWidget* aParent)
 //==============================================================================
 void MainWindow::init()
 {
+    qDebug() << "MainWindow::init";
+
     // Check Event Filter
     if (!mEventFilter) {
         // Create Event Filter
@@ -195,10 +199,22 @@ void MainWindow::init()
 //==============================================================================
 void MainWindow::restoreUI()
 {
+    qDebug() << "MainWindow::restoreUI";
     // Grab Keyboard Focus
     //grabKeyboard();
 
     //installEventFilter();
+
+    // Check Settings
+    if (mSettings) {
+        // Restore Window State
+        Qt::WindowState lastState = (Qt::WindowState)(mSettings->mainWindowState());
+        // Check Last State
+        if (lastState == Qt::WindowMaximized) {
+            // Set Window State
+            setWindowState(lastState);
+        }
+    }
 }
 
 //==============================================================================
@@ -335,9 +351,9 @@ void MainWindow::openProject(const QString& aFilePath)
         connect(mProjectModel, SIGNAL(componentsModelChanged(ComponentsModel*)), this, SIGNAL(componentsModelChanged(ComponentsModel*)));
         connect(mProjectModel, SIGNAL(viewsModelChanged(ViewsModel*)), this, SIGNAL(viewsModelChanged(ViewsModel*)));
 
-        connect(mProjectModel, SIGNAL(baseComponentCreated(ComponentInfo*)), this, SLOT(baseComponentCreated(ComponentInfo*)));
-        connect(mProjectModel, SIGNAL(componentCreated(ComponentInfo*)), this, SLOT(componentCreated(ComponentInfo*)));
-        connect(mProjectModel, SIGNAL(viewCreated(ComponentInfo*)), this, SLOT(viewCreated(ComponentInfo*)));
+//        connect(mProjectModel, SIGNAL(baseComponentCreated(ComponentInfo*)), this, SLOT(baseComponentCreated(ComponentInfo*)));
+//        connect(mProjectModel, SIGNAL(componentCreated(ComponentInfo*)), this, SLOT(componentCreated(ComponentInfo*)));
+//        connect(mProjectModel, SIGNAL(viewCreated(ComponentInfo*)), this, SLOT(viewCreated(ComponentInfo*)));
     }
 
     // Load Project
@@ -362,6 +378,12 @@ void MainWindow::openProject(const QString& aFilePath)
 
         // ...
 
+        // Check Project Tree Model
+        if (mProjectTreeModel) {
+            // Set Current Path
+            mProjectTreeModel->setCurrentPath(mProjectModel->projectDir());
+        }
+
         // Emit Current Project Changed Signal
         emit currentProjectChanged(mProjectModel);
 
@@ -369,6 +391,27 @@ void MainWindow::openProject(const QString& aFilePath)
 
     } else {
         qWarning() << "MainWindow::openProject - aFilePath: " << aFilePath << " - ERROR LOADING PROJECT";
+    }
+}
+
+//==============================================================================
+// Open Component
+//==============================================================================
+void MainWindow::openComponent(ComponentInfo* aComponent)
+{
+    // Check Properties Controller
+    if (!mPropertiesController) {
+        qWarning() << "MainWindow::openComponent - NO PROPERTIES CONTROLLER!";
+        return;
+    }
+
+    // Check Component Info
+    if (aComponent) {
+
+        // ...
+
+        // Emit Component Opened
+        emit componentOpened(aComponent);
     }
 }
 
@@ -581,7 +624,9 @@ void MainWindow::launchDefineBaseComponent()
         createNewComponent(mCreateComponentDialog->componentName(),
                            COMPONENT_TYPE_BASECOMPONENT,
                            mCreateComponentDialog->componentBaseName(),
-                           mCreateComponentDialog->componentCategory());
+                           mCreateComponentDialog->componentCategory(),
+                           DEFAULT_COMPONENT_WIDTH,
+                           DEFAULT_COMPONENT_HEIGHT);
     }
 
     // Grab Keyboard Focus
@@ -623,7 +668,9 @@ void MainWindow::launchCreateComponent()
         createNewComponent(mCreateComponentDialog->componentName(),
                            COMPONENT_TYPE_COMPONENT,
                            mCreateComponentDialog->componentBaseName(),
-                           mCreateComponentDialog->componentCategory());
+                           mCreateComponentDialog->componentCategory(),
+                           DEFAULT_COMPONENT_WIDTH,
+                           DEFAULT_COMPONENT_HEIGHT);
     }
 
     // ...
@@ -664,7 +711,9 @@ void MainWindow::launchCreateView()
         createNewComponent(mCreateViewDialog->viewName(),
                            COMPONENT_TYPE_VIEW,
                            mCreateViewDialog->viewBaseName(),
-                           COMPONENT_CATEGORY_VISUAL);
+                           COMPONENT_CATEGORY_VISUAL,
+                           mCreateViewDialog->viewWidth(),
+                           mCreateViewDialog->viewHeight());
     }
 
     // ...
@@ -689,36 +738,43 @@ void MainWindow::createNewProject()
         connect(mProjectModel, SIGNAL(componentsModelChanged(ComponentsModel*)), this, SIGNAL(componentsModelChanged(ComponentsModel*)));
         connect(mProjectModel, SIGNAL(viewsModelChanged(ViewsModel*)), this, SIGNAL(viewsModelChanged(ViewsModel*)));
 
-        connect(mProjectModel, SIGNAL(baseComponentCreated(ComponentInfo*)), this, SLOT(baseComponentCreated(ComponentInfo*)));
-        connect(mProjectModel, SIGNAL(componentCreated(ComponentInfo*)), this, SLOT(componentCreated(ComponentInfo*)));
-        connect(mProjectModel, SIGNAL(viewCreated(ComponentInfo*)), this, SLOT(viewCreated(ComponentInfo*)));
+//        connect(mProjectModel, SIGNAL(baseComponentCreated(ComponentInfo*)), this, SLOT(baseComponentCreated(ComponentInfo*)));
+//        connect(mProjectModel, SIGNAL(componentCreated(ComponentInfo*)), this, SLOT(componentCreated(ComponentInfo*)));
+//        connect(mProjectModel, SIGNAL(viewCreated(ComponentInfo*)), this, SLOT(viewCreated(ComponentInfo*)));
     }
 
     // Set Project Name
-    mProjectModel->initProject(mProjectPropertiesDiaog->projectName(), mProjectPropertiesDiaog->projectDir());
+    if (mProjectModel->initProject(mProjectPropertiesDiaog->projectName(), mProjectPropertiesDiaog->projectDir())) {
 
-    // Update Project
-    updateProject();
+        // Update Project
+        updateProject();
 
-    // ...
+        // ...
 
-    // Enable Save Project Menu Item
-    ui->actionSaveProject->setEnabled(true);
-    // Enable Save As Project Menu Item
-    ui->actionSaveProjectAs->setEnabled(true);
-    // Enable Project Properties Menu Item
-    ui->actionProjectProperties->setEnabled(true);
-    // Enable Close Project Menu Item
-    ui->actionCloseProject->setEnabled(true);
-    // Set Enable Define Base Components Menu
-    ui->actionDefineBaseComponent->setEnabled(true);
-    // Set Enable Create Component Menu Item
-    ui->actionCreateComponent->setEnabled(true);
-    // Set Enable Create View Menu Item
-    ui->actionCreateView->setEnabled(true);
+        // Enable Save Project Menu Item
+        ui->actionSaveProject->setEnabled(true);
+        // Enable Save As Project Menu Item
+        ui->actionSaveProjectAs->setEnabled(true);
+        // Enable Project Properties Menu Item
+        ui->actionProjectProperties->setEnabled(true);
+        // Enable Close Project Menu Item
+        ui->actionCloseProject->setEnabled(true);
+        // Set Enable Define Base Components Menu
+        ui->actionDefineBaseComponent->setEnabled(true);
+        // Set Enable Create Component Menu Item
+        ui->actionCreateComponent->setEnabled(true);
+        // Set Enable Create View Menu Item
+        ui->actionCreateView->setEnabled(true);
 
-    // Emit Current Project chnged Signal
-    emit currentProjectChanged(mProjectModel);
+        // Check Project Tree Model
+        if (mProjectTreeModel) {
+            // Set Current Path
+            mProjectTreeModel->setCurrentPath(mProjectModel->projectDir());
+        }
+
+        // Emit Current Project chnged Signal
+        emit currentProjectChanged(mProjectModel);
+    }
 }
 
 //==============================================================================
@@ -748,12 +804,12 @@ void MainWindow::createNewComponent(const QString& aName,
         if (aType == COMPONENT_TYPE_BASECOMPONENT) {
 
             // Create New Base Component
-            newComponent = mProjectModel->createBaseComponent(aName, aBase, aCategory);
+            newComponent = mProjectModel->createBaseComponent(aName, aBase, aCategory, aWidth, aHeight);
 
         } else if (aType == COMPONENT_TYPE_COMPONENT) {
 
             // Create New Component
-            newComponent = mProjectModel->createComponent(aName, aBase, aCategory);
+            newComponent = mProjectModel->createComponent(aName, aBase, aCategory, aWidth, aHeight);
 
         } else if (aType == COMPONENT_TYPE_VIEW) {
 
@@ -775,7 +831,7 @@ void MainWindow::saveProject(const QString& aFilePath)
 {
     // Check Project Model
     if (!mProjectModel) {
-        qWarning() << "MainWindow::saveProject - NO PROJECT MODEL!";
+        //qWarning() << "MainWindow::saveProject - NO PROJECT MODEL!";
         return;
     }
 
@@ -874,9 +930,9 @@ void MainWindow::closeProject()
     disconnect(mProjectModel, SIGNAL(componentsModelChanged(ComponentsModel*)), this, SIGNAL(componentsModelChanged(ComponentsModel*)));
     disconnect(mProjectModel, SIGNAL(viewsModelChanged(ViewsModel*)), this, SIGNAL(viewsModelChanged(ViewsModel*)));
 
-    disconnect(mProjectModel, SIGNAL(baseComponentCreated(ComponentInfo*)), this, SLOT(baseComponentCreated(ComponentInfo*)));
-    disconnect(mProjectModel, SIGNAL(componentCreated(ComponentInfo*)), this, SLOT(componentCreated(ComponentInfo*)));
-    disconnect(mProjectModel, SIGNAL(viewCreated(ComponentInfo*)), this, SLOT(viewCreated(ComponentInfo*)));
+//    disconnect(mProjectModel, SIGNAL(baseComponentCreated(ComponentInfo*)), this, SLOT(baseComponentCreated(ComponentInfo*)));
+//    disconnect(mProjectModel, SIGNAL(componentCreated(ComponentInfo*)), this, SLOT(componentCreated(ComponentInfo*)));
+//    disconnect(mProjectModel, SIGNAL(viewCreated(ComponentInfo*)), this, SLOT(viewCreated(ComponentInfo*)));
 
     // Delete Project Model
     delete mProjectModel;
@@ -911,9 +967,23 @@ void MainWindow::closeProject()
 //==============================================================================
 void MainWindow::closeComponent()
 {
-    qDebug() << "MainWindow::closeComponent";
+    // Check Properties Controller
+    if (!mPropertiesController) {
+        return;
+    }
 
-    // ...
+    // Get Focused Component
+    ComponentInfo* focusedComponent = mPropertiesController->focusedComponent();
+
+    // Check Component Info
+    if (focusedComponent && focusedComponent->isRoot()) {
+        qDebug() << "MainWindow::closeComponent";
+
+        // Request Close
+        focusedComponent->requestClose();
+
+        // ...
+    }
 }
 
 //==============================================================================
@@ -1306,19 +1376,28 @@ void MainWindow::on_actionSwitchMode_triggered()
 }
 
 //==============================================================================
-// Action Save Compoennt Triggered Slot
+// Action Edit Component Triggered Slot
 //==============================================================================
-void MainWindow::on_actionSaveComponent_triggered()
+void MainWindow::on_actionEditComponent_triggered()
 {
 
 }
 
 //==============================================================================
-// Action Save View Triggered Slot
+// Action Edit View Triggered Slot
 //==============================================================================
-void MainWindow::on_actionSaveView_triggered()
+void MainWindow::on_actionEditView_triggered()
 {
 
+}
+
+//==============================================================================
+// Action Close Component Triggered Slot
+//==============================================================================
+void MainWindow::on_actionCloseComponent_triggered()
+{
+    // Close And Save Component
+    closeComponent();
 }
 
 // ...
@@ -1361,6 +1440,39 @@ void MainWindow::keyReleaseEvent(QKeyEvent* aEvent)
 }
 
 //==============================================================================
+// Event
+//==============================================================================
+bool MainWindow::event(QEvent* aEvent)
+{
+    // Check Event
+    if (aEvent) {
+        // Switch Event Type
+        switch (aEvent->type()) {
+            case QEvent::WindowStateChange: {
+                // Get Window State Change Event
+                QWindowStateChangeEvent* wsChangeEvent = static_cast<QWindowStateChangeEvent*>(aEvent);
+
+                qDebug() << "#### MainWindow::event - oldState: " << wsChangeEvent->oldState() << " - windowState: " << windowState();
+
+                // Check Settings
+                if (mSettings) {
+                    // Store Main Window State
+                    mSettings->setMainWindowState((int)windowState());
+                }
+                // ...
+
+            } break;
+
+            default:
+            break;
+        }
+    }
+
+    // Parent's Event
+    return QMainWindow::event(aEvent);
+}
+
+//==============================================================================
 // Destructor
 //==============================================================================
 MainWindow::~MainWindow()
@@ -1374,11 +1486,6 @@ MainWindow::~MainWindow()
 
     // Close Project
     closeProject();
-
-//    if (mProjectModel) {
-//        delete mProjectModel;
-//        mProjectModel = NULL;
-//    }
 
     if (mEventFilter) {
         delete mEventFilter;
@@ -1435,6 +1542,11 @@ MainWindow::~MainWindow()
     if (mCreateViewDialog) {
         delete mCreateViewDialog;
         mCreateViewDialog = NULL;
+    }
+
+    if (mLiveWindow) {
+        delete mLiveWindow;
+        mLiveWindow = NULL;
     }
 
     // ...

@@ -58,5 +58,7 @@
         <file>qml/DTransitionEditor.qml</file>
         <file>qml/DFlow.qml</file>
         <file>qml/DGrid.qml</file>
+        <file>qml/DAssetContainer.qml</file>
+        <file>qml/DSourceContainer.qml</file>
     </qresource>
 </RCC>

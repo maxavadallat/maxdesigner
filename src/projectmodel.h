@@ -42,7 +42,7 @@ public:
     explicit ProjectModel(QObject* aParent = NULL);
 
     // Init New Project
-    void initProject(const QString& aName, const QString& aDir);
+    bool initProject(const QString& aName, const QString& aDir);
     // Load Project
     bool loadProject(const QString& aFileName);
     // Save Project
@@ -50,13 +50,15 @@ public:
     // Close Project
     void closeProject(const bool& aSave = true);
 
+    // Get Absolute Project Path
+    QString absoluteProjectPath();
     // Get Absolute Project File Path
     QString absoluteProjectFilePath();
 
     // Create Base Component
-    ComponentInfo* createBaseComponent(const QString& aName, const QString& aBaseName, const QString& aCategory);
+    ComponentInfo* createBaseComponent(const QString& aName, const QString& aBaseName, const QString& aCategory, const int& aWidth, const int& aHeight);
     // Create Component
-    ComponentInfo* createComponent(const QString& aName, const QString& aBaseName, const QString& aCategory);
+    ComponentInfo* createComponent(const QString& aName, const QString& aBaseName, const QString& aCategory, const int& aWidth, const int& aHeight);
     // Create View
     ComponentInfo* createView(const QString& aName, const QString& aBaseName, const int& aWidth, const int& aHeight);
 
@@ -134,7 +136,7 @@ public:
     ComponentInfo* currentComponent();
 
     // Get Component By Name
-    Q_INVOKABLE ComponentInfo* getComponentByName(const QString& aName);
+    Q_INVOKABLE ComponentInfo* getComponentByName(const QString& aName, const QString& aType = "");
 
     // Destructor
     ~ProjectModel();
@@ -179,11 +181,11 @@ signals:
     void viewsModelChanged(ViewsModel* aViews);
 
     // Base Component Created Signal
-    void baseComponentCreated(ComponentInfo* aComponent);
+    void baseComponentCreated(ComponentInfo* aComponent, const int& aWidth, const int& aHeight);
     // Component Created Signal
-    void componentCreated(ComponentInfo* aComponent);
+    void componentCreated(ComponentInfo* aComponent, const int& aWidth, const int& aHeight);
     // View Creaeted Signal
-    void viewCreated(ComponentInfo* aComponent);
+    void viewCreated(ComponentInfo* aComponent, const int& aWidth, const int& aHeight);
 
     // Current Component Changed Signal
     void currentComponentChanged(ComponentInfo* aComponent);

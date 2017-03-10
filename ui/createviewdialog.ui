@@ -149,6 +149,9 @@
    </item>
    <item row="4" column="0" colspan="5">
     <widget class="QTabWidget" name="baseTypeTab">
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
+     </property>
      <property name="currentIndex">
       <number>1</number>
      </property>
@@ -180,6 +183,9 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
         </widget>
        </item>
       </layout>
@@ -205,7 +211,11 @@
         <number>0</number>
        </property>
        <item row="0" column="0">
-        <widget class="QComboBox" name="componentTypeComboBox"/>
+        <widget class="QComboBox" name="componentTypeComboBox">
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

@@ -52,10 +52,14 @@ public:
 private slots:
     // On Component Name Edit Text Changed Slot
     void on_componentNameEdit_textChanged(const QString& arg1);
+    // On Base Type Combo Box Current Index Changed Slot
+    void on_baseTypeComboBox_currentIndexChanged(int index);
+    // On Component Type Combo Box Current Index Changed Slot
+    void on_componentTypeComboBox_currentIndexChanged(int index);
 
 private:
     // UI
-    Ui::CreateComponentDialog*  ui;
+    Ui::CreateComponentDialog*      ui;
 
     // Base Compoennts List Model
     BaseComponentsModel*            mBaseComponents;
@@ -64,10 +68,6 @@ private:
     // Components Category Model
     ComponentCategoryModel*         mCategories;
 };
-
-
-
-
 
 
 #endif // CREATECOMPONENTDIALOG_H

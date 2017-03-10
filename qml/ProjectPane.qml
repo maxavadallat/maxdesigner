@@ -54,9 +54,11 @@ DPane {
         id: baseComponentsSection
         width: projectPaneRoot.contentWidth
         title: "Base Components"
-        state: stateClosed
+        //state: stateClosed
+        minHeight: baseComponentsRepeater.count > 0 ? baseComponentsFlow.height : 200
 
         DFlow {
+            id: baseComponentsFlow
             width: projectPaneRoot.contentWidth
             spacing: Style.defaultSpacing
             opacity: baseComponentsRepeater.count > 0 ? 1.0 : 0.0
@@ -96,8 +98,10 @@ DPane {
         width: projectPaneRoot.contentWidth
         title: "Components"
         //state: stateOpen
+        minHeight: componentsRepeater.count > 0 ? componentsFlow.height : 200
 
         DFlow {
+            id: componentsFlow
             width: projectPaneRoot.contentWidth
             spacing: Style.defaultSpacing
             opacity: componentsRepeater.count > 0 ? 1.0 : 0.0
@@ -136,9 +140,11 @@ DPane {
         id: viewsSection
         width: projectPaneRoot.contentWidth
         title: "Views"
-        state: stateClosed
+        //state: stateClosed
+        minHeight: viewsRepeater.count > 0 ? viewsFlow.height : 200
 
         DFlow {
+            id: viewsFlow
             width: projectPaneRoot.contentWidth
             spacing: Style.defaultSpacing
             opacity: viewsRepeater.count > 0 ? 1.0 : 0.0
@@ -232,10 +238,49 @@ DPane {
         title: "Open Documents"
         state: stateClosed
 
+        property Connections openFilesModelConnection: Connections {
+            target: openFilesModel
+            onFileOpened: {
+                openFilesSection.open();
+            }
+        }
+
         ListView {
             id: openFilesListView
             width: projectPaneRoot.contentWidth
+            height: count > 0 ? 300 : 0
+
             opacity: count > 0 ? 1.0 : 0.0
+            visible: opacity > 0.0
+
+            model: openFilesModel
+            highlightFollowsCurrentItem: true
+
+            delegate: Rectangle {
+                width: openFilesListView
+                height: Style.listItemHeight
+                color: index === openFilesListView.currentIndex ? Style.colorHighLight : "transparent"
+                DMouseArea {
+                    anchors.fill: parent
+
+                    onClicked: {
+                        // Set Current Index
+                        openFilesListView.currentIndex = index;
+                    }
+
+                    onDoubleClicked: {
+                        // Set Current Index
+                        openFilesListView.currentIndex = index;
+                        // Select File
+                        openFilesModel.selectFile(index);
+                    }
+                }
+
+                DText {
+                    anchors.fill: parent
+                    text: fileName
+                }
+            }
         }
 
         DNoContent {

@@ -13,12 +13,14 @@ DPaneBase {
 
     property bool explodingMode: false
 
-    title: "Component"
+    property QtObject componentInfo: null
+
+    title: "Component" + (componentInfo ? (" - " + componentInfo.componentName  ) : "")
 
     hideToSide: hideToBottom
 
     enablePosOverlay: false
-    enableSizeOverlay: true
+    enableSizeOverlay: false
 
     showTitle: false
     showBackground: false
@@ -27,16 +29,14 @@ DPaneBase {
 
     rootContainer: true
 
+    focusOnShow: true
+
+    enableSizeOverlayOnShow: true
+
+    enableScaling: true
+
     borderColor: dropArea.hovering || compoenntRootContainerRoot.focus ? Style.colorBorder : Style.colorBorderNoFocus
     radius: 0
-
-    onPressed: {
-        compoenntRootContainerRoot.focus = true;
-    }
-
-    onWidthChanged: {
-        baseCanvas.requestPaint();
-    }
 
     // New Child Component
     property Component newComponent: Component {
@@ -67,11 +67,119 @@ DPaneBase {
         }
     }
 
-    Keys.onReleased: {
-        switch (event.key) {
-            case Qt.Key_Space:
+    // Properties Controller Connection
+    property Connections propertiesControllerConnection: Connections {
+        target: propertiesController
+    }
 
-            break;
+    // Open Files Model Connection
+    property Connections openFilesModelConnection: Connections {
+        target: openFilesModel
+
+        onFileSelected: {
+            console.log("DComponentRootContainer.openFilesModelConnection.onFileSelected - aFilePath: " + aFilePath);
+
+            // Check File Path
+            if (compoenntRootContainerRoot.componentInfo.infoPath === aFilePath) {
+                // Set Focus
+                compoenntRootContainerRoot.focus = true;
+            }
+
+            // ...
+        }
+    }
+
+    // Component Info Connections
+    property Connections componentInfoConnection: Connections {
+        target: compoenntRootContainerRoot.componentInfo
+
+        onRequestContainerClose: {
+            console.log("DComponentRootContainer.componentInfoConnection.onRequestContainerClose");
+
+            // Save & Close
+            compoenntRootContainerRoot.reset(true);
+            // Reset Focused Component
+            propertiesController.focusedComponent = null;
+
+            // ...
+        }
+    }
+
+    onFocusChanged: {
+        // Check Focus & Component Info
+        if (focus && componentInfo) {
+//            // Check Previous Scale Level
+//            if (compoenntRootContainerRoot.previousScale !== compoenntRootContainerRoot.scale) {
+//                // Set Scale Duration
+//                compoenntRootContainerRoot.scaleDuration = 100;
+//                // Reset Scale
+//                compoenntRootContainerRoot.scale = compoenntRootContainerRoot.previousScale;
+//            } else {
+//                // Reset Scale Duration
+//                compoenntRootContainerRoot.scaleDuration = 0;
+//            }
+
+            // Reset Scale Duration
+            compoenntRootContainerRoot.scaleDuration = 0;
+
+            // Set Focused Component
+            propertiesController.focusedComponent = compoenntRootContainerRoot.componentInfo;
+        } else {
+            // Reset Focused Component
+            //propertiesController.focusedComponent = null;
+
+            // Set Scale Duration
+            compoenntRootContainerRoot.scaleDuration = 100;
+//            // Save Previous Scale
+//            compoenntRootContainerRoot.previousScale = compoenntRootContainerRoot.scale;
+            // Reset Scale Level
+            compoenntRootContainerRoot.scale = 1.0;
+        }
+    }
+
+    onPressed: {
+        compoenntRootContainerRoot.focus = true;
+    }
+
+    onWidthChanged: {
+        baseCanvas.requestPaint();
+
+        //propertiesController.requestCWidth()
+
+        // ...
+    }
+
+    onHeightChanged: {
+
+        // ...
+    }
+
+    DMouseArea {
+        id: wheelArea
+        anchors.fill: parent
+        visible: compoenntRootContainerRoot.focus
+
+        onWheel: {
+            //console.log("#### delta: " + wheel.angleDelta.y);
+
+            // Check Wheel Delta
+            if (wheel.angleDelta.y > 2) {
+                // Check Enable Scaling & Scale level
+                if (compoenntRootContainerRoot.enableScaling && compoenntRootContainerRoot.scale < 1.5) {
+                    // Reset Scale Duration
+                    compoenntRootContainerRoot.scaleDuration = 0;
+                    // Inc Scale Level
+                    compoenntRootContainerRoot.scale += 0.025;
+                }
+            } else if (wheel.angleDelta.y < -2) {
+                // Check Enable Scaling & Scale level
+                if (compoenntRootContainerRoot.enableScaling && compoenntRootContainerRoot.scale > 1.0) {
+                    // Reset Scale Duration
+                    compoenntRootContainerRoot.scaleDuration = 0;
+                    // Dec Scale Level
+                    compoenntRootContainerRoot.scale -= 0.025;
+                }
+            }
         }
     }
 
@@ -121,6 +229,9 @@ DPaneBase {
 
             // Reset Hovering
             hovering = false;
+
+            // Reset Previous Scale Level
+            compoenntRootContainerRoot.previousScale = 1.0;
 
             // Create New Object
             var newObject = newComponent.createObject(paneContainer, { "x": drop.x - CONSTS.componentItemWidth / 2,

@@ -202,7 +202,7 @@ void ProjectModel::createBaseComponents()
 //==============================================================================
 // Init New Project
 //==============================================================================
-void ProjectModel::initProject(const QString& aName, const QString& aDir)
+bool ProjectModel::initProject(const QString& aName, const QString& aDir)
 {
     // Check Name
     if (!aName.isEmpty() && !aDir.isEmpty()) {
@@ -213,8 +213,24 @@ void ProjectModel::initProject(const QString& aName, const QString& aDir)
         // Set Base Components Dir
         setBaseComponentsDir(projectDir() + "/" + DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME);
 
+        // Init Project Dir
+        QString pDirPath(projectDir());
+        // Init Temp Dir
+        QDir tempDir(pDirPath);
+
+        // Check If Dir Exists and Create
+        if (!tempDir.exists() && !tempDir.mkpath(pDirPath)) {
+            qWarning() << "ProjectModel::initProject - path: " << pDirPath << " - ERROR CREATING PATH!!";
+
+            return false;
+        }
+
         // ...
+
+        return true;
     }
+
+    return false;
 }
 
 //==============================================================================
@@ -372,6 +388,14 @@ void ProjectModel::closeProject(const bool& aSave)
 }
 
 //==============================================================================
+// Get Absolute Project Path
+//==============================================================================
+QString ProjectModel::absoluteProjectPath()
+{
+    return  mProperties[JSON_KEY_PROJECT_DIR].toString();
+}
+
+//==============================================================================
 // Get Absolute Project File Path
 //==============================================================================
 QString ProjectModel::absoluteProjectFilePath()
@@ -389,7 +413,7 @@ QString ProjectModel::absoluteProjectFilePath()
 //==============================================================================
 // Create Base Component
 //==============================================================================
-ComponentInfo* ProjectModel::createBaseComponent(const QString& aName, const QString& aBaseName, const QString& aCategory)
+ComponentInfo* ProjectModel::createBaseComponent(const QString& aName, const QString& aBaseName, const QString& aCategory, const int& aWidth, const int& aHeight)
 {
     // Check Current Compoennt
     if (mCurrentComponent) {
@@ -400,6 +424,9 @@ ComponentInfo* ProjectModel::createBaseComponent(const QString& aName, const QSt
 
     // Create New Component
     ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_BASECOMPONENT, aCategory, this, aBaseName);
+    // Set Width & Height
+    newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
+    newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
 
     // Create Base Components Model
     createBaseComponentsModel();
@@ -411,7 +438,7 @@ ComponentInfo* ProjectModel::createBaseComponent(const QString& aName, const QSt
     setCurrentComponent(newComponent);
 
     // Emit Base Compoennt Created Signal
-    emit baseComponentCreated(newComponent);
+    emit baseComponentCreated(newComponent, aWidth, aHeight);
 
     return newComponent;
 }
@@ -419,7 +446,7 @@ ComponentInfo* ProjectModel::createBaseComponent(const QString& aName, const QSt
 //==============================================================================
 // Create Component
 //==============================================================================
-ComponentInfo* ProjectModel::createComponent(const QString& aName, const QString& aBaseName, const QString& aCategory)
+ComponentInfo* ProjectModel::createComponent(const QString& aName, const QString& aBaseName, const QString& aCategory, const int& aWidth, const int& aHeight)
 {
     // Check Current Compoennt
     if (mCurrentComponent) {
@@ -431,6 +458,10 @@ ComponentInfo* ProjectModel::createComponent(const QString& aName, const QString
     // Create New Component
     ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_COMPONENT, aCategory, this, aBaseName);
 
+    // Set Width & Height
+    newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
+    newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
+
     // Create Components Model
     createComponentsModel();
 
@@ -441,7 +472,7 @@ ComponentInfo* ProjectModel::createComponent(const QString& aName, const QString
     setCurrentComponent(newComponent);
 
     // Emit Component Created Signal
-    emit componentCreated(newComponent);
+    emit componentCreated(newComponent, aWidth, aHeight);
 
     return newComponent;
 }
@@ -475,7 +506,7 @@ ComponentInfo* ProjectModel::createView(const QString& aName, const QString& aBa
     setCurrentComponent(newComponent);
 
     // Emit View Created Signal
-    emit viewCreated(newComponent);
+    emit viewCreated(newComponent, aWidth, aHeight);
 
     return newComponent;
 }
@@ -924,11 +955,49 @@ ComponentInfo* ProjectModel::currentComponent()
 //==============================================================================
 // Get Component By Name
 //==============================================================================
-ComponentInfo* ProjectModel::getComponentByName(const QString& aName)
+ComponentInfo* ProjectModel::getComponentByName(const QString& aName, const QString& aType)
 {
-    Q_UNUSED(aName);
+    // Check Name
+    if (aName.isEmpty()) {
+        return NULL;
+    }
 
-    return NULL;
+    qDebug() << "ProjectModel::getComponentByName - aName: " << aName << " - aType: " << aType;
+
+    // Init Component Info
+    ComponentInfo* cInfo = NULL;
+
+    // Check Type
+    if (mBaseComponents && ((aType == COMPONENT_TYPE_BASECOMPONENT) || (aType == ""))) {
+        // Get Component Info
+        cInfo = mBaseComponents->getComponent(aName);
+        // Check Component Info
+        if (cInfo) {
+            return cInfo;
+        }
+    }
+
+    // Check Type
+    if (mComponents && ((aType == COMPONENT_TYPE_COMPONENT) || (aType == ""))) {
+        // Get Component Info
+        cInfo = mComponents->getComponent(aName);
+        // Check Component Info
+        if (cInfo) {
+            return cInfo;
+        }
+    }
+
+    // Check Type
+    if (mViews && ((aType == COMPONENT_TYPE_VIEW) || (aType == ""))) {
+        // Get Component Info
+        cInfo = mViews->getView(aName);
+        // Check Component Info
+        if (cInfo) {
+            return cInfo;
+        }
+    }
+
+    return cInfo;
 }
 
 //==============================================================================

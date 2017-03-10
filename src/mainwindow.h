@@ -27,7 +27,7 @@ class RecentProjectsModel;
 class ProjectPropertiesDialog;
 class CreateComponentDialog;
 class CreateViewDialog;
-
+class LiveWindow;
 
 //==============================================================================
 // Main Window Class
@@ -70,6 +70,9 @@ public:
     // Open Project
     Q_INVOKABLE void openProject(const QString& aFilePath);
 
+    // Open Component
+    Q_INVOKABLE void openComponent(ComponentInfo* aComponent);
+
     // Destructor
     ~MainWindow();
 
@@ -88,6 +91,12 @@ signals:
 
     // Screen Shot Mode Changed Signal
     void screenshotModeChanged(const bool& aScreenShotMode);
+
+    // Component Opened Signal
+    void componentOpened(ComponentInfo* aComponent);
+
+    // Proto Type Selected Signal
+    void protoTypeSelected(ComponentInfo* aComponent);
 
 private:
     // Init
@@ -216,10 +225,12 @@ private slots:
     void on_actionScreenshot_triggered();
     // Action Switch Mode Triggered Slot
     void on_actionSwitchMode_triggered();
-    // Action Save Compoennt Triggered Slot
-    void on_actionSaveComponent_triggered();
-    // Action Save View Triggered Slot
-    void on_actionSaveView_triggered();
+    // Action Edit Component Triggered Slot
+    void on_actionEditComponent_triggered();
+    // Action Edit View Triggered Slot
+    void on_actionEditView_triggered();
+    // Action Close Component Triggered Slot
+    void on_actionCloseComponent_triggered();
 
     // ...
 
@@ -227,8 +238,12 @@ private slots:
     void on_actionQuit_triggered();
 
 protected: // from QMainWindow
+
     // Key Release Event
     virtual void keyReleaseEvent(QKeyEvent* aEvent);
+
+    // Event
+    virtual bool event(QEvent* aEvent);
 
 private:
     // UI
@@ -257,6 +272,8 @@ private:
     CreateComponentDialog*      mCreateComponentDialog;
     // Create View Dialog
     CreateViewDialog*           mCreateViewDialog;
+    // Live Window
+    LiveWindow*                 mLiveWindow;
 
     // Properties Controller
     PropertiesController*       mPropertiesController;

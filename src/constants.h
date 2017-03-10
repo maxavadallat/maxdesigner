@@ -68,6 +68,8 @@
 #define DEFAULT_RECENTPROJECTLIST_FILE_NAME                 ".designerrecent.list"
 // Max Recent Project File
 #define DEFAULT_RECENTPROJECTS_MAX                          10
+// Default Recent File List
+#define DEFAULT_RECENTFILESLIST_FILE_NAME                   ".recentfiles.list"
 
 // Image Provider ID
 #define DEFAULT_IMAGE_PROVIDER_ID                           "fileIcon"
@@ -108,7 +110,10 @@
 #define COMPONENT_CATEGORY_NONVISUAL                        "NonVisual"
 #define COMPONENT_CATEGORY_LAYOUT                           "Layout"
 #define COMPONENT_CATEGORY_CONTAINER                        "Container"
-#define COMPONENT_CATEGORY_DELEGATE                         "Container"
+#define COMPONENT_CATEGORY_DELEGATE                         "Delegate"
+
+#define DEFAULT_COMPONENT_WIDTH                             128
+#define DEFAULT_COMPONENT_HEIGHT                            64
 
 // JSON Keys for Component Info
 #define JSON_KEY_COMPONENT_NAME                             "componentName"

@@ -33,8 +33,9 @@ SOURCES             += src/settingscontroller.cpp \
                     src/designerfilesortproxy.cpp \
                     src/componentcategorymodel.cpp
 
-# Dialog Sources
+# Views/Dialog Sources
 SOURCES             += src/mainwindow.cpp \
+                    src/livewindow.cpp \
                     src/preferencesdialog.cpp \
                     src/aboutdialog.cpp \
                     src/confirmdialog.cpp \
@@ -72,8 +73,9 @@ HEADERS             += src/settingscontroller.h \
                     src/minimizedcomponents.h \
                     src/componentcategorymodel.h
 
-# Dialog Headers
+# View/Dialog Headers
 HEADERS             += src/mainwindow.h \
+                    src/livewindow.h \
                     src/preferencesdialog.h \
                     src/aboutdialog.h \
                     src/confirmdialog.h \
@@ -94,7 +96,8 @@ FORMS               += ui/mainwindow.ui \
                     ui/projectpropertiesdialog.ui \
                     ui/createcomponentdialog.ui \
                     ui/createviewdialog.ui \
-                    ui/resourceviewerdialog.ui
+                    ui/resourceviewerdialog.ui \
+                    ui/livewindow.ui
 
 # Resources
 RESOURCES           += maxdesigner.qrc \

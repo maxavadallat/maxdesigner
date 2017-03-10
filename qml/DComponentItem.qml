@@ -58,8 +58,8 @@ Item {
         property int scaleDuration: 500
 
         onPressed: {
-            // Set Activity Indicator Running State
-            loadingIndicator.running = true;
+            // Start Loading Delay Timer
+            loadingDelayTimer.restart();
             // Set Focus
             dragContainer.focus = true;
         }
@@ -67,6 +67,8 @@ Item {
         onPressAndHold: {
             // Set Activity Indicator Running State
             loadingIndicator.running = false;
+            // Reset Loading Delay Timer Running State
+            loadingDelayTimer.running = false;
 
             // Set Grabbed
             componentItemRoot.grabbed = true;
@@ -85,15 +87,39 @@ Item {
                 componentItemRoot.grabbed = false;
             }
 
+            // Reset Loading Delay Timer Running State
+            loadingDelayTimer.running = false;
             // Set Activity Indicator Running State
             loadingIndicator.running = false;
         }
 
         onCanceled: {
+            // Reset Loading Delay Timer Running State
+            loadingDelayTimer.running = false;
             // Set Activity Indicator Running State
             loadingIndicator.running = false;
             // Reset Grabbed
             componentItemRoot.grabbed = false;
+        }
+
+        onDoubleClicked: {
+            // Reset Loading Delay Timer Running State
+            loadingDelayTimer.running = false;
+            // Set Activity Indicator Running State
+            loadingIndicator.running = false;
+
+            // Open Component
+            openFilesModel.openComponent(componentItemRoot.componentInfo);
+        }
+
+        Timer {
+            id: loadingDelayTimer
+            interval: 400
+            repeat: false
+            onTriggered: {
+                // Set Activity Indicator Running State
+                loadingIndicator.running = true;
+            }
         }
 
         DRectangle {

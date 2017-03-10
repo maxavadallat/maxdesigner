@@ -132,6 +132,9 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="editable">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
       </layout>
@@ -157,7 +160,11 @@
         <number>0</number>
        </property>
        <item row="0" column="0">
-        <widget class="QComboBox" name="componentTypeComboBox"/>
+        <widget class="QComboBox" name="componentTypeComboBox">
+         <property name="editable">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

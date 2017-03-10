@@ -73,6 +73,7 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mCategory(aCategory)
     , mBaseName(aBaseName)
     , mFocused(false)
+    , mIsRoot(false)
     , mBase(mProject ? mProject->getComponentByName(mBaseName) : NULL)
     , mParent(NULL)
 {
@@ -89,24 +90,31 @@ void ComponentInfo::init()
 {
     // Check Project
     if (mProject) {
+        // Init info Path
+        QString ipTemp = "";
         // Check Type
         if (mType == COMPONENT_TYPE_BASECOMPONENT) {
             // Set Info Path
-            mInfoPath = mProject->baseComponentsDir();
+            ipTemp = mProject->baseComponentsDir();
         } else if (mType == COMPONENT_TYPE_COMPONENT) {
             // Set Info Path
-            mInfoPath = mProject->componentsDir();
+            ipTemp = mProject->componentsDir();
         } else if (mType == COMPONENT_TYPE_VIEW) {
             // Set Info Path
-            mInfoPath = mProject->viewsDir();
+            ipTemp = mProject->viewsDir();
         } else if (mType != "") {
             qWarning() << "ComponentInfo::init - mType: " << mType << " - NOT SUPPORTED TYPE!!";
 
             return;
         }
 
-        // Add Component Name To Info Path
-        mInfoPath += QString("/%2.%3").arg(mName).arg(DEFAULT_JSON_SUFFIX);
+        // Check Component Name
+        if (mName.isEmpty()) {
+            return;
+        }
+
+        // Set Info Path
+        setInfoPath(QString("%1/%2.%3").arg(ipTemp).arg(mName).arg(DEFAULT_JSON_SUFFIX));
 
         qDebug() << "ComponentInfo::init - mInfoPath: " << mInfoPath;
 
@@ -141,7 +149,7 @@ void ComponentInfo::load(const QString& aFilePath)
         }
     } else {
         // Set Info Path
-        mInfoPath = aFilePath;
+        setInfoPath(aFilePath);
     }
 
     // Init Component Info File
@@ -157,6 +165,8 @@ void ComponentInfo::load(const QString& aFilePath)
         ciFile.close();
         // From JSON
         fromJSON(ciFileContent.toUtf8());
+        // Set Dirty State
+        setDirty(false);
     } else {
         qWarning() << "ComponentInfo::load - mInfoPath: " << mInfoPath << " - ERROR LOADING COMPONENT INFO!";
     }
@@ -167,6 +177,12 @@ void ComponentInfo::load(const QString& aFilePath)
 //==============================================================================
 void ComponentInfo::save(const QString& aFilePath)
 {
+    // Check If Prototype
+    if (!mProtoType) {
+        // Saving Only Prototypes...
+        return;
+    }
+
     // Check File Path
     if (aFilePath.isEmpty() && !mDirty) {
         // No Need to Save
@@ -328,11 +344,41 @@ void ComponentInfo::setFocused(const bool& aFocused)
 }
 
 //==============================================================================
+// Get Is Root
+//==============================================================================
+bool ComponentInfo::isRoot()
+{
+    return mIsRoot;
+}
+
+//==============================================================================
+// Set Is Root
+//==============================================================================
+void ComponentInfo::setIsRoot(const bool& aRoot)
+{
+    // Check Is Root
+    if (mIsRoot != aRoot) {
+        // Set Is Root
+        mIsRoot = aRoot;
+        // Emit Is Root Changed Signal
+        emit isRootChanged(mIsRoot);
+    }
+}
+
+//==============================================================================
 // Get QML Source Path
 //==============================================================================
 QString ComponentInfo::sourcePath()
 {
     return mQMLPath;
+}
+
+//==============================================================================
+// Get Component Info Path
+//==============================================================================
+QString ComponentInfo::infoPath()
+{
+    return mInfoPath;
 }
 
 //==============================================================================
@@ -346,6 +392,22 @@ void ComponentInfo::setSourcePath(const QString& aPath)
         mQMLPath = aPath;
         // Emit Source Path Changed Signal
         emit sourcePathChanged(mQMLPath);
+    }
+}
+
+//==============================================================================
+// Set Info Path
+//==============================================================================
+void ComponentInfo::setInfoPath(const QString& aInfoPath)
+{
+    // Check Info Path
+    if (mInfoPath != aInfoPath) {
+        // Set Info Path
+        mInfoPath = aInfoPath;
+        // Emit Info Path Changed Signal
+        emit infoPathChanged(mInfoPath);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -369,7 +431,7 @@ void ComponentInfo::baseComponentsDirChanged(const QString& aBaseComponentsDir)
     // Check Type
     if (mType == COMPONENT_TYPE_BASECOMPONENT) {
         // Set Info Path
-        mInfoPath = aBaseComponentsDir;
+        setInfoPath(QString("%1/%2.%3").arg(aBaseComponentsDir).arg(mName).arg(DEFAULT_JSON_SUFFIX));
     }
 }
 
@@ -381,7 +443,7 @@ void ComponentInfo::componentsDirChanged(const QString& aComponentsDir)
     // Check Type
     if (mType == COMPONENT_TYPE_COMPONENT) {
         // Set Info Path
-        mInfoPath = aComponentsDir;
+        setInfoPath(QString("%1/%2.%3").arg(aComponentsDir).arg(mName).arg(DEFAULT_JSON_SUFFIX));
     }
 }
 
@@ -393,7 +455,7 @@ void ComponentInfo::viewsDirChanged(const QString& aViewsDir)
     // Check Type
     if (mType == COMPONENT_TYPE_VIEW) {
         // Set Info Path
-        mInfoPath = aViewsDir;
+        setInfoPath(QString("%1/%2.%3").arg(aViewsDir).arg(mName).arg(DEFAULT_JSON_SUFFIX));
     }
 }
 
@@ -527,13 +589,24 @@ void ComponentInfo::fromJSON(const QByteArray& aContent)
 
     // Set Base
     mBase = mProject->getComponentByName(mBaseName);
-
     // Set Parent
     mParent = mProject->getComponentByName(ciObject[JSON_KEY_COMPONENT_PARENT].toString());
 
     // Set Children
 
     // ...
+}
+
+//==============================================================================
+// Request Close
+//==============================================================================
+void ComponentInfo::requestClose()
+{
+    // Check If Is Root
+    if (mIsRoot) {
+        // Emit Request Container Close
+        emit requestContainerClose();
+    }
 }
 
 //==============================================================================

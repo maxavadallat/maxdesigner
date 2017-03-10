@@ -25,9 +25,24 @@ class ComponentInfo : public QObject
     Q_PROPERTY(QString componentCategory READ componentCategory WRITE setComponentCategory NOTIFY componentCategoryChanged)
     Q_PROPERTY(QString componentBase READ componentBase WRITE setComponentBase NOTIFY componentBaseChanged)
 
+    Q_PROPERTY(QString infoPath READ infoPath NOTIFY infoPathChanged)
+
     Q_PROPERTY(bool focused READ focused WRITE setFocused NOTIFY focusedChanged)
 
+    Q_PROPERTY(bool isRoot READ isRoot WRITE setIsRoot NOTIFY isRootChanged)
+
     Q_PROPERTY(QString sourcePath READ sourcePath NOTIFY sourcePathChanged)
+
+    // Pos
+
+    // Size
+
+    // Anchors
+
+    // States
+
+    // Transitions
+
 
 public:
     // Create Component From QML File
@@ -67,8 +82,16 @@ public:
     // Set Focused State
     void setFocused(const bool& aFocused);
 
+    // Get Is Root
+    bool isRoot();
+    // Set Is Root
+    void setIsRoot(const bool& aRoot);
+
     // Get QML Source Path
     QString sourcePath();
+
+    // Get Component Info Path
+    QString infoPath();
 
     // Get Component Hierarchy
     QStringList hierarchy();
@@ -87,9 +110,9 @@ public:
     void setComponentProperty(const QString& aName, const QVariant& aValue);
 
     // Add Child
-    void addChild(ComponentInfo* aChild);
+    Q_INVOKABLE void addChild(ComponentInfo* aChild);
     // Remove Child
-    void removeChild(ComponentInfo* aChild, const bool& aDelete = true);
+    Q_INVOKABLE void removeChild(ComponentInfo* aChild, const bool& aDelete = true);
 
     // Export To QML
     void exportToQML(const QString& aFilePath);
@@ -101,6 +124,9 @@ public:
 
     // Set Up Component From JSON Content/String
     void fromJSON(const QByteArray& aContent);
+
+    // Request Close
+    Q_INVOKABLE void requestClose();
 
     // Destructor
     ~ComponentInfo();
@@ -116,10 +142,30 @@ signals:
     void componentCategoryChanged(const QString& aCategory);
     // Component Base Name Changed
     void componentBaseChanged(const QString& aBaseName);
+    // Info Path Changed Signal
+    void infoPathChanged(const QString& aInfoPath);
     // Focused State Changed Signal
     void focusedChanged(const bool& aFocused);
+    // Is Root changed Signal
+    void isRootChanged(const bool& aRoot);
     // Source Path Changed Signal
     void sourcePathChanged(const QString& aPath);
+
+    // Request Close Container Signal
+    void requestContainerClose();
+
+    // Pos X Changed  Signal
+    void posXChanged(const int& aPosX);
+    // Pos Y Changed Signal
+    void posYChanged(const int aPosY);
+    // Pos Z Changed Signal
+    void posZChanged(const int aPosZ);
+    // Width Changed Signal
+    void widthChanged(const int& aWidth);
+    // Height Changed Signal
+    void heightChanged(const int& aHeight);
+
+    // ...
 
 protected:
     friend class ProjectModel;
@@ -145,6 +191,8 @@ protected:
 
     // Set QML Source Path
     void setSourcePath(const QString& aPath);
+    // Set Info Path
+    void setInfoPath(const QString& aInfoPath);
 
     // Set Dirty State
     void setDirty(const bool& aDirty);
@@ -184,6 +232,8 @@ private: // Data
 
     // Focused State
     bool                    mFocused;
+    // Is Root
+    bool                    mIsRoot;
 
     // Own Properties
     QJsonObject             mOwnProperties;

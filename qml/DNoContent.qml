@@ -9,6 +9,7 @@ Canvas {
     height: 300
 
     opacity: 0.2
+    visible: opacity > 0.0
 
     onPaint: {
         // Get 2D Context

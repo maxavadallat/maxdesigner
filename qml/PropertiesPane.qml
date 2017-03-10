@@ -35,6 +35,7 @@ DPane {
     }
 
     Row {
+        id: idRow
         spacing: 2
 
         DText {
@@ -49,6 +50,7 @@ DPane {
     }
 
     Row {
+        id: objectNameRow
         spacing: 2
 
         DText {
@@ -63,78 +65,98 @@ DPane {
         }
     }
 
-
     Item {
         width: 1
         height: Style.defaultSpacing
     }
 
     DSection {
+        id: sizeAndPosSection
         width: propertiesPaneRoot.contentWidth
         title: "Size & Pos"
-        state: stateOpen
-        minHeight: 120
+        minHeight: sizeAndPosFlow.height
 
-        Row {
-            id: posRow
-            spacing: Style.defaultSpacing
+        state: stateClosed
+        //state: stateOpen
 
-            DText {
-                width: 24
-                anchors.verticalCenter: parent.verticalCenter
-                horizontalAlignment: Text.AlignRight
-                text: "x: "
+        DFlow {
+            id: sizeAndPosFlow
+            width: propertiesPaneRoot.contentWidth
+
+            Row {
+                id: posRow
+                spacing: Style.defaultSpacing
+
+                opacity: {
+                    if (propertiesController.focusedComponent && propertiesController.focusedComponent.isRoot) {
+                        return 0.0;
+                    }
+
+                    return 1.0;
+                }
+
+                Behavior on opacity { DFadeAnimation { } }
+                visible: opacity > 0.0
+
+                DText {
+                    width: 24
+                    anchors.verticalCenter: parent.verticalCenter
+                    horizontalAlignment: Text.AlignRight
+                    text: "x: "
+                }
+
+                DSpinner {
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                DText {
+                    width: 24
+                    anchors.verticalCenter: parent.verticalCenter
+                    horizontalAlignment: Text.AlignRight
+                    text: "y:"
+                }
+
+                DSpinner {
+                    anchors.verticalCenter: parent.verticalCenter
+                }
             }
 
-            DSpinner {
-                anchors.verticalCenter: parent.verticalCenter
-            }
+            Row {
+                id: sizeRow
+                spacing: Style.defaultSpacing
 
-            DText {
-                width: 24
-                anchors.verticalCenter: parent.verticalCenter
-                horizontalAlignment: Text.AlignRight
-                text: "y:"
-            }
+                DText {
+                    width: 24
+                    anchors.verticalCenter: parent.verticalCenter
+                    horizontalAlignment: Text.AlignRight
+                    text: "w:"
+                }
 
-            DSpinner {
-                anchors.verticalCenter: parent.verticalCenter
-            }
-        }
+                DSpinner {
+                    anchors.verticalCenter: parent.verticalCenter
+                }
 
-        Row {
-            id: sizeRow
-            spacing: Style.defaultSpacing
+                DText {
+                    width: 24
+                    anchors.verticalCenter: parent.verticalCenter
+                    horizontalAlignment: Text.AlignRight
+                    text: "h:"
+                }
 
-            DText {
-                width: 24
-                anchors.verticalCenter: parent.verticalCenter
-                horizontalAlignment: Text.AlignRight
-                text: "w:"
-            }
-
-            DSpinner {
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            DText {
-                width: 24
-                anchors.verticalCenter: parent.verticalCenter
-                horizontalAlignment: Text.AlignRight
-                text: "h:"
-            }
-
-            DSpinner {
-                anchors.verticalCenter: parent.verticalCenter
+                DSpinner {
+                    anchors.verticalCenter: parent.verticalCenter
+                }
             }
         }
     }
 
     DSection {
+        id: anchorsSection
         width: propertiesPaneRoot.contentWidth
         title: "Anchors & Margins"
 
-        state: stateOpen
+        state: stateClosed
+        //state: stateOpen
 
         Row {
             //height: anchorTargetEditor.height
@@ -310,9 +332,26 @@ DPane {
     }
 
     DSection {
+        id: ownPropertiesSection
         width: propertiesPaneRoot.contentWidth
-        title: "Component(!)"
+        title: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentName : ""
         minHeight: ownPropertiesContainer.height + addOwnPropertyButton.height
+        state: stateHidden
+
+        property Connections proppertiesControllerConnection: Connections {
+            target: propertiesController
+
+            onFocusedComponentChanged: {
+                // Check Focused Component
+                if (propertiesController.focusedComponent) {
+                    // Open
+                    ownPropertiesSection.open();
+                } else {
+                    // Hide Section
+                    ownPropertiesSection.hide();
+                }
+            }
+        }
 
         // Own Properties
         Item {
@@ -334,6 +373,7 @@ DPane {
     }
 
     DSection {
+        id: signalsSection
         width: propertiesPaneRoot.contentWidth
         title: "Signals"
         minHeight: signalsContainer.height + addSignalButton.height
@@ -355,9 +395,12 @@ DPane {
     }
 
     DSection {
+        id: statesSection
         width: propertiesPaneRoot.contentWidth
         title: "States"
         minHeight: statesContainer.height + addStateButton.height
+
+        state: stateClosed
 
         // States
         Item {
@@ -376,9 +419,12 @@ DPane {
     }
 
     DSection {
+        id: transitionsSection
         width: propertiesPaneRoot.contentWidth
         title: "Transitions"
         minHeight: transitionsContainer.height + addTransitionButton.height
+
+        state: stateClosed
 
         // Transitions
         Item {
@@ -396,12 +442,17 @@ DPane {
         }
     }
 
+    // Parents
+
+    // ...
+
     DSection {
-        id: itemSection
+        id: parentSection
         width: propertiesPaneRoot.contentWidth
         title: "Item"
 
-        state: stateOpen
+        state: stateHidden
+        //state: stateOpen
 
         DButton {
             //onClicked: checked = !checked;
@@ -471,81 +522,5 @@ DPane {
                 currentIndex = buttonIndex;
             }
         }
-
     }
-
-
-/*
-    Row {
-        id: posRow
-        height: CONSTS.defaultPaneItemHeight
-        spacing: Style.defaultSpacing
-
-        DText {
-            width: 18
-            anchors.verticalCenter: parent.verticalCenter
-            text: "x:"
-        }
-
-        DTextInput {
-            width: 84
-            editor.inputMethodHints: Qt.ImhDigitsOnly
-            editor.horizontalAlignment: TextInput.AlignHCenter
-            editor.validator: IntValidator { }
-        }
-
-        DText {
-            width: 18
-            anchors.verticalCenter: parent.verticalCenter
-            text: "y:"
-        }
-
-        DTextInput {
-            width: 84
-            editor.inputMethodHints: Qt.ImhDigitsOnly
-            editor.horizontalAlignment: TextInput.AlignHCenter
-            editor.validator: IntValidator { }
-        }
-    }
-
-    Row {
-        id: sizeRow
-        height: CONSTS.defaultPaneItemHeight
-        spacing: Style.defaultSpacing
-
-        DText {
-            width: 18
-            anchors.verticalCenter: parent.verticalCenter
-            text: "w:"
-        }
-
-        DTextInput {
-            width: 84
-            editor.inputMethodHints: Qt.ImhDigitsOnly
-            editor.horizontalAlignment: TextInput.AlignHCenter
-            editor.validator: IntValidator { }
-        }
-
-        DText {
-            width: 18
-            anchors.verticalCenter: parent.verticalCenter
-            text: "h:"
-        }
-
-        DTextInput {
-            width: 84
-            editor.inputMethodHints: Qt.ImhDigitsOnly
-            editor.horizontalAlignment: TextInput.AlignHCenter
-            editor.validator: IntValidator { }
-        }
-    }
-
-    Row {
-        id: horizontalAnchoringRow
-        height: CONSTS.defaultPaneItemHeight
-        spacing: Style.defaultSpacing
-
-
-    }
-*/
 }

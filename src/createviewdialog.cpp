@@ -103,6 +103,24 @@ void CreateViewDialog::on_viewNameEdit_textChanged(const QString& arg1)
 }
 
 //==============================================================================
+// Base Type Combo Box Current index Changed Slot
+//==============================================================================
+void CreateViewDialog::on_baseTypeComboBox_currentIndexChanged(int index)
+{
+    // Set Current Text
+    ui->baseTypeComboBox->setCurrentText(mBaseComponents->data(mBaseComponents->index(index)).toString());
+}
+
+//==============================================================================
+// Base Type Combo Box Current Index Changed Slot
+//==============================================================================
+void CreateViewDialog::on_componentTypeComboBox_currentIndexChanged(int index)
+{
+    // Set Current Text
+    ui->componentTypeComboBox->setCurrentText(mComponents->data(mComponents->index(index)).toString());
+}
+
+//==============================================================================
 // Destructor
 //==============================================================================
 CreateViewDialog::~CreateViewDialog()

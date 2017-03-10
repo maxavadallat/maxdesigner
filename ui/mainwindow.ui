@@ -79,10 +79,9 @@
     <addaction name="actionSaveProject"/>
     <addaction name="actionSaveProjectAs"/>
     <addaction name="separator"/>
-    <addaction name="actionCloseProject"/>
+    <addaction name="actionCloseComponent"/>
     <addaction name="separator"/>
-    <addaction name="actionSaveComponent"/>
-    <addaction name="actionSaveView"/>
+    <addaction name="actionCloseProject"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -108,6 +107,8 @@
     <addaction name="actionDefineBaseComponent"/>
     <addaction name="actionCreateComponent"/>
     <addaction name="separator"/>
+    <addaction name="actionEditComponent"/>
+    <addaction name="separator"/>
     <addaction name="actionRemoveComponent"/>
     <addaction name="separator"/>
    </widget>
@@ -123,9 +124,11 @@
     </property>
     <addaction name="actionCreateView"/>
     <addaction name="separator"/>
-    <addaction name="actionRemoveView"/>
+    <addaction name="actionEditView"/>
     <addaction name="separator"/>
     <addaction name="actionScreenshot"/>
+    <addaction name="separator"/>
+    <addaction name="actionRemoveView"/>
    </widget>
    <addaction name="menuMaxDesigner"/>
    <addaction name="menuFile"/>
@@ -311,12 +314,15 @@
     <string>Ctrl+M</string>
    </property>
   </action>
-  <action name="actionSaveComponent">
+  <action name="actionCloseComponent">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Save Component</string>
+    <string>Close Component</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
    </property>
   </action>
   <action name="actionSaveView">
@@ -325,6 +331,22 @@
    </property>
    <property name="text">
     <string>Save View</string>
+   </property>
+  </action>
+  <action name="actionEditComponent">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Edit Component</string>
+   </property>
+  </action>
+  <action name="actionEditView">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Edit View</string>
    </property>
   </action>
  </widget>

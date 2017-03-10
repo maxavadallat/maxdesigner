@@ -43,6 +43,7 @@ DControl {
 
             ctx.beginPath();
 
+            ctx.lineCap = "round";
             ctx.lineWidth = Style.activityIndicatorLineWidth;
             ctx.strokeStyle = "white";
 

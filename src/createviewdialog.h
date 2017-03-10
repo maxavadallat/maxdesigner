@@ -48,6 +48,11 @@ public:
 private slots:
     // On View Name Text Editor Text Changed Slot
     void on_viewNameEdit_textChanged(const QString& arg1);
+    // Base Type Combo Box Current index Changed Slot
+    void on_baseTypeComboBox_currentIndexChanged(int index);
+    // Base Type Combo Box Current Index Changed Slot
+    void on_componentTypeComboBox_currentIndexChanged(int index);
+
 
 private: // Data
     // UI

@@ -41,6 +41,10 @@ DContainer {
 
     property int resetWidth: 0
 
+    property bool focusOnShow: false
+    property bool enableSizeOverlayOnShow: false
+    property bool enableScaling: false
+
     property bool transitioning: false
 
     property int hiddenX: {
@@ -76,10 +80,17 @@ DContainer {
 
     property alias topMouseAreaVisible: topMouseArea.visible
 
+    property int scaleDuration: 0
+    property real previousScale: 1.0
+
+    Behavior on scale { DAnimation { duration: scaleDuration; easing.type: Easing.Linear } }
+
     enableSizeOverlay: false
     enablePosOverlay: false
 
     clipContent: false
+
+    property bool destroyOnResetFinished: false
 
     property Connections parentConnections: Connections {
         target: parent
@@ -132,8 +143,11 @@ DContainer {
 
     onPressed: {
         //console.log("DPaneBase.onPressed");
-        // Set Drag Target - ASSUMING Parent is MainGrabArea
-        parent.setDragTarget(paneBaseRoot);
+        // Check Set Drag Target
+        if (paneBaseRoot.parent.setDragTarget !== undefined) {
+            // Set Drag Target - ASSUMING Parent is MainGrabArea
+            paneBaseRoot.parent.setDragTarget(paneBaseRoot);
+        }
     }
 
     onReleased: {
@@ -143,11 +157,15 @@ DContainer {
     }
 
     onResizePressed: {
-        paneBaseRoot.parent.setDragTarget(paneBaseRoot);
+        // Check Set Drag Target
+        if (paneBaseRoot.parent.setDragTarget !== undefined) {
+            // Set Drag Target
+            paneBaseRoot.parent.setDragTarget(paneBaseRoot);
+        }
     }
 
     // Reset To Create State
-    function reset() {
+    function reset(destroyOnFinished) {
         // Check Hide To Sie
         if (paneBaseRoot.hideToSide === paneBaseRoot.hideToLeft || paneBaseRoot.hideToSide === paneBaseRoot.hideToBottom) {
             // Set Reset Width
@@ -157,7 +175,10 @@ DContainer {
             paneBaseRoot.resetWidth = paneBaseRoot.initialX - paneBaseRoot.x;
         }
 
-        //console.log("DPaneBase.reset - resetWidth: " + resetWidth);
+        // Set Destroy On Finished
+        paneBaseRoot.destroyOnResetFinished = destroyOnFinished;
+
+        //console.log("DPaneBase.reset - destroyOnFinished: " + destroyOnFinished);
 
         // Set State
         paneBaseRoot.state = stateCreate;
@@ -194,15 +215,23 @@ DContainer {
 
         onPressed: {
             //console.log("DPaneBase.topMouseArea.onPressed");
-            // Set Drag Target - ASSUMING Parent is MainGrabArea
-            paneBaseRoot.parent.setDragTarget(paneBaseRoot);
+            // Check Set Drag Target
+            if (paneBaseRoot.parent.setDragTarget !== undefined) {
+                // Set Drag Target - ASSUMING Parent is MainGrabArea
+                paneBaseRoot.parent.setDragTarget(paneBaseRoot);
+            }
+
             mouse.accepted = false;
         }
 
         onReleased: {
             //console.log("DPaneBase.topMouseArea.onReleased");
-            // Set Drag Target - ASSUMING Parent is MainGrabArea
-            paneBaseRoot.parent.clearDragTarget();
+            // Check Clear Drag Target
+            if (paneBaseRoot.parent.clearDragTarget !== undefined) {
+                // Set Drag Target - ASSUMING Parent is MainGrabArea
+                paneBaseRoot.parent.clearDragTarget();
+            }
+
             mouse.accepted = false;
         }
     }
@@ -361,8 +390,6 @@ DContainer {
 
                 PauseAnimation { duration: 200 }
 
-                PropertyAction { target: paneBaseRoot; property: "focus"; value: true }
-
                 PropertyAction { target: paneBaseRoot; property: "height"; value: 1 }
                 PropertyAction { target: paneBaseRoot; property: "x"; value: paneBaseRoot.initialX }
                 PropertyAction { target: paneBaseRoot; property: "y"; value: paneBaseRoot.initialY }
@@ -389,6 +416,9 @@ DContainer {
                 PropertyAction { target: titleTextLabel; property: "opacity"; value: 1.0 }
                 PropertyAction { target: hideShowButton; property: "opacity"; value: 1.0 }
 
+                PropertyAction { target: paneBaseRoot; property: "enableSizeOverlay"; value: paneBaseRoot.enableSizeOverlayOnShow }
+                PropertyAction { target: paneBaseRoot; property: "focus"; value: paneBaseRoot.focusOnShow }
+
                 PropertyAction { target: paneBaseRoot; property: "transitioning"; value: false }
             }
         },
@@ -401,6 +431,7 @@ DContainer {
 
                 PropertyAction { target: paneBaseRoot; property: "transitioning"; value: true }
 
+                PropertyAction { target: paneBaseRoot; property: "enableSizeOverlay"; value: false }
                 PropertyAction { target: titleTextLabel; property: "opacity"; value: 0.0 }
                 PropertyAction { target: hideShowButton; property: "opacity"; value: 0.0 }
 
@@ -425,6 +456,22 @@ DContainer {
                 // ...
 
                 PropertyAction { target: paneBaseRoot; property: "transitioning"; value: false }
+
+                ScriptAction {
+                    script: {
+                        // Check Destroy On Finished
+                        if (paneBaseRoot.destroyOnResetFinished) {
+                            // Check Focused Component
+                            if (propertiesController.focusedComponent === componentInfo) {
+                                // Reset Focused
+                                propertiesController.focusedComponent = null;
+                            }
+
+                            // Destroy
+                            paneBaseRoot.destroy();
+                        }
+                    }
+                }
             }
         },
 
