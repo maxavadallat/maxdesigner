@@ -29,6 +29,8 @@ DControl {
 //        treeView.collapse(mi);
 //    }
 
+    signal itemDoubleClicked(var index)
+
     // Collapse All Items
     function collapseAll() {
 
@@ -67,8 +69,9 @@ DControl {
                 expand(index);
                 // Check Expanded
                 if (!expanded(index)) {
-                    // ...
-                    console.log("DTreeView.treeView.onDoubleClicked - index: " + index);
+                    //console.log("DTreeView.treeView.onDoubleClicked - index: " + index);
+                    // Emit Item Double Clicked Signal
+                    treeRoot.itemDoubleClicked(index);
                 }
             }
         }

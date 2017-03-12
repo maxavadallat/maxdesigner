@@ -13,7 +13,7 @@ DPaneBase {
 
     property bool explodingMode: false
 
-    property QtObject componentInfo: null
+    property ComponentInfo componentInfo: null
 
     title: "Component" + (componentInfo ? (" - " + componentInfo.componentName  ) : "")
 
@@ -49,6 +49,7 @@ DPaneBase {
             DText {
                 id: titleLabel
                 anchors.centerIn: parent
+                text: componentInfo ? componentInfo.componentName : ""
             }
         }
     }
@@ -70,6 +71,7 @@ DPaneBase {
     // Properties Controller Connection
     property Connections propertiesControllerConnection: Connections {
         target: propertiesController
+
     }
 
     // Open Files Model Connection
@@ -83,6 +85,8 @@ DPaneBase {
             if (compoenntRootContainerRoot.componentInfo.infoPath === aFilePath) {
                 // Set Focus
                 compoenntRootContainerRoot.focus = true;
+                // Bring To Front
+                compoenntRootContainerRoot.parent.bringToFront(compoenntRootContainerRoot);
             }
 
             // ...
@@ -124,6 +128,10 @@ DPaneBase {
 
             // Set Focused Component
             propertiesController.focusedComponent = compoenntRootContainerRoot.componentInfo;
+
+            // Set Focused File
+            openFilesModel.focusedFile = compoenntRootContainerRoot.componentInfo ? compoenntRootContainerRoot.componentInfo.infoPath : "";
+
         } else {
             // Reset Focused Component
             //propertiesController.focusedComponent = null;
@@ -142,14 +150,19 @@ DPaneBase {
     }
 
     onWidthChanged: {
-        baseCanvas.requestPaint();
+        //baseCanvas.requestPaint();
 
-        //propertiesController.requestCWidth()
+        // Request Width Change
+        propertiesController.requestCWidth(compoenntRootContainerRoot.width);
 
         // ...
     }
 
     onHeightChanged: {
+        //baseCanvas.requestPaint();
+
+        // Request Height Change
+        propertiesController.requestCHeight(compoenntRootContainerRoot.height);
 
         // ...
     }
@@ -225,6 +238,12 @@ DPaneBase {
         }
 
         onDropped: {
+            // Check Source
+            if (drop.source === null) {
+                console.warn("DComponentRootContainer.dropArea.onDropped - NULL SOURCE!!");
+                return;
+            }
+
             console.log("DComponentRootContainer.dropArea.onDropped - source: " + drop.source);
 
             // Reset Hovering

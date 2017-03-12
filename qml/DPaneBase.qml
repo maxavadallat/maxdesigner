@@ -85,16 +85,19 @@ DContainer {
 
     Behavior on scale { DAnimation { duration: scaleDuration; easing.type: Easing.Linear } }
 
-    enableSizeOverlay: false
-    enablePosOverlay: false
-
-    clipContent: false
-
     property bool destroyOnResetFinished: false
 
     property Connections parentConnections: Connections {
         target: parent
     }
+
+    enableSizeOverlay: false
+    enablePosOverlay: false
+
+    clipContent: false
+
+    signal transitionFinished(var newState)
+
 
     onXChanged: {
 //        // Check State
@@ -420,6 +423,13 @@ DContainer {
                 PropertyAction { target: paneBaseRoot; property: "focus"; value: paneBaseRoot.focusOnShow }
 
                 PropertyAction { target: paneBaseRoot; property: "transitioning"; value: false }
+
+                ScriptAction {
+                    script: {
+                        // Emit Transition Finished Signal
+                        transitionFinished(stateShown);
+                    }
+                }
             }
         },
 
@@ -456,6 +466,13 @@ DContainer {
                 // ...
 
                 PropertyAction { target: paneBaseRoot; property: "transitioning"; value: false }
+
+                ScriptAction {
+                    script: {
+                        // Emit Transition Finished Signal
+                        transitionFinished(stateCreate);
+                    }
+                }
 
                 ScriptAction {
                     script: {

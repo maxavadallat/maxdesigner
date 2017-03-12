@@ -19,6 +19,7 @@ class OpenFilesModel : public QAbstractListModel
 
     Q_PROPERTY(bool busy READ busy WRITE setBusy NOTIFY busyChanged)
     Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
+    Q_PROPERTY(QString focusedFile READ focusedFile WRITE setFocusedFile NOTIFY focusedFileChanged)
 
 public:
     // Constructor
@@ -27,15 +28,24 @@ public:
     // Set Project Model
     void setProjectModel(ProjectModel* aProject);
 
+    // Close Project
+    void closeProjectModel();
+
     // Get Busy State
     bool busy();
 
     // Get Current Index
     int currentIndex();
-    // Set Current Index
-    void setCurrentIndex(const int& aCurrentIndex);
+
+    // Get Focused File
+    QString focusedFile();
+    // Set Focused File
+    void setFocusedFile(const QString& aFilePath);
+
+    // ...
+
     // Open File
-    Q_INVOKABLE int openFile(const QString& aFilePath);
+    Q_INVOKABLE int openFile(const QString& aFilePath, const bool& aComponent = false);
     // Close File
     Q_INVOKABLE void closeFile(const int& aIndex);
     // Close File
@@ -69,6 +79,9 @@ signals:
     // Current Index Changed Signal
     void currentIndexChanged(const int& aCurrentIndex);
 
+    // Focused File Changed Signal
+    void focusedFileChanged(const QString& aFilePath);
+
     // File Closed Signal
     void fileClosed(const QString& aFilePath);
     // Component Closed Signal
@@ -82,6 +95,8 @@ private:
 
     // Set Busy State
     void setBusy(const bool& aBusy);
+    // Set Current Index
+    void setCurrentIndex(const int& aCurrentIndex);
 
     // Open RecentFiles
     void openRecentFiles();
@@ -89,7 +104,7 @@ private:
     void saveRecentFiles();
 
     // Get Compoennt index
-    int compoenntIndex(ComponentInfo* aComponent);
+    int componentIndex(ComponentInfo* aComponent);
 
 public: // from QAbstractListModel
     // Row Count
@@ -118,6 +133,9 @@ private: // Data
 //    QMap<ComponentInfo*, int>   mComponentMap;
     // Current Index
     int                         mCurrentIndex;
+
+    // Focused File
+    QString                     mFocusedFile;
 };
 
 #endif // OPENFILESMODEL_H

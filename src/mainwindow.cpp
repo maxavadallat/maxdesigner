@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget* aParent)
     , mEventFilter(NULL)
 
     , mProjectTreeModel(NULL)
-    , mOpenfiles(NULL)
+    , mOpenFiles(NULL)
 
     , mRecentProjects(NULL)
 
@@ -105,9 +105,13 @@ void MainWindow::init()
     }
 
     // Check Open File Model
-    if (!mOpenfiles) {
+    if (!mOpenFiles) {
         // Create Open Files Model
-        mOpenfiles = new OpenFilesModel();
+        mOpenFiles = new OpenFilesModel();
+
+        // Connect Signals
+        connect(mOpenFiles, SIGNAL(fileOpened(QString)), this, SLOT(fileOpened(QString)));
+        connect(mOpenFiles, SIGNAL(fileSelected(QString)), this, SLOT(fileSelected(QString)));
     }
 
     // Check Recent Projects Model
@@ -141,7 +145,7 @@ void MainWindow::init()
     // Set Context Properties - Project Tree Model
     ctx->setContextProperty(MODEL_NAME_PROJECT_TREE, mProjectTreeModel);
     // Set Context Properties - Open Files List Model
-    ctx->setContextProperty(MODEL_NAME_OPEN_FILES, mOpenfiles);
+    ctx->setContextProperty(MODEL_NAME_OPEN_FILES, mOpenFiles);
     // Set Context Properties - Recent Projects List Model
     ctx->setContextProperty(MODEL_NAME_RECENT_PROJECTS, mRecentProjects);
 
@@ -384,6 +388,12 @@ void MainWindow::openProject(const QString& aFilePath)
             mProjectTreeModel->setCurrentPath(mProjectModel->projectDir());
         }
 
+        // Check Open Fies Model
+        if (mOpenFiles) {
+            // Set Current Project
+            mOpenFiles->setProjectModel(mProjectModel);
+        }
+
         // Emit Current Project Changed Signal
         emit currentProjectChanged(mProjectModel);
 
@@ -473,6 +483,12 @@ void MainWindow::launchCreateNewProject()
     if (mProjectPropertiesDiaog->exec()) {
         // Create New Project
         createNewProject();
+    }
+
+    // Check Open Files Model
+    if (mOpenFiles && mProjectModel) {
+        // Close File
+        mOpenFiles->closeFile(mProjectModel->absoluteProjectFilePath());
     }
 
     // Grab Keyboard Focus
@@ -579,10 +595,19 @@ void MainWindow::launchProjectProperties()
     // Set Plugin Paths
     mProjectPropertiesDiaog->setPluginPaths(mProjectModel->pluginPaths());
 
+    // Get Last Project Path
+    QString lastProjectPath = mProjectModel->absoluteProjectFilePath();
+
     // Exec Dialog
     if (mProjectPropertiesDiaog->exec()) {
         // Set Project Properties
         updateProject();
+    }
+
+    // Check Open Files Model
+    if (mOpenFiles) {
+        // Close File
+        mOpenFiles->closeFile(lastProjectPath);
     }
 
     // Grab Keyboard Focus
@@ -749,6 +774,9 @@ void MainWindow::createNewProject()
         // Update Project
         updateProject();
 
+        // Save Project
+        saveProject();
+
         // ...
 
         // Enable Save Project Menu Item
@@ -770,6 +798,12 @@ void MainWindow::createNewProject()
         if (mProjectTreeModel) {
             // Set Current Path
             mProjectTreeModel->setCurrentPath(mProjectModel->projectDir());
+        }
+
+        // Check Open Fies Model
+        if (mOpenFiles) {
+            // Set Current Project
+            mOpenFiles->setProjectModel(mProjectModel);
         }
 
         // Emit Current Project chnged Signal
@@ -818,7 +852,18 @@ void MainWindow::createNewComponent(const QString& aName,
 
         } else {
             qWarning() << "MainWindow::createNewComponent - UNSUPPORTED COMPONENT TYPE!";
+            return;
         }
+
+        // Save New Component
+        newComponent->save();
+
+        // Open Component
+        if (mOpenFiles) {
+            // Open Component
+            mOpenFiles->openComponent(newComponent);
+        }
+
     } else {
         qWarning() << "MainWindow::createNewComponent - EMPTY COMPONENT NAME!";
     }
@@ -913,13 +958,13 @@ void MainWindow::updateComponent()
 //==============================================================================
 void MainWindow::closeProject()
 {
-    // Save Project
-    saveProject();
-
     // Check Project Model
     if (!mProjectModel) {
         return;
     }
+
+    // Save Project
+    saveProject();
 
     qDebug() << "MainWindow::closeProject";
 
@@ -933,6 +978,18 @@ void MainWindow::closeProject()
 //    disconnect(mProjectModel, SIGNAL(baseComponentCreated(ComponentInfo*)), this, SLOT(baseComponentCreated(ComponentInfo*)));
 //    disconnect(mProjectModel, SIGNAL(componentCreated(ComponentInfo*)), this, SLOT(componentCreated(ComponentInfo*)));
 //    disconnect(mProjectModel, SIGNAL(viewCreated(ComponentInfo*)), this, SLOT(viewCreated(ComponentInfo*)));
+
+    // Check Project Tree Model
+    if (mProjectTreeModel) {
+        // Set Current Path
+        //mProjectTreeModel->setCurrentPath(QDir::homePath());
+    }
+
+    // Check Open Fies Model
+    if (mOpenFiles) {
+        // Close Current Project
+        mOpenFiles->closeProjectModel();
+    }
 
     // Delete Project Model
     delete mProjectModel;
@@ -1236,6 +1293,40 @@ void MainWindow::viewCreated(ComponentInfo* aComponent)
 }
 
 //==============================================================================
+// File Opened Slot
+//==============================================================================
+void MainWindow::fileOpened(const QString& aFilePath)
+{
+    //qDebug() << "MainWindow::fileOpened - aFilePath: " << aFilePath;
+
+    // Check Project Model
+    if (mProjectModel) {
+        // Check Project Model Path
+        if (mProjectModel->absoluteProjectFilePath() == aFilePath) {
+            // Launch Project Properties
+            launchProjectProperties();
+        }
+    }
+}
+
+//==============================================================================
+// File Selected Slot
+//==============================================================================
+void MainWindow::fileSelected(const QString& aFilePath)
+{
+    //qDebug() << "MainWindow::fileSelected - aFilePath: " << aFilePath;
+
+    // Check Project Model
+    if (mProjectModel) {
+        // Check Project Model Path
+        if (mProjectModel->absoluteProjectFilePath() == aFilePath) {
+            // Launch Project Properties
+            launchProjectProperties();
+        }
+    }
+}
+
+//==============================================================================
 // Action About Triggered Slot
 //==============================================================================
 void MainWindow::on_actionAbout_triggered()
@@ -1450,17 +1541,13 @@ bool MainWindow::event(QEvent* aEvent)
         switch (aEvent->type()) {
             case QEvent::WindowStateChange: {
                 // Get Window State Change Event
-                QWindowStateChangeEvent* wsChangeEvent = static_cast<QWindowStateChangeEvent*>(aEvent);
-
-                qDebug() << "#### MainWindow::event - oldState: " << wsChangeEvent->oldState() << " - windowState: " << windowState();
-
+                //QWindowStateChangeEvent* wsChangeEvent = static_cast<QWindowStateChangeEvent*>(aEvent);
+                //qDebug() << "MainWindow::event - oldState: " << wsChangeEvent->oldState() << " - windowState: " << windowState();
                 // Check Settings
                 if (mSettings) {
                     // Store Main Window State
                     mSettings->setMainWindowState((int)windowState());
                 }
-                // ...
-
             } break;
 
             default:
@@ -1477,15 +1564,15 @@ bool MainWindow::event(QEvent* aEvent)
 //==============================================================================
 MainWindow::~MainWindow()
 {
+    // Close Project
+    closeProject();
+
     // Delete UI
     delete ui->mainQuickWidget;
     delete ui;
 
     // Release Settings
     mSettings->release();
-
-    // Close Project
-    closeProject();
 
     if (mEventFilter) {
         delete mEventFilter;
@@ -1497,9 +1584,9 @@ MainWindow::~MainWindow()
         mProjectTreeModel = NULL;
     }
 
-    if (mOpenfiles) {
-        delete mOpenfiles;
-        mOpenfiles = NULL;
+    if (mOpenFiles) {
+        delete mOpenFiles;
+        mOpenFiles = NULL;
     }
 
     if (mRecentProjects) {

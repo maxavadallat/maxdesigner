@@ -36,14 +36,17 @@ void BaseComponentsModel::init()
 //==============================================================================
 void BaseComponentsModel::clear()
 {
+    //qDebug() << "BaseComponentsModel::clear";
+
     // Begin Reset Model
     beginResetModel();
 
     // Iterate Through Base Component List
     while (mBaseComponentList.count() > 0) {
-        // Delete Last
+        // Delete Last Item
         delete mBaseComponentList.takeLast();
     }
+
     // End Reset Model
     endResetModel();
 }
@@ -208,6 +211,19 @@ ComponentInfo* BaseComponentsModel::getComponent(const QString& aName)
         if (component->componentName() == aName) {
             return component;
         }
+    }
+
+    return NULL;
+}
+
+//==============================================================================
+// Get Compoennt By Index
+//==============================================================================
+ComponentInfo* BaseComponentsModel::getComponentByIndex(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < mBaseComponentList.count()) {
+        return mBaseComponentList[aIndex];
     }
 
     return NULL;

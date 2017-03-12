@@ -44,9 +44,12 @@ ComponentInfo* ComponentInfo::clone()
 {
     // Create Component Info
     ComponentInfo* newComponent = new ComponentInfo(mName, mType, mCategory, mProject, mBaseName);
-
     // Set ProtoType
     newComponent->mProtoType = false;
+    // Set Is Root
+    newComponent->mIsRoot = false;
+    // Set Dirty
+    //newComponent->mDirty = false;
 
     // ...
 
@@ -73,7 +76,7 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mCategory(aCategory)
     , mBaseName(aBaseName)
     , mFocused(false)
-    , mIsRoot(false)
+    , mIsRoot(true)
     , mBase(mProject ? mProject->getComponentByName(mBaseName) : NULL)
     , mParent(NULL)
 {
@@ -132,8 +135,20 @@ void ComponentInfo::clear()
 {
     qDebug() << "ComponentInfo::clear";
 
-
     // Clear Children
+    clearChildren();
+}
+
+//==============================================================================
+// Clear Children
+//==============================================================================
+void ComponentInfo::clearChildren()
+{
+    // Iterate Through Children
+    while (mChildren.count() > 0) {
+        // Delete Last
+        delete mChildren.takeLast();
+    }
 }
 
 //==============================================================================
@@ -322,6 +337,28 @@ void ComponentInfo::setComponentBase(const QString& aBaseName)
 }
 
 //==============================================================================
+// Get Component Parent
+//==============================================================================
+ComponentInfo* ComponentInfo::componentParent()
+{
+    return mParent;
+}
+
+//==============================================================================
+// Set Component Parent
+//==============================================================================
+void ComponentInfo::setComponentParent(ComponentInfo* aParent)
+{
+    // Check Parent
+    if (mParent != aParent) {
+        // Set Parent
+        mParent = aParent;
+        // Emit Parent Changed Signal
+        emit componentParentChanged(mParent);
+    }
+}
+
+//==============================================================================
 // Get Focused State
 //==============================================================================
 bool ComponentInfo::focused()
@@ -366,19 +403,35 @@ void ComponentInfo::setIsRoot(const bool& aRoot)
 }
 
 //==============================================================================
-// Get QML Source Path
-//==============================================================================
-QString ComponentInfo::sourcePath()
-{
-    return mQMLPath;
-}
-
-//==============================================================================
 // Get Component Info Path
 //==============================================================================
 QString ComponentInfo::infoPath()
 {
     return mInfoPath;
+}
+
+//==============================================================================
+// Set Info Path
+//==============================================================================
+void ComponentInfo::setInfoPath(const QString& aInfoPath)
+{
+    // Check Info Path
+    if (mInfoPath != aInfoPath) {
+        // Set Info Path
+        mInfoPath = aInfoPath;
+        // Emit Info Path Changed Signal
+        emit infoPathChanged(mInfoPath);
+        // Set Dirty
+        setDirty(true);
+    }
+}
+
+//==============================================================================
+// Get QML Source Path
+//==============================================================================
+QString ComponentInfo::sourcePath()
+{
+    return mQMLPath;
 }
 
 //==============================================================================
@@ -396,19 +449,146 @@ void ComponentInfo::setSourcePath(const QString& aPath)
 }
 
 //==============================================================================
-// Set Info Path
+// Get Component ID
 //==============================================================================
-void ComponentInfo::setInfoPath(const QString& aInfoPath)
+QString ComponentInfo::componentID()
 {
-    // Check Info Path
-    if (mInfoPath != aInfoPath) {
-        // Set Info Path
-        mInfoPath = aInfoPath;
-        // Emit Info Path Changed Signal
-        emit infoPathChanged(mInfoPath);
-        // Set Dirty
-        setDirty(true);
+    return componentProperty(JSON_KEY_COMPONENT_PROPERTY_ID).toString();
+}
+
+//==============================================================================
+// Set Component ID
+//==============================================================================
+void ComponentInfo::setComponentID(const QString& aID)
+{
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_ID, aID);
+}
+
+//==============================================================================
+// Get Object Name
+//==============================================================================
+QString ComponentInfo::componentObjectName()
+{
+    return componentProperty(JSON_KEY_COMPONENT_PROPERTY_OBJECT_NAME).toString();
+}
+
+//==============================================================================
+// Set Object Name
+//==============================================================================
+void ComponentInfo::setComponentObjectName(const QString& aObjectName)
+{
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_OBJECT_NAME, aObjectName);
+}
+
+//==============================================================================
+// Get Pos X
+//==============================================================================
+QString ComponentInfo::posX()
+{
+    return componentProperty(JSON_KEY_COMPONENT_PROPERTY_X).toString();
+}
+
+//==============================================================================
+// Set Pos X
+//==============================================================================
+void ComponentInfo::setPosX(const QString& aPosX)
+{
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_X, aPosX);
+}
+
+//==============================================================================
+// Get Pos Y
+//==============================================================================
+QString ComponentInfo::posY()
+{
+    return componentProperty(JSON_KEY_COMPONENT_PROPERTY_Y).toString();
+}
+
+//==============================================================================
+// Set Pos Y
+//==============================================================================
+void ComponentInfo::setPosY(const QString& aPosY)
+{
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Y, aPosY);
+}
+
+//==============================================================================
+// Get Pos Z
+//==============================================================================
+QString ComponentInfo::posZ()
+{
+    return componentProperty(JSON_KEY_COMPONENT_PROPERTY_Z).toString();
+}
+
+//==============================================================================
+// Set Pos Z
+//==============================================================================
+void ComponentInfo::setPosZ(const QString& aPosZ)
+{
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Z, aPosZ);
+}
+
+//==============================================================================
+// Get Width
+//==============================================================================
+QString ComponentInfo::width()
+{
+    return componentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH).toString();
+}
+
+//==============================================================================
+// Set Width
+//==============================================================================
+void ComponentInfo::setWidth(const QString& aWidth)
+{
+    // Set Property - Width
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
+    // Emit Width Changed Signal
+    emit widthChanged(componentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH).toString());
+}
+
+//==============================================================================
+// Get Height
+//==============================================================================
+QString ComponentInfo::height()
+{
+    return componentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT).toString();
+}
+
+//==============================================================================
+// Set Height
+//==============================================================================
+void ComponentInfo::setHeight(const QString& aHeight)
+{
+    // Set Property - Height
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
+    // Emit Height Changed Signal
+    emit heightChanged(componentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT).toString());
+}
+
+//==============================================================================
+// Get Properties
+//==============================================================================
+QStringList ComponentInfo::componentProperties()
+{
+    // Init Property Keys
+    QStringList propertyKeys = mOwnProperties.keys();
+
+    // Check Base
+    if (mBase) {
+        // Add Properties
+        propertyKeys += mBase->componentProperties();
     }
+
+    return propertyKeys;
+}
+
+//==============================================================================
+// Get Dynamic Properties
+//==============================================================================
+QList<QByteArray> ComponentInfo::dynamicProperties()
+{
+    return dynamicPropertyNames();
 }
 
 //==============================================================================
@@ -522,28 +702,32 @@ QJsonObject ComponentInfo::toJSONObject()
         ciObject[JSON_KEY_COMPONENT_PARENT]     = mParent->componentName();
     }
 
+    // Set Signals
+    ciObject[JSON_KEY_COMPONENT_SIGNALS]        = mSignals;
+
     // Set States
+    ciObject[JSON_KEY_COMPONENT_STATES]         = mStates;
 
     // Set Transitions
+    ciObject[JSON_KEY_COMPONENT_TRANSITIONS]    = mTransitions;
 
+    // Get Children Count
+    int cCount = mChildren.count();
 
-//    // Get Children Count
-//    int cCount = mChildren.count();
+    // Check Children
+    if (cCount > 0) {
+        // Init Children Array
+        QJsonArray cArray;
 
-//    // Check Children
-//    if (cCount > 0) {
-//        // Init Children Array
-//        QJsonArray cArray;
+        // Iterate Through Children Array
+        for (int i=0; i<cCount; i++) {
+            // Append Child
+            cArray << mChildren[i]->toJSONObject();
+        }
 
-//        // Iterate Through Children Array
-//        for (int i=0; i<cCount; i++) {
-//            // Append Child
-//            cArray << mChildren[i]->toJSONObject();
-//        }
-
-//        // Save Children
-//        ciObject[JSON_KEY_COMPONENT_CHILDREN] = cArray;
-//    }
+        // Save Children
+        ciObject[JSON_KEY_COMPONENT_CHILDREN] = cArray;
+    }
 
     // ...
 
@@ -562,6 +746,65 @@ QByteArray ComponentInfo::toJSONContent()
 }
 
 //==============================================================================
+// Set Up From JSON Object
+//==============================================================================
+void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
+{
+    // Set Component Name
+    setComponentName(aObject[JSON_KEY_COMPONENT_NAME].toString());
+    // Set Component Type
+    setComponentType(aObject[JSON_KEY_COMPONENT_TYPE].toString());
+    // Set Component Category
+    setComponentCategory(aObject[JSON_KEY_COMPONENT_CATEGORY].toString());
+    // Set Component Base Name
+    setComponentBase(aObject[JSON_KEY_COMPONENT_BASE].toString());
+
+    // ...
+
+    // Set Own Properties
+    mOwnProperties = aObject[JSON_KEY_COMPONENT_OWN_PROPERTIES].toObject();
+    // Set Properties
+    mProperties = aObject[JSON_KEY_COMPONENT_PROPERTIES].toObject();
+
+    // Set Base
+    mBase = mProject ? mProject->getComponentByName(mBaseName) : NULL;
+    // Set Parent
+    mParent = mProject ? mProject->getComponentByName(aObject[JSON_KEY_COMPONENT_PARENT].toString()) : NULL;
+
+    // Set Signals
+    mSignals = aObject[JSON_KEY_COMPONENT_SIGNALS].toArray();
+    // States
+    mStates = aObject[JSON_KEY_COMPONENT_STATES].toArray();
+    // Transitions
+    mTransitions = aObject[JSON_KEY_COMPONENT_TRANSITIONS].toArray();
+
+    // Set Children
+    QJsonArray childrenArray = aObject[JSON_KEY_COMPONENT_CHILDREN].toArray();
+    // Get Children Array Count
+    int caCount = childrenArray.count();
+    // Iterate Through Children Array
+    for (int i=0; i<caCount; i++) {
+        // Get Array Item
+        QJsonObject childObject = childrenArray[i].toObject();
+        // Get Child Component Name
+        QString ccName = childObject[JSON_KEY_COMPONENT_NAME].toString();
+        // Get Compoennt ProtoType
+        ComponentInfo* componentProtoType = mProject ? mProject->getComponentByName(ccName) : NULL;
+        // Check Child Component
+        if (componentProtoType) {
+            // Clone Component
+            ComponentInfo* childComponent = componentProtoType->clone();
+            // Set Up Child Component
+            childComponent->fromJSONObject(childObject);
+            // Add To Children
+            mChildren << childComponent;
+        } else {
+            qWarning() << "ComponentInfo::fromJSON - ccName: " << ccName << " - NO COMPONENT!!";
+        }
+    }
+}
+
+//==============================================================================
 // Set Up Component From JSON Content/String
 //==============================================================================
 void ComponentInfo::fromJSON(const QByteArray& aContent)
@@ -571,30 +814,8 @@ void ComponentInfo::fromJSON(const QByteArray& aContent)
     // Init JSON Object
     QJsonObject ciObject = ciDocument.object();
 
-    // Set Component Name
-    setComponentName(ciObject[JSON_KEY_COMPONENT_NAME].toString());
-    // Set Component Type
-    setComponentType(ciObject[JSON_KEY_COMPONENT_TYPE].toString());
-    // Set Component Category
-    setComponentCategory(ciObject[JSON_KEY_COMPONENT_CATEGORY].toString());
-    // Set Component Base Name
-    setComponentBase(ciObject[JSON_KEY_COMPONENT_BASE].toString());
-
-    // ...
-
-    // Set Own Properties
-    mOwnProperties = ciObject[JSON_KEY_COMPONENT_OWN_PROPERTIES].toObject();
-    // Set Properties
-    mProperties = ciObject[JSON_KEY_COMPONENT_PROPERTIES].toObject();
-
-    // Set Base
-    mBase = mProject->getComponentByName(mBaseName);
-    // Set Parent
-    mParent = mProject->getComponentByName(ciObject[JSON_KEY_COMPONENT_PARENT].toString());
-
-    // Set Children
-
-    // ...
+    // From JSON Object
+    fromJSONObject(ciObject);
 }
 
 //==============================================================================
@@ -610,40 +831,16 @@ void ComponentInfo::requestClose()
 }
 
 //==============================================================================
-// Add Propery
-//==============================================================================
-void ComponentInfo::addProperty(const QString& aName, const QVariant& aValue)
-{
-    mOwnProperties[aName] = aValue.toJsonValue();
-}
-
-//==============================================================================
-// Remove Property
-//==============================================================================
-void ComponentInfo::removeProperty(const QString& aName)
-{
-    // Get Keys
-    QStringList opKeys = mOwnProperties.keys();
-    // Get Property Index
-    int opIndex = opKeys.indexOf(aName);
-    // Check Own Property Index
-    if (opIndex >= 0) {
-        // Remove Value
-        mProperties.remove(aName);
-    }
-}
-
-//==============================================================================
 // Get Property
 //==============================================================================
 QVariant ComponentInfo::componentProperty(const QString& aName)
 {
     // Check Own Properties First
     if (mOwnProperties.keys().indexOf(aName) >= 0) {
-        return mOwnProperties.value(aName);
+        return mOwnProperties[aName].toVariant();
     }
 
-    return mProperties.value(aName);
+    return mProperties[aName].toVariant();
 }
 
 //==============================================================================
@@ -651,17 +848,51 @@ QVariant ComponentInfo::componentProperty(const QString& aName)
 //==============================================================================
 void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& aValue)
 {
-    // Check Own Properties
-    if (mOwnProperties.keys().indexOf(aName) >= 0) {
-        // Set Own Properties
-        mOwnProperties[aName] = aValue.toJsonValue();
-    } else {
-        // Check Type
-        if ((mType == COMPONENT_TYPE_COMPONENT || mType == COMPONENT_TYPE_VIEW) && mBase) {
+    // Get Property Keys
+    QStringList baseProperties = mBase ? mBase->componentProperties() : QStringList();
+    // Get Base Key Index
+    int bpkIndex = baseProperties.indexOf(aName);
+    // Check Base Key Index
+    if (bpkIndex < 0) {
+        qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - OWN";
+        // Set Own Property
+        //mOwnProperties[aName] = aValue.type() == QVariant::Int ? aValue.toString() : aValue.toJsonValue();
+        mOwnProperties[aName] = aValue.toString();
 
-        } else {
-            qWarning() << "ComponentInfo::setProperty - aName: " << aName << " - NO PRORPERTY!";
-        }
+        // Set Dirty
+        setDirty(true);
+
+        return;
+    }
+
+    qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - BASE";
+
+    // Set Dirty
+    setDirty(true);
+
+    // Set Property
+    //mProperties[aName] = aValue.type() == QVariant::Int ? aValue.toString() : aValue.toJsonValue();
+    mProperties[aName] = aValue.toString();
+}
+
+//==============================================================================
+// Remove Property
+//==============================================================================
+void ComponentInfo::removeProperty(const QString& aName)
+{
+    qDebug() << "ComponentInfo::removeProperty - aName: " << aName;
+
+    // Get Keys
+    QStringList opKeys = mOwnProperties.keys();
+    // Get Property Index
+    int opIndex = opKeys.indexOf(aName);
+    // Check Own Property Index
+    if (opIndex >= 0) {
+        // Remove Value
+        mOwnProperties.remove(aName);
+    } else {
+        // Remove Value
+        mProperties.remove((aName));
     }
 }
 

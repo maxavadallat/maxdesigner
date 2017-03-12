@@ -32,8 +32,12 @@ public:
     enum class EPropertyType
     {
         EPTString   = 0,
+        EPTBool,
         EPTInt,
-        EPTDouble
+        EPTDouble,
+        EPTReal,
+        EPTVar,
+
     };
     Q_ENUM(EPropertyType)
 
@@ -87,13 +91,13 @@ public:
     Q_INVOKABLE void requestCHeight(const QString& aHeight);
 
     // Add Own Property
-    Q_INVOKABLE void addOwnProperty(const QString& aKey, PropertiesController::EPropertyType aType);
+    Q_INVOKABLE void addOwnProperty(const QString& aName, PropertiesController::EPropertyType aType);
     // Remove Own Property
-    Q_INVOKABLE void removeOwnProperty(const QString& aKey);
+    Q_INVOKABLE void removeOwnProperty(const QString& aName);
     // Set Property
-    Q_INVOKABLE void setProperty(const QString& aKey, const QString& aValue);
+    Q_INVOKABLE void setProperty(const QString& aName, const QString& aValue);
     // Clear Property
-    Q_INVOKABLE void clearProperty(const QString& aKey);
+    Q_INVOKABLE void clearProperty(const QString& aName);
 
     // Add Signal
     Q_INVOKABLE void addSignal(const QString& aSignalDef);

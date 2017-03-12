@@ -6,6 +6,8 @@ import "Constants.js" as CONSTS
 Flow {
     id: flowRoot
 
+    Behavior on height { DAnimation { } }
+
     property int cellWidth: CONSTS.componentItemWidth
     property int cellHeight: CONSTS.componentItemHeight
 

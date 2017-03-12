@@ -93,6 +93,17 @@ QModelIndex ProjectTreeModel::rootIndex()
 }
 
 //==============================================================================
+// Get Path By Index
+//==============================================================================
+QString ProjectTreeModel::getPathByIndex(const QModelIndex& aIndex)
+{
+    // Init File Info
+    QFileInfo fileInfo(data(aIndex, FilePathRole).toString());
+
+    return fileInfo.isDir() ? "" : fileInfo.absoluteFilePath();
+}
+
+//==============================================================================
 // Data
 //==============================================================================
 QVariant ProjectTreeModel::data(const QModelIndex& index, int role) const

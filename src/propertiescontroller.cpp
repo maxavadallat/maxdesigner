@@ -97,7 +97,11 @@ QString PropertiesController::cID()
 //==============================================================================
 void PropertiesController::requestCID(const QString& aID)
 {
-
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Set Component ID
+        mFocusedComponent->setComponentID(aID);
+    }
 }
 
 //==============================================================================
@@ -113,7 +117,11 @@ QString PropertiesController::cObjectName()
 //==============================================================================
 void PropertiesController::requestCObjectName(const QString& aObjectName)
 {
-
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Set Component Object Name
+        mFocusedComponent->setComponentObjectName(aObjectName);
+    }
 }
 
 //==============================================================================
@@ -129,7 +137,11 @@ QString PropertiesController::cX()
 //==============================================================================
 void PropertiesController::requestCX(const QString& aX)
 {
-
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Set Pos X
+        mFocusedComponent->setPosX(aX);
+    }
 }
 
 //==============================================================================
@@ -145,7 +157,11 @@ QString PropertiesController::cY()
 //==============================================================================
 void PropertiesController::requestCY(const QString& aY)
 {
-
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Set Pos Y
+        mFocusedComponent->setPosY(aY);
+    }
 }
 
 //==============================================================================
@@ -161,7 +177,11 @@ QString PropertiesController::cZ()
 //==============================================================================
 void PropertiesController::requestCZ(const QString& aZ)
 {
-
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Set Pos Z
+        mFocusedComponent->setPosZ(aZ);
+    }
 }
 
 //==============================================================================
@@ -177,7 +197,11 @@ QString PropertiesController::cWidth()
 //==============================================================================
 void PropertiesController::requestCWidth(const QString& aWidth)
 {
-
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Set Width
+        mFocusedComponent->setWidth(aWidth);
+    }
 }
 
 //==============================================================================
@@ -193,7 +217,11 @@ QString PropertiesController::cHeight()
 //==============================================================================
 void PropertiesController::requestCHeight(const QString& aHeight)
 {
-
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Set Height
+        mFocusedComponent->setHeight(aHeight);
+    }
 }
 
 // ...
@@ -201,49 +229,76 @@ void PropertiesController::requestCHeight(const QString& aHeight)
 //==============================================================================
 // Add Own Property
 //==============================================================================
-void PropertiesController::addOwnProperty(const QString& aKey, PropertiesController::EPropertyType aType)
+void PropertiesController::addOwnProperty(const QString& aName, PropertiesController::EPropertyType aType)
 {
     // Check Focused Component
-    if (!mFocusedComponent)
-        return;
+    if (mFocusedComponent) {
+        // Switch Type
+        switch (aType) {
+            default:
+            case PropertiesController::EPropertyType::EPTString:
+                // Set Property
+                mFocusedComponent->setComponentProperty(aName, QVariant(QVariant::String));
+            break;
 
-    // ...
+            case PropertiesController::EPropertyType::EPTBool:
+                // Set Property
+                mFocusedComponent->setComponentProperty(aName, QVariant(QVariant::Bool));
+            break;
+
+            case PropertiesController::EPropertyType::EPTInt:
+                // Set Property
+                mFocusedComponent->setComponentProperty(aName, QVariant(QVariant::Int));
+            break;
+
+            case PropertiesController::EPropertyType::EPTReal:
+            case PropertiesController::EPropertyType::EPTDouble:
+                // Set Property
+                mFocusedComponent->setComponentProperty(aName, QVariant(QVariant::Double));
+            break;
+
+            case PropertiesController::EPropertyType::EPTVar:
+                // Set Property
+                mFocusedComponent->setComponentProperty(aName, QJsonObject());
+            break;
+        }
+    }
 }
 
 //==============================================================================
 // Remove Own Property
 //==============================================================================
-void PropertiesController::removeOwnProperty(const QString& aKey)
+void PropertiesController::removeOwnProperty(const QString& aName)
 {
     // Check Focused Component
-    if (!mFocusedComponent)
-        return;
-
-    // ...
+    if (mFocusedComponent) {
+        // Remove Property
+        mFocusedComponent->removeProperty(aName);
+    }
 }
 
 //==============================================================================
 // Set Property
 //==============================================================================
-void PropertiesController::setProperty(const QString& aKey, const QString& aValue)
+void PropertiesController::setProperty(const QString& aName, const QString& aValue)
 {
     // Check Focused Component
-    if (!mFocusedComponent)
-        return;
-
-    // ...
+    if (mFocusedComponent) {
+        // Set Property
+        mFocusedComponent->setComponentProperty(aName, aValue);
+    }
 }
 
 //==============================================================================
 // Clear Property
 //==============================================================================
-void PropertiesController::clearProperty(const QString& aKey)
+void PropertiesController::clearProperty(const QString& aName)
 {
     // Check Focused Component
-    if (!mFocusedComponent)
-        return;
-
-    // ...
+    if (mFocusedComponent) {
+        // Remove Property
+        mFocusedComponent->removeProperty(aName);
+    }
 }
 
 //==============================================================================
@@ -252,10 +307,10 @@ void PropertiesController::clearProperty(const QString& aKey)
 void PropertiesController::addSignal(const QString& aSignalDef)
 {
     // Check Focused Component
-    if (!mFocusedComponent)
-        return;
+    if (mFocusedComponent) {
 
-    // ...
+        // ...
+    }
 }
 
 //==============================================================================
@@ -264,10 +319,10 @@ void PropertiesController::addSignal(const QString& aSignalDef)
 void PropertiesController::removeSignal(const QString& aSignalDef)
 {
     // Check Focused Component
-    if (!mFocusedComponent)
-        return;
+    if (mFocusedComponent) {
 
-    // ...
+        // ...
+    }
 }
 
 //==============================================================================
@@ -276,10 +331,10 @@ void PropertiesController::removeSignal(const QString& aSignalDef)
 void PropertiesController::addState(const QString& aName)
 {
     // Check Focused Component
-    if (!mFocusedComponent)
-        return;
+    if (mFocusedComponent) {
 
-    // ...
+        // ...
+    }
 }
 
 //==============================================================================
@@ -288,10 +343,10 @@ void PropertiesController::addState(const QString& aName)
 void PropertiesController::removeState(const QString& aName)
 {
     // Check Focused Component
-    if (!mFocusedComponent)
-        return;
+    if (mFocusedComponent) {
 
-    // ...
+        // ...
+    }
 }
 
 //==============================================================================
@@ -300,10 +355,10 @@ void PropertiesController::removeState(const QString& aName)
 void PropertiesController::addTransition(const QString& aFrom, const QString& aTo)
 {
     // Check Focused Component
-    if (!mFocusedComponent)
-        return;
+    if (mFocusedComponent) {
 
-    // ...
+        // ...
+    }
 }
 
 //==============================================================================
@@ -312,10 +367,10 @@ void PropertiesController::addTransition(const QString& aFrom, const QString& aT
 void PropertiesController::removeTransition(const QString& aFrom, const QString& aTo)
 {
     // Check Focused Component
-    if (!mFocusedComponent)
-        return;
+    if (mFocusedComponent) {
 
-    // ...
+        // ...
+    }
 }
 
 // ...

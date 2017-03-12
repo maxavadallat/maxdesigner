@@ -19,15 +19,16 @@ class ProjectModel : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString projectName READ projectName WRITE setProjectName NOTIFY projectNameChanged)
-    Q_PROPERTY(QString projectDir READ projectDir WRITE setProjectDir NOTIFY projectDirChanged)
-    Q_PROPERTY(QString mainQMLFile READ mainQMLFile WRITE setMainQMLFile NOTIFY mainQMLFileChanged)
-    Q_PROPERTY(QString qmlDir READ qmlDir WRITE setQmlDir NOTIFY qmlDirChanged)
-    Q_PROPERTY(QString jsDir READ jsDir WRITE setJsDir NOTIFY jsDirChanged)
-    Q_PROPERTY(QString imagesDir READ imagesDir WRITE setImagesDir NOTIFY imagesDirChanged)
-    Q_PROPERTY(QString baseComponentsDir READ baseComponentsDir WRITE setBaseComponentsDir NOTIFY baseComponentsDirChanged)
-    Q_PROPERTY(QString componentsDir READ componentsDir WRITE setComponentsDir NOTIFY componentsDirChanged)
-    Q_PROPERTY(QString viewsDir READ viewsDir WRITE setViewsDir NOTIFY viewsDirChanged)
+    Q_PROPERTY(QString projectName READ projectName NOTIFY projectNameChanged)
+    Q_PROPERTY(QString projectDir READ projectDir NOTIFY projectDirChanged)
+    Q_PROPERTY(QString projectFilePath READ absoluteProjectFilePath NOTIFY projectFilePathChanged)
+    Q_PROPERTY(QString mainQMLFile READ mainQMLFile NOTIFY mainQMLFileChanged)
+    Q_PROPERTY(QString qmlDir READ qmlDir NOTIFY qmlDirChanged)
+    Q_PROPERTY(QString jsDir READ jsDir NOTIFY jsDirChanged)
+    Q_PROPERTY(QString imagesDir READ imagesDir NOTIFY imagesDirChanged)
+    Q_PROPERTY(QString baseComponentsDir READ baseComponentsDir NOTIFY baseComponentsDirChanged)
+    Q_PROPERTY(QString componentsDir READ componentsDir NOTIFY componentsDirChanged)
+    Q_PROPERTY(QString viewsDir READ viewsDir NOTIFY viewsDirChanged)
     Q_PROPERTY(QStringList importPaths READ importPaths NOTIFY importPathsChanged)
     Q_PROPERTY(QStringList pluginPaths READ pluginPaths NOTIFY pluginPathsChanged)
 
@@ -137,6 +138,8 @@ public:
 
     // Get Component By Name
     Q_INVOKABLE ComponentInfo* getComponentByName(const QString& aName, const QString& aType = "");
+    // Get Component By File Path
+    Q_INVOKABLE ComponentInfo* getComponentByPath(const QString& aFilePath);
 
     // Destructor
     ~ProjectModel();
@@ -146,6 +149,8 @@ signals:
     void projectNameChanged(const QString& aName);
     // Poject Dir Changed Signal
     void projectDirChanged(const QString& aDir);
+    // Project File Path Changed
+    void projectFilePathChanged(const QString& aFilePath);
     // Main QML File Changed Signal
     void mainQMLFileChanged(const QString& aQMLFile);
     // QML Dir Changed Signal

@@ -10,6 +10,9 @@ Item {
 
     focus: true
 
+    // Array For Root Components
+    property var rootComponents: []
+
     // Create New Component Root
     function createNewComponentRoot(componentInfo, width, height) {
         // Incubate Object
@@ -20,7 +23,7 @@ Item {
             incubator.onStatusChanged = function(status) {
                 // Check Status
                 if (status === Component.Ready) {
-                    console.log("componentRootFactory - object: ", incubator.object, " ready!");
+                    //console.log("componentRootFactory - object: ", incubator.object, " ready!");
                     // Launch Root Component
                     launchComponentRoot(incubator.object, componentInfo, width, height);
 
@@ -29,7 +32,7 @@ Item {
                 }
             }
         } else {
-            console.log("componentRootFactory - object: ", incubator.object, " immediately ready!");
+            //console.log("componentRootFactory - object: ", incubator.object, " immediately ready!");
             // Launch Root Component
             launchComponentRoot(incubator.object, componentInfo, width, height);
         }
@@ -37,11 +40,16 @@ Item {
 
     // Launch Component Root
     function launchComponentRoot(object, componentInfo, width, height) {
+        //console.log("launchComponentRoot - componentName: " + componentInfo.componentName + " - width: " + width + " - height: " + height);
         // Set Component Info
         object.componentInfo = componentInfo;
         // Set Creation Width & Height
         object.creationWidth = width;
         object.creationHeight = height;
+
+        // Push Object To Root Components
+        mainRoot.rootComponents.push(object);
+
         // Show
         object.show();
     }
@@ -64,6 +72,19 @@ Item {
     // Launch Source Container Root
     function launchSourceRoot(object, fileName, width, height) {
 
+    }
+
+    // Close All Root Components
+    function closeRootComponents() {
+//        // Get Root Components Count
+//        var rcCount = mainRoot.rootComponents.length;
+//        // Iterate Through Root Component
+//        for (var i=0; i<rcCount; i++) {
+//            // Get Root Component
+//            var rComponent = mainRoot.rootComponents[i];
+//            // Close Root Component
+//            rComponent.reset(true);
+//        }
     }
 
     // Keys Handling
@@ -91,6 +112,10 @@ Item {
                 propertiesPane.show();
 
             } else {
+
+                // Close Root Components
+                closeRootComponents();
+
                 // Reset Project Pane
                 projectPane.reset(false);
                 // Reset Properties Pane
@@ -110,7 +135,7 @@ Item {
             // Show Project Pane
             projectPane.show();
             // Create New Component Root
-            createNewComponentRoot(aComponent, aWidth, aHeight);
+            //createNewComponentRoot(aComponent, aWidth, aHeight);
         }
 
         onComponentCreated: {
@@ -118,7 +143,7 @@ Item {
             // Show Project Pane
             projectPane.show();
             // Create New Component Root
-            createNewComponentRoot(aComponent, aWidth, aHeight);
+            //createNewComponentRoot(aComponent, aWidth, aHeight);
         }
 
         onViewCreated: {
@@ -126,10 +151,51 @@ Item {
             // Show Project Pane
             projectPane.show();
             // Create New Component Root
-            createNewComponentRoot(aComponent, aWidth, aHeight);
+            //createNewComponentRoot(aComponent, aWidth, aHeight);
         }
 
         // ...
+    }
+
+    Connections {
+        target: openFilesModel
+
+        onFileOpened: {
+            // Check Current Project Absolute File Path
+            if (mainController.currentProject !== null && mainController.currentProject.projectFilePath === aFilePath) {
+                //console.log("openFilesModel.onFileOpened - aFilePath: " + aFilePath + " - Current Project File Selected");
+
+                // Project File Opened
+                return;
+            }
+
+            console.log("openFilesModel.onFileOpened - aFilePath: " + aFilePath);
+
+            // Check Current Project
+            if (mainController.currentProject !== null) {
+                // Get Component
+                var component = mainController.currentProject.getComponentByPath(aFilePath);
+                // Check Component
+                if (component !== null) {
+                    // Open Component
+                    createNewComponentRoot(component, component.width, component.height);
+                } else {
+                    // Open Other Files
+
+                    // ...
+
+                }
+            }
+        }
+
+        onComponentOpened: {
+            //console.log("openFilesModel.onComponentOpened - aComponent: " + aComponent);
+            // Check Component
+            if (aComponent !== null) {
+                // Open Component
+                createNewComponentRoot(aComponent, aComponent.width, aComponent.height);
+            }
+        }
     }
 
     Rectangle {
@@ -235,6 +301,13 @@ Item {
 
             state: stateCreate
             //state: stateShown
+
+            onTransitionFinished: {
+                // Check New State
+                if (newState === stateShown) {
+                    // ...
+                }
+            }
         }
 
         // Properties Pane

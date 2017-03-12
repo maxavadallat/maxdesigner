@@ -112,18 +112,20 @@
 #define COMPONENT_CATEGORY_CONTAINER                        "Container"
 #define COMPONENT_CATEGORY_DELEGATE                         "Delegate"
 
-#define DEFAULT_COMPONENT_WIDTH                             128
-#define DEFAULT_COMPONENT_HEIGHT                            64
+#define DEFAULT_COMPONENT_WIDTH                             320
+#define DEFAULT_COMPONENT_HEIGHT                            200
 
 // JSON Keys for Component Info
 #define JSON_KEY_COMPONENT_NAME                             "componentName"
 #define JSON_KEY_COMPONENT_TYPE                             "componentType"
 #define JSON_KEY_COMPONENT_CATEGORY                         "componentCategory"
+#define JSON_KEY_COMPONENT_BUILTIN                          "componentBuiltIn"
 #define JSON_KEY_COMPONENT_BASE                             "componentBase"
 #define JSON_KEY_COMPONENT_OWN_PROPERTIES                   "componentOwnProperties"
 #define JSON_KEY_COMPONENT_PROPERTIES                       "componentProperties"
 #define JSON_KEY_COMPONENT_PARENT                           "componentParent"
 #define JSON_KEY_COMPONENT_CHILDREN                         "componentChildren"
+#define JSON_KEY_COMPONENT_SIGNALS                          "componentSignals"
 #define JSON_KEY_COMPONENT_STATES                           "componentStates"
 #define JSON_KEY_COMPONENT_TRANSITIONS                      "componentTransitions"
 #define JSON_KEY_COMPONENT_SOURCE                           "componentSource"
@@ -155,6 +157,8 @@
 
 #define JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER_OFFS    "anchors.horizontalCenterOffset"
 #define JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER_OFFS    "anchors.verticalCenterOffset"
+
+#define JSON_KEY_COMPONENT_PROPERTY_STATE                   "state"
 
 /*
 #define JSON_KEY_COMPONENT_PROPERTY_OPACITY                 "opacity"

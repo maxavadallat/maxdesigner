@@ -1,6 +1,5 @@
 
 #include <QDebug>
-#include <QImage>
 #include <QApplication>
 
 #include "designerapplication.h"

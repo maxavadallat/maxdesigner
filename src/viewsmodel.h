@@ -28,6 +28,8 @@ public:
     int getViewIndex(const QString& aName);
     // Get View By Name
     ComponentInfo* getView(const QString& aName);
+    // Get View By Index
+    Q_INVOKABLE ComponentInfo* getViewByIndex(const int& aIndex);
 
     // Destructor
     ~ViewsModel();

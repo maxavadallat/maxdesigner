@@ -28,10 +28,39 @@ DPane {
 
     //state: stateShown
 
-    property QtObject propertiesControllerConnection: Connections {
+    property Connections propertiesControllerConnection: Connections {
         target: propertiesController
 
+        onFocusedComponentChanged: {
+            // Check Focused Component
+            if (propertiesController.focusedComponent !== null) {
+                // Open Sections
+                sizeAndPosSection.open();
+
+            } else {
+                // Close All Sections
+                sizeAndPosSection.close();
+                anchorsSection.close();
+                ownPropertiesSection.close();
+                signalsSection.close();
+                statesSection.close();
+                transitionsSection.close();
+            }
+        }
+
         // ...
+    }
+
+    property Connections focusedComponentConnection: Connections {
+        target: propertiesController.focusedComponent
+
+        onWidthChanged: {
+            console.log("PropertiesPane.focusedComponentConnection.onWidthChanged - width: " + propertiesController.focusedComponent.width);
+        }
+
+        onHeightChanged: {
+            console.log("PropertiesPane.focusedComponentConnection.onHeightChanged - height: " + propertiesController.focusedComponent.height);
+        }
     }
 
     Row {
@@ -107,6 +136,7 @@ DPane {
 
                 DSpinner {
                     anchors.verticalCenter: parent.verticalCenter
+                    value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.posX) : 0
                 }
 
                 DText {
@@ -118,6 +148,7 @@ DPane {
 
                 DSpinner {
                     anchors.verticalCenter: parent.verticalCenter
+                    value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.posY) : 0
                 }
             }
 
@@ -134,6 +165,7 @@ DPane {
 
                 DSpinner {
                     anchors.verticalCenter: parent.verticalCenter
+                    value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.width) : 0
                 }
 
                 DText {
@@ -145,6 +177,7 @@ DPane {
 
                 DSpinner {
                     anchors.verticalCenter: parent.verticalCenter
+                    value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.height) : 0
                 }
             }
         }
@@ -442,7 +475,7 @@ DPane {
         }
     }
 
-    // Parents
+    // Parent
 
     // ...
 

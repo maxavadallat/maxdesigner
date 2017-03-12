@@ -29,3 +29,6 @@ var newComponentDragKey                         = "Drag.NewComponent";
 
 // Component Move Step
 var componentMoveStep                           = 1;
+
+// Component Suffix
+var componentSuffix                             = ".json"

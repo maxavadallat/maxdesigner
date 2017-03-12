@@ -191,6 +191,19 @@ ComponentInfo* ViewsModel::getView(const QString& aName)
 }
 
 //==============================================================================
+// Get Compoennt By Index
+//==============================================================================
+ComponentInfo* ViewsModel::getViewByIndex(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < mViewsList.count()) {
+        return mViewsList[aIndex];
+    }
+
+    return NULL;
+}
+
+//==============================================================================
 // Row Count
 //==============================================================================
 int ViewsModel::rowCount(const QModelIndex& ) const

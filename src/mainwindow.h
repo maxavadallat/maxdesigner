@@ -194,6 +194,10 @@ private slots:
     // View Creaeted Slot
     void viewCreated(ComponentInfo* aComponent);
 
+    // File Opened Slot
+    void fileOpened(const QString& aFilePath);
+    // File Selected Slot
+    void fileSelected(const QString& aFilePath);
 
     // Action About Triggered Slot
     void on_actionAbout_triggered();
@@ -259,7 +263,7 @@ private:
     ProjectTreeModel*           mProjectTreeModel;
 
     // Open Files List Model
-    OpenFilesModel*             mOpenfiles;
+    OpenFilesModel*             mOpenFiles;
 
     // Recent Projects Model
     RecentProjectsModel*        mRecentProjects;

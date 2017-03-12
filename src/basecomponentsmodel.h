@@ -31,6 +31,8 @@ public:
     int getComponentIndex(const QString& aName);
     // Get Component By Name
     ComponentInfo* getComponent(const QString& aName);
+    // Get Compoennt By Index
+    Q_INVOKABLE ComponentInfo* getComponentByIndex(const int& aIndex);
 
     // Destructor
     ~BaseComponentsModel();

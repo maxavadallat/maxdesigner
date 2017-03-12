@@ -108,6 +108,7 @@
     <addaction name="actionCreateComponent"/>
     <addaction name="separator"/>
     <addaction name="actionEditComponent"/>
+    <addaction name="actionRenameComponent"/>
     <addaction name="separator"/>
     <addaction name="actionRemoveComponent"/>
     <addaction name="separator"/>
@@ -125,6 +126,7 @@
     <addaction name="actionCreateView"/>
     <addaction name="separator"/>
     <addaction name="actionEditView"/>
+    <addaction name="actionRenameView"/>
     <addaction name="separator"/>
     <addaction name="actionScreenshot"/>
     <addaction name="separator"/>
@@ -347,6 +349,22 @@
    </property>
    <property name="text">
     <string>Edit View</string>
+   </property>
+  </action>
+  <action name="actionRenameComponent">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Rename Component</string>
+   </property>
+  </action>
+  <action name="actionRenameView">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Rename View</string>
    </property>
   </action>
  </widget>

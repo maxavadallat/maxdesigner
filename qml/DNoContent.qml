@@ -8,6 +8,9 @@ Canvas {
     width: 400
     height: 300
 
+    Behavior on width { DAnimation { } }
+    Behavior on height { DAnimation { } }
+
     opacity: 0.2
     visible: opacity > 0.0
 

@@ -424,6 +424,7 @@ ComponentInfo* ProjectModel::createBaseComponent(const QString& aName, const QSt
 
     // Create New Component
     ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_BASECOMPONENT, aCategory, this, aBaseName);
+
     // Set Width & Height
     newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
     newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
@@ -531,6 +532,8 @@ void ProjectModel::setProjectName(const QString& aName)
         mProperties[JSON_KEY_PROJECT_NAME] = aName;
         // Emit Project Name Changed
         emit projectNameChanged(mProperties[JSON_KEY_PROJECT_NAME].toString());
+        // Emit Project File Path Changed Signal
+        emit projectFilePathChanged(absoluteProjectFilePath());
         // Set Dirty Properties
         setDirty(true);
     }
@@ -556,6 +559,8 @@ void ProjectModel::setProjectDir(const QString& aDir)
         mProperties[JSON_KEY_PROJECT_DIR] = aDir;
         // Emit Project Dir Changed
         emit projectDirChanged(mProperties[JSON_KEY_PROJECT_DIR].toString());
+        // Emit Project File Path Changed Signal
+        emit projectFilePathChanged(absoluteProjectFilePath());
         // Set Dirty Properties
         setDirty(true);
     }
@@ -996,6 +1001,65 @@ ComponentInfo* ProjectModel::getComponentByName(const QString& aName, const QStr
             return cInfo;
         }
     }
+
+    return cInfo;
+}
+
+//==============================================================================
+// Get Component By File Path
+//==============================================================================
+ComponentInfo* ProjectModel::getComponentByPath(const QString& aFilePath)
+{
+    // Check Name
+    if (aFilePath.isEmpty()) {
+        return NULL;
+    }
+
+    // Init File Info
+    QFileInfo cFileInfo(aFilePath);
+
+    // Check Suffix
+    if (cFileInfo.suffix() != DEFAULT_JSON_SUFFIX) {
+        // Not a Component
+        return NULL;
+    }
+
+    qDebug() << "ProjectModel::getComponentByPath - aFilePath: " << aFilePath;
+
+    // Init Component Info
+    ComponentInfo* cInfo = NULL;
+
+    // Check For Base Compoennts
+    if (cFileInfo.absolutePath() == mProperties[JSON_KEY_PROJECT_BASECOMPONENTS_DIR].toString()) {
+        // Get Component Info
+        cInfo = mBaseComponents->getComponent(cFileInfo.baseName());
+        // Check Component Info
+        if (cInfo) {
+            return cInfo;
+        }
+    }
+
+    // Check For Compoennts
+    if (cFileInfo.absolutePath() == mProperties[JSON_KEY_PROJECT_COMPONENTS_DIR].toString()) {
+        // Get Component Info
+        cInfo = mComponents->getComponent(cFileInfo.baseName());
+        // Check Component Info
+        if (cInfo) {
+            return cInfo;
+        }
+    }
+
+    // Check For Compoennts
+    if (cFileInfo.absolutePath() == mProperties[JSON_KEY_PROJECT_VIEWS_DIR].toString()) {
+        // Get Component Info
+        cInfo = mViews->getView(cFileInfo.baseName());
+        // Check Component Info
+        if (cInfo) {
+            return cInfo;
+        }
+    }
+
+    // ...
 
     return cInfo;
 }

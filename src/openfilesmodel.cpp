@@ -15,6 +15,7 @@ OpenFilesModel::OpenFilesModel(QObject* aParent)
     , mProject(NULL)
     , mBusy(false)
     , mCurrentIndex(-1)
+    , mFocusedFile("")
 {
     qDebug() << "OpenFilesModel created.";
 
@@ -95,16 +96,42 @@ void OpenFilesModel::setCurrentIndex(const int& aCurrentIndex)
 }
 
 //==============================================================================
+// Get Focused File
+//==============================================================================
+QString OpenFilesModel::focusedFile()
+{
+    return mFocusedFile;
+}
+
+//==============================================================================
+// Set Focused File
+//==============================================================================
+void OpenFilesModel::setFocusedFile(const QString& aFilePath)
+{
+    // Check Focused File
+    if (mFocusedFile != aFilePath) {
+        // Set Focused File
+        mFocusedFile = aFilePath;
+        // Emit Focused File Changed Signal
+        emit focusedFileChanged(mFocusedFile);
+
+        // Init Focused File Info
+        QFileInfo ffInfo(mFocusedFile);
+
+        // Set Current Index
+        setCurrentIndex(mFileInfoList.indexOf(ffInfo));
+    }
+}
+
+//==============================================================================
 // Set Project Model
 //==============================================================================
 void OpenFilesModel::setProjectModel(ProjectModel* aProject)
 {
     qDebug() << "OpenFilesModel::setProjectModel - aProject.projectName: " << (aProject ? aProject->projectName() : "");
 
-    // Save Recent Files
-    saveRecentFiles();
-    // Clear
-    clear();
+    // Close Previous Project Model
+    closeProjectModel();
 
     // Set Project Model
     mProject = aProject;
@@ -114,9 +141,23 @@ void OpenFilesModel::setProjectModel(ProjectModel* aProject)
 }
 
 //==============================================================================
+// Close Project
+//==============================================================================
+void OpenFilesModel::closeProjectModel()
+{
+    // Save Recent Files
+    saveRecentFiles();
+    // Clear
+    clear();
+
+    // Reset Project
+    mProject = NULL;
+}
+
+//==============================================================================
 // Open File - Add File To
 //==============================================================================
-int OpenFilesModel::openFile(const QString& aFilePath)
+int OpenFilesModel::openFile(const QString& aFilePath, const bool& aComponent)
 {
     // Init New File Info
     QFileInfo fileInfo(aFilePath);
@@ -152,7 +193,11 @@ int OpenFilesModel::openFile(const QString& aFilePath)
             // End Insert Rows
             endInsertRows();
 
-            // Emit File Opened Signal
+            // Check If Opening Component
+            if (!aComponent) {
+                // Emit File Opened Signal
+                emit fileOpened(fileInfo.absoluteFilePath());
+            }
 
             return i;
         }
@@ -165,7 +210,11 @@ int OpenFilesModel::openFile(const QString& aFilePath)
     // End Insert Rows
     endInsertRows();
 
-    // Emit File Opened Signal
+    // Check If Opening Component
+    if (!aComponent) {
+        // Emit File Opened Signal
+        emit fileOpened(fileInfo.absoluteFilePath());
+    }
 
     return mFileInfoList.count() - 1;
 }
@@ -254,9 +303,9 @@ void OpenFilesModel::openComponent(ComponentInfo* aComponent)
     }
 
     // Get Component Index
-    int cIndex = compoenntIndex(aComponent);
+    int cIndex = componentIndex(aComponent);
 
-    // Check Compoennt Index
+    // Check Component Index
     if (cIndex >= 0) {
         // Emit Component Selected
         emit componentSelected(aComponent);
@@ -266,7 +315,7 @@ void OpenFilesModel::openComponent(ComponentInfo* aComponent)
     // Check Component
     if (aComponent) {
         // Open File
-        openFile(aComponent->infoPath());
+        openFile(aComponent->infoPath(), true);
         // Emit Component Opened Signal
         emit componentOpened(aComponent);
     }
@@ -278,7 +327,7 @@ void OpenFilesModel::openComponent(ComponentInfo* aComponent)
 void OpenFilesModel::closeComponent(ComponentInfo* aComponent)
 {
     // Get Component Index
-    int cIndex = compoenntIndex(aComponent);
+    int cIndex = componentIndex(aComponent);
 
     // Check Component Index
     if (cIndex >= 0) {
@@ -309,20 +358,26 @@ void OpenFilesModel::openRecentFiles()
 
     // Open Recent Files
     if (rFiles.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "OpenFilesModel::openRecentFiles - recentFilesPath: " << recentFilesPath;
         // Read All Content
         QString rfContent = rFiles.readAll();
         // Set Recent File List
-        QStringList recentFiles = rfContent.split("\n");
+        QStringList recentFiles = rfContent.split("\n", QString::SkipEmptyParts);
         // Get Recent Files Count
         int rfCount = recentFiles.count();
         // Iterate Through Recent Files
         for (int i=0; i<rfCount; i++) {
-            // Open File
-            openFile(recentFiles[i]);
+            // Check Recent File to skip launch Project Properties
+            if (recentFiles[i] != mProject->absoluteProjectFilePath()) {
+                // Open File
+                openFile(recentFiles[i]);
+            }
         }
 
         // Close Files
         rFiles.close();
+    } else {
+        qWarning() << "OpenFilesModel::openRecentFiles - recentFilesPath: " << recentFilesPath << " - CAN NOT READ FILE!";
     }
 
     // Set Busy
@@ -349,6 +404,7 @@ void OpenFilesModel::saveRecentFiles()
 
     // Open Recent Files
     if (rFiles.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qDebug() << "OpenFilesModel::saveRecentFiles - recentFilesPath: " << recentFilesPath;
         // Init Text Stream
         QTextStream rfStream(&rFiles);
         // Get Open Files Count
@@ -365,6 +421,8 @@ void OpenFilesModel::saveRecentFiles()
         rfStream.flush();
         // Close Files
         rFiles.close();
+    } else {
+        qWarning() << "OpenFilesModel::saveRecentFiles - recentFilesPath: " << recentFilesPath << " - CAN NOT WRITE FILE!";
     }
 
     // Set Busy
@@ -372,14 +430,19 @@ void OpenFilesModel::saveRecentFiles()
 }
 
 //==============================================================================
-// Get Compoennt index
+// Get Component index
 //==============================================================================
-int OpenFilesModel::compoenntIndex(ComponentInfo* aComponent)
+int OpenFilesModel::componentIndex(ComponentInfo* aComponent)
 {
-    // Init Component File Info
-    QFileInfo componentInfo(aComponent->infoPath());
+    // Check Component
+    if (aComponent) {
+        // Init Component File Info
+        QFileInfo componentFileInfo(aComponent->infoPath());
 
-    return mFileInfoList.indexOf(componentInfo);
+        return mFileInfoList.indexOf(componentFileInfo);
+    }
+
+    return -1;
 }
 
 //==============================================================================
@@ -406,7 +469,7 @@ QVariant OpenFilesModel::data(const QModelIndex& index, int role) const
         switch (role) {
             case FileNameRole:      return mFileInfoList[i].fileName();
             case FilePathRole:      return mFileInfoList[i].absoluteFilePath();
-            case FileIconRole:      return "";
+            case FileIconRole:      return QString("image://%1/%2").arg(DEFAULT_IMAGE_PROVIDER_ID).arg(mFileInfoList[i].absoluteFilePath());
         }
     }
 

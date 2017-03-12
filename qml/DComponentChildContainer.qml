@@ -10,7 +10,7 @@ DContainer {
 
     property bool grabbed: false
 
-    property QtObject componentInfo: null
+    property ComponentInfo componentInfo: null
 
     backgroundColor: Qt.hsla(Math.random(), 0.5, 0.4, 0.2)
     borderColor: cccRoot.selected ? Style.colorBorderSelected : cccRoot.focus ? Style.colorBorder : Style.colorBorderNoFocus

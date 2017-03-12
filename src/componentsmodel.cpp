@@ -191,6 +191,19 @@ ComponentInfo* ComponentsModel::getComponent(const QString& aName)
 }
 
 //==============================================================================
+// Get Compoennt By Index
+//==============================================================================
+ComponentInfo* ComponentsModel::getComponentByIndex(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < mComponentList.count()) {
+        return mComponentList[aIndex];
+    }
+
+    return NULL;
+}
+
+//==============================================================================
 // Row Count
 //==============================================================================
 int ComponentsModel::rowCount(const QModelIndex& ) const

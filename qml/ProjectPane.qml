@@ -25,28 +25,42 @@ DPane {
 
     borderColor: Style.colorBorder
 
-    property QtObject currentProjectConnection: Connections {
+    property Connections currentProjectConnection: Connections {
         target: mainController.currentProject
 
         onBaseComponentCreated: {
-            console.log("ProjectPane.currentProjectConnection.onBaseComponentCreated - aComponent: " + aComponent);
+            //console.log("ProjectPane.currentProjectConnection.onBaseComponentCreated - aComponent: " + aComponent);
 
             // Open Base Compoennts Section
             baseComponentsSection.open();
         }
 
         onComponentCreated: {
-            console.log("ProjectPane.currentProjectConnection.onComponentCreated - aComponent: " + aComponent);
+            //console.log("ProjectPane.currentProjectConnection.onComponentCreated - aComponent: " + aComponent);
 
             // Open Components Section
             ownComponentsSection.open();
         }
 
         onViewCreated: {
-            console.log("ProjectPane.currentProjectConnection.onViewCreated - aComponent: " + aComponent);
+            //console.log("ProjectPane.currentProjectConnection.onViewCreated - aComponent: " + aComponent);
 
             // Open Views Section
             viewsSection.open();
+        }
+    }
+
+    property Connections openFilesModelConnection: Connections {
+        target: openFilesModel
+
+        onCurrentIndexChanged: {
+            //console.log("ProjectPane.openFilesModelConnection.onCurrentIndexChanged - currentIndex: " + openFilesModel.currentIndex);
+
+            // Check Open Files List View Current Index
+            if (openFilesListView.currentIndex !== openFilesModel.currentIndex) {
+                // Set Open Files List View Current Index
+                openFilesListView.currentIndex = openFilesModel.currentIndex;
+            }
         }
     }
 
@@ -69,6 +83,7 @@ DPane {
                 delegate: DComponentItem {
                     id: baseComponentItemDelegateRoot
                     title: componentName
+                    componentInfo: mainController.currentProject.baseComponentsModel.getComponentByIndex(index);
                     onGrabbedChanged: {
                         // Bring Section To Top
                         baseComponentsSection.z = grabbed ? 0.1 : 0.0;
@@ -81,7 +96,7 @@ DPane {
 
         DNoContent {
             width: projectPaneRoot.contentWidth
-            height: baseComponentsSection.minHeight
+            height: baseComponentsRepeater.count === 0 ? baseComponentsSection.minHeight : 0
             opacity: baseComponentsRepeater.count === 0 ? 0.2 : 0.0
 
             DText {
@@ -112,6 +127,7 @@ DPane {
                 delegate: DComponentItem {
                     id: componentItemDelegateRoot
                     title: componentName
+                    componentInfo: mainController.currentProject.componentsModel.getComponentByIndex(index);
                     onGrabbedChanged: {
                         // Bring Section To Top
                         ownComponentsSection.z = grabbed ? 0.1 : 0.0;
@@ -124,7 +140,7 @@ DPane {
 
         DNoContent {
             width: projectPaneRoot.contentWidth
-            height: ownComponentsSection.minHeight
+            height: componentsRepeater.count === 0 ? ownComponentsSection.minHeight : 0
             opacity: componentsRepeater.count === 0 ? 0.2 : 0.0
 
             DText {
@@ -155,6 +171,7 @@ DPane {
                 delegate: DComponentItem {
                     id: viewItemDelegateRoot
                     title: viewName
+                    componentInfo: mainController.currentProject.viewsModel.getViewByIndex(index);
                     onGrabbedChanged: {
                         // Bring Section To Top
                         viewsSection.z = grabbed ? 0.1 : 0.0;
@@ -167,7 +184,7 @@ DPane {
 
         DNoContent {
             width: projectPaneRoot.contentWidth
-            height: viewsSection.minHeight
+            height: viewsRepeater.count === 0 ? viewsSection.minHeight : 0
             opacity: viewsRepeater.count === 0 ? 0.2 : 0.0
 
             DText {
@@ -203,12 +220,6 @@ DPane {
                 id: projectTreeDelegateRoot
                 width: projectTreeDelegateRow.width
 
-//                onDoubleClicked: {
-//                    if (model && model.fileIsDir) {
-//                        //if (projectTreeView.expand())
-//                    }
-//                }
-
                 Row {
                     id: projectTreeDelegateRow
                     height: parent.height
@@ -227,6 +238,19 @@ DPane {
                         text: model ? model.fileName : ""
                         anchors.verticalCenter: parent.verticalCenter
                     }
+                }
+            }
+
+            onItemDoubleClicked: {
+                // Get Item File Path
+                var itemFilePath = projectTreeModel.getPathByIndex(index);
+
+                // Check Item File Path
+                if (itemFilePath !== "") {
+                    //console.log("ProjectPane.projectTreeView.onItemDoubleClicked - itemFilePath: " + itemFilePath);
+
+                    // Open File
+                    openFilesModel.openFile(itemFilePath);
                 }
             }
         }
@@ -257,27 +281,39 @@ DPane {
             highlightFollowsCurrentItem: true
 
             delegate: Rectangle {
-                width: openFilesListView
+                width: openFilesListView.width
                 height: Style.listItemHeight
-                color: index === openFilesListView.currentIndex ? Style.colorHighLight : "transparent"
+
+                color: index === openFilesListView.currentIndex ? Style.colorSelectedHighLight : "transparent"
+
                 DMouseArea {
                     anchors.fill: parent
 
                     onClicked: {
                         // Set Current Index
                         openFilesListView.currentIndex = index;
-                    }
-
-                    onDoubleClicked: {
-                        // Set Current Index
-                        openFilesListView.currentIndex = index;
                         // Select File
                         openFilesModel.selectFile(index);
                     }
+
+                    onDoubleClicked: {
+
+                    }
+                }
+
+                Image {
+                    id: iconImage
+                    width: Style.iconWidthSmall
+                    height: Style.iconHeightSmall
+                    anchors.verticalCenter: parent.verticalCenter
+                    fillMode: Image.PreserveAspectFit
+                    source: fileIcon
+                    asynchronous: true
                 }
 
                 DText {
                     anchors.fill: parent
+                    anchors.leftMargin: iconImage.source !== "" ? iconImage.width + Style.defaultMargin : 0
                     text: fileName
                 }
             }

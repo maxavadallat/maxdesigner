@@ -30,6 +30,9 @@ public:
     // Get Root Index
     QModelIndex rootIndex();
 
+    // Get Path By Index
+    Q_INVOKABLE QString getPathByIndex(const QModelIndex& aIndex);
+
     // Destructor
     ~ProjectTreeModel();
 
