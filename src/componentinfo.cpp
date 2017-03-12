@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QJsonDocument>
+#include <QJsonParseError>
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
@@ -64,11 +65,13 @@ ComponentInfo::ComponentInfo(const QString& aName,
                              const QString& aCategory,
                              ProjectModel* aProject,
                              const QString& aBaseName,
+                             const bool& aBuiltIn,
                              QObject* aParent)
     : QObject(aParent)
     , mProject(aProject)
     , mProtoType(true)
     , mDirty(true)
+    , mBuiltIn(aBuiltIn)
     , mInfoPath("")
     , mQMLPath("")
     , mName(aName)
@@ -176,6 +179,7 @@ void ComponentInfo::load(const QString& aFilePath)
     if (ciFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         // Read File Content
         QString ciFileContent = ciFile.readAll();
+        //qDebug() << "ComponentInfo::load - ciFileContent: " << ciFileContent;
         // Close File
         ciFile.close();
         // From JSON
@@ -461,7 +465,10 @@ QString ComponentInfo::componentID()
 //==============================================================================
 void ComponentInfo::setComponentID(const QString& aID)
 {
+    // Set Component Property
     setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_ID, aID);
+    // Emit Component ID Changed Signal
+    emit componentIDChanged(componentID());
 }
 
 //==============================================================================
@@ -477,7 +484,10 @@ QString ComponentInfo::componentObjectName()
 //==============================================================================
 void ComponentInfo::setComponentObjectName(const QString& aObjectName)
 {
+    // Set Component Property
     setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_OBJECT_NAME, aObjectName);
+    // Emit Object Name Changed Signal
+    emit componentObjectNameChanged(componentObjectName());
 }
 
 //==============================================================================
@@ -493,7 +503,10 @@ QString ComponentInfo::posX()
 //==============================================================================
 void ComponentInfo::setPosX(const QString& aPosX)
 {
+    // Set Component Property
     setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_X, aPosX);
+    // Emit Pos X Changed Signal
+    emit posXChanged(posX());
 }
 
 //==============================================================================
@@ -509,7 +522,10 @@ QString ComponentInfo::posY()
 //==============================================================================
 void ComponentInfo::setPosY(const QString& aPosY)
 {
+    // Set Component Property
     setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Y, aPosY);
+    // Emit Pos Y Changed Signal
+    emit posYChanged(posY());
 }
 
 //==============================================================================
@@ -525,7 +541,10 @@ QString ComponentInfo::posZ()
 //==============================================================================
 void ComponentInfo::setPosZ(const QString& aPosZ)
 {
+    // Set Component Property
     setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Z, aPosZ);
+    // Emit Pos Z Changed Signal
+    emit posZChanged(posZ());
 }
 
 //==============================================================================
@@ -544,7 +563,7 @@ void ComponentInfo::setWidth(const QString& aWidth)
     // Set Property - Width
     setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
     // Emit Width Changed Signal
-    emit widthChanged(componentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH).toString());
+    emit widthChanged(width());
 }
 
 //==============================================================================
@@ -563,7 +582,7 @@ void ComponentInfo::setHeight(const QString& aHeight)
     // Set Property - Height
     setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
     // Emit Height Changed Signal
-    emit heightChanged(componentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT).toString());
+    emit heightChanged(height());
 }
 
 //==============================================================================
@@ -766,9 +785,10 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
     // Set Properties
     mProperties = aObject[JSON_KEY_COMPONENT_PROPERTIES].toObject();
 
-    // Set Base
+    // Base Components Might Not Be Ready !!!!
+    // Set Base Component
     mBase = mProject ? mProject->getComponentByName(mBaseName) : NULL;
-    // Set Parent
+    // Set Parent Component
     mParent = mProject ? mProject->getComponentByName(aObject[JSON_KEY_COMPONENT_PARENT].toString()) : NULL;
 
     // Set Signals
@@ -809,8 +829,16 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
 //==============================================================================
 void ComponentInfo::fromJSON(const QByteArray& aContent)
 {
+    // Init Parser Error
+    QJsonParseError parserError;
     // Init Component Info Document
-    QJsonDocument ciDocument = QJsonDocument::fromJson(aContent);
+    QJsonDocument ciDocument = QJsonDocument::fromJson(aContent, &parserError);
+
+    // Check Document
+    if (ciDocument.isEmpty() || ciDocument.isNull() || parserError.error != QJsonParseError::NoError) {
+        qCritical() << "ComponentInfo::fromJSON - INVALID OBJECT! - parserError: " << parserError.errorString();
+    }
+
     // Init JSON Object
     QJsonObject ciObject = ciDocument.object();
 
@@ -840,7 +868,14 @@ QVariant ComponentInfo::componentProperty(const QString& aName)
         return mOwnProperties[aName].toVariant();
     }
 
-    return mProperties[aName].toVariant();
+    // Check Property Keys
+    if (mProperties.keys().indexOf(aName) >= 0) {
+        return mProperties[aName].toVariant();
+    }
+
+    qWarning() << "ComponentInfo::componentProperty - aName: " << aName << " - NO PROPERTY!";
+
+    return QVariant();
 }
 
 //==============================================================================

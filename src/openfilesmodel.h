@@ -29,7 +29,7 @@ public:
     void setProjectModel(ProjectModel* aProject);
 
     // Close Project
-    void closeProjectModel();
+    void closeProject();
 
     // Get Busy State
     bool busy();
@@ -59,6 +59,13 @@ public:
     // Close Component
     Q_INVOKABLE void closeComponent(ComponentInfo* aComponent);
 
+    // Open RecentFiles
+    Q_INVOKABLE void openRecentFiles();
+    // Close Focused File
+    Q_INVOKABLE void closeFocusedFile();
+    // Close All Files
+    Q_INVOKABLE void closeAllFiles();
+
     // Destructor
     ~OpenFilesModel();
 
@@ -85,7 +92,7 @@ signals:
     // File Closed Signal
     void fileClosed(const QString& aFilePath);
     // Component Closed Signal
-    void compoenntClosed(ComponentInfo* aComponent);
+    void componentClosed(ComponentInfo* aComponent);
 
 private:
     // Init
@@ -98,13 +105,15 @@ private:
     // Set Current Index
     void setCurrentIndex(const int& aCurrentIndex);
 
-    // Open RecentFiles
-    void openRecentFiles();
     // Save Recent files
     void saveRecentFiles();
 
     // Get Compoennt index
     int componentIndex(ComponentInfo* aComponent);
+
+private slots:
+    // Project Loaded Slot
+    void projectLoaded();
 
 public: // from QAbstractListModel
     // Row Count

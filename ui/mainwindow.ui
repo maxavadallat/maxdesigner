@@ -20,7 +20,7 @@
    <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Max Designer</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -80,6 +80,7 @@
     <addaction name="actionSaveProjectAs"/>
     <addaction name="separator"/>
     <addaction name="actionCloseComponent"/>
+    <addaction name="actionCloseAllComponents"/>
     <addaction name="separator"/>
     <addaction name="actionCloseProject"/>
    </widget>
@@ -92,6 +93,8 @@
     <addaction name="actionGenerateQMLSources"/>
     <addaction name="separator"/>
     <addaction name="actionSwitchMode"/>
+    <addaction name="separator"/>
+    <addaction name="actionGoLive"/>
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
@@ -365,6 +368,28 @@
    </property>
    <property name="text">
     <string>Rename View</string>
+   </property>
+  </action>
+  <action name="actionCloseAllComponents">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Close All Components</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+W</string>
+   </property>
+  </action>
+  <action name="actionGoLive">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Go Live!</string>
+   </property>
+   <property name="shortcut">
+    <string>F9</string>
    </property>
   </action>
  </widget>

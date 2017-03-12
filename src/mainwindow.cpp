@@ -112,6 +112,8 @@ void MainWindow::init()
         // Connect Signals
         connect(mOpenFiles, SIGNAL(fileOpened(QString)), this, SLOT(fileOpened(QString)));
         connect(mOpenFiles, SIGNAL(fileSelected(QString)), this, SLOT(fileSelected(QString)));
+        connect(mOpenFiles, SIGNAL(fileClosed(QString)), this, SLOT(fileClosed(QString)));
+        connect(mOpenFiles, SIGNAL(componentOpened(ComponentInfo*)), this, SLOT(componentOpened(ComponentInfo*)));
     }
 
     // Check Recent Projects Model
@@ -345,6 +347,12 @@ void MainWindow::openProject(const QString& aFilePath)
 {
     qDebug() << "MainWindow::openProject - aFilePath: " << aFilePath;
 
+    // Check Open Fies Model
+    if (mOpenFiles) {
+        // Close Project
+        mOpenFiles->closeProject();
+    }
+
     // Check Project Model
     if (!mProjectModel) {
         // Create Project Model
@@ -364,6 +372,9 @@ void MainWindow::openProject(const QString& aFilePath)
     if (mProjectModel->loadProject(aFilePath)) {
         // Store recent Project
         mRecentProjects->storeRecentProject(aFilePath);
+
+        // Set Window Title
+        setWindowTitle(QString("Max Designer - %1").arg(mProjectModel->projectName()));
 
         // Enable Save Project Menu Item
         ui->actionSaveProject->setEnabled(true);
@@ -390,7 +401,7 @@ void MainWindow::openProject(const QString& aFilePath)
 
         // Check Open Fies Model
         if (mOpenFiles) {
-            // Set Current Project
+            // Set Project Model
             mOpenFiles->setProjectModel(mProjectModel);
         }
 
@@ -409,20 +420,19 @@ void MainWindow::openProject(const QString& aFilePath)
 //==============================================================================
 void MainWindow::openComponent(ComponentInfo* aComponent)
 {
-    // Check Properties Controller
-    if (!mPropertiesController) {
-        qWarning() << "MainWindow::openComponent - NO PROPERTIES CONTROLLER!";
-        return;
+    // Check Open Files Model
+    if (mOpenFiles) {
+        // Open Component
+        mOpenFiles->openComponent(aComponent);
     }
+}
 
-    // Check Component Info
-    if (aComponent) {
+//==============================================================================
+// Launch About
+//==============================================================================
+void MainWindow::launchAbout()
+{
 
-        // ...
-
-        // Emit Component Opened
-        emit componentOpened(aComponent);
-    }
 }
 
 //==============================================================================
@@ -642,6 +652,8 @@ void MainWindow::launchDefineBaseComponent()
 
     // Reset Dialog
     mCreateComponentDialog->reset();
+    // Set Built In Visibility
+    mCreateComponentDialog->setBuiltInVisibility(true);
 
     // Exec Dialog
     if (mCreateComponentDialog->exec()) {
@@ -650,6 +662,7 @@ void MainWindow::launchDefineBaseComponent()
                            COMPONENT_TYPE_BASECOMPONENT,
                            mCreateComponentDialog->componentBaseName(),
                            mCreateComponentDialog->componentCategory(),
+                           mCreateComponentDialog->componentBuiltIn(),
                            DEFAULT_COMPONENT_WIDTH,
                            DEFAULT_COMPONENT_HEIGHT);
     }
@@ -686,6 +699,8 @@ void MainWindow::launchCreateComponent()
 
     // Reset Dialog
     mCreateComponentDialog->reset();
+    // Set Built In Visibility
+    mCreateComponentDialog->setBuiltInVisibility(false);
 
     // Exec Dialog
     if (mCreateComponentDialog->exec()) {
@@ -694,6 +709,7 @@ void MainWindow::launchCreateComponent()
                            COMPONENT_TYPE_COMPONENT,
                            mCreateComponentDialog->componentBaseName(),
                            mCreateComponentDialog->componentCategory(),
+                           false,
                            DEFAULT_COMPONENT_WIDTH,
                            DEFAULT_COMPONENT_HEIGHT);
     }
@@ -737,6 +753,7 @@ void MainWindow::launchCreateView()
                            COMPONENT_TYPE_VIEW,
                            mCreateViewDialog->viewBaseName(),
                            COMPONENT_CATEGORY_VISUAL,
+                           false,
                            mCreateViewDialog->viewWidth(),
                            mCreateViewDialog->viewHeight());
     }
@@ -745,6 +762,14 @@ void MainWindow::launchCreateView()
 
     // Grab Keyboard Focus
     //grabKeyboard();
+}
+
+//==============================================================================
+// Launch Live Window
+//==============================================================================
+void MainWindow::launchLiveWindow()
+{
+    // ...
 }
 
 //==============================================================================
@@ -778,6 +803,9 @@ void MainWindow::createNewProject()
         saveProject();
 
         // ...
+
+        // Set Window Title
+        setWindowTitle(QString("Max Designer - %1").arg(mProjectModel->projectName()));
 
         // Enable Save Project Menu Item
         ui->actionSaveProject->setEnabled(true);
@@ -818,6 +846,7 @@ void MainWindow::createNewComponent(const QString& aName,
                                     const QString& aType,
                                     const QString& aBase,
                                     const QString& aCategory,
+                                    const bool& aBuiltIn,
                                     const int& aWidth,
                                     const int& aHeight)
 {
@@ -838,7 +867,7 @@ void MainWindow::createNewComponent(const QString& aName,
         if (aType == COMPONENT_TYPE_BASECOMPONENT) {
 
             // Create New Base Component
-            newComponent = mProjectModel->createBaseComponent(aName, aBase, aCategory, aWidth, aHeight);
+            newComponent = mProjectModel->createBaseComponent(aName, aBase, aCategory, aBuiltIn, aWidth, aHeight);
 
         } else if (aType == COMPONENT_TYPE_COMPONENT) {
 
@@ -883,9 +912,15 @@ void MainWindow::saveProject(const QString& aFilePath)
     qDebug() << "MainWindow::saveProject - aFilePath: " << aFilePath;
 
     // Save Project
-    if (mProjectModel->saveProject(aFilePath)) {
+    if (mProjectModel->saveProject(aFilePath) && mRecentProjects) {
         // Store Recent
         mRecentProjects->storeRecentProject(mProjectModel->absoluteProjectFilePath());
+    }
+
+    // Check Open Fies Model
+    if (mOpenFiles) {
+        // Close Current Project
+        mOpenFiles->closeProject();
     }
 }
 
@@ -963,10 +998,17 @@ void MainWindow::closeProject()
         return;
     }
 
-    // Save Project
-    saveProject();
+    // Check Properties Controller
+    if (mPropertiesController) {
+        // Reset Focused Component
+        mPropertiesController->setFocusedComponent(NULL
+                                                   );
+    }
 
     qDebug() << "MainWindow::closeProject";
+
+    // Save Project
+    saveProject();
 
     // Save Project
     //mProjectModel->saveProject();
@@ -985,12 +1027,6 @@ void MainWindow::closeProject()
         //mProjectTreeModel->setCurrentPath(QDir::homePath());
     }
 
-    // Check Open Fies Model
-    if (mOpenFiles) {
-        // Close Current Project
-        mOpenFiles->closeProjectModel();
-    }
-
     // Delete Project Model
     delete mProjectModel;
     mProjectModel = NULL;
@@ -1000,21 +1036,26 @@ void MainWindow::closeProject()
 
     // ...
 
-    // Set Enable Save Project Menu Item
-    ui->actionSaveProject->setEnabled(false);
-    // Set Enable Save As Project Menu Item
-    ui->actionSaveProjectAs->setEnabled(false);
-    // Set Enable Project Properties Menu Item
-    ui->actionProjectProperties->setEnabled(false);
-    // Set Enable Close Project Menu Item
-    ui->actionCloseProject->setEnabled(false);
+    // Set Window Title
+    setWindowTitle(QString("Max Designer"));
 
-    // Set Enable Define Base Components Menu
+    // Set Menu Items Enabled State
+    ui->actionSaveProject->setEnabled(false);
+    ui->actionSaveProjectAs->setEnabled(false);
+    ui->actionProjectProperties->setEnabled(false);
+    ui->actionCloseProject->setEnabled(false);
     ui->actionDefineBaseComponent->setEnabled(false);
-    // Set Enable Create Component Menu Item
     ui->actionCreateComponent->setEnabled(false);
-    // Set Enable Create View Menu Item
     ui->actionCreateView->setEnabled(false);
+    ui->actionCloseComponent->setEnabled(false);
+    ui->actionCloseAllComponents->setEnabled(false);
+    ui->actionEditComponent->setEnabled(false);
+    ui->actionEditView->setEnabled(false);
+    ui->actionRemoveComponent->setEnabled(false);
+    ui->actionRemoveView->setEnabled(false);
+    ui->actionRenameComponent->setEnabled(false);
+    ui->actionRenameView->setEnabled(false);
+    ui->actionGoLive->setEnabled(false);
 
     // ...
 }
@@ -1024,22 +1065,22 @@ void MainWindow::closeProject()
 //==============================================================================
 void MainWindow::closeComponent()
 {
-    // Check Properties Controller
-    if (!mPropertiesController) {
-        return;
+    // Check Open Files Model
+    if (mOpenFiles) {
+        // Close Focused File
+        mOpenFiles->closeFocusedFile();
     }
+}
 
-    // Get Focused Component
-    ComponentInfo* focusedComponent = mPropertiesController->focusedComponent();
-
-    // Check Component Info
-    if (focusedComponent && focusedComponent->isRoot()) {
-        qDebug() << "MainWindow::closeComponent";
-
-        // Request Close
-        focusedComponent->requestClose();
-
-        // ...
+//==============================================================================
+// Close All Component
+//==============================================================================
+void MainWindow::closeAllComponents()
+{
+    // Check Open Files Model
+    if (mOpenFiles) {
+        // Close All Files
+        mOpenFiles->closeAllFiles();
     }
 }
 
@@ -1297,7 +1338,7 @@ void MainWindow::viewCreated(ComponentInfo* aComponent)
 //==============================================================================
 void MainWindow::fileOpened(const QString& aFilePath)
 {
-    //qDebug() << "MainWindow::fileOpened - aFilePath: " << aFilePath;
+    qDebug() << "MainWindow::fileOpened - aFilePath: " << aFilePath;
 
     // Check Project Model
     if (mProjectModel) {
@@ -1306,6 +1347,13 @@ void MainWindow::fileOpened(const QString& aFilePath)
             // Launch Project Properties
             launchProjectProperties();
         }
+    }
+
+    // Check Open Files Model
+    if (mOpenFiles && mOpenFiles->rowCount() > 0) {
+        // Set Menu Items Enabled State
+        ui->actionCloseAllComponents->setEnabled(true);
+        ui->actionCloseComponent->setEnabled(true);
     }
 }
 
@@ -1327,11 +1375,42 @@ void MainWindow::fileSelected(const QString& aFilePath)
 }
 
 //==============================================================================
+// File Closed Slot
+//==============================================================================
+void MainWindow::fileClosed(const QString& aFilePath)
+{
+    qDebug() << "MainWindow::fileClosed - aFilePath: " << aFilePath;
+
+    // Check Open Files Model
+    if (!mOpenFiles || mOpenFiles->rowCount() == 0) {
+        // Set Menu Items Enabled State
+        ui->actionCloseAllComponents->setEnabled(false);
+        ui->actionCloseComponent->setEnabled(false);
+    }
+}
+
+//==============================================================================
+// Component Opened Slot
+//==============================================================================
+void MainWindow::componentOpened(ComponentInfo* aComponent)
+{
+    qDebug() << "MainWindow::componentOpened - aComponent: " << (aComponent ? aComponent->componentName() : "NULL!");
+
+    // Check Open Files Model
+    if (mOpenFiles && mOpenFiles->rowCount() > 0) {
+        // Set Menu Items Enabled State
+        ui->actionCloseAllComponents->setEnabled(true);
+        ui->actionCloseComponent->setEnabled(true);
+    }
+}
+
+//==============================================================================
 // Action About Triggered Slot
 //==============================================================================
 void MainWindow::on_actionAbout_triggered()
 {
-    // Show About
+    // Launch About
+    launchAbout();
 }
 
 //==============================================================================
@@ -1339,7 +1418,7 @@ void MainWindow::on_actionAbout_triggered()
 //==============================================================================
 void MainWindow::on_actionPreferences_triggered()
 {
-    // Show Preferences
+    // Launch Preferences
     launchPreferences();
 }
 
@@ -1471,7 +1550,7 @@ void MainWindow::on_actionSwitchMode_triggered()
 //==============================================================================
 void MainWindow::on_actionEditComponent_triggered()
 {
-
+    // ...
 }
 
 //==============================================================================
@@ -1479,7 +1558,7 @@ void MainWindow::on_actionEditComponent_triggered()
 //==============================================================================
 void MainWindow::on_actionEditView_triggered()
 {
-
+    // ...
 }
 
 //==============================================================================
@@ -1491,7 +1570,23 @@ void MainWindow::on_actionCloseComponent_triggered()
     closeComponent();
 }
 
-// ...
+//==============================================================================
+// Action Close All Components Triggered Slot
+//==============================================================================
+void MainWindow::on_actionCloseAllComponents_triggered()
+{
+    // Close All Components
+    closeAllComponents();
+}
+
+//==============================================================================
+// Action Go Live Triggered Slot
+//==============================================================================
+void MainWindow::on_actionGoLive_triggered()
+{
+    // Launch Live Window
+    launchLiveWindow();
+}
 
 //==============================================================================
 // Action Quit Triggered Slot
@@ -1640,5 +1735,3 @@ MainWindow::~MainWindow()
 
     qDebug() << "MainWindow deleted.";
 }
-
-

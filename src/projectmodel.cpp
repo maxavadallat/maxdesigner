@@ -36,7 +36,6 @@ ProjectModel::ProjectModel(QObject* parent)
 //==============================================================================
 void ProjectModel::init()
 {
-
     // ...
 }
 
@@ -200,6 +199,30 @@ void ProjectModel::createBaseComponents()
 }
 
 //==============================================================================
+// Update Base Components
+//==============================================================================
+void ProjectModel::updateBaseComponents()
+{
+    // Base Components
+    if (mBaseComponents) {
+        // Update Base Components
+        mBaseComponents->updateBaseComponents();
+    }
+
+    // Components
+    if (mComponents) {
+        // Update Base Components
+        mComponents->updateBaseComponents();
+    }
+
+    // Views
+    if (mViews) {
+        // Update Base Components
+        mViews->updateBaseComponents();
+    }
+}
+
+//==============================================================================
 // Init New Project
 //==============================================================================
 bool ProjectModel::initProject(const QString& aName, const QString& aDir)
@@ -269,14 +292,22 @@ bool ProjectModel::loadProject(const QString& aFileName)
         emit importPathsChanged(importPaths());
         emit pluginPathsChanged(pluginPaths());
 
+        // ...
+
         // Create Base Components Model
         createBaseComponentsModel();
-
         // Create Components Model
         createComponentsModel();
-
         // Create Views Model
         createViewsModel();
+
+        // Update Base Components
+        updateBaseComponents();
+
+        qDebug() << "ProjectModel::loadProject - aFileName: " << aFileName << " - DONE.";
+
+        // Emit Project Loaded Signal
+        emit projectLoaded();
 
         return true;
     }
@@ -413,7 +444,12 @@ QString ProjectModel::absoluteProjectFilePath()
 //==============================================================================
 // Create Base Component
 //==============================================================================
-ComponentInfo* ProjectModel::createBaseComponent(const QString& aName, const QString& aBaseName, const QString& aCategory, const int& aWidth, const int& aHeight)
+ComponentInfo* ProjectModel::createBaseComponent(const QString& aName,
+                                                 const QString& aBaseName,
+                                                 const QString& aCategory,
+                                                 const bool& aBuiltIn,
+                                                 const int& aWidth,
+                                                 const int& aHeight)
 {
     // Check Current Compoennt
     if (mCurrentComponent) {
@@ -423,11 +459,14 @@ ComponentInfo* ProjectModel::createBaseComponent(const QString& aName, const QSt
     qDebug() << "ProjectModel::createBaseComponent - aName: " << aName << " - aBaseName: " << aBaseName << " - aCategory: " << aCategory;
 
     // Create New Component
-    ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_BASECOMPONENT, aCategory, this, aBaseName);
+    ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_BASECOMPONENT, aCategory, this, aBaseName, aBuiltIn);
 
-    // Set Width & Height
-    newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
-    newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
+    // Check Width & Height
+    if (aWidth > 0 && aHeight > 0) {
+        // Set Width & Height
+        newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
+        newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
+    }
 
     // Create Base Components Model
     createBaseComponentsModel();
@@ -459,9 +498,12 @@ ComponentInfo* ProjectModel::createComponent(const QString& aName, const QString
     // Create New Component
     ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_COMPONENT, aCategory, this, aBaseName);
 
-    // Set Width & Height
-    newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
-    newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
+    // Check Width & Height
+    if (aWidth > 0 && aHeight > 0) {
+        // Set Width & Height
+        newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
+        newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
+    }
 
     // Create Components Model
     createComponentsModel();

@@ -83,6 +83,31 @@ void ViewsModel::loadViews()
 }
 
 //==============================================================================
+// Update Base Components
+//==============================================================================
+void ViewsModel::updateBaseComponents()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    // Get View Components Count
+    int vcCount = rowCount();
+    // Iterate Through Base Components
+    for (int i=0; i<vcCount; i++) {
+        // Get Component Info
+        ComponentInfo* componentInfo = mViewsList[i];
+        // Check Base Name
+        if (componentInfo && !componentInfo->mBaseName.isEmpty() && !componentInfo->mBase) {
+            qDebug() << "ViewsModel::updateBaseComponents - name: " << componentInfo->componentName();
+            // Set Base Component
+            componentInfo->mBase = mProjectModel->getComponentByName(componentInfo->mBaseName);
+        }
+    }
+}
+
+//==============================================================================
 // Set Views Dir
 //==============================================================================
 void ViewsModel::setViewsDir(const QString& aDirPath)

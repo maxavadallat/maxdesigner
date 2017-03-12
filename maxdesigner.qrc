@@ -60,5 +60,6 @@
         <file>qml/DGrid.qml</file>
         <file>qml/DAssetContainer.qml</file>
         <file>qml/DSourceContainer.qml</file>
+        <file>qml/DBuiltInComponentFactory.qml</file>
     </qresource>
 </RCC>

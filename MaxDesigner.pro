@@ -57,7 +57,8 @@ HEADERS             += src/designerapplication.h \
                     src/propertiescontroller.h \
                     src/designereventfilter.h \
                     src/designerimageprovider.h \
-                    src/designerfilesortproxy.h
+                    src/designerfilesortproxy.h \
+                    src/uiengineinterface.h
 
 # Model Headers
 HEADERS             += src/settingscontroller.h \

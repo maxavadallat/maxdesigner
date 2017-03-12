@@ -15,6 +15,8 @@ DPaneBase {
 
     property ComponentInfo componentInfo: null
 
+    property bool updateComponentInfoEnabled: false
+
     title: "Component" + (componentInfo ? (" - " + componentInfo.componentName  ) : "")
 
     hideToSide: hideToBottom
@@ -82,7 +84,7 @@ DPaneBase {
             console.log("DComponentRootContainer.openFilesModelConnection.onFileSelected - aFilePath: " + aFilePath);
 
             // Check File Path
-            if (compoenntRootContainerRoot.componentInfo.infoPath === aFilePath) {
+            if (compoenntRootContainerRoot.componentInfo && compoenntRootContainerRoot.componentInfo.infoPath === aFilePath) {
                 // Set Focus
                 compoenntRootContainerRoot.focus = true;
                 // Bring To Front
@@ -90,6 +92,26 @@ DPaneBase {
             }
 
             // ...
+        }
+
+        onComponentClosed: {
+            console.log("DComponentRootContainer.openFilesModelConnection.onComponentClosed - aComponent: " + aComponent);
+
+            // Check File Path
+            if (compoenntRootContainerRoot.componentInfo === aComponent) {
+                // Reset
+                compoenntRootContainerRoot.reset(true);
+            }
+        }
+
+        onFileClosed: {
+            console.log("DComponentRootContainer.openFilesModelConnection.onFileClosed - aFilePath: " + aFilePath);
+
+            // Check File Path
+            if (compoenntRootContainerRoot.componentInfo && compoenntRootContainerRoot.componentInfo.infoPath === aFilePath) {
+                // Reset
+                compoenntRootContainerRoot.reset(true);
+            }
         }
     }
 
@@ -152,8 +174,12 @@ DPaneBase {
     onWidthChanged: {
         //baseCanvas.requestPaint();
 
-        // Request Width Change
-        propertiesController.requestCWidth(compoenntRootContainerRoot.width);
+        // Check Update Component Info Enabled
+        if (compoenntRootContainerRoot.updateComponentInfoEnabled) {
+            // Request Width Change
+            propertiesController.requestCWidth(compoenntRootContainerRoot.width);
+        }
+
 
         // ...
     }
@@ -161,10 +187,32 @@ DPaneBase {
     onHeightChanged: {
         //baseCanvas.requestPaint();
 
-        // Request Height Change
-        propertiesController.requestCHeight(compoenntRootContainerRoot.height);
+        // Check Update Component Info Enabled
+        if (compoenntRootContainerRoot.updateComponentInfoEnabled) {
+            // Request Height Change
+            propertiesController.requestCHeight(compoenntRootContainerRoot.height);
+        }
 
         // ...
+    }
+
+    onTransitionFinished: {
+        // Check State
+        if (compoenntRootContainerRoot.state === compoenntRootContainerRoot.stateShown) {
+            // Set Update Component Info Enabled
+            compoenntRootContainerRoot.updateComponentInfoEnabled = true;
+        } else {
+            // Reset Update Component Info Enabled
+            compoenntRootContainerRoot.updateComponentInfoEnabled = false;
+        }
+    }
+
+    onStateChanged: {
+        // Check State
+        if (compoenntRootContainerRoot.state !== compoenntRootContainerRoot.stateShown) {
+            // Reset Update Component Info Enabled
+            compoenntRootContainerRoot.updateComponentInfoEnabled = false;
+        }
     }
 
     DMouseArea {

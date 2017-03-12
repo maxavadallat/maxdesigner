@@ -9,6 +9,9 @@
 #include <QString>
 
 class ProjectModel;
+class BaseComponentsModel;
+class ComponentsModel;
+class ViewsModel;
 class MainWindow;
 class QMLParser;
 
@@ -192,16 +195,6 @@ public:
     // Export To QML
     void exportToQML(const QString& aFilePath);
 
-    // Get JSON Object
-    QJsonObject toJSONObject();
-    // Get JSON Content/Sting
-    QByteArray toJSONContent();
-
-    // Set Up From JSON Object
-    void fromJSONObject(const QJsonObject& aObject);
-    // Set Up Component From JSON Content/String
-    void fromJSON(const QByteArray& aContent);
-
     // Request Close
     Q_INVOKABLE void requestClose();
 
@@ -262,9 +255,11 @@ signals:
 
     // ...
 
-//protected:
-public:
+protected:
     friend class ProjectModel;
+    friend class BaseComponentsModel;
+    friend class ComponentsModel;
+    friend class ViewsModel;
     friend class MainWindow;
     friend class QMLParser;
     friend class PropertiesController;
@@ -275,6 +270,7 @@ public:
                            const QString& aCategory,
                            ProjectModel* aProject,
                            const QString& aBaseName = "",
+                           const bool& aBuiltIn = false,
                            QObject* aParent = NULL);
 
     // Init
@@ -288,6 +284,16 @@ public:
     void load(const QString& aFilePath = "");
     // Save
     void save(const QString& aFilePath = "");
+
+    // Get JSON Object
+    QJsonObject toJSONObject();
+    // Get JSON Content/Sting
+    QByteArray toJSONContent();
+
+    // Set Up From JSON Object
+    void fromJSONObject(const QJsonObject& aObject);
+    // Set Up Component From JSON Content/String
+    void fromJSON(const QByteArray& aContent);
 
     // Set QML Source Path
     void setSourcePath(const QString& aPath);
@@ -330,15 +336,16 @@ protected slots:
     // Views Dir Changed Slot
     void viewsDirChanged(const QString& aViewsDir);
 
-private: // Data
+protected: // Data
     // Project Model
     ProjectModel*           mProject;
 
     // ProtoType
     bool                    mProtoType;
-
     // Dirty
     bool                    mDirty;
+    // Built In
+    bool                    mBuiltIn;
 
     // Component Info File Path
     QString                 mInfoPath;

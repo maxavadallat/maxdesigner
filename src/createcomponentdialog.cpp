@@ -79,6 +79,14 @@ QString CreateComponentDialog::componentBaseName()
 }
 
 //==============================================================================
+// Component Built In
+//==============================================================================
+bool CreateComponentDialog::componentBuiltIn()
+{
+    return ui->buildInCheckBox->isChecked();
+}
+
+//==============================================================================
 // Set Component Category
 //==============================================================================
 void CreateComponentDialog::setComponentCategory(const QString& aCategory)
@@ -96,6 +104,14 @@ void CreateComponentDialog::setComponentCategory(const QString& aCategory)
 }
 
 //==============================================================================
+// Set Built-in Visibility
+//==============================================================================
+void CreateComponentDialog::setBuiltInVisibility(const bool& aVisible)
+{
+    ui->buildInCheckBox->setVisible(aVisible);
+}
+
+//==============================================================================
 // Reset
 //==============================================================================
 void CreateComponentDialog::reset()
@@ -108,6 +124,7 @@ void CreateComponentDialog::reset()
     ui->componentTypeComboBox->setCurrentText("");
     ui->categoryComboBox->setCurrentIndex(0);
     ui->categoryComboBox->setCurrentText(ui->categoryComboBox->itemData(0).toString());
+    ui->buildInCheckBox->setChecked(false);
 }
 
 //==============================================================================

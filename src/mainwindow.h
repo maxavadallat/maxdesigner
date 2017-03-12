@@ -92,12 +92,6 @@ signals:
     // Screen Shot Mode Changed Signal
     void screenshotModeChanged(const bool& aScreenShotMode);
 
-    // Component Opened Signal
-    void componentOpened(ComponentInfo* aComponent);
-
-    // Proto Type Selected Signal
-    void protoTypeSelected(ComponentInfo* aComponent);
-
 private:
     // Init
     void init();
@@ -112,6 +106,8 @@ private:
     // Set Screen Shot Mode
     void setScreenShotMode(const bool& aScreenShotMode);
 
+    // Launch About
+    void launchAbout();
     // Launch Preferences
     void launchPreferences();
     // Launch Create New Project
@@ -128,8 +124,8 @@ private:
     void launchCreateComponent();
     // Launch Create View
     void launchCreateView();
-
-    // ...
+    // Launch Live Window
+    void launchLiveWindow();
 
     // Create New Project
     void createNewProject();
@@ -138,6 +134,7 @@ private:
                             const QString& aType,
                             const QString& aBase,
                             const QString& aCategory,
+                            const bool& aBuiltIn = false,
                             const int& aWidth = 0,
                             const int& aHeight = 0);
 
@@ -157,6 +154,8 @@ private:
     void closeProject();
     // Close Component
     void closeComponent();
+    // Close All Component
+    void closeAllComponents();
 
     // Remove Component By Name
     void removeComponent(const QString& aName);
@@ -198,6 +197,11 @@ private slots:
     void fileOpened(const QString& aFilePath);
     // File Selected Slot
     void fileSelected(const QString& aFilePath);
+    // File Closed Slot
+    void fileClosed(const QString& aFilePath);
+    // Component Opened Slot
+    void componentOpened(ComponentInfo* aComponent);
+
 
     // Action About Triggered Slot
     void on_actionAbout_triggered();
@@ -235,9 +239,10 @@ private slots:
     void on_actionEditView_triggered();
     // Action Close Component Triggered Slot
     void on_actionCloseComponent_triggered();
-
-    // ...
-
+    // Action Close All Components Triggered Slot
+    void on_actionCloseAllComponents_triggered();
+    // Action Go Live Triggered Slot
+    void on_actionGoLive_triggered();
     // Action Quit Triggered Slot
     void on_actionQuit_triggered();
 

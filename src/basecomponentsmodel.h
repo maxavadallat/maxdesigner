@@ -47,6 +47,9 @@ protected:
     // Clear
     void clear();
 
+    // Update Base Components
+    void updateBaseComponents();
+
 protected slots:
     // Load Base Components
     void loadBaseComponents();

@@ -40,8 +40,14 @@ public:
     // Get Component Base Class Name
     QString componentBaseName();
 
+    // Component Built In
+    bool componentBuiltIn();
+
     // Set Component Category
     void setComponentCategory(const QString& aCategory);
+
+    // Set Built-in Visibility
+    void setBuiltInVisibility(const bool& aVisible);
 
     // Reset
     void reset();

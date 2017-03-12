@@ -57,11 +57,23 @@ public:
     QString absoluteProjectFilePath();
 
     // Create Base Component
-    ComponentInfo* createBaseComponent(const QString& aName, const QString& aBaseName, const QString& aCategory, const int& aWidth, const int& aHeight);
+    ComponentInfo* createBaseComponent(const QString& aName,
+                                       const QString& aBaseName,
+                                       const QString& aCategory,
+                                       const bool& aBuiltIn,
+                                       const int& aWidth,
+                                       const int& aHeight);
     // Create Component
-    ComponentInfo* createComponent(const QString& aName, const QString& aBaseName, const QString& aCategory, const int& aWidth, const int& aHeight);
+    ComponentInfo* createComponent(const QString& aName,
+                                   const QString& aBaseName,
+                                   const QString& aCategory,
+                                   const int& aWidth,
+                                   const int& aHeight);
     // Create View
-    ComponentInfo* createView(const QString& aName, const QString& aBaseName, const int& aWidth, const int& aHeight);
+    ComponentInfo* createView(const QString& aName,
+                              const QString& aBaseName,
+                              const int& aWidth,
+                              const int& aHeight);
 
     // Get Project Name
     QString projectName();
@@ -195,6 +207,9 @@ signals:
     // Current Component Changed Signal
     void currentComponentChanged(ComponentInfo* aComponent);
 
+    // Project Loaded Signal
+    void projectLoaded();
+
     // Project Properties Dirty State changed Signal
     void dirtyChanged(const bool& aDirty);
 
@@ -231,6 +246,8 @@ private:
 
     // Create/register Base Components
     void createBaseComponents();
+    // Update Base Components
+    void updateBaseComponents();
 
 private: // Data
 

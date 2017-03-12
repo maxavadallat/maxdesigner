@@ -52,6 +52,31 @@ void BaseComponentsModel::clear()
 }
 
 //==============================================================================
+// Update Base Components
+//==============================================================================
+void BaseComponentsModel::updateBaseComponents()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    // Get Base Components Count
+    int bcCount = rowCount();
+    // Iterate Through Base Components
+    for (int i=0; i<bcCount; i++) {
+        // Get Component Info
+        ComponentInfo* componentInfo = mBaseComponentList[i];
+        // Check Base Name
+        if (componentInfo && !componentInfo->mBaseName.isEmpty() && !componentInfo->mBase) {
+            qDebug() << "BaseComponentsModel::updateBaseComponents - name: " << componentInfo->componentName();
+            // Set Base Component
+            componentInfo->mBase = mProjectModel->getComponentByName(componentInfo->mBaseName);
+        }
+    }
+}
+
+//==============================================================================
 // Load Base Components
 //==============================================================================
 void BaseComponentsModel::loadBaseComponents()
@@ -76,7 +101,7 @@ void BaseComponentsModel::loadBaseComponents()
         // Get Item Path
         QString itemPath = bcIterator.filePath();
 
-        qDebug() << "BaseComponentsModel::loadBaseComponents - itemPath: " << itemPath;
+        //qDebug() << "BaseComponentsModel::loadBaseComponents - itemPath: " << itemPath;
 
         // Create Base Component
         ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
@@ -108,6 +133,8 @@ void BaseComponentsModel::addBaseComponent(ComponentInfo* aComponent)
 {
     // Check Component
     if (aComponent) {
+        //qDebug() << "BaseComponentsModel::addBaseComponent - name: " << aComponent->componentName();
+
         // Get Base Components Count
         int bcCount = mBaseComponentList.count();
         // Get Index Of Component
@@ -116,10 +143,6 @@ void BaseComponentsModel::addBaseComponent(ComponentInfo* aComponent)
         if (bcIndex < 0) {
             // Begin Insert Rows
             beginInsertRows(QModelIndex(), bcCount, bcCount);
-            // Iterate Thur Base Components
-            for (int i=0; i<bcCount; i++) {
-
-            }
             // Append Base Component
             mBaseComponentList << aComponent;
             // End Insert Rows
@@ -207,8 +230,16 @@ ComponentInfo* BaseComponentsModel::getComponent(const QString& aName)
     for (int i=0; i<cCount; i++) {
         // Get Component Info
         ComponentInfo* component = mBaseComponentList[i];
+        // Get Component Name
+        QString componentName = component->componentName();
+
         // Check Component Name
-        if (component->componentName() == aName) {
+        if (componentName.isEmpty()) {
+            qWarning() << "BaseComponentsModel::getComponent - COMPONENT NAME IS EMPTY!!!";
+        }
+
+        // Check Component Name
+        if (componentName == aName) {
             return component;
         }
     }

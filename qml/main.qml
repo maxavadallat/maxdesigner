@@ -10,6 +10,8 @@ Item {
 
     focus: true
 
+    property bool openRecentFilesOnShowFinished: false
+
     // Array For Root Components
     property var rootComponents: []
 
@@ -43,9 +45,10 @@ Item {
         //console.log("launchComponentRoot - componentName: " + componentInfo.componentName + " - width: " + width + " - height: " + height);
         // Set Component Info
         object.componentInfo = componentInfo;
+
         // Set Creation Width & Height
-        object.creationWidth = width;
-        object.creationHeight = height;
+        object.creationWidth = width > 0 ? width : CONSTS.defaultNonVisualComponentWidth;
+        object.creationHeight = height > 0 ? height : CONSTS.defaultNonVisualComponentHeight;
 
         // Push Object To Root Components
         mainRoot.rootComponents.push(object);
@@ -104,6 +107,9 @@ Item {
             //console.log("main.Connections.mainController.onCurrentProjectChanged - currentProject: " + mainController.currentProject);
             // Check Current Project
             if (mainController.currentProject !== null) {
+                // Set Open Recent Files On Show Finished
+                openRecentFilesOnShowFinished = true;
+
                 // Hide Welcome Screen
                 welcomScreen.hide();
                 // Show Project Pane
@@ -111,7 +117,11 @@ Item {
                 // Show Properties Pane
                 propertiesPane.show();
 
+                //
+
             } else {
+                // Set Open Recent Files On Show Finished
+                openRecentFilesOnShowFinished = false;
 
                 // Close Root Components
                 closeRootComponents();
@@ -305,7 +315,13 @@ Item {
             onTransitionFinished: {
                 // Check New State
                 if (newState === stateShown) {
-                    // ...
+                    // Check Open Recent Files On Show Finished
+                    if (mainRoot.openRecentFilesOnShowFinished) {
+                        // reset Open Recent Files On Show Finished
+                        mainRoot.openRecentFilesOnShowFinished = false;
+                        // Open Recent Files
+                        openFilesModel.openRecentFiles();
+                    }
                 }
             }
         }

@@ -16,7 +16,6 @@ var defaultButtonHeight                         = 32;
 // Default Button Group Width
 var defaultButtonGroupWidth                     = 128;
 
-
 // Minimized Components Row Height
 var minimizedComponentsHeight                   = 32;
 
@@ -32,3 +31,9 @@ var componentMoveStep                           = 1;
 
 // Component Suffix
 var componentSuffix                             = ".json"
+
+// Default Non Visual Component Width
+var defaultNonVisualComponentWidth              = 320;
+// Default Non Visual Component Height
+var defaultNonVisualComponentHeight             = 200;
+

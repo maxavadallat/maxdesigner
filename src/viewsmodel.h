@@ -46,6 +46,8 @@ protected:
 
     // Load Views
     void loadViews();
+    // Update Base Components
+    void updateBaseComponents();
 
 public: // from QAbstractListModel
     // Row Count

@@ -36,17 +36,8 @@ void OpenFilesModel::init()
 //==============================================================================
 void OpenFilesModel::clear()
 {
-    // Begin Reset Model
-    beginResetModel();
-
-    // Clear File Info List
-    mFileInfoList.clear();
-
-    // End Reset Model
-    endResetModel();
-
-//    // Clear Component Map
-//    mComponentMap.clear();
+    // Close All Files
+    closeAllFiles();
 }
 
 //==============================================================================
@@ -130,20 +121,25 @@ void OpenFilesModel::setProjectModel(ProjectModel* aProject)
 {
     qDebug() << "OpenFilesModel::setProjectModel - aProject.projectName: " << (aProject ? aProject->projectName() : "");
 
+    // Check Project
+    if (mProject) {
+        // ...
+    }
+
     // Close Previous Project Model
-    closeProjectModel();
+    //closeProjectModel();
 
     // Set Project Model
     mProject = aProject;
 
     // Open Recent Files
-    openRecentFiles();
+    //openRecentFiles();
 }
 
 //==============================================================================
 // Close Project
 //==============================================================================
-void OpenFilesModel::closeProjectModel()
+void OpenFilesModel::closeProject()
 {
     // Save Recent Files
     saveRecentFiles();
@@ -239,6 +235,9 @@ void OpenFilesModel::closeFile(const int& aIndex)
 
         // Emit File Closed Signal
         emit fileClosed(filePath);
+
+        // Set Current Index
+        setCurrentIndex(qBound(-1, mCurrentIndex, rowCount() - 1));
     }
 }
 
@@ -260,6 +259,39 @@ void OpenFilesModel::closeFile(const QString& aFilePath)
     }
 
     // ...
+}
+
+//==============================================================================
+// Close Focused File
+//==============================================================================
+void OpenFilesModel::closeFocusedFile()
+{
+    // Close File
+    closeFile(mCurrentIndex);
+}
+
+//==============================================================================
+// Close All Files
+//==============================================================================
+void OpenFilesModel::closeAllFiles()
+{
+    // Begin Reset Model
+    beginResetModel();
+
+    // Get Count
+    int rfCount = mFileInfoList.count();
+
+    // Iterate Thru Recent Files
+    for (int i=0; i<rfCount; i++) {
+        // Emit file Closed Signal
+        emit fileClosed(mFileInfoList[i].absoluteFilePath());
+    }
+
+    // Clear File Info List
+    mFileInfoList.clear();
+
+    // End Reset Model
+    endResetModel();
 }
 
 //==============================================================================
@@ -315,9 +347,10 @@ void OpenFilesModel::openComponent(ComponentInfo* aComponent)
     // Check Component
     if (aComponent) {
         // Open File
-        openFile(aComponent->infoPath(), true);
-        // Emit Component Opened Signal
-        emit componentOpened(aComponent);
+        if (openFile(aComponent->infoPath(), true) >= 0) {
+            // Emit Component Opened Signal
+            emit componentOpened(aComponent);
+        }
     }
 }
 
@@ -334,7 +367,7 @@ void OpenFilesModel::closeComponent(ComponentInfo* aComponent)
         // Close File
         closeFile(cIndex);
         // Emit Component Closed
-        emit compoenntClosed(aComponent);
+        emit componentClosed(aComponent);
     }
 }
 
@@ -443,6 +476,14 @@ int OpenFilesModel::componentIndex(ComponentInfo* aComponent)
     }
 
     return -1;
+}
+
+//==============================================================================
+// Project Loaded Slot
+//==============================================================================
+void OpenFilesModel::projectLoaded()
+{
+    // ...
 }
 
 //==============================================================================

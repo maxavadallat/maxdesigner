@@ -83,6 +83,31 @@ void ComponentsModel::loadComponents()
 }
 
 //==============================================================================
+// Update Base Components
+//==============================================================================
+void ComponentsModel::updateBaseComponents()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    // Get Components Count
+    int cCount = rowCount();
+    // Iterate Through Base Components
+    for (int i=0; i<cCount; i++) {
+        // Get Component Info
+        ComponentInfo* componentInfo = mComponentList[i];
+        // Check Base Name
+        if (componentInfo && !componentInfo->mBaseName.isEmpty() && !componentInfo->mBase) {
+            qDebug() << "ComponentsModel::updateBaseComponents - name: " << componentInfo->componentName();
+            // Set Base Component
+            componentInfo->mBase = mProjectModel->getComponentByName(componentInfo->mBaseName);
+        }
+    }
+}
+
+//==============================================================================
 // Set Components Dir
 //==============================================================================
 void ComponentsModel::setComponentsDir(const QString& aDirPath)
