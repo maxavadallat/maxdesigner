@@ -32,6 +32,7 @@ SettingsController::SettingsController(QObject* aParent)
     : QObject(aParent)
     , mRefCounter(1)
     , mTracerVisible(DEFAULT_SETTINGS_VALUE_TRACER_VISIBLE)
+    , mSlowMotion(DEFAULT_SETTINGS_VALUE_SLOW_MOTION)
     , mMainWindowState(DEFAULT_SETTINGS_VALUE_MAIN_WINDOW_STATE)
     , mDesignerMode(DEFAULT_SETTINGS_VALUE_DESIGNER_MODE)
 
@@ -250,7 +251,29 @@ void SettingsController::setTracerVisible(const bool& aVisible)
         // Emit Tracer Visible Changed Signal
         emit tracerVisibleChanged(mTracerVisible);
         // Set Dirty
-        setDirty(true);
+        //setDirty(true);
+    }
+}
+
+//==============================================================================
+// Get Slow Motion
+//==============================================================================
+bool SettingsController::slowMotion()
+{
+    return mSlowMotion;
+}
+
+//==============================================================================
+// Set Slow Motion
+//==============================================================================
+void SettingsController::setSlowMotion(const bool& aSlowMotion)
+{
+    // Check Slow Motion
+    if (mSlowMotion != aSlowMotion) {
+        // Set SLow Motion
+        mSlowMotion = aSlowMotion;
+        // Emit Slow Motion Changed Signal
+        emit slowMotionChanged(mSlowMotion);
     }
 }
 

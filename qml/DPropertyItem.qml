@@ -55,7 +55,7 @@ DSwipeGesture {
         // Set Mark For Deletion
         propertyItemRoot.markFordeletion = propertyItemRoot.swipeOn;
         // Set Behavior Duration
-        deleteButton.behaviorDuration = Style.animDuration;
+        deleteButton.behaviorDuration = DStyle.animDuration;
         // Bind Delete Button Pos X
         deleteButton.x = Qt.binding(function() {
             return propertyItemRoot.markFordeletion ? deleteButton.showPosX : deleteButton.hiddenPosX;
@@ -78,7 +78,7 @@ DSwipeGesture {
         anchors.fill: parent
         color: "transparent"
         border.color: swipeOn ? "orange" : "gray"
-        radius: Style.defaultRadius
+        radius: DStyle.defaultRadius
     }
 
     // Content Fade Curtain
@@ -98,16 +98,16 @@ DSwipeGesture {
 
         Behavior on x { DAnimation { duration: deleteButton.behaviorDuration } }
 
-        property real showPosX: propertyItemRoot.width - deleteButton.width - Style.defaultMargin
-        property real hiddenPosX: propertyItemRoot.width + Style.defaultMargin
-        property int behaviorDuration: Style.animDuration
+        property real showPosX: propertyItemRoot.width - deleteButton.width - DStyle.defaultMargin
+        property real hiddenPosX: propertyItemRoot.width + DStyle.defaultMargin
+        property int behaviorDuration: DStyle.animDuration
 
         anchors.verticalCenter: parent.verticalCenter
 
         preventStealing: true
 
-        bgColor: Style.colorCancel
-        highlightColor: Style.colorCancelHighLight
+        bgColor: DStyle.colorCancel
+        highlightColor: DStyle.colorCancelHighLight
         text: "Delete"
 
         onXChanged: {

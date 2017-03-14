@@ -3,7 +3,7 @@ import QtQuick 2.0
 import enginecomponents 0.1
 
 import "style"
-import "Constants.js" as CONSTS
+import "DConstants.js" as CONSTS
 
 DPane {
     id: propertiesPaneRoot
@@ -24,7 +24,7 @@ DPane {
 
     hideToSide: hideToRight
 
-    borderColor: Style.colorBorder
+    borderColor: DStyle.colorBorder
 
     //state: stateShown
 
@@ -96,7 +96,7 @@ DPane {
 
     Item {
         width: 1
-        height: Style.defaultSpacing
+        height: DStyle.defaultSpacing
     }
 
     DSection {
@@ -114,7 +114,7 @@ DPane {
 
             Row {
                 id: posRow
-                spacing: Style.defaultSpacing
+                spacing: DStyle.defaultSpacing
 
                 opacity: {
                     if (propertiesController.focusedComponent && propertiesController.focusedComponent.isRoot) {
@@ -154,7 +154,7 @@ DPane {
 
             Row {
                 id: sizeRow
-                spacing: Style.defaultSpacing
+                spacing: DStyle.defaultSpacing
 
                 DText {
                     width: 24
@@ -193,7 +193,7 @@ DPane {
 
         Row {
             //height: anchorTargetEditor.height
-            spacing: Style.defaultMargin * 0.25
+            spacing: DStyle.defaultMargin * 0.25
 
             DCheckBox {
                 id: anchorFillCheckBox
@@ -216,7 +216,7 @@ DPane {
             }
 
             DTextInput {
-                width: propertiesPaneRoot.contentWidth - anchorTargetLabel.width - anchorFillCheckBox.width - Style.defaultMargin * 0.5 - 12
+                width: propertiesPaneRoot.contentWidth - anchorTargetLabel.width - anchorFillCheckBox.width - DStyle.defaultMargin * 0.5 - 12
                 anchors.verticalCenter: parent.verticalCenter
                 text: "parent"
             }
@@ -287,12 +287,12 @@ DPane {
 
         Item {
             width: propertiesPaneRoot.contentWidth
-            height: Style.defaultMargin
+            height: DStyle.defaultMargin
         }
 
         Row {
             DText {
-                width: propertiesPaneRoot.contentWidth - leftMarginSpinner.width - Style.defaultMargin / 2
+                width: propertiesPaneRoot.contentWidth - leftMarginSpinner.width - DStyle.defaultMargin / 2
                 text: "leftMargin: "
             }
 
@@ -304,7 +304,7 @@ DPane {
 
         Row {
             DText {
-                width: propertiesPaneRoot.contentWidth - rightMarginSpinner.width - Style.defaultMargin / 2
+                width: propertiesPaneRoot.contentWidth - rightMarginSpinner.width - DStyle.defaultMargin / 2
                 text: "rightMargin: "
             }
 
@@ -316,7 +316,7 @@ DPane {
 
         Row {
             DText {
-                width: propertiesPaneRoot.contentWidth - topMarginSpinner.width - Style.defaultMargin / 2
+                width: propertiesPaneRoot.contentWidth - topMarginSpinner.width - DStyle.defaultMargin / 2
                 text: "topMargin: "
             }
 
@@ -328,7 +328,7 @@ DPane {
 
         Row {
             DText {
-                width: propertiesPaneRoot.contentWidth - bottomMarginSpinner.width - Style.defaultMargin / 2
+                width: propertiesPaneRoot.contentWidth - bottomMarginSpinner.width - DStyle.defaultMargin / 2
                 text: "bottomMargin: "
             }
 
@@ -340,7 +340,7 @@ DPane {
 
         Row {
             DText {
-                width: propertiesPaneRoot.contentWidth - horizontalCenterOffsetSpinner.width - Style.defaultMargin / 2
+                width: propertiesPaneRoot.contentWidth - horizontalCenterOffsetSpinner.width - DStyle.defaultMargin / 2
                 text: "horizontal center offs: "
             }
 
@@ -352,7 +352,7 @@ DPane {
 
         Row {
             DText {
-                width: propertiesPaneRoot.contentWidth - verticalCenterOffsetSpinner.width - Style.defaultMargin / 2
+                width: propertiesPaneRoot.contentWidth - verticalCenterOffsetSpinner.width - DStyle.defaultMargin / 2
                 text: "vertical center offs: "
             }
 
@@ -367,7 +367,7 @@ DPane {
     DSection {
         id: ownPropertiesSection
         width: propertiesPaneRoot.contentWidth
-        title: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentName : ""
+        title: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentName : "NULL"
         minHeight: ownPropertiesContainer.height + addOwnPropertyButton.height
         state: stateHidden
 

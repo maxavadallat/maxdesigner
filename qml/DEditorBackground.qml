@@ -13,11 +13,11 @@ Item {
 
 //    property bool highLight: false
 
-//    color: Style.colorEditorBG
-//    border.color: Style.colorBG
+//    color: DStyle.colorEditorBG
+//    border.color: DStyle.colorBG
 //    color: "transparent"
 
-    property int radius: Style.defaultRadius
+    property int radius: DStyle.defaultRadius
 
 //    smooth: true
 //    antialiasing: true
@@ -26,7 +26,7 @@ Item {
         id: shadowRectangle
         anchors.fill: parent
         anchors.margins: 1
-        color: Style.colorEditorBG
+        color: DStyle.colorEditorBG
         radius: parent.radius
         visible: false
 //        smooth: true
@@ -40,7 +40,7 @@ Item {
         samples: 16
         horizontalOffset: 3
         verticalOffset: 3
-        color: Style.colorShadow
+        color: DStyle.colorShadow
         source: shadowRectangle
         visible: !editorBGRoot.highLight
 //        smooth: true
@@ -52,7 +52,7 @@ Item {
 //        id: highlightShadowRectangle
 //        anchors.fill: parent
 //        anchors.margins: 1
-//        color: Style.colorBorder
+//        color: DStyle.colorBorder
 //        radius: parent.radius
 //        visible: false
 ////        smooth: true
@@ -66,7 +66,7 @@ Item {
 //        samples: 16
 //        horizontalOffset: 3
 //        verticalOffset: 3
-//        color: Style.colorShadow
+//        color: DStyle.colorShadow
 //        source: highlightShadowRectangle
 //        visible: editorBGRoot.highLight
 ////        smooth: true
@@ -76,7 +76,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         color: "transparent"
-        border.color: editorBGRoot.editorFocus ? Style.colorBorder : Style.colorBorderNoFocus
+        border.color: editorBGRoot.editorFocus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
         radius: editorBGRoot.radius
         smooth: true
         antialiasing: true

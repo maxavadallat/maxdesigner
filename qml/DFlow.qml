@@ -1,27 +1,47 @@
 import QtQuick 2.0
 
 import "style"
-import "Constants.js" as CONSTS
+import "DConstants.js" as CONSTS
 
-Flow {
+Item {
     id: flowRoot
 
+    width: 300
+    height: flow.height
+
+    Behavior on width { DAnimation { } }
     Behavior on height { DAnimation { } }
 
-    property int cellWidth: CONSTS.componentItemWidth
-    property int cellHeight: CONSTS.componentItemHeight
+    default property alias contentContainer: flow.children
+    property alias spacing: flow.spacing
+    property alias flowItem: flow
 
-    spacing: Style.defaultSpacing
+    clip: true
 
-//    add: Transition {
-//        SequentialAnimation {
-//            alwaysRunToEnd: true
-//            PauseAnimation { duration: 200 }
-//            DAnimation { properties: "opacity, scale"; from: 0.0; to: 1.0; /*easing.type: Easing.OutBack*/ }
-//        }
-//    }
+    Flow {
+        id: flow
+        width: flowRoot.width
 
-    move: Transition {
-        DAnimation { properties: "x, y" }
+        property int cellWidth: CONSTS.componentItemWidth
+        property int cellHeight: CONSTS.componentItemHeight
+
+        spacing: DStyle.defaultSpacing
+
+    //    add: Transition {
+    //        SequentialAnimation {
+    //            alwaysRunToEnd: true
+    //            PauseAnimation { duration: 200 }
+    //            DAnimation { properties: "opacity, scale"; from: 0.0; to: 1.0; /*easing.type: Easing.OutBack*/ }
+    //        }
+    //    }
+
+    //    populate: Transition {
+    //        DAnimation { properties: "x, y" }
+    //    }
+
+        move: Transition {
+            DAnimation { properties: "x, y" }
+        }
     }
 }
+

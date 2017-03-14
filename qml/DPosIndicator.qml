@@ -6,8 +6,8 @@ import "style"
 DRectangle {
     id: posIndicatorRoot
 
-    //width: Style.posIndicatorWidth
-    //height: Style.posIndicatorHeight
+    //width: DStyle.posIndicatorWidth
+    //height: DStyle.posIndicatorHeight
     width: posOverlay.width + 12
     height: posOverlay.height + 4
 
@@ -16,12 +16,12 @@ DRectangle {
 
     property bool autoHide: true
 
-    border.color: Style.colorBorderTransparent
+    border.color: DStyle.colorBorderTransparent
     radius: 0
 
     opacity: 0.0
     Behavior on opacity { DFadeAnimation { } }
-    visible: opacity > 0.0
+    visible: posIndicatorRoot.enabled && (opacity > 0.0)
 
     onPosXChanged: {
         showPosIndicator();
@@ -31,10 +31,16 @@ DRectangle {
         showPosIndicator();
     }
 
+    onEnabledChanged: {
+        showPosIndicator();
+    }
+
     function showPosIndicator() {
-        posIndicatorRoot.opacity = 1.0;
-        if (posIndicatorRoot.autoHide) {
-            hideTimer.restart();
+        if (posIndicatorRoot.enabled) {
+            posIndicatorRoot.opacity = 1.0;
+            if (posIndicatorRoot.autoHide) {
+                hideTimer.restart();
+            }
         }
     }
 
@@ -51,12 +57,12 @@ DRectangle {
 //        source: posOverlay
 //        radius: 4
 //        samples: 16
-//        color: Style.colorBorder
+//        color: DStyle.colorBorder
 //    }
 
     Timer {
         id: hideTimer
-        interval: Style.defaultHideTimeout
+        interval: DStyle.defaultHideTimeout
         onTriggered: {
             posIndicatorRoot.opacity = 0.0;
         }

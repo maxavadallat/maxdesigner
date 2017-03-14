@@ -78,7 +78,9 @@ void OpenFilesModel::setCurrentIndex(const int& aCurrentIndex)
     // Get Count
     int ofCount = rowCount();
     // Check Current Index
-    if (mCurrentIndex != aCurrentIndex && aCurrentIndex >= 0 && aCurrentIndex < ofCount) {
+    if (mCurrentIndex != aCurrentIndex && aCurrentIndex >= -1 && aCurrentIndex < ofCount) {
+        qDebug() << "OpenFilesModel::setCurrentIndex - aCurrentIndex: " << aCurrentIndex;
+
         // Set Current Index
         mCurrentIndex = aCurrentIndex;
         // Emit Current Index Changed Signal
@@ -169,6 +171,8 @@ int OpenFilesModel::openFile(const QString& aFilePath, const bool& aComponent)
 
     // Check Index
     if (fIndex >= 0) {
+        // Set Current Index
+        setCurrentIndex(fIndex);
         // Emit File Selected Signal
         emit fileSelected(aFilePath);
         // File Already Open
@@ -191,6 +195,8 @@ int OpenFilesModel::openFile(const QString& aFilePath, const bool& aComponent)
 
             // Check If Opening Component
             if (!aComponent) {
+                // Set Current Index
+                setCurrentIndex(i);
                 // Emit File Opened Signal
                 emit fileOpened(fileInfo.absoluteFilePath());
             }
@@ -208,6 +214,8 @@ int OpenFilesModel::openFile(const QString& aFilePath, const bool& aComponent)
 
     // Check If Opening Component
     if (!aComponent) {
+        // Set Current Index
+        setCurrentIndex(filCount);
         // Emit File Opened Signal
         emit fileOpened(fileInfo.absoluteFilePath());
     }
@@ -266,6 +274,8 @@ void OpenFilesModel::closeFile(const QString& aFilePath)
 //==============================================================================
 void OpenFilesModel::closeFocusedFile()
 {
+    qDebug() << "OpenFilesModel::closeFocusedFile - mCurrentIndex: " << mCurrentIndex;
+
     // Close File
     closeFile(mCurrentIndex);
 }
@@ -275,6 +285,8 @@ void OpenFilesModel::closeFocusedFile()
 //==============================================================================
 void OpenFilesModel::closeAllFiles()
 {
+    qDebug() << "OpenFilesModel::closeFocusedFile";
+
     // Begin Reset Model
     beginResetModel();
 
@@ -301,6 +313,8 @@ void OpenFilesModel::selectFile(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < mFileInfoList.count()) {
+        // Set Current Index
+        setCurrentIndex(aIndex);
         // Emit File Selected Signal
         emit fileSelected(mFileInfoList[aIndex].absoluteFilePath());
     }
@@ -313,10 +327,8 @@ void OpenFilesModel::selectFile(const QString& aFilePath)
 {
     // Init File Info
     QFileInfo fileInfo(aFilePath);
-
     // Get Index
     int fIndex = mFileInfoList.indexOf(fileInfo);
-
     // Check Index
     if (fIndex >= 0) {
         // SelectFile
@@ -339,6 +351,8 @@ void OpenFilesModel::openComponent(ComponentInfo* aComponent)
 
     // Check Component Index
     if (cIndex >= 0) {
+        // Set Current Index
+        setCurrentIndex(cIndex);
         // Emit Component Selected
         emit componentSelected(aComponent);
         return;
@@ -346,8 +360,12 @@ void OpenFilesModel::openComponent(ComponentInfo* aComponent)
 
     // Check Component
     if (aComponent) {
+        // Get Opened File Index
+        cIndex = openFile(aComponent->infoPath(), true);
         // Open File
-        if (openFile(aComponent->infoPath(), true) >= 0) {
+        if (cIndex >= 0) {
+            // Set Current Index
+            setCurrentIndex(cIndex);
             // Emit Component Opened Signal
             emit componentOpened(aComponent);
         }

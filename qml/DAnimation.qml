@@ -3,6 +3,6 @@ import QtQuick 2.0
 import "style"
 
 NumberAnimation {
-    duration: Style.animDuration
+    duration: DStyle.animDuration
     easing.type: Easing.InOutCubic
 }

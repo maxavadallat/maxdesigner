@@ -1065,6 +1065,17 @@ void MainWindow::closeProject()
 //==============================================================================
 void MainWindow::closeComponent()
 {
+    qDebug() << "MainWindow::closeComponent";
+
+    // Check Properties Controller
+    if (mPropertiesController) {
+        // Check Focused Component
+        if (mPropertiesController->focusedComponent()) {
+            // Reset Focused Component
+            mPropertiesController->setFocusedComponent(NULL);
+        }
+    }
+
     // Check Open Files Model
     if (mOpenFiles) {
         // Close Focused File
@@ -1077,6 +1088,17 @@ void MainWindow::closeComponent()
 //==============================================================================
 void MainWindow::closeAllComponents()
 {
+    qDebug() << "MainWindow::closeAllComponents";
+
+    // Check Properties Controller
+    if (mPropertiesController) {
+        // Check Focused Component
+        if (mPropertiesController->focusedComponent()) {
+            // Reset Focused Component
+            mPropertiesController->setFocusedComponent(NULL);
+        }
+    }
+
     // Check Open Files Model
     if (mOpenFiles) {
         // Close All Files

@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "Constants.js" as CONSTS
+import "DConstants.js" as CONSTS
 import "style"
 
 DContainer {
@@ -64,7 +64,7 @@ DContainer {
         return paneBaseRoot.y;
     }
 
-    readonly property int animDuration: 500
+    readonly property int animDuration: DStyle.animDuration * 2.5
 
     property alias paneContainer: contentContainer
     default property alias paneContainerChildren: contentContainer.children
@@ -89,6 +89,14 @@ DContainer {
 
     property Connections parentConnections: Connections {
         target: parent
+
+        onWidthChanged: {
+
+        }
+
+        onHeightChanged: {
+
+        }
     }
 
     enableSizeOverlay: false
@@ -195,11 +203,28 @@ DContainer {
 
     // Hide
     function hide() {
+        // Set Last Shown X & Y
+        paneBaseRoot.lastShownX = paneBaseRoot.x;
+        paneBaseRoot.lastShownY = paneBaseRoot.y;
+
         // Set State
         paneBaseRoot.state = stateHidden;
     }
 
+    // Close
     function close() {
+        // Check Hide To Sie
+        if (paneBaseRoot.hideToSide === paneBaseRoot.hideToLeft || paneBaseRoot.hideToSide === paneBaseRoot.hideToBottom) {
+            // Set Reset Width
+            paneBaseRoot.resetWidth = paneBaseRoot.x + paneBaseRoot.width - paneBaseRoot.initialX;
+        } else {
+            // Set Reset Width
+            paneBaseRoot.resetWidth = paneBaseRoot.initialX - paneBaseRoot.x;
+        }
+
+        // Set Destroy On Finished
+        paneBaseRoot.destroyOnResetFinished = true;
+
         // Set State
         paneBaseRoot.state = stateClosed;
     }
@@ -243,9 +268,9 @@ DContainer {
     DText {
         id: titleTextLabel
         anchors.left: parent.left
-        anchors.leftMargin: Style.defaultMargin
+        anchors.leftMargin: DStyle.defaultMargin
         anchors.top: parent.top
-        anchors.topMargin: Style.defaultMargin
+        anchors.topMargin: DStyle.defaultMargin
         text: paneBaseRoot.title
         Behavior on opacity { DFadeAnimation { } }
         opacity: 0.0
@@ -303,7 +328,7 @@ DContainer {
             text: "•••"
 
             horizontalAlignment: Text.AlignHCenter
-            color: buttonMouseArea.pressed ? Style.colorBorder : Style.colorFontDark
+            color: buttonMouseArea.pressed ? DStyle.colorBorder : DStyle.colorFontDark
         }
 
         DMouseArea {
@@ -414,10 +439,11 @@ DContainer {
                 ParallelAnimation {
                     DAnimation { target: paneBaseRoot; property: "y"; to: paneBaseRoot.creationY }
                     DAnimation { target: paneBaseRoot; property: "height"; to: paneBaseRoot.creationHeight }
+                    DFadeAnimation { target: hideShowButton; to: 1.0 }
                 }
 
                 PropertyAction { target: titleTextLabel; property: "opacity"; value: 1.0 }
-                PropertyAction { target: hideShowButton; property: "opacity"; value: 1.0 }
+                //PropertyAction { target: hideShowButton; property: "opacity"; value: 1.0 }
 
                 PropertyAction { target: paneBaseRoot; property: "enableSizeOverlay"; value: paneBaseRoot.enableSizeOverlayOnShow }
                 PropertyAction { target: paneBaseRoot; property: "focus"; value: paneBaseRoot.focusOnShow }
@@ -443,11 +469,12 @@ DContainer {
 
                 PropertyAction { target: paneBaseRoot; property: "enableSizeOverlay"; value: false }
                 PropertyAction { target: titleTextLabel; property: "opacity"; value: 0.0 }
-                PropertyAction { target: hideShowButton; property: "opacity"; value: 0.0 }
+                //PropertyAction { target: hideShowButton; property: "opacity"; value: 0.0 }
 
                 ParallelAnimation {
                     DAnimation { target: paneBaseRoot; property: "y"; to: paneBaseRoot.y + paneBaseRoot.height / 2 }
                     DAnimation { target: paneBaseRoot; property: "height"; to: 1 }
+                    DFadeAnimation { target: hideShowButton; to: 0.0 }
                 }
 
                 ParallelAnimation {
@@ -484,6 +511,9 @@ DContainer {
                                 propertiesController.focusedComponent = null;
                             }
 
+                            // Select Other File
+                            openFilesModel.selectFile(openFilesModel.currentIndex);
+
                             // Destroy
                             paneBaseRoot.destroy();
                         }
@@ -509,6 +539,13 @@ DContainer {
                 }
 
                 PropertyAnimation { target: paneBaseRoot; properties: "x, y"; easing.type: Easing.InOutBack; duration: paneBaseRoot.animDuration }
+
+                ScriptAction {
+                    script: {
+                        // Emit Transition Finished Signal
+                        transitionFinished(stateShown);
+                    }
+                }
             }
         },
 
@@ -523,6 +560,8 @@ DContainer {
                     script: {
                         // Set Hide Button Text
                         hideButtonText.text = paneBaseRoot.title;
+                        // Emit Transition Finished Signal
+                        transitionFinished(stateHidden);
                     }
                 }
             }
@@ -533,6 +572,19 @@ DContainer {
 
             SequentialAnimation {
 
+                // ...
+
+                ScriptAction {
+                    script: {
+                        // Emit Transition Finished Signal
+                        transitionFinished(stateClosed);
+
+                        // ...
+
+                        // Destroy
+                        paneBaseRoot.destroy();
+                    }
+                }
             }
         }
     ]

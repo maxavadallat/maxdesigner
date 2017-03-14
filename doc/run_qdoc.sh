@@ -1,0 +1,1 @@
+qdoc -highlighting maxdesigner.qdocconf

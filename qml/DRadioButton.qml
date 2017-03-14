@@ -22,25 +22,25 @@ DButtonBase {
         anchors.right: radioButtonRoot.rightAligned ? parent.right : undefined
         anchors.verticalCenter: parent.verticalCenter
         text: radioButtonRoot.text
-        color: radioButtonRoot.highlight ? Style.colorBorder : Style.colorFontDark
+        color: radioButtonRoot.highlight ? DStyle.colorBorder : DStyle.colorFontDark
     }
 
     DEditorBackground {
         id: buttonBG
-        width: Style.radioButtonRadius * 2
-        height: Style.radioButtonRadius * 2
+        width: DStyle.radioButtonRadius * 2
+        height: DStyle.radioButtonRadius * 2
 
         anchors.left: radioButtonRoot.rightAligned ? parent.left : undefined
         anchors.right: radioButtonRoot.rightAligned ? undefined : parent.right
 
         anchors.verticalCenter: parent.verticalCenter
 
-        //bgColor: radioButtonRoot.pressed ? Style.colorHighLight : Style.colorEditorBG
+        //bgColor: radioButtonRoot.pressed ? DStyle.colorHighLight : DStyle.colorEditorBG
         //bgColor: "red"
         //highLight: radioButtonRoot.highlight
         editorFocus: radioButtonRoot.highlight
 
-        radius: Style.radioButtonRadius
+        radius: DStyle.radioButtonRadius
     }
 
     Rectangle {
@@ -48,8 +48,8 @@ DButtonBase {
         width: radius * 2
         height: radius * 2
         anchors.centerIn: buttonBG
-        color: Style.colorRadioButton
-        radius: Style.defaultRadius + 1
+        color: DStyle.colorRadioButton
+        radius: DStyle.defaultRadius + 1
         opacity: radioButtonRoot.checked ? 1.0 : 0.0
         Behavior on opacity { DFadeAnimation { } }
         visible: opacity > 0.0

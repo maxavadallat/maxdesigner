@@ -13,13 +13,13 @@ DButtonBase {
         anchors.right: switchRoot.rightAligned ? parent.right : undefined
         anchors.verticalCenter: parent.verticalCenter
         text: switchRoot.text
-        color: switchRoot.highlight ? Style.colorBorder : Style.colorFontDark
+        color: switchRoot.highlight ? DStyle.colorBorder : DStyle.colorFontDark
     }
 
     DEditorBackground {
         id: buttonBG
-        width: Style.switchWidth
-        height: parent.height - Style.defaultMargin
+        width: DStyle.switchWidth
+        height: parent.height - DStyle.defaultMargin
 
         anchors.left: switchRoot.rightAligned ? parent.left : undefined
         anchors.right: switchRoot.rightAligned ? undefined : parent.right
@@ -33,11 +33,11 @@ DButtonBase {
     DRectangle {
         anchors.fill: buttonBG
         anchors.margins: 2
-        color: Style.colorBorderNoFocus
+        color: DStyle.colorBorderNoFocus
         border.color: "transparent"
         radius: height / 2
         opacity: switchRoot.checked ? 0.5 : 0.0
-        Behavior on opacity { NumberAnimation { duration: Style.animDuration } }
+        Behavior on opacity { NumberAnimation { duration: DStyle.animDuration } }
         visible: opacity > 0.0
     }
 
@@ -47,8 +47,8 @@ DButtonBase {
         height: width
         anchors.verticalCenter: buttonBG.verticalCenter
         radius: height / 2
-        //border.color: switchRoot.highlight ? Style.colorBorder : Style.colorFontDark
-        border.color: Style.colorFontDark
+        //border.color: switchRoot.highlight ? DStyle.colorBorder : DStyle.colorFontDark
+        border.color: DStyle.colorFontDark
 
         states: [
             State {

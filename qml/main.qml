@@ -2,7 +2,7 @@ import QtQuick 2.0
 
 import enginecomponents 0.1
 
-import "Constants.js" as CONSTS
+import "DConstants.js" as CONSTS
 import "style"
 
 Item {
@@ -95,6 +95,10 @@ Item {
         switch (event.key) {
             case Qt.Key_T:
                 settingsController.tracerVisible = !settingsController.tracerVisible;
+            break;
+
+            case Qt.Key_F8:
+                settingsController.slowMotion = !settingsController.slowMotion;
             break;
         }
     }
@@ -212,7 +216,7 @@ Item {
         id: bgContainer
         anchors.fill: parent
 
-        color: Style.colorMainBG
+        color: DStyle.colorMainBG
 
         Image {
             id: bgImage
@@ -237,7 +241,7 @@ Item {
         DComponentRootContainer {
             id: newComponentRootContainer
             initialX: projectPane.x + projectPane.width
-            initialY: Math.max(Math.min(mainGrabArea.height / 2, projectPane.y + projectPane.height - Style.defaultMargin), projectPane.y + Style.defaultMargin)
+            initialY: Math.max(Math.min(mainGrabArea.height / 2, projectPane.y + projectPane.height - DStyle.defaultMargin), projectPane.y + DStyle.defaultMargin)
 
             creationWidth: 400
             creationHeight: 600
@@ -300,7 +304,7 @@ Item {
             creationWidth: 360
             creationHeight: 600
 
-            creationX: Style.defaultMargin * 2
+            creationX: DStyle.defaultMargin * 2
             creationY: parentHeight / 2 - creationHeight / 2
 
             lastShownX: projectPane.creationX
@@ -336,7 +340,7 @@ Item {
             creationWidth: 300
             creationHeight: 600
 
-            creationX: parentWidth - creationWidth - Style.defaultMargin * 2
+            creationX: parentWidth - creationWidth - DStyle.defaultMargin * 2
             creationY: parentHeight / 2 - creationHeight / 2
 
             lastShownX: propertiesPane.creationX
@@ -353,7 +357,7 @@ Item {
             id: formulaEditor
 
             initialX: propertiesPane.x
-            initialY: Math.max(Math.min(mainGrabArea.height / 2, propertiesPane.y + propertiesPane.height - Style.defaultMargin), propertiesPane.y + Style.defaultMargin)
+            initialY: Math.max(Math.min(mainGrabArea.height / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
 
             creationWidth: 320
             creationHeight: 200
@@ -382,6 +386,12 @@ Item {
     DMinimizedComponents {
         id: minimzedComponents
         anchors.horizontalCenter: parent.horizontalCenter
+    }
+
+    DDemoContainer {
+        id: demoContainer
+        anchors.centerIn: parent
+        visible: false
     }
 }
 

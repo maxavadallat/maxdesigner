@@ -23,7 +23,7 @@ DPane {
 
     hideToSide: hideToLeft
 
-    borderColor: Style.colorBorder
+    borderColor: DStyle.colorBorder
 
     property Connections currentProjectConnection: Connections {
         target: mainController.currentProject
@@ -74,7 +74,7 @@ DPane {
         DFlow {
             id: baseComponentsFlow
             width: projectPaneRoot.contentWidth
-            spacing: Style.defaultSpacing
+            spacing: DStyle.defaultSpacing
             opacity: baseComponentsRepeater.count > 0 ? 1.0 : 0.0
 
             Repeater {
@@ -118,7 +118,7 @@ DPane {
         DFlow {
             id: componentsFlow
             width: projectPaneRoot.contentWidth
-            spacing: Style.defaultSpacing
+            spacing: DStyle.defaultSpacing
             opacity: componentsRepeater.count > 0 ? 1.0 : 0.0
 
             Repeater {
@@ -162,7 +162,7 @@ DPane {
         DFlow {
             id: viewsFlow
             width: projectPaneRoot.contentWidth
-            spacing: Style.defaultSpacing
+            spacing: DStyle.defaultSpacing
             opacity: viewsRepeater.count > 0 ? 1.0 : 0.0
 
             Repeater {
@@ -223,11 +223,11 @@ DPane {
                 Row {
                     id: projectTreeDelegateRow
                     height: parent.height
-                    spacing: Style.defaultSpacing
+                    spacing: DStyle.defaultSpacing
 
                     Image {
-                        width: Style.iconWidthSmall
-                        height: Style.iconHeightSmall
+                        width: DStyle.iconWidthSmall
+                        height: DStyle.iconHeightSmall
                         anchors.verticalCenter: parent.verticalCenter
                         fillMode: Image.PreserveAspectFit
                         source: model ? model.fileIcon : ""
@@ -282,9 +282,9 @@ DPane {
 
             delegate: Rectangle {
                 width: openFilesListView.width
-                height: Style.listItemHeight
+                height: DStyle.listItemHeight
 
-                color: index === openFilesListView.currentIndex ? Style.colorSelectedHighLight : "transparent"
+                color: index === openFilesListView.currentIndex ? DStyle.colorSelectedHighLight : "transparent"
 
                 DMouseArea {
                     anchors.fill: parent
@@ -303,8 +303,8 @@ DPane {
 
                 Image {
                     id: iconImage
-                    width: Style.iconWidthSmall
-                    height: Style.iconHeightSmall
+                    width: DStyle.iconWidthSmall
+                    height: DStyle.iconHeightSmall
                     anchors.verticalCenter: parent.verticalCenter
                     fillMode: Image.PreserveAspectFit
                     source: fileIcon
@@ -313,7 +313,7 @@ DPane {
 
                 DText {
                     anchors.fill: parent
-                    anchors.leftMargin: iconImage.source !== "" ? iconImage.width + Style.defaultMargin : 0
+                    anchors.leftMargin: iconImage.source !== "" ? iconImage.width + DStyle.defaultMargin : 0
                     text: fileName
                 }
             }

@@ -3,6 +3,7 @@
 
 
 #define DEFAULT_SETTINGS_VALUE_TRACER_VISIBLE                   false
+#define DEFAULT_SETTINGS_VALUE_SLOW_MOTION                      false
 
 #define DEFAULT_SETTINGS_VALUE_MAIN_WINDOW_STATE                Qt::WindowNoState
 

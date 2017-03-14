@@ -12,11 +12,11 @@ DRectangle {
     Behavior on height { DAnimation { } }
 
     property int popupWidth: popupRoot.maxItemWidth
-    property int popupHeight: popupColumn.height + Style.defaultMargin * 2
+    property int popupHeight: popupColumn.height + DStyle.defaultMargin * 2
 
     property list<QtObject> model
 
-    property int maxItemWidth: Style.defaultPopupWidth
+    property int maxItemWidth: DStyle.defaultPopupWidth
 
     property int currentIndex: -1
 
@@ -34,7 +34,7 @@ DRectangle {
     signal subPopupHidden()
 
     onModelChanged: {
-        maxItemWidth = Style.defaultPopupWidth;
+        maxItemWidth = DStyle.defaultPopupWidth;
         currentIndex = 0;
     }
 

@@ -91,7 +91,7 @@ QtObject {
     readonly property int fontSizeXL:                       28
 
     // Default Anim Duration
-    readonly property int animDuration:                     200
+    readonly property int animDuration:                     200 * (settingsController.slowMotion ? 10 : 1)
 
     // Disabled Opacity
     readonly property real disabledOpacity:                 0.7

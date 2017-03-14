@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import QtGraphicalEffects 1.0
 
-import "Constants.js" as CONSTS
+import "DConstants.js" as CONSTS
 import "style"
 
 DMouseArea {
@@ -26,7 +26,7 @@ DMouseArea {
     property bool enablePosOverlay: true
 
     property alias backgroundColor: containerBG.color
-    property string borderColor: Style.colorBorderNoFocus
+    property string borderColor: DStyle.colorBorderNoFocus
     property alias radius: containerBG.radius
 
     property alias clipContent: contentContainer.clip
@@ -175,25 +175,27 @@ DMouseArea {
         id: posIndicator
         anchors.left: parent.left
         anchors.top: parent.top
-        posX: enablePosOverlay ? containerRoot.x : 0
-        posY: enablePosOverlay ? containerRoot.y : 0
+        enabled: enablePosOverlay
+        posX: containerRoot.x
+        posY: containerRoot.y
     }
 
     DSizeIndicator {
         id: sizeIndicator
         anchors.centerIn: parent
-        sizeW: enableSizeOverlay ? containerRoot.width : 0
-        sizeH: enableSizeOverlay ? containerRoot.height : 0
+        enabled: enableSizeOverlay
+        sizeW: containerRoot.width
+        sizeH: containerRoot.height
     }
 
     DResizeArea {
         id: topLeftResizer
-        width: Style.resizeAreaSize * 1.5
-        height: Style.resizeAreaSize * 1.5
+        width: DStyle.resizeAreaSize * 1.5
+        height: DStyle.resizeAreaSize * 1.5
         anchors.left: parent.left
-        anchors.leftMargin: -Style.resizeAreaSize * 0.5
+        anchors.leftMargin: -DStyle.resizeAreaSize * 0.5
         anchors.top: parent.top
-        anchors.topMargin: -Style.resizeAreaSize * 0.5
+        anchors.topMargin: -DStyle.resizeAreaSize * 0.5
         cursorShape: Qt.SizeFDiagCursor
 
         onPressed: {
@@ -231,11 +233,11 @@ DMouseArea {
 
     DResizeArea {
         id: topResizer
-        width: parent.width - Style.resizeAreaSize * 2
-        height: Style.resizeAreaSize
+        width: parent.width - DStyle.resizeAreaSize * 2
+        height: DStyle.resizeAreaSize
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
-        anchors.topMargin: -Style.resizeAreaSize * 0.5
+        anchors.topMargin: -DStyle.resizeAreaSize * 0.5
         cursorShape: Qt.SizeVerCursor
 
         onPressed: {
@@ -266,12 +268,12 @@ DMouseArea {
 
     DResizeArea {
         id: topRightResizer
-        width: Style.resizeAreaSize * 1.5
-        height: Style.resizeAreaSize * 1.5
+        width: DStyle.resizeAreaSize * 1.5
+        height: DStyle.resizeAreaSize * 1.5
         anchors.right: parent.right
-        anchors.rightMargin: -Style.resizeAreaSize * 0.5
+        anchors.rightMargin: -DStyle.resizeAreaSize * 0.5
         anchors.top: parent.top
-        anchors.topMargin: -Style.resizeAreaSize * 0.5
+        anchors.topMargin: -DStyle.resizeAreaSize * 0.5
         cursorShape: Qt.SizeBDiagCursor
 
         onPressed: {
@@ -309,10 +311,10 @@ DMouseArea {
 
     DResizeArea {
         id: leftResizer
-        width: Style.resizeAreaSize
-        height: parent.height - Style.resizeAreaSize * 2
+        width: DStyle.resizeAreaSize
+        height: parent.height - DStyle.resizeAreaSize * 2
         anchors.left: parent.left
-        anchors.leftMargin: -Style.resizeAreaSize * 0.5
+        anchors.leftMargin: -DStyle.resizeAreaSize * 0.5
         anchors.verticalCenter: parent.verticalCenter
         cursorShape: Qt.SizeHorCursor
 
@@ -344,10 +346,10 @@ DMouseArea {
 
     DResizeArea {
         id: rightResizer
-        width: Style.resizeAreaSize
-        height: parent.height - Style.resizeAreaSize * 2
+        width: DStyle.resizeAreaSize
+        height: parent.height - DStyle.resizeAreaSize * 2
         anchors.right: parent.right
-        anchors.rightMargin: -Style.resizeAreaSize * 0.5
+        anchors.rightMargin: -DStyle.resizeAreaSize * 0.5
         anchors.verticalCenter: parent.verticalCenter
         cursorShape: Qt.SizeHorCursor
 
@@ -378,12 +380,12 @@ DMouseArea {
 
     DResizeArea {
         id: bottomLeftResizer
-        width: Style.resizeAreaSize * 1.5
-        height: Style.resizeAreaSize * 1.5
+        width: DStyle.resizeAreaSize * 1.5
+        height: DStyle.resizeAreaSize * 1.5
         anchors.left: parent.left
-        anchors.leftMargin: -Style.resizeAreaSize * 0.5
+        anchors.leftMargin: -DStyle.resizeAreaSize * 0.5
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: -Style.resizeAreaSize * 0.5
+        anchors.bottomMargin: -DStyle.resizeAreaSize * 0.5
         cursorShape: Qt.SizeBDiagCursor
 
         onPressed: {
@@ -420,11 +422,11 @@ DMouseArea {
 
     DResizeArea {
         id: bottomResizer
-        width: parent.width - Style.resizeAreaSize * 2
-        height: Style.resizeAreaSize
+        width: parent.width - DStyle.resizeAreaSize * 2
+        height: DStyle.resizeAreaSize
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: -Style.resizeAreaSize * 0.5
+        anchors.bottomMargin: -DStyle.resizeAreaSize * 0.5
         cursorShape: Qt.SizeVerCursor
 
         onPressed: {
@@ -454,12 +456,12 @@ DMouseArea {
 
     DResizeArea {
         id: bottomRightResizer
-        width: Style.resizeAreaSize * 1.5
-        height: Style.resizeAreaSize * 1.5
+        width: DStyle.resizeAreaSize * 1.5
+        height: DStyle.resizeAreaSize * 1.5
         anchors.right: parent.right
-        anchors.rightMargin: -Style.resizeAreaSize * 0.5
+        anchors.rightMargin: -DStyle.resizeAreaSize * 0.5
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: -Style.resizeAreaSize * 0.5
+        anchors.bottomMargin: -DStyle.resizeAreaSize * 0.5
         cursorShape: Qt.SizeFDiagCursor
 
         onPressed: {

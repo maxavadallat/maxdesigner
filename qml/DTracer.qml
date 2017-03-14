@@ -10,6 +10,6 @@ Loader {
     sourceComponent: Rectangle {
         anchors.fill: parent
         color: "transparent"//"#22FFFF00"
-        border.color: Style.colorTrace
+        border.color: DStyle.colorTrace
     }
 }

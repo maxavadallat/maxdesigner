@@ -2,6 +2,7 @@
 #define SETTINGSKEYS_H
 
 #define SETTINGS_KEY_TRACER_VISIBLE                         "tracerVisible"
+#define SETTINGS_KEY_SLOW_MOTION                            "slowMotion"
 
 #define SETTINGS_KEY_MAIN_WINDOW_STATE                      "mainWindowState"
 

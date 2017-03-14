@@ -5,13 +5,16 @@ import "style"
 DPaneBase {
     id: formulaEditorRoot
 
+//    width: DStyle.formulaEdiorWidth
+//    height: DStyle.formulaEditorHeight
+
     title: "Formula" // Id
 
     enablePosOverlay: false
     enableSizeOverlay: false
 
-    minWidth: Style.formulaEdiorWidth
-    minHeight: Style.formulaEditorHeight
+    minWidth: DStyle.formulaEdiorWidth
+    minHeight: DStyle.formulaEditorHeight
 
     enablePaneContent: true
 
@@ -23,12 +26,14 @@ DPaneBase {
 
     clipContent: true
 
+    //border.color: textInput.editor.focus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
+
     DText {
         id: label
         anchors.left: parent.left
-        anchors.leftMargin: Style.defaultMargin
+        anchors.leftMargin: DStyle.defaultMargin
         anchors.top: parent.top
-        anchors.topMargin: Style.defaultMargin
+        anchors.topMargin: DStyle.defaultMargin
         text: formulaEditorRoot.title
         opacity: formulaEditorRoot.state === formulaEditorRoot.stateShown ? 1.0 : 0.0
     }
@@ -37,10 +42,10 @@ DPaneBase {
         id: textInput
         anchors.fill: parent
         anchors {
-            leftMargin: Style.defaultMargin
-            topMargin: label.height + Style.defaultMargin * 2
-            rightMargin: Style.defaultMargin
-            bottomMargin: Style.defaultMargin
+            leftMargin: DStyle.defaultMargin
+            topMargin: label.height + DStyle.defaultMargin * 2
+            rightMargin: DStyle.defaultMargin
+            bottomMargin: DStyle.defaultMargin
         }
 
         fixTextSize: true

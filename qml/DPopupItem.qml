@@ -5,8 +5,8 @@ import "style"
 DMouseArea {
     id: popupItemRoot
 
-    width: Style.defaultPopupWidth + Style.defaultMargin * 2
-    height: itemTextLabel.text === "-" ? (Style.popupItemHeight * 0.5) : Style.popupItemHeight
+    width: DStyle.defaultPopupWidth + DStyle.defaultMargin * 2
+    height: itemTextLabel.text === "-" ? (DStyle.popupItemHeight * 0.5) : DStyle.popupItemHeight
 
     property int itemIndex: -1
 
@@ -16,7 +16,7 @@ DMouseArea {
 
     property bool selected: false
 
-    property int textWidth: itemTextLabel.text !== "-" ? itemTextLabel.width : Style.defaultPopupWidth
+    property int textWidth: itemTextLabel.text !== "-" ? itemTextLabel.width : DStyle.defaultPopupWidth
 
     hoverEnabled: true
 
@@ -50,13 +50,13 @@ DMouseArea {
 
     Rectangle {
         anchors.fill: parent
-        color: popupItemRoot.selected && itemTextLabel.text !== "-" ? Style.colorSelectedHighLight : "transparent"
+        color: popupItemRoot.selected && itemTextLabel.text !== "-" ? DStyle.colorSelectedHighLight : "transparent"
     }
 
     DText {
         id: itemTextLabel
         anchors.left: parent.left
-        anchors.leftMargin: Style.defaultMargin
+        anchors.leftMargin: DStyle.defaultMargin
         anchors.verticalCenter: parent.verticalCenter
         visible: text !== "-"
     }
@@ -64,7 +64,7 @@ DMouseArea {
     DText {
         id: subMenuItemIndicator
         anchors.right: parent.right
-        anchors.rightMargin: Style.defaultMargin
+        anchors.rightMargin: DStyle.defaultMargin
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: -1
         text: ">"
@@ -80,7 +80,7 @@ DMouseArea {
 
     Timer {
         id: hoverTimer
-        interval: Style.popupItemHoverTimeout
+        interval: DStyle.popupItemHoverTimeout
         onTriggered: {
             popupItemRoot.subMenuItemSelected(itemIndex);
         }

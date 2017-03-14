@@ -6,13 +6,13 @@ Item {
     id: sectionRoot
 
     width: 200
-    height: Style.headerHeight
+    height: DStyle.headerHeight
 
     property string title: "Section"
 
     property int minHeight: 200
 
-    readonly property int openedHeight: Math.max(contentFlickable.contentHeight + sectionHeader.height + Style.defaultMargin * 2, minHeight)
+    readonly property int openedHeight: Math.max(contentFlickable.contentHeight + sectionHeader.height + DStyle.defaultMargin * 2, minHeight)
 
     default property alias contentContainer: contentFlickable.contentContainer
 
@@ -45,7 +45,7 @@ Item {
     DMouseArea {
         id: sectionHeader
         width: parent.width
-        height: Style.headerHeight
+        height: DStyle.headerHeight
 
         preventStealing: false
 
@@ -68,7 +68,7 @@ Item {
         DRectangle {
             id: titleBGRect
             anchors.fill: parent
-            color: Style.colorFontDark
+            color: DStyle.colorFontDark
             border.color: "transparent"
             opacity: 0.2
         }
@@ -80,20 +80,20 @@ Item {
             // Indicator
             DText {
                 id: indicator
-                width: Style.headerHeight
-                height: Style.headerHeight
+                width: DStyle.headerHeight
+                height: DStyle.headerHeight
                 horizontalAlignment: Text.AlignHCenter
                 text: sectionRoot.state === sectionRoot.stateOpen ? "-" : "+"
                 font.bold: true
-                color: sectionHeader.pressed ? Style.colorBorder : Style.colorFontDark
+                color: sectionHeader.pressed ? DStyle.colorBorder : DStyle.colorFontDark
             }
 
             // Title
             DText {
                 id: titleText
-                height: Style.headerHeight
+                height: DStyle.headerHeight
                 text: sectionRoot.title
-                color: sectionHeader.pressed ? Style.colorBorder : Style.colorFontDark
+                color: sectionHeader.pressed ? DStyle.colorBorder : DStyle.colorFontDark
             }
         }
     }
@@ -104,9 +104,9 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: sectionHeader.bottom
-        anchors.topMargin: Style.defaultMargin
+        anchors.topMargin: DStyle.defaultMargin
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: Style.defaultMargin
+        anchors.bottomMargin: DStyle.defaultMargin
         clip: true
     }
 
@@ -119,7 +119,7 @@ Item {
 
         State {
             name: sectionRoot.stateClosed
-            PropertyChanges { target: sectionRoot; height: Style.headerHeight }
+            PropertyChanges { target: sectionRoot; height: DStyle.headerHeight }
         },
 
         State {

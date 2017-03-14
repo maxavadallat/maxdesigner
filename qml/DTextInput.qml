@@ -6,8 +6,8 @@ import "style"
 DControl {
     id: textInputRoot
 
-    width: Style.textInputWidth
-    height: Style.textInputHeight
+    width: DStyle.textInputWidth
+    height: DStyle.textInputHeight
 
     property alias editor: textInput
     property alias text: textInput.text
@@ -38,28 +38,28 @@ DControl {
 
         width: {
             if (text.length === 0 || !textInputRoot.showClearButton) {
-                return parent.width - Style.defaultMargin * 2;
+                return parent.width - DStyle.defaultMargin * 2;
             }
 
-            return parent.width - Style.defaultMargin * 2.5 - clearButton.width;
+            return parent.width - DStyle.defaultMargin * 2.5 - clearButton.width;
         }
 
-        height: parent.height - Style.defaultMargin
+        height: parent.height - DStyle.defaultMargin
 
         Behavior on width { DAnimation { } }
 
         anchors.left: parent.left
-        anchors.leftMargin: Style.defaultMargin
+        anchors.leftMargin: DStyle.defaultMargin
         anchors.verticalCenter: parent.verticalCenter
         //anchors.verticalCenterOffset: 1
 
         verticalAlignment: Text.AlignVCenter
 
-        font.pixelSize: fixTextSize ? Style.fontSizeL : textInput.height - 6
+        font.pixelSize: fixTextSize ? DStyle.fontSizeL : textInput.height - 6
 
         selectByMouse: true
 
-        color: Style.colorFontLight
+        color: DStyle.colorFontLight
 
 //        Rectangle {
 //            anchors.fill: parent
@@ -89,10 +89,10 @@ DControl {
 
     DButton {
         id: clearButton
-        width: Style.textInputHeight * 0.6
+        width: DStyle.textInputHeight * 0.6
         height: width
         anchors.right: parent.right
-        anchors.rightMargin: Style.defaultMargin * 0.7
+        anchors.rightMargin: DStyle.defaultMargin * 0.7
         anchors.verticalCenter: parent.verticalCenter
 
         opacity: (textInput.text.length > 0 && textInputRoot.showClearButton) ? 1.0 : 0.0
@@ -100,7 +100,7 @@ DControl {
         visible: opacity > 0.0
         text: "X"
         radius: height * 0.5 - 1
-        pixelSize: Style.fontSizeS
+        pixelSize: DStyle.fontSizeS
 
         onClicked: {
             // Clear Text

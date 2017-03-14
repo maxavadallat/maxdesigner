@@ -5,8 +5,8 @@ import "style"
 DControl {
     id: spinnerRoot
 
-    width: Style.spinnerWidth
-    height: Style.spinnerHeight
+    width: DStyle.spinnerWidth
+    height: DStyle.spinnerHeight
 
     property double value: 0.0
 
@@ -55,7 +55,7 @@ DControl {
         id: textInput
 
         width: parent.width - buttonsColumn.width
-        height: Style.spinnerHeight
+        height: DStyle.spinnerHeight
 
         editor.inputMethodHints: Qt.ImhDigitsOnly
         editor.horizontalAlignment: TextInput.AlignHCenter
@@ -64,7 +64,7 @@ DControl {
             top: spinnerRoot.maxValue
         }
 
-        pixelSize: Style.fontSizeM
+        pixelSize: DStyle.fontSizeM
         showClearButton: false
 
         onTextChanged: {
@@ -102,15 +102,15 @@ DControl {
 
     Column {
         id: buttonsColumn
-        width: Style.spinnerButtonWidth
+        width: DStyle.spinnerButtonWidth
 
         anchors.right: parent.right
-        //anchors.rightMargin: Style.defaultMargin
+        //anchors.rightMargin: DStyle.defaultMargin
         anchors.verticalCenter: parent.verticalCenter
 
         DMouseArea {
-            width: Style.spinnerButtonWidth
-            height: Style.spinnerButtonHeight
+            width: DStyle.spinnerButtonWidth
+            height: DStyle.spinnerButtonHeight
             anchors.right: parent.right
 
             onClicked: {
@@ -141,13 +141,13 @@ DControl {
             DText {
                 anchors.centerIn: parent
                 text: "+"
-                color: parent.pressed ? Style.colorBorder : Style.colorFontDark
+                color: parent.pressed ? DStyle.colorBorder : DStyle.colorFontDark
             }
 
             Timer {
                 id: incTimer
                 repeat: true
-                interval: Style.spinnerButtonTimer
+                interval: DStyle.spinnerButtonTimer
                 onTriggered: {
                     spinnerRoot.incValue();
                 }
@@ -155,8 +155,8 @@ DControl {
         }
 
         DMouseArea {
-            width: Style.spinnerButtonWidth
-            height: Style.spinnerButtonHeight
+            width: DStyle.spinnerButtonWidth
+            height: DStyle.spinnerButtonHeight
             anchors.right: parent.right
 
             onClicked: {
@@ -187,13 +187,13 @@ DControl {
             DText {
                 anchors.centerIn: parent
                 text: "-"
-                color: parent.pressed ? Style.colorBorder : Style.colorFontDark
+                color: parent.pressed ? DStyle.colorBorder : DStyle.colorFontDark
             }
 
             Timer {
                 id: decTimer
                 repeat: true
-                interval: Style.spinnerButtonTimer
+                interval: DStyle.spinnerButtonTimer
                 onTriggered: {
                     spinnerRoot.decValue();
                 }

@@ -2,7 +2,7 @@ import QtQuick 2.0
 
 import enginecomponents 0.1
 
-import "Constants.js" as CONSTS
+import "DConstants.js" as CONSTS
 import "style"
 
 DPaneBase {
@@ -64,11 +64,11 @@ DPaneBase {
     DFlickable {
         id: sourceContainerFlickable
         anchors.fill: parent
-        //anchors.margins: Style.defaultMargin
-        anchors.topMargin: titleLabel.height + Style.defaultMargin * 2
-        anchors.leftMargin: Style.defaultMargin
-        anchors.rightMargin: Style.defaultMargin
-        anchors.bottomMargin: Style.defaultMargin
+        //anchors.margins: DStyle.defaultMargin
+        anchors.topMargin: titleLabel.height + DStyle.defaultMargin * 2
+        anchors.leftMargin: DStyle.defaultMargin
+        anchors.rightMargin: DStyle.defaultMargin
+        anchors.bottomMargin: DStyle.defaultMargin
 
         Item {
             id: textInputContainer
@@ -114,17 +114,17 @@ DPaneBase {
 
             TextEdit {
                 id: sourceTextInput
-                width: textInputContainer.width - lineNumbers.width - Style.defaultMargin
+                width: textInputContainer.width - lineNumbers.width - DStyle.defaultMargin
                 height: Math.max(sourceContainerFlickable.height, contentHeight)
                 anchors.left: lineNumbers.right
-                anchors.leftMargin:Style.defaultMargin
+                anchors.leftMargin:DStyle.defaultMargin
                 font.family: sourceContainerRoot.fontFamily
                 font.pixelSize: sourceContainerRoot.fontSize
                 wrapMode: TextEdit.NoWrap
                 horizontalAlignment: TextEdit.AlignLeft
                 verticalAlignment: TextEdit.AlignTop
                 textFormat: TextEdit.RichText
-                color: Style.colorFontDark
+                color: DStyle.colorFontDark
 
                 // TODO: Syntax Highlighting, line numbers
 

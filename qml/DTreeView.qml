@@ -52,10 +52,10 @@ DControl {
             transientScrollBars: true
             frame: Item { }
             rowDelegate: Rectangle {
-                height: Style.listItemHeight
-                color: styleData.selected ? Style.colorSelectedHighLight : "transparent"
+                height: DStyle.listItemHeight
+                color: styleData.selected ? DStyle.colorSelectedHighLight : "transparent"
             }
-            highlightedTextColor: Style.colorBorder
+            highlightedTextColor: DStyle.colorBorder
         }
 
         onCurrentIndexChanged: {

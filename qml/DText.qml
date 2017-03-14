@@ -5,11 +5,11 @@ import "style"
 Text {
     id: textRoot
     verticalAlignment: Text.AlignVCenter
-    color: Style.colorFontDark
-    font.pixelSize: Style.fontSizeM
+    color: DStyle.colorFontDark
+    font.pixelSize: DStyle.fontSizeM
     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
-    opacity: enabled ? 1.0 : Style.disabledOpacity
-    Behavior on opacity { NumberAnimation { duration: Style.animDuration } }
+    opacity: enabled ? 1.0 : DStyle.disabledOpacity
+    Behavior on opacity { NumberAnimation { duration: DStyle.animDuration } }
     visible: opacity > 0.0
 }

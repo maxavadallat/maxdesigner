@@ -1,12 +1,12 @@
 import QtQuick 2.0
 
-import "Constants.js" as CONSTS
+import "DConstants.js" as CONSTS
 import "style"
 
 Row {
     id: minimizedComponentsRoot
 
-    height: Style.minimizedComponentsHeight
+    height: DStyle.minimizedComponentsHeight
 
     property var itemModel: null
 
@@ -49,7 +49,7 @@ Row {
                 id: delegateText
                 height: parent.height
                 text: model.componentName
-                color: delegateRoot.pressed ? Style.colorBorder : Style.colorFontDark
+                color: delegateRoot.pressed ? DStyle.colorBorder : DStyle.colorFontDark
             }
 
             onClicked: {

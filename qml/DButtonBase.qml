@@ -1,7 +1,7 @@
 import QtQuick 2.0
 
 import "style"
-import "Constants.js" as CONSTS
+import "DConstants.js" as CONSTS
 
 DMouseArea {
     id: buttonBaseRoot

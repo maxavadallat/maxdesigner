@@ -1,10 +1,10 @@
 <RCC>
     <qresource prefix="/">
-        <file>qml/style/Style.qml</file>
+        <file>qml/style/DStyle.qml</file>
         <file>qml/style/Designer.js</file>
         <file>qml/style/Developer.js</file>
         <file>qml/style/qmldir</file>
-        <file>qml/Constants.js</file>
+        <file>qml/DConstants.js</file>
         <file>qml/main.qml</file>
         <file>qml/ProjectPane.qml</file>
         <file>qml/PropertiesPane.qml</file>
@@ -61,5 +61,9 @@
         <file>qml/DAssetContainer.qml</file>
         <file>qml/DSourceContainer.qml</file>
         <file>qml/DBuiltInComponentFactory.qml</file>
+        <file>qml/DDemoContainer.qml</file>
+        <file>qml/DCarousel.qml</file>
+        <file>qml/DOption.qml</file>
+        <file>qml/DCarouselDelegate.qml</file>
     </qresource>
 </RCC>

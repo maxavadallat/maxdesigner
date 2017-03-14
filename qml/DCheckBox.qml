@@ -1,13 +1,13 @@
 import QtQuick 2.0
 
 import "style"
-import "Constants.js" as CONSTS
+import "DConstants.js" as CONSTS
 
 DControl {
     id: checkBoxRoot
 
-    width: CONSTS.defaultButtonWidth + Style.defaultSpacing
-    height: CONSTS.defaultButtonHeight + Style.defaultSpacing
+    width: CONSTS.defaultButtonWidth + DStyle.defaultSpacing
+    height: CONSTS.defaultButtonHeight + DStyle.defaultSpacing
 
     property bool rightAligned: false
 
@@ -24,7 +24,7 @@ DControl {
         anchors.right: checkBoxRoot.rightAligned ? parent.right : undefined
         anchors.verticalCenter: parent.verticalCenter
         text: "CheckBox"
-        color: checkBoxRoot.focus ? Style.colorBorder : Style.colorFontDark
+        color: checkBoxRoot.focus ? DStyle.colorBorder : DStyle.colorFontDark
         MouseArea {
             anchors.fill: parent
             onClicked: checkBoxRoot.focus = true;
@@ -33,15 +33,15 @@ DControl {
 
     DEditorBackground {
         id: buttonBG
-        width: Style.radioButtonRadius * 2
-        height: Style.radioButtonRadius * 2
+        width: DStyle.radioButtonRadius * 2
+        height: DStyle.radioButtonRadius * 2
 
         anchors.left: checkBoxRoot.rightAligned ? parent.left : undefined
         anchors.right: checkBoxRoot.rightAligned ? undefined : parent.right
 
         anchors.verticalCenter: parent.verticalCenter
         editorFocus: checkBoxRoot.focus
-        radius: Style.defaultRadius
+        radius: DStyle.defaultRadius
 
         DButtonBase {
             id: checkBox
@@ -61,12 +61,12 @@ DControl {
         anchors.centerIn: buttonBG
         //anchors.horizontalCenterOffset: 1
         anchors.verticalCenterOffset: 1
-        color: Style.colorFontLight
+        color: DStyle.colorFontLight
         opacity: checkBoxRoot.checked ? 1.0 : 0.0
         Behavior on opacity { DFadeAnimation { } }
         visible: opacity > 0.0
         text: "X"
-        font.pixelSize: Style.fontSizeS
+        font.pixelSize: DStyle.fontSizeS
         font.bold: true
     }
 }

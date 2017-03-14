@@ -6,8 +6,8 @@ import "style"
 DRectangle {
     id: sizeIndicatorRoot
 
-    //width: Style.sizeIndicatorWidth
-    //height: Style.sizeIndicatorHeight
+    //width: DStyle.sizeIndicatorWidth
+    //height: DStyle.sizeIndicatorHeight
 
     width: sizeOverlay.width + 12
     height: sizeOverlay.height + 4
@@ -17,12 +17,12 @@ DRectangle {
 
     property bool autoHide: true
 
-    border.color: Style.colorBorderTransparent
+    border.color: DStyle.colorBorderTransparent
     radius: 0
 
     opacity: 0.0
     Behavior on opacity { DFadeAnimation { } }
-    visible: opacity > 0.0
+    visible: sizeIndicatorRoot.enabled && (opacity > 0.0)
 
     onSizeWChanged: {
         showSizeIndicator();
@@ -32,10 +32,16 @@ DRectangle {
         showSizeIndicator();
     }
 
+    onEnabledChanged: {
+        showSizeIndicator();
+    }
+
     function showSizeIndicator() {
-        sizeIndicatorRoot.opacity = 1.0;
-        if (sizeIndicatorRoot.autoHide) {
-            hideTimer.restart();
+        if (sizeIndicatorRoot.enabled) {
+            sizeIndicatorRoot.opacity = 1.0;
+            if (sizeIndicatorRoot.autoHide) {
+                hideTimer.restart();
+            }
         }
     }
 
@@ -52,12 +58,12 @@ DRectangle {
 //        source: sizeOverlay
 //        radius: 4
 //        samples: 16
-//        color: Style.colorBorder
+//        color: DStyle.colorBorder
 //    }
 
     Timer {
         id: hideTimer
-        interval: Style.defaultHideTimeout
+        interval: DStyle.defaultHideTimeout
         onTriggered: {
             sizeIndicatorRoot.opacity = 0.0;
         }

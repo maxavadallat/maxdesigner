@@ -49,7 +49,7 @@ DMouseArea {
         ]
 
         transitions: Transition {
-            DAnimation { target: rotation; property: "angle"; duration: Style.flipDuration }
+            DAnimation { target: rotation; property: "angle"; duration: DStyle.flipDuration }
         }
     }
 }

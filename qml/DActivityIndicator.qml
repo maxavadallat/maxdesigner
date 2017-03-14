@@ -6,8 +6,8 @@ import "style"
 DControl {
     id: activityIndicatorRoot
 
-    width: Style.activityIndicatorWidth
-    height: Style.activityIndicatorHeight
+    width: DStyle.activityIndicatorWidth
+    height: DStyle.activityIndicatorHeight
 
     property alias running: activityIndicatorTimer.running
 
@@ -32,7 +32,7 @@ DControl {
         width: Math.min(activityIndicatorRoot.width, activityIndicatorRoot.height)
         height: Math.min(activityIndicatorRoot.width, activityIndicatorRoot.height)
 
-        property real radius: width * 0.5 - Style.activityIndicatorLineWidth
+        property real radius: width * 0.5 - DStyle.activityIndicatorLineWidth
         property int centreX: width * 0.5
         property int centreY: height * 0.5
 
@@ -44,7 +44,7 @@ DControl {
             ctx.beginPath();
 
             ctx.lineCap = "round";
-            ctx.lineWidth = Style.activityIndicatorLineWidth;
+            ctx.lineWidth = DStyle.activityIndicatorLineWidth;
             ctx.strokeStyle = "white";
 
             ctx.arc(centreX, centreY, radius, 0, 2 * Math.PI);
@@ -63,13 +63,13 @@ DControl {
         gradient: Gradient {
             GradientStop { position: 0.0; color: "transparent" }
             GradientStop { position: 0.2; color: "transparent" }
-            GradientStop { position: 1.0; color: Style.colorBorder }
+            GradientStop { position: 1.0; color: DStyle.colorBorder }
         }
     }
 
     Timer {
         id: activityIndicatorTimer
-        interval: Style.activityIndicatorInterval
+        interval: DStyle.activityIndicatorInterval
         repeat: true
         onTriggered: {
             activityIndicatorGradient.visible = true;

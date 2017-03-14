@@ -28,7 +28,7 @@ Column {
         height: 48
         anchors.horizontalCenter: parent.horizontalCenter
         text: "Welcome to Designer!"
-        font.pixelSize: Style.fontSizeXL
+        font.pixelSize: DStyle.fontSizeXL
     }
 
     DRectangle {
@@ -46,14 +46,14 @@ Column {
         width: 256
         anchors.horizontalCenter: parent.horizontalCenter
         text: "- Create a New Project: ⌘N"
-        font.pixelSize: Style.fontSizeL
+        font.pixelSize: DStyle.fontSizeL
     }
 
     DText {
         width: 256
         anchors.horizontalCenter: parent.horizontalCenter
         text: "- Open Project: ⌘O"
-        font.pixelSize: Style.fontSizeL
+        font.pixelSize: DStyle.fontSizeL
     }
 
     Item {
@@ -77,7 +77,7 @@ Column {
         //height: 48
         anchors.horizontalCenter: parent.horizontalCenter
         text: "Recent Projects"
-        //font.pixelSize: Style.fontSizeXL
+        //font.pixelSize: DStyle.fontSizeXL
         visible: rpListView.count > 0
     }
 
@@ -87,7 +87,7 @@ Column {
         width: 512
         height: Math.min(contentHeight, delegateHeight * 5)
 
-        property int delegateHeight: Style.fontSizeL
+        property int delegateHeight: DStyle.fontSizeL
 
         anchors.horizontalCenter: parent.horizontalCenter
         model: recentProjectsModel
@@ -109,7 +109,7 @@ Column {
                 elide: Text.ElideMiddle
                 horizontalAlignment: Text.AlignHCenter
                 text: filePath
-                color: delegateRoot.pressed && delegateRoot.hovering ? Style.colorBorder : Style.colorFontDark
+                color: delegateRoot.pressed && delegateRoot.hovering ? DStyle.colorBorder : DStyle.colorFontDark
             }
 
             onEntered: {

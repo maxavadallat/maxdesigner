@@ -2,11 +2,11 @@ import QtQuick 2.0
 
 import enginecomponents 0.1
 
-import "Constants.js" as CONSTS
+import "DConstants.js" as CONSTS
 import "style"
 
 DPaneBase {
-    id: compoenntRootContainerRoot
+    id: componentRootContainerRoot
 
     width: 600
     height: 400
@@ -37,7 +37,7 @@ DPaneBase {
 
     enableScaling: true
 
-    borderColor: dropArea.hovering || compoenntRootContainerRoot.focus ? Style.colorBorder : Style.colorBorderNoFocus
+    borderColor: dropArea.hovering || componentRootContainerRoot.focus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
     radius: 0
 
     // New Child Component
@@ -80,15 +80,41 @@ DPaneBase {
     property Connections openFilesModelConnection: Connections {
         target: openFilesModel
 
+        onComponentSelected: {
+            console.log("DComponentRootContainer.openFilesModelConnection.onComponentSelected - aComponent: " + aComponent);
+
+            // Check Component Info
+            if (componentRootContainerRoot.componentInfo === aComponent) {
+                // Check State
+                if (componentRootContainerRoot.state === componentRootContainerRoot.stateHidden) {
+                    // Show
+                    componentRootContainerRoot.show();
+                } else {
+                    // Set Focus
+                    componentRootContainerRoot.focus = true;
+                    // Bring To Front
+                    componentRootContainerRoot.parent.bringToFront(componentRootContainerRoot);
+                }
+            }
+
+            // ...
+        }
+
         onFileSelected: {
             console.log("DComponentRootContainer.openFilesModelConnection.onFileSelected - aFilePath: " + aFilePath);
 
             // Check File Path
-            if (compoenntRootContainerRoot.componentInfo && compoenntRootContainerRoot.componentInfo.infoPath === aFilePath) {
-                // Set Focus
-                compoenntRootContainerRoot.focus = true;
-                // Bring To Front
-                compoenntRootContainerRoot.parent.bringToFront(compoenntRootContainerRoot);
+            if (componentRootContainerRoot.componentInfo && componentRootContainerRoot.componentInfo.infoPath === aFilePath) {
+                // Check State
+                if (componentRootContainerRoot.state === componentRootContainerRoot.stateHidden) {
+                    // Show
+                    componentRootContainerRoot.show();
+                } else {
+                    // Set Focus
+                    componentRootContainerRoot.focus = true;
+                    // Bring To Front
+                    componentRootContainerRoot.parent.bringToFront(componentRootContainerRoot);
+                }
             }
 
             // ...
@@ -97,10 +123,10 @@ DPaneBase {
         onComponentClosed: {
             console.log("DComponentRootContainer.openFilesModelConnection.onComponentClosed - aComponent: " + aComponent);
 
-            // Check File Path
-            if (compoenntRootContainerRoot.componentInfo === aComponent) {
+            // Check Component Info
+            if (componentRootContainerRoot.componentInfo === aComponent) {
                 // Reset
-                compoenntRootContainerRoot.reset(true);
+                componentRootContainerRoot.reset(true);
             }
         }
 
@@ -108,22 +134,22 @@ DPaneBase {
             console.log("DComponentRootContainer.openFilesModelConnection.onFileClosed - aFilePath: " + aFilePath);
 
             // Check File Path
-            if (compoenntRootContainerRoot.componentInfo && compoenntRootContainerRoot.componentInfo.infoPath === aFilePath) {
+            if (componentRootContainerRoot.componentInfo && componentRootContainerRoot.componentInfo.infoPath === aFilePath) {
                 // Reset
-                compoenntRootContainerRoot.reset(true);
+                componentRootContainerRoot.reset(true);
             }
         }
     }
 
     // Component Info Connections
     property Connections componentInfoConnection: Connections {
-        target: compoenntRootContainerRoot.componentInfo
+        target: componentRootContainerRoot.componentInfo
 
         onRequestContainerClose: {
             console.log("DComponentRootContainer.componentInfoConnection.onRequestContainerClose");
 
             // Save & Close
-            compoenntRootContainerRoot.reset(true);
+            componentRootContainerRoot.reset(true);
             // Reset Focused Component
             propertiesController.focusedComponent = null;
 
@@ -135,49 +161,49 @@ DPaneBase {
         // Check Focus & Component Info
         if (focus && componentInfo) {
 //            // Check Previous Scale Level
-//            if (compoenntRootContainerRoot.previousScale !== compoenntRootContainerRoot.scale) {
+//            if (componentRootContainerRoot.previousScale !== componentRootContainerRoot.scale) {
 //                // Set Scale Duration
-//                compoenntRootContainerRoot.scaleDuration = 100;
+//                componentRootContainerRoot.scaleDuration = 100;
 //                // Reset Scale
-//                compoenntRootContainerRoot.scale = compoenntRootContainerRoot.previousScale;
+//                componentRootContainerRoot.scale = componentRootContainerRoot.previousScale;
 //            } else {
 //                // Reset Scale Duration
-//                compoenntRootContainerRoot.scaleDuration = 0;
+//                componentRootContainerRoot.scaleDuration = 0;
 //            }
 
             // Reset Scale Duration
-            compoenntRootContainerRoot.scaleDuration = 0;
+            componentRootContainerRoot.scaleDuration = 0;
 
             // Set Focused Component
-            propertiesController.focusedComponent = compoenntRootContainerRoot.componentInfo;
+            propertiesController.focusedComponent = componentRootContainerRoot.componentInfo;
 
             // Set Focused File
-            openFilesModel.focusedFile = compoenntRootContainerRoot.componentInfo ? compoenntRootContainerRoot.componentInfo.infoPath : "";
+            openFilesModel.focusedFile = componentRootContainerRoot.componentInfo ? componentRootContainerRoot.componentInfo.infoPath : "";
 
         } else {
             // Reset Focused Component
             //propertiesController.focusedComponent = null;
 
             // Set Scale Duration
-            compoenntRootContainerRoot.scaleDuration = 100;
+            componentRootContainerRoot.scaleDuration = 100;
 //            // Save Previous Scale
-//            compoenntRootContainerRoot.previousScale = compoenntRootContainerRoot.scale;
+//            componentRootContainerRoot.previousScale = componentRootContainerRoot.scale;
             // Reset Scale Level
-            compoenntRootContainerRoot.scale = 1.0;
+            componentRootContainerRoot.scale = 1.0;
         }
     }
 
     onPressed: {
-        compoenntRootContainerRoot.focus = true;
+        componentRootContainerRoot.focus = true;
     }
 
     onWidthChanged: {
         //baseCanvas.requestPaint();
 
         // Check Update Component Info Enabled
-        if (compoenntRootContainerRoot.updateComponentInfoEnabled) {
+        if (componentRootContainerRoot.updateComponentInfoEnabled) {
             // Request Width Change
-            propertiesController.requestCWidth(compoenntRootContainerRoot.width);
+            propertiesController.requestCWidth(componentRootContainerRoot.width);
         }
 
 
@@ -188,9 +214,9 @@ DPaneBase {
         //baseCanvas.requestPaint();
 
         // Check Update Component Info Enabled
-        if (compoenntRootContainerRoot.updateComponentInfoEnabled) {
+        if (componentRootContainerRoot.updateComponentInfoEnabled) {
             // Request Height Change
-            propertiesController.requestCHeight(compoenntRootContainerRoot.height);
+            propertiesController.requestCHeight(componentRootContainerRoot.height);
         }
 
         // ...
@@ -198,27 +224,29 @@ DPaneBase {
 
     onTransitionFinished: {
         // Check State
-        if (compoenntRootContainerRoot.state === compoenntRootContainerRoot.stateShown) {
+        if (componentRootContainerRoot.state === componentRootContainerRoot.stateShown) {
+            // Set Focus
+            componentRootContainerRoot.focus = true;
             // Set Update Component Info Enabled
-            compoenntRootContainerRoot.updateComponentInfoEnabled = true;
+            componentRootContainerRoot.updateComponentInfoEnabled = true;
         } else {
             // Reset Update Component Info Enabled
-            compoenntRootContainerRoot.updateComponentInfoEnabled = false;
+            componentRootContainerRoot.updateComponentInfoEnabled = false;
         }
     }
 
     onStateChanged: {
         // Check State
-        if (compoenntRootContainerRoot.state !== compoenntRootContainerRoot.stateShown) {
+        if (componentRootContainerRoot.state !== componentRootContainerRoot.stateShown) {
             // Reset Update Component Info Enabled
-            compoenntRootContainerRoot.updateComponentInfoEnabled = false;
+            componentRootContainerRoot.updateComponentInfoEnabled = false;
         }
     }
 
     DMouseArea {
         id: wheelArea
         anchors.fill: parent
-        visible: compoenntRootContainerRoot.focus
+        visible: componentRootContainerRoot.focus
 
         onWheel: {
             //console.log("#### delta: " + wheel.angleDelta.y);
@@ -226,19 +254,19 @@ DPaneBase {
             // Check Wheel Delta
             if (wheel.angleDelta.y > 2) {
                 // Check Enable Scaling & Scale level
-                if (compoenntRootContainerRoot.enableScaling && compoenntRootContainerRoot.scale < 1.5) {
+                if (componentRootContainerRoot.enableScaling && componentRootContainerRoot.scale < 1.5) {
                     // Reset Scale Duration
-                    compoenntRootContainerRoot.scaleDuration = 0;
+                    componentRootContainerRoot.scaleDuration = 0;
                     // Inc Scale Level
-                    compoenntRootContainerRoot.scale += 0.025;
+                    componentRootContainerRoot.scale += 0.025;
                 }
             } else if (wheel.angleDelta.y < -2) {
                 // Check Enable Scaling & Scale level
-                if (compoenntRootContainerRoot.enableScaling && compoenntRootContainerRoot.scale > 1.0) {
+                if (componentRootContainerRoot.enableScaling && componentRootContainerRoot.scale > 1.0) {
                     // Reset Scale Duration
-                    compoenntRootContainerRoot.scaleDuration = 0;
+                    componentRootContainerRoot.scaleDuration = 0;
                     // Dec Scale Level
-                    compoenntRootContainerRoot.scale -= 0.025;
+                    componentRootContainerRoot.scale -= 0.025;
                 }
             }
         }
@@ -293,18 +321,25 @@ DPaneBase {
             }
 
             console.log("DComponentRootContainer.dropArea.onDropped - source: " + drop.source);
+            //console.log("DComponentRootContainer.dropArea.onDropped - dynamicProperties: " + drop.source.dynamicProperties);
 
             // Reset Hovering
             hovering = false;
 
             // Reset Previous Scale Level
-            compoenntRootContainerRoot.previousScale = 1.0;
+            componentRootContainerRoot.previousScale = 1.0;
 
             // Create New Object
             var newObject = newComponent.createObject(paneContainer, { "x": drop.x - CONSTS.componentItemWidth / 2,
                                                                        "y": drop.y - CONSTS.componentItemHeight / 2,
                                                                        "focus": true,
-                                                                       "parentContainer": compoenntRootContainerRoot });
+                                                                       "parentContainer": componentRootContainerRoot });
+
+//            // Set Cloned Component Info
+//            newObject.componentInfo = drop.source.clone();
+//            // Add Child
+//            componentRootContainerRoot.componentInfo.addChild(newObject.componentInfo);
+
 
             // ...
 

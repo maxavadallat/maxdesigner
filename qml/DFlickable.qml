@@ -26,7 +26,7 @@ Item {
         Column {
             id: contentContainerColumn
             width: parent.width
-            spacing: Style.defaultSpacing
+            spacing: DStyle.defaultSpacing
         }
     }
 

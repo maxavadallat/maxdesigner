@@ -160,7 +160,7 @@ DMouseArea {
             anchors.right: swipeGestureRoot.swipeDirection < 0 ? parent.right : undefined
             anchors.left: swipeGestureRoot.swipeDirection > 0 ? parent.left : undefined
             color: "transparent"
-            border.color: Style.colorTrace
+            border.color: DStyle.colorTrace
         }
 
         Rectangle {
@@ -169,7 +169,7 @@ DMouseArea {
             anchors.right: swipeGestureRoot.swipeDirection < 0 ? parent.right : undefined
             anchors.left: swipeGestureRoot.swipeDirection > 0 ? parent.left : undefined
             color: "transparent"
-            border.color: Style.colorTrace
+            border.color: DStyle.colorTrace
         }
 
         Rectangle {
@@ -178,7 +178,7 @@ DMouseArea {
             anchors.right: swipeGestureRoot.swipeDirection < 0 ? parent.right : undefined
             anchors.left: swipeGestureRoot.swipeDirection > 0 ? parent.left : undefined
             anchors.verticalCenter: parent.verticalCenter
-            color: Style.colorTrace
+            color: DStyle.colorTrace
         }
     }
 }

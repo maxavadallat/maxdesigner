@@ -3,7 +3,7 @@ import QtQuick 2.0
 import "style"
 
 Rectangle {
-    color: Style.colorBG
-    border.color: Style.colorBorderNoFocus
-    radius: Style.defaultRadius
+    color: DStyle.colorBG
+    border.color: DStyle.colorBorderNoFocus
+    radius: DStyle.defaultRadius
 }

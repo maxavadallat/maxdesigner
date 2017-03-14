@@ -1,0 +1,75 @@
+
+project                 = maxdesigner
+
+description             = Max Designer Application Documentation
+
+sources.fileextensions  = "*.cpp *.qdoc *.mm *.qml *.js"
+headers.fileextensions  = "*.h *.ch *.h++ *.hh *.hpp *.hxx"
+
+headerdirs              = ../src
+
+sourcedirs              = ../src \
+                        ../qml
+
+imagedirs               = images \
+                        ../assets/icons \
+                        ../assets/images
+
+sources                 = index.qdoc
+
+sourceencoding          = UTF-8
+outputencoding          = UTF-8
+naturallanguage         = en_US
+
+outputdir               = html
+
+#indexes                = $QTDIR/doc/html/qt.index
+
+
+# Define the location of the templates to use. Style sheets and scripts are
+# specified relative to the template directory and will be copied into
+# subdirectories of the output directory.
+
+HTML.stylesheets        = style/offline.css \
+
+# Adding jquery and functions - providing online tools and search features
+HTML.scripts            =
+
+# Files not referenced in any qdoc file.
+# See also qhp.Qt.extraFiles
+HTML.extraimages        = \
+                        images/btn_next.png \
+                        images/btn_prev.png \
+                        images/home.png
+
+# Include the style sheets and scripts used.
+
+HTML.headerstyles       = \
+    "  <link rel=\"stylesheet\" type=\"text/css\" href=\"style/offline.css\" />\n"
+
+HTML.postheader         = \
+    " <div class=\"breadcrumb toolblock\">\n" \
+    " <ul>\n" \
+    " <li class=\"first\"><a href=\"index.html\">Home</a></li>\n" \
+    " <!-- Breadcrumbs go here -->\n" \
+
+HTML.postpostheader     = \
+    " </ul>\n" \
+    " </div>\n" \
+    "<div class=\"content mainContent\">\n" \
+
+HTML.footer             = \
+    "</div>\n" \
+    "<div class=\"footer\">\n" \
+    "  <acronym title=\"Copyright\">&copy;</acronym> 2017 Max" \
+    "</div>\n" \
+
+
+qhp.projects                        = maxdesigner
+qhp.vccspauimid.file                = maxdesigner.qhp
+qhp.vccspauimid.namespace           = com.mysoft.maxdesigner.100
+qhp.vccspauimid.virtualFolder       = qdoc
+qhp.vccspauimid.indexTitle          = Public API of the vcc-spa-ui-mid
+qhp.vccspauimid.indexRoot           =
+qhp.vccspauimid.extraFiles          = style/offline.css
+qhp.vccspauimid.filterAttributes    = maxdesigner

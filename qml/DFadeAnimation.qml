@@ -4,5 +4,5 @@ import "style"
 
 NumberAnimation {
     property: "opacity"
-    duration: Style.animDuration * 0.5
+    duration: DStyle.animDuration * 0.5
 }
