@@ -5,7 +5,8 @@ import "style"
 MouseArea {
     id: mouseAreaRoot
 
-    hoverEnabled: true
+    hoverEnabled: enabled
+    visible: enabled
 
     property int pressPosX: 0
     property int pressPosY: 0

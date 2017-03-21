@@ -25,13 +25,17 @@ SOURCES             += src/settingscontroller.cpp \
                     src/openfilesmodel.cpp \
                     src/projectmodel.cpp \
                     src/componentinfo.cpp \
-                    src/propertiesmodel.cpp \
                     src/recentprojectsmodel.cpp \
                     src/projectitemmodel.cpp \
                     src/componentsmodel.cpp \
                     src/viewsmodel.cpp \
                     src/designerfilesortproxy.cpp \
-                    src/componentcategorymodel.cpp
+                    src/componentcategorymodel.cpp \
+                    src/componentstatesmodel.cpp \
+                    src/componenttransitionsmodel.cpp \
+                    src/componentanchorsmodel.cpp \
+                    src/componentsignalsmodel.cpp \
+                    src/componentpropertiesmodel.cpp
 
 # Views/Dialog Sources
 SOURCES             += src/mainwindow.cpp \
@@ -65,14 +69,18 @@ HEADERS             += src/settingscontroller.h \
                     src/basecomponentsmodel.h \
                     src/openfilesmodel.h \
                     src/projectmodel.h \
-                    src/propertiesmodel.h \
                     src/componentinfo.h \
                     src/recentprojectsmodel.h \
                     src/projectitemmodel.h \
                     src/componentsmodel.h \
                     src/viewsmodel.h \
                     src/minimizedcomponents.h \
-                    src/componentcategorymodel.h
+                    src/componentcategorymodel.h \
+                    src/componentstatesmodel.h \
+                    src/componenttransitionsmodel.h \
+                    src/componentanchorsmodel.h \
+                    src/componentsignalsmodel.h \
+                    src/componentpropertiesmodel.h
 
 # View/Dialog Headers
 HEADERS             += src/mainwindow.h \

@@ -7,16 +7,26 @@ namespace Ui {
 class InfoDialog;
 }
 
+//==============================================================================
+// Confirmation Dialog Class
+//==============================================================================
 class InfoDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit InfoDialog(QWidget *parent = 0);
+    // Constructor
+    explicit InfoDialog(QWidget* aParent = NULL);
+
+    // Set Information Text
+    void setInfoText(const QString& aText);
+
+    // Destructor
     ~InfoDialog();
 
 private:
-    Ui::InfoDialog *ui;
+    // UI
+    Ui::InfoDialog*     ui;
 };
 
 #endif // INFODIALOG_H

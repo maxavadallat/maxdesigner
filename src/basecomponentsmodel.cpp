@@ -158,6 +158,8 @@ void BaseComponentsModel::removeBaseComponent(ComponentInfo* aComponent, const b
 {
     // Check Component
     if (aComponent) {
+        //qDebug() << "BaseComponentsModel::removeBaseComponent - name: " << aComponent->componentName();
+
         // Get Base Components Count
         int bcCount = mBaseComponentList.count();
         // Get Index Of Component

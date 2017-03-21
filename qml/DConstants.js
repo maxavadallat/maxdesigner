@@ -13,6 +13,10 @@ var defaultPaneHideButtonHeight                 = 120;
 var defaultButtonWidth                          = 96;
 var defaultButtonHeight                         = 32;
 
+// Default Option Size
+var defaultOptionWidth                          = 168;
+var defaultOptionHeight                         = 32;
+
 // Default Button Group Width
 var defaultButtonGroupWidth                     = 128;
 
@@ -32,8 +36,11 @@ var componentMoveStep                           = 1;
 // Component Suffix
 var componentSuffix                             = ".json"
 
-// Default Non Visual Component Width
+// Default Non Visual Component Size
 var defaultNonVisualComponentWidth              = 320;
-// Default Non Visual Component Height
 var defaultNonVisualComponentHeight             = 200;
+
+// Default Disc Size
+var defaultDiscWidth                            = 56;
+var defaultDiscHeight                           = defaultDiscWidth;
 

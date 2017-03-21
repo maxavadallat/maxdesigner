@@ -5,5 +5,10 @@
         <file>assets/images/tron-wallpaper-27.jpeg</file>
         <file>assets/images/default_file.png</file>
         <file>assets/images/carousel_mask.png</file>
+        <file>assets/images/blue-disc.png</file>
+        <file>assets/icons/designer.04.png</file>
+        <file>assets/icons/information-icon.png</file>
+        <file>assets/icons/question-icon.png</file>
+        <file>assets/icons/warning-icon.png</file>
     </qresource>
 </RCC>

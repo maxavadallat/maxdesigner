@@ -14,6 +14,9 @@ DRectangle {
     property int popupWidth: popupRoot.maxItemWidth
     property int popupHeight: popupColumn.height + DStyle.defaultMargin * 2
 
+    property var hideX: undefined
+    property var hideY: undefined
+
     property list<QtObject> model
 
     property int maxItemWidth: DStyle.defaultPopupWidth
@@ -22,9 +25,12 @@ DRectangle {
 
     property bool subPopup: false
 
+    property bool showing: false
     property bool hiding: false
 
     visible: popupRoot.width > 0 && popupRoot.height > 0
+
+    border.color: popupRoot.focus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
 
     clip: true
 
@@ -32,6 +38,7 @@ DRectangle {
     signal subMenuItemSelected(var itemIndex, var itemPosY)
     signal itemHovered(var itemIndex, var subMenuItem)
     signal subPopupHidden()
+    signal cancelled()
 
     onModelChanged: {
         maxItemWidth = DStyle.defaultPopupWidth;
@@ -46,11 +53,16 @@ DRectangle {
         if (height === 0) {
             // Reset Hiding
             popupRoot.hiding = false;
+        } else if (height === popupRoot.popupHeight) {
+            // Reset Showing
+            popupRoot.showing = false;
         }
     }
 
     // Show Popup
     function show(posX, posY) {
+        // Set Showing
+        popupRoot.showing = true;
         // Reset Current Index
         popupRoot.currentIndex = -1;
 
@@ -67,9 +79,19 @@ DRectangle {
     }
 
     // Hide Popup
-    function hide() {
+    function hide(posX, posY) {
         // Set Hiding
         popupRoot.hiding = true;
+
+        if (posX !== undefined) {
+            // Set Pos X
+            popupRoot.x = posX;
+        }
+
+        if (posY !== undefined) {
+            // Set Pos Y
+            popupRoot.y = posY;
+        }
 
         // Reset Width & Height
         popupRoot.width = 0;
@@ -81,6 +103,17 @@ DRectangle {
         if (popupRoot.subPopup) {
             // Emit Popup Hidden Signal
             popupRoot.subPopupHidden();
+        }
+    }
+
+    // Set Item Checked
+    function setItemChecked(checkedIndex) {
+        // Get Count
+        var mCount = popupRoot.model.length;
+        // Iterate Thru Model
+        for (var i=0; i<mCount; i++) {
+            // Check Checked Index
+            popupRoot.model[i].checked = (i === checkedIndex);
         }
     }
 
@@ -108,6 +141,7 @@ DRectangle {
                 enabled: !model.disabled
                 subMenuItem: model.subMenuItem
                 selected: itemIndex === popupRoot.currentIndex
+                checked: model.checked
                 preventStealing: true
 
                 Component.onCompleted: {
@@ -137,7 +171,7 @@ DRectangle {
                         // Emit Item Selected Signal
                         popupRoot.itemSelected(itemIndex);
                         // Hide Popup
-                        popupRoot.hide();
+                        popupRoot.hide(popupRoot.hideX, popupRoot.hideY);
                     }
                 }
 
@@ -153,7 +187,10 @@ DRectangle {
     Keys.onReleased:  {
         switch (event.key) {
             case Qt.Key_Escape:
-                popupRoot.hide();
+                // Emit Cancelled Signal
+                cancelled();
+                // Hide Popup
+                popupRoot.hide(popupRoot.hideX, popupRoot.hideY);
             break;
         }
     }

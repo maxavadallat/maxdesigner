@@ -5,6 +5,11 @@
 
 class ProjectModel;
 class ComponentInfo;
+class ComponentPropertiesModel;
+class ComponentSignalsModel;
+class ComponentAnchorsModel;
+class ComponentStatesModel;
+class ComponentTransitionsModel;
 
 //==============================================================================
 // Properties Controller Class
@@ -27,18 +32,18 @@ class PropertiesController : public QObject
     Q_PROPERTY(QString cHeight READ cHeight NOTIFY cHeightChanged)
 
     // ...
+
 public:
     // Property Type
-    enum class EPropertyType
-    {
+    enum class EPropertyType {
         EPTString   = 0,
         EPTBool,
         EPTInt,
         EPTDouble,
         EPTReal,
-        EPTVar,
-
+        EPTVar
     };
+
     Q_ENUM(EPropertyType)
 
 public:
@@ -142,9 +147,6 @@ signals:
 
     // ...
 
-
-public slots:
-
 private:
     // Init
     void init();
@@ -153,11 +155,21 @@ private:
 
 private: // Data
     // Project Model
-    ProjectModel*   mProject;
+    ProjectModel*               mProject;
 
     // Focused Component
-    ComponentInfo*  mFocusedComponent;
+    ComponentInfo*              mFocusedComponent;
 
+    // Anchors
+    ComponentAnchorsModel*      mComponentAnchors;
+    // Signals
+    ComponentSignalsModel*      mComponentSignals;
+    // Properties
+    ComponentPropertiesModel*   mComponentProperties;
+    // States
+    ComponentStatesModel*       mComponentStates;
+    // Transitions
+    ComponentTransitionsModel*  mComponentTransitions;
 };
 
 #endif // PROPERTIESCONTROLLER_H

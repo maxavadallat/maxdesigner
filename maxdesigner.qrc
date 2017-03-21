@@ -65,5 +65,15 @@
         <file>qml/DCarousel.qml</file>
         <file>qml/DOption.qml</file>
         <file>qml/DCarouselDelegate.qml</file>
+        <file>qml/DPropertyEditor.qml</file>
+        <file>qml/DStateSelector.qml</file>
+        <file>qml/DImage.qml</file>
+        <file>qml/DDisc.qml</file>
+        <file>qml/DPropertyChangesEditor.qml</file>
+        <file>qml/DPropertyChangeDelegate.qml</file>
+        <file>qml/DSignalDelegate.qml</file>
+        <file>qml/DStateDelegate.qml</file>
+        <file>qml/DTransitionDelegate.qml</file>
+        <file>qml/DTransitionNodeDelegate.qml</file>
     </qresource>
 </RCC>

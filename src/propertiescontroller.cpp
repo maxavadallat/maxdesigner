@@ -3,6 +3,11 @@
 #include "propertiescontroller.h"
 #include "projectmodel.h"
 #include "componentinfo.h"
+#include "componentpropertiesmodel.h"
+#include "componentsignalsmodel.h"
+#include "componentanchorsmodel.h"
+#include "componentstatesmodel.h"
+#include "componenttransitionsmodel.h"
 #include "constants.h"
 
 //==============================================================================
@@ -12,6 +17,11 @@ PropertiesController::PropertiesController(ProjectModel* aProjectModel, QObject*
     : QObject(aParent)
     , mProject(aProjectModel)
     , mFocusedComponent(NULL)
+    , mComponentAnchors(NULL)
+    , mComponentSignals(NULL)
+    , mComponentProperties(NULL)
+    , mComponentStates(NULL)
+    , mComponentTransitions(NULL)
 {
     qDebug() << "PropertiesController created.";
     // Init
@@ -31,7 +41,42 @@ void PropertiesController::init()
 //==============================================================================
 void PropertiesController::clear()
 {
-    // Clear
+    // Check Component Anchors Model
+    if (mComponentAnchors) {
+        // Delete Component Anchors Model
+        delete mComponentAnchors;
+        mComponentAnchors = NULL;
+    }
+
+    // Check Component Signals Model
+    if (mComponentSignals) {
+        // Delete Component Signals Model
+        delete mComponentSignals;
+        mComponentSignals = NULL;
+    }
+
+    // Check Component Properties Model
+    if (mComponentProperties) {
+        // Delete Component Properties Model
+        delete mComponentProperties;
+        mComponentProperties = NULL;
+    }
+
+    // Check Component States Model
+    if (mComponentStates) {
+        // Delete Component States Model
+        delete mComponentStates;
+        mComponentStates = NULL;
+    }
+
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // Delete Component Transitions Model
+        delete mComponentTransitions;
+        mComponentTransitions = NULL;
+    }
+
+    // ...
 }
 
 //==============================================================================
@@ -72,11 +117,19 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
 {
     // Check Focused Component
     if (mFocusedComponent != aComponent) {
+
+        // Check Previous Focused Component
+
+
         qDebug() << "PropertiesController::setFocusedCompoenent - componentName: " << (aComponent ? aComponent->componentName() : "NULL");
+
         // Set Focused Component
         mFocusedComponent = aComponent;
+
         // Emit Focused Component Changed Signal
         emit focusedComponentChanged(mFocusedComponent);
+
+        // Load Models
 
         // Emit Changes For All Properties
 
@@ -306,6 +359,8 @@ void PropertiesController::clearProperty(const QString& aName)
 //==============================================================================
 void PropertiesController::addSignal(const QString& aSignalDef)
 {
+    Q_UNUSED(aSignalDef);
+
     // Check Focused Component
     if (mFocusedComponent) {
 
@@ -318,6 +373,8 @@ void PropertiesController::addSignal(const QString& aSignalDef)
 //==============================================================================
 void PropertiesController::removeSignal(const QString& aSignalDef)
 {
+    Q_UNUSED(aSignalDef);
+
     // Check Focused Component
     if (mFocusedComponent) {
 
@@ -330,6 +387,8 @@ void PropertiesController::removeSignal(const QString& aSignalDef)
 //==============================================================================
 void PropertiesController::addState(const QString& aName)
 {
+    Q_UNUSED(aName);
+
     // Check Focused Component
     if (mFocusedComponent) {
 
@@ -342,6 +401,8 @@ void PropertiesController::addState(const QString& aName)
 //==============================================================================
 void PropertiesController::removeState(const QString& aName)
 {
+    Q_UNUSED(aName);
+
     // Check Focused Component
     if (mFocusedComponent) {
 
@@ -354,6 +415,9 @@ void PropertiesController::removeState(const QString& aName)
 //==============================================================================
 void PropertiesController::addTransition(const QString& aFrom, const QString& aTo)
 {
+    Q_UNUSED(aFrom);
+    Q_UNUSED(aTo);
+
     // Check Focused Component
     if (mFocusedComponent) {
 
@@ -366,6 +430,9 @@ void PropertiesController::addTransition(const QString& aFrom, const QString& aT
 //==============================================================================
 void PropertiesController::removeTransition(const QString& aFrom, const QString& aTo)
 {
+    Q_UNUSED(aFrom);
+    Q_UNUSED(aTo);
+
     // Check Focused Component
     if (mFocusedComponent) {
 
@@ -384,6 +451,8 @@ PropertiesController::~PropertiesController()
 
     // Clear
     clear();
+
+    // ...
 
     qDebug() << "PropertiesController deleted.";
 }

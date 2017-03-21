@@ -11,6 +11,7 @@ DButtonBase {
     property string selectedColor: DStyle.colorSelected
     property alias radius: buttonBg.radius
     property alias pixelSize: buttonText.font.pixelSize
+    property alias border: buttonBg.border
 
     Rectangle {
         id: buttonBg

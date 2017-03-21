@@ -137,7 +137,8 @@ void ComponentInfo::init()
 void ComponentInfo::clear()
 {
     qDebug() << "ComponentInfo::clear";
-
+    // Clear ID Map
+    clearIDMap();
     // Clear Children
     clearChildren();
 }
@@ -152,6 +153,15 @@ void ComponentInfo::clearChildren()
         // Delete Last
         delete mChildren.takeLast();
     }
+}
+
+//==============================================================================
+// Clear ID Map
+//==============================================================================
+void ComponentInfo::clearIDMap()
+{
+    // Clear ID Map
+    mIDMap.clear();
 }
 
 //==============================================================================

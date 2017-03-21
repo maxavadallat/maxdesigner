@@ -12,6 +12,151 @@ DRectangle {
     width: 800
     height: 800
 
+    clip: true
+    focus: true
+
+    border.color: demoContainerRoot.focus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
+
+    Keys.onReleased: {
+        switch (event.key) {
+
+            case Qt.Key_F8:
+                settingsController.slowMotion = !settingsController.slowMotion;
+            break;
+
+            case Qt.Key_T:
+                settingsController.tracerVisible = !settingsController.tracerVisible;
+            break;
+
+            // ...
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            demoContainerRoot.focus = true;
+        }
+    }
+
+    DDisc {
+        anchors.centerIn: parent
+        width: 512
+        height: 512
+    }
+
+    Row {
+        anchors.right: parent.right
+        anchors.rightMargin: 32
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 32
+
+        spacing: DStyle.defaultSpacing
+
+        DButton {
+            width: 128
+            text: propertyEditor.state === propertyEditor.stateCreate ? "Create Property" : "Reset Property"
+
+            onClicked: {
+                if (propertyEditor.state === propertyEditor.stateCreate) {
+                    propertyEditor.show();
+                } else {
+                    propertyEditor.reset(false);
+                }
+            }
+        }
+
+        DButton {
+            width: 128
+            text: stateEditor.state === stateEditor.stateCreate ? "Create State" : "Reset State"
+
+            onClicked: {
+                if (stateEditor.state === stateEditor.stateCreate) {
+                    stateEditor.show();
+                } else {
+                    stateEditor.reset(false);
+                }
+            }
+        }
+
+        DButton {
+            width: 168
+            text: transitionEditor.state === transitionEditor.stateCreate ? "Create Transition" : "Reset Transition"
+
+            onClicked: {
+                if (transitionEditor.state === transitionEditor.stateCreate) {
+                    transitionEditor.show();
+                } else {
+                    transitionEditor.reset(false);
+                }
+            }
+        }
+
+        DButton {
+            width: 188
+            text: propertyChangesEditor.state === propertyChangesEditor.stateCreate ? "Create Property Changes" : "Reset Property Changes"
+
+            onClicked: {
+                if (propertyChangesEditor.state === propertyChangesEditor.stateCreate) {
+                    propertyChangesEditor.show();
+                } else {
+                    propertyChangesEditor.reset(false);
+                }
+            }
+        }
+
+        // ...
+
+    }
+
+    // Property Editor
+    DPropertyEditor {
+        id: propertyEditor
+
+        //initialX: propertiesPane.x
+        //initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+
+        state: stateCreate
+    }
+
+    // State Editor
+    DStateEditor {
+        id: stateEditor
+
+        state: stateCreate
+    }
+
+    DPropertyChangesEditor {
+        id: propertyChangesEditor
+
+        state: stateCreate
+    }
+
+    // Transition Editor
+    DTransitionEditor {
+        id: transitionEditor
+
+        state: stateCreate
+    }
+
+
+
+/*
+    DOption {
+        anchors.centerIn: parent
+
+        currentIndex: 0
+
+        model: [
+            DPopupItemObject { text: "Option 1" },
+            DPopupItemObject { text: "Option 2" },
+            DPopupItemObject { text: "Option 3" },
+            DPopupItemObject { text: "Option 4" },
+            DPopupItemObject { text: "Option 5" }
+        ]
+    }
+*/
+/*
     DCarousel {
         id: carouselDemo
 
@@ -63,7 +208,7 @@ DRectangle {
             }
         }
     }
-
+*/
 /*
     Component {
         id: demoComponent

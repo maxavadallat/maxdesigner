@@ -34,6 +34,8 @@ DMouseArea {
 
     property bool mainDrag: true
 
+    property bool enableResize: true
+
     property bool setFocusOnResize: true
 
     property bool rootContainer: false
@@ -197,6 +199,7 @@ DMouseArea {
         anchors.top: parent.top
         anchors.topMargin: -DStyle.resizeAreaSize * 0.5
         cursorShape: Qt.SizeFDiagCursor
+        enabled: containerRoot.enableResize
 
         onPressed: {
             // Check Main drag
@@ -239,6 +242,7 @@ DMouseArea {
         anchors.top: parent.top
         anchors.topMargin: -DStyle.resizeAreaSize * 0.5
         cursorShape: Qt.SizeVerCursor
+        enabled: containerRoot.enableResize
 
         onPressed: {
             // Check Main drag
@@ -275,6 +279,7 @@ DMouseArea {
         anchors.top: parent.top
         anchors.topMargin: -DStyle.resizeAreaSize * 0.5
         cursorShape: Qt.SizeBDiagCursor
+        enabled: containerRoot.enableResize
 
         onPressed: {
             // Check Main drag
@@ -317,6 +322,7 @@ DMouseArea {
         anchors.leftMargin: -DStyle.resizeAreaSize * 0.5
         anchors.verticalCenter: parent.verticalCenter
         cursorShape: Qt.SizeHorCursor
+        enabled: containerRoot.enableResize
 
         onPressed: {
             // Check Main drag
@@ -352,6 +358,7 @@ DMouseArea {
         anchors.rightMargin: -DStyle.resizeAreaSize * 0.5
         anchors.verticalCenter: parent.verticalCenter
         cursorShape: Qt.SizeHorCursor
+        enabled: containerRoot.enableResize
 
         onPressed: {
             // Check Main drag
@@ -387,6 +394,7 @@ DMouseArea {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: -DStyle.resizeAreaSize * 0.5
         cursorShape: Qt.SizeBDiagCursor
+        enabled: containerRoot.enableResize
 
         onPressed: {
             // Check Main drag
@@ -428,6 +436,7 @@ DMouseArea {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: -DStyle.resizeAreaSize * 0.5
         cursorShape: Qt.SizeVerCursor
+        enabled: containerRoot.enableResize
 
         onPressed: {
             // Check Main drag
@@ -463,6 +472,7 @@ DMouseArea {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: -DStyle.resizeAreaSize * 0.5
         cursorShape: Qt.SizeFDiagCursor
+        enabled: containerRoot.enableResize
 
         onPressed: {
             // Check Main drag

@@ -15,6 +15,12 @@ class ViewsModel;
 class MainWindow;
 class QMLParser;
 
+class ComponentAnchorsModel;
+class ComponentPropertiesModel;
+class ComponentSignalsModel;
+class ComponentStatesModel;
+class ComponentTransitionsModel;
+
 //==============================================================================
 // Component Info Class
 //==============================================================================
@@ -38,6 +44,7 @@ class ComponentInfo : public QObject
     Q_PROPERTY(bool focused READ focused WRITE setFocused NOTIFY focusedChanged)
     // Is Root
     Q_PROPERTY(bool isRoot READ isRoot WRITE setIsRoot NOTIFY isRootChanged)
+
     // Info Path
     Q_PROPERTY(QString infoPath READ infoPath NOTIFY infoPathChanged)
     // Source Path
@@ -59,10 +66,11 @@ class ComponentInfo : public QObject
 
     // Anchors
 
+    // Signals
+
     // States
 
     // Transitions
-
 
 public:
     // Create Component From QML File
@@ -279,6 +287,8 @@ protected:
     void clear();
     // Clear Children
     void clearChildren();
+    // Clear ID Map
+    void clearIDMap();
 
     // Load
     void load(const QString& aFilePath = "");
@@ -337,6 +347,11 @@ protected slots:
     void viewsDirChanged(const QString& aViewsDir);
 
 protected: // Data
+    friend class ComponentAnchorsModel;
+    friend class ComponentSignalsModel;
+    friend class ComponentStatesModel;
+    friend class ComponentTransitionsModel;
+
     // Project Model
     ProjectModel*           mProject;
 
@@ -366,6 +381,9 @@ protected: // Data
     // Is Root
     bool                    mIsRoot;
 
+    // Groupped
+    bool                    mGroupped;
+
     // Base Component Info
     ComponentInfo*          mBase;
     // Parent Component Info
@@ -374,18 +392,21 @@ protected: // Data
     // Children
     QList<ComponentInfo*>   mChildren;
 
+    // Component Id Map
+    QMap<QString, QObject*> mIDMap;
+
     // Own Properties
     QJsonObject             mOwnProperties;
     // Properties
     QJsonObject             mProperties;
-
+    // Anchors
+    QJsonObject             mAnchors;
     // Signals
     QJsonArray              mSignals;
     // States
     QJsonArray              mStates;
     // Transitions
     QJsonArray              mTransitions;
-
 };
 
 #endif // COMPONENTINFO_H

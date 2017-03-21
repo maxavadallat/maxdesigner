@@ -6,7 +6,9 @@ DMouseArea {
     id: popupItemRoot
 
     width: DStyle.defaultPopupWidth + DStyle.defaultMargin * 2
-    height: itemTextLabel.text === "-" ? (DStyle.popupItemHeight * 0.5) : DStyle.popupItemHeight
+    height: itemHeight
+
+    property int itemHeight: itemTextLabel.text === "-" ? (DStyle.popupItemHeight * 0.5) : DStyle.popupItemHeight
 
     property int itemIndex: -1
 
@@ -15,6 +17,8 @@ DMouseArea {
     property bool subMenuItem: false
 
     property bool selected: false
+
+    property bool checked: false
 
     property int textWidth: itemTextLabel.text !== "-" ? itemTextLabel.width : DStyle.defaultPopupWidth
 
@@ -69,6 +73,17 @@ DMouseArea {
         anchors.verticalCenterOffset: -1
         text: ">"
         visible: popupItemRoot.subMenuItem
+    }
+
+    DText {
+        id: checkedIndicator
+        anchors.right: parent.right
+        anchors.rightMargin: DStyle.defaultMargin
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -2
+        text: "•"
+        font.pixelSize: DStyle.fontSizeXL
+        visible: popupItemRoot.checked
     }
 
     Rectangle {

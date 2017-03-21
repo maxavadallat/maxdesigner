@@ -7,16 +7,28 @@ namespace Ui {
 class ConfirmDialog;
 }
 
+//==============================================================================
+// Confirmation Dialog Class
+//==============================================================================
 class ConfirmDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit ConfirmDialog(QWidget *parent = 0);
+    // Constructor
+    explicit ConfirmDialog(QWidget* aParent = NULL);
+
+    // Set Confirmation Text
+    void setConfirmationText(const QString& aText);
+    // Set Confirmation Icon
+    void setConfirmationIcon(const QString& aIcon);
+
+    // Destructor
     ~ConfirmDialog();
 
 private:
-    Ui::ConfirmDialog *ui;
+    // UI
+    Ui::ConfirmDialog*  ui;
 };
 
 #endif // CONFIRMDIALOG_H

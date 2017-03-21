@@ -37,7 +37,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
     Q_PROPERTY(ProjectModel* currentProject READ currentProject NOTIFY currentProjectChanged)
-    Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent WRITE setCurrentComponent NOTIFY currentComponentChanged)
+    //Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent WRITE setCurrentComponent NOTIFY currentComponentChanged)
 
     Q_PROPERTY(BaseComponentsModel* baseComponentsModel READ baseComponentsModel NOTIFY baseComponentsModelChanged)
     Q_PROPERTY(ComponentsModel* componentsModel READ componentsModel NOTIFY componentsModelChanged)
@@ -69,9 +69,13 @@ public:
 
     // Open Project
     Q_INVOKABLE void openProject(const QString& aFilePath);
-
     // Open Component
     Q_INVOKABLE void openComponent(ComponentInfo* aComponent);
+
+    // Launch Info Dialog
+    Q_INVOKABLE void launchInfoDialog(const QString& aText);
+    // Launch Confirm Dialog
+    Q_INVOKABLE bool launchConfirmDialog(const QString& aText, const QString& aIcon = "");
 
     // Destructor
     ~MainWindow();
@@ -272,6 +276,13 @@ private:
 
     // Recent Projects Model
     RecentProjectsModel*        mRecentProjects;
+
+    // About Dialog
+    AboutDialog*                mAboutDialog;
+    // Info Dialog
+    InfoDialog*                 mInfoDialog;
+    // Confirm Dialog
+    ConfirmDialog*              mConfirmDialog;
 
     // Preferences Dialog
     PreferencesDialog*          mPreferencesDialog;

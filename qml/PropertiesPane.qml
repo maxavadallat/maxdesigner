@@ -63,6 +63,19 @@ DPane {
         }
     }
 
+    signal newPropertyLaunch(var componentInfo)
+    signal propertyEditLaunch(var componentInfo)
+
+    signal formulaEditLaunch(var componentInfo)
+
+    signal newStateLaunch(var componentInfo)
+    signal stateEditLaunch(var componentInfo)
+    signal stateSelectionLaunch(var componentInfo)
+
+    signal newTransitionLaunch(var componentInfo)
+    signal transitionEditLaunch(var componentInfo)
+
+
     Row {
         id: idRow
         spacing: 2
@@ -116,16 +129,16 @@ DPane {
                 id: posRow
                 spacing: DStyle.defaultSpacing
 
-                opacity: {
-                    if (propertiesController.focusedComponent && propertiesController.focusedComponent.isRoot) {
-                        return 0.0;
-                    }
+//                opacity: {
+//                    if (propertiesController.focusedComponent && propertiesController.focusedComponent.isRoot) {
+//                        return 0.0;
+//                    }
 
-                    return 1.0;
-                }
+//                    return 1.0;
+//                }
 
-                Behavior on opacity { DFadeAnimation { } }
-                visible: opacity > 0.0
+//                Behavior on opacity { DFadeAnimation { } }
+//                visible: opacity > 0.0
 
                 DText {
                     width: 24
@@ -400,7 +413,8 @@ DPane {
             width: propertiesPaneRoot.contentWidth
             text: "Add Property"
             onClicked: {
-
+                // Emit New Property Launch
+                propertiesPaneRoot.newPropertyLaunch(propertiesController.focusedComponent);
             }
         }
     }
@@ -474,10 +488,6 @@ DPane {
             text: "Add Transition"
         }
     }
-
-    // Parent
-
-    // ...
 
     DSection {
         id: parentSection

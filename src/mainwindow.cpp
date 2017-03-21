@@ -52,6 +52,10 @@ MainWindow::MainWindow(QWidget* aParent)
 
     , mRecentProjects(NULL)
 
+    , mAboutDialog(NULL)
+    , mInfoDialog(NULL)
+    , mConfirmDialog(NULL)
+
     , mPreferencesDialog(NULL)
     , mProjectPropertiesDiaog(NULL)
     , mCreateComponentDialog(NULL)
@@ -432,7 +436,54 @@ void MainWindow::openComponent(ComponentInfo* aComponent)
 //==============================================================================
 void MainWindow::launchAbout()
 {
+    // Check About Dialog
+    if (!mAboutDialog) {
+        // Create About Dialog
+        mAboutDialog = new AboutDialog();
+    }
 
+    // Exec Dialog
+    mAboutDialog->exec();
+}
+
+//==============================================================================
+// Launch Info Dialog
+//==============================================================================
+void MainWindow::launchInfoDialog(const QString& aText)
+{
+    // Check Info Dialog
+    if (!mInfoDialog) {
+        // Create Info Dialog
+        mInfoDialog = new InfoDialog();
+    }
+
+    // Set Info Text
+    mInfoDialog->setInfoText(aText);
+    // Exec
+    mInfoDialog->exec();
+}
+
+//==============================================================================
+// Launch Confirm Dialog
+//==============================================================================
+bool MainWindow::launchConfirmDialog(const QString& aText, const QString& aIcon)
+{
+    // Check Confirm Dialog
+    if (!mConfirmDialog) {
+        // Create Info Dialog
+        mConfirmDialog = new ConfirmDialog();
+    }
+
+    // Set Confirm Text
+    mConfirmDialog->setConfirmationText(aText);
+    // Check Icon
+    if (!aIcon.isEmpty()) {
+        // Set Confirmation Icon
+        mConfirmDialog->setConfirmationIcon(aIcon);
+    }
+
+    // Exec Confirm Dialog
+    return mConfirmDialog->exec();
 }
 
 //==============================================================================
@@ -1717,6 +1768,21 @@ MainWindow::~MainWindow()
     }
 
     // ...
+
+    if (mAboutDialog) {
+        delete mAboutDialog;
+        mAboutDialog = NULL;
+    }
+
+    if (mInfoDialog) {
+        delete mInfoDialog;
+        mInfoDialog = NULL;
+    }
+
+    if (mConfirmDialog) {
+        delete mConfirmDialog;
+        mConfirmDialog = NULL;
+    }
 
     if (mPreferencesDialog) {
         delete mPreferencesDialog;

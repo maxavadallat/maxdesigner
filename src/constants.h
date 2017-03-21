@@ -115,6 +115,13 @@
 #define DEFAULT_COMPONENT_WIDTH                             320
 #define DEFAULT_COMPONENT_HEIGHT                            200
 
+#define JSON_VALUE_TRANSITION_NODE_TYPE_PARALLEL            "parallel"
+#define JSON_VALUE_TRANSITION_NODE_TYPE_SQUENTIAL           "sequential"
+#define JSON_VALUE_TRANSITION_NODE_TYPE_PAUSE               "pause"
+#define JSON_VALUE_TRANSITION_NODE_TYPE_ACTION              "action"
+#define JSON_VALUE_TRANSITION_NODE_TYPE_SCRIPT              "script"
+#define JSON_VALUE_TRANSITION_NODE_TYPE_ANIMATION           "animation"
+
 // JSON Keys for Component Info
 #define JSON_KEY_COMPONENT_NAME                             "componentName"
 #define JSON_KEY_COMPONENT_TYPE                             "componentType"
@@ -125,10 +132,48 @@
 #define JSON_KEY_COMPONENT_PROPERTIES                       "componentProperties"
 #define JSON_KEY_COMPONENT_PARENT                           "componentParent"
 #define JSON_KEY_COMPONENT_CHILDREN                         "componentChildren"
+#define JSON_KEY_COMPONENT_ANCHORS                          "componentAnchors"
 #define JSON_KEY_COMPONENT_SIGNALS                          "componentSignals"
 #define JSON_KEY_COMPONENT_STATES                           "componentStates"
 #define JSON_KEY_COMPONENT_TRANSITIONS                      "componentTransitions"
 #define JSON_KEY_COMPONENT_SOURCE                           "componentSource"
+#define JSON_KEY_COMPONENT_IMPORTS                          "componentImports"
+
+#define JSON_KEY_COMPONENT_SIGNAL_NAME                      "componentSignalName"
+#define JSON_KEY_COMPONENT_SIGNAL_PARAMETERS                "componentSignalParameters"
+
+#define JSON_KEY_COMPONENT_STATE_NAME                       "componentStateName"
+#define JSON_KEY_COMPONENT_STATE_WHEN                       "componentStateWhen"
+#define JSON_KEY_COMPONENT_STATE_PROPERTY_CHANGES           "componentStatePropertyChanges"
+
+#define JSON_KEY_COMPONENT_PROPERTY_CHANGE_TARGET           "componentPropertyChangeTarget"
+#define JSON_KEY_COMPONENT_PROPERTY_CHANGE_PROPERTY         "componentPropertyChangeProperty"
+#define JSON_KEY_COMPONENT_PROPERTY_CHANGE_VALUE            "componentPropertyChangeValue"
+
+#define JSON_KEY_COMPONENT_TRANSITION_FROM                  "componentTransitionFrom"
+#define JSON_KEY_COMPONENT_TRANSITION_TO                    "componentTransitionTo"
+
+#define JSON_KEY_COMPONENT_TRANSITION_ROOT                  "componentTransitionRoot"
+
+#define JSON_KEY_COMPONENT_TRANSITION_NODE_TYPE             "componentTransitionNodeType"
+#define JSON_KEY_COMPONENT_TRANSITION_NODE_CHILDREN         "componentTransitionNodeChildren"
+
+#define JSON_KEY_COMPONENT_TRANSITION_PAUSE_DURATION        "componentTransitionPauseDuration"
+
+#define JSON_KEY_COMPONENT_TRANSITION_PACTION_TARGET        "componentTransitionPActionTarget"
+#define JSON_KEY_COMPONENT_TRANSITION_PACTION_PROPERTY      "componentTransitionPActionProperty"
+#define JSON_KEY_COMPONENT_TRANSITION_PACTION_VALUE         "componentTransitionPActionValue"
+
+#define JSON_KEY_COMPONENT_TRANSITION_SACTION_SCRIPT        "componentTransitionSActionScript"
+
+#define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_TARGET     "componentTransitionPAnimationTarget"
+#define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_PROPERTY   "componentTransitionPAnimationProperty"
+#define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_VALUEFROM  "componentTransitionPAnimationValueFrom"
+#define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_VALUETO    "componentTransitionPAnimationValueTo"
+#define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_DURATION   "componentTransitionPAnimationDuration"
+#define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_ETYPE      "componentTransitionPAnimationEType"
+
+
 
 // Default/Basec JSON Keys For Component Properties
 #define JSON_KEY_COMPONENT_PROPERTY_ID                      "id"
@@ -163,6 +208,7 @@
 /*
 #define JSON_KEY_COMPONENT_PROPERTY_OPACITY                 "opacity"
 #define JSON_KEY_COMPONENT_PROPERTY_VISIBLE                 "visible"
+#define JSON_KEY_COMPONENT_PROPERTY_SCALE                   "scale"
 
 #define JSON_KEY_COMPONENT_PROPERTY_RADIUS                  "radius"
 #define JSON_KEY_COMPONENT_PROPERTY_SPACING                 "spacing"

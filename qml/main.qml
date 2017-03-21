@@ -351,19 +351,48 @@ Item {
 
             state: stateCreate
             //state: stateShown
+
+            onNewPropertyLaunch: {
+                // Show Property Editor
+                propertyEditor.show();
+            }
         }
 
+        // Property Editor
+        DPropertyEditor {
+            id: propertyEditor
+
+//            creationWidth: 320
+//            creationHeight: 200
+
+            initialX: propertiesPane.x
+//            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+            initialY: propertiesPane.y + propertiesPane.height / 2
+
+//            creationX: propertiesPane.x - creationWidth - 32
+//            creationY: initialY - creationHeight / 2
+
+//            lastShownX: formulaEditor.creationX
+//            lastShownY: formulaEditor.creationY
+
+//            parentWidth: mainGrabArea.width
+//            parentHeight: mainGrabArea.height
+
+            state: stateCreate
+        }
+
+        // Formula Editor
         DFormulaEditor {
             id: formulaEditor
 
             initialX: propertiesPane.x
-            initialY: Math.max(Math.min(mainGrabArea.height / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
 
             creationWidth: 320
             creationHeight: 200
 
-            creationX: parentWidth / 2 - creationWidth / 2 + 100
-            creationY: initialY - creationHeight / 2 + 150
+            creationX: propertiesPane.x - creationWidth - 32
+            creationY: initialY - creationHeight / 2
 
             lastShownX: formulaEditor.creationX
             lastShownY: formulaEditor.creationY
@@ -374,6 +403,39 @@ Item {
             state: stateCreate
             //state: stateShown
         }
+
+        // State Editor
+        DStateEditor {
+            id: stateEditor
+
+            parentWidth: mainGrabArea.width
+            parentHeight: mainGrabArea.height
+
+            state: stateCreate
+        }
+
+        // State Selector
+        DStateSelector {
+            id: stateSelector
+
+            parentWidth: mainGrabArea.width
+            parentHeight: mainGrabArea.height
+
+            state: stateCreate
+        }
+
+        // Transition Editor
+        DTransitionEditor {
+            id: transitionEditor
+
+            parentWidth: mainGrabArea.width
+            parentHeight: mainGrabArea.height
+
+            state: stateCreate
+        }
+
+        // ...
+
     }
 
     DWelcome {
