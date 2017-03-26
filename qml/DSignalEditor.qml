@@ -3,14 +3,13 @@ import QtQuick 2.0
 import enginecomponents 0.1
 
 import "style"
-import "DConstants.js" as CONSTS
 
 DPaneBase {
-    id: stateEditorRoot
+    id: signalEditorRoot
+
+    title: "Signal"
 
     hideToSide: hideToRight
-
-    title: "State Editor"
 
     creationWidth: 332
     creationHeight: 118
@@ -22,14 +21,28 @@ DPaneBase {
 
     property ComponentInfo componentInfo: null
 
-    property var stateModel: []
+    signal newParameter()
+    signal editParameter()
 
-    signal newPropertyChange()
-    signal editPropertyChange()
+//    onAccepted: {
+//        // Reset
+//        signalEditorRoot.reset(false);
+//    }
+
+//    onRejected: {
+//        // Reset
+//        signalEditorRoot.reset(false);
+//    }
 
     onTransitionFinished: {
         if (newState === stateShown) {
+            // Set Editor Focus
             nameEditor.setEditorFocus(true, true);
+        }
+
+        if (newState === stateHidden) {
+            // Reset Focus
+            nameEditor.setEditorFocus(false);
         }
     }
 
@@ -40,7 +53,6 @@ DPaneBase {
         }
     }
 
-
     DDisc {
         anchors.right: parent.right
         anchors.rightMargin: DStyle.defaultMargin * 2
@@ -48,9 +60,7 @@ DPaneBase {
 
         onClicked: {
             // Emit Accepted Signal
-            stateEditorRoot.accepted();
-            // Reset
-            stateEditorRoot.reset(false);
+            signalEditorRoot.accepted();
 
             // ...
         }
@@ -65,8 +75,8 @@ DPaneBase {
         spacing: DStyle.defaultSpacing
 
         DText {
-            id: nameLabel
-            //width: 58
+            id: targetLabel
+            width: 64
             anchors.verticalCenter: parent.verticalCenter
             horizontalAlignment: Text.AlignRight
             text: "name:"
@@ -75,12 +85,11 @@ DPaneBase {
         DTextInput {
             id: nameEditor
             width: 168
-            anchors.verticalCenter: parent.verticalCenter
             onKeyEvent: {
                 switch (event.key) {
                     case Qt.Key_Escape:
                         // Dismiss Pane
-                        stateEditorRoot.dismissPane(true);
+                        signalEditorRoot.dismissPane(true);
                     break;
 
                     case Qt.Key_Tab:
@@ -97,17 +106,12 @@ DPaneBase {
         width: nameRow.width
         anchors.left: parent.left
         anchors.leftMargin: DStyle.defaultMargin
-//        anchors.top: nameRow.bottom
-//        anchors.topMargin: DStyle.defaultMargin
-//        anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: DStyle.defaultMargin
-        text: "Add Property Change"
+        text: "Add Parameter"
 
         onClicked: {
-            // Signal New Property Change
-            stateEditorRoot.newPropertyChange();
+            signalEditorRoot.newParameter();
         }
     }
-
 }

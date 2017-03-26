@@ -13,29 +13,26 @@ DPaneBase {
     title: "New Property"
 
     creationWidth: 332
-    creationHeight: 120
+    creationHeight: 118
 
     minWidth: 332
-    minHeight: 120
-
-    property ComponentInfo componentInfo: null
+    minHeight: 118
 
     enableResize: false
 
-    signal accepted()
-    signal rejected()
+    property ComponentInfo componentInfo: null
 
     onTransitionStarted: {
         if (newState === stateHidden) {
             // Set Focus
-            nameEdit.setEditorFocus(false);
+            nameEditor.setEditorFocus(false);
         }
     }
 
     onTransitionFinished: {
         if (newState === stateShown) {
             // Set Focus
-            nameEdit.setEditorFocus(true);
+            nameEditor.setEditorFocus(true, true);
         }
     }
 
@@ -47,8 +44,6 @@ DPaneBase {
         onClicked: {
             // Emit Accepted Signal
             propertyEditorRoot.accepted();
-            // Reset
-            propertyEditorRoot.reset(false);
 
             // ...
         }
@@ -77,9 +72,22 @@ DPaneBase {
             }
 
             DTextInput {
-                id: nameEdit
+                id: nameEditor
                 width: typeOption.width
                 anchors.verticalCenter: parent.verticalCenter
+                onKeyEvent: {
+                    switch (event.key) {
+                        case Qt.Key_Escape:
+                            // Reset
+                            propertyEditorRoot.dismissPane(true);
+                        break;
+
+                        case Qt.Key_Tab:
+                            // Set Focus
+                            typeOption.setOptionFocus(true);
+                        break;
+                    }
+                }
             }
         }
 
@@ -99,12 +107,27 @@ DPaneBase {
                 //width: propertyEditorRoot.width - 64
                 anchors.verticalCenter: parent.verticalCenter
                 model: [
-                    DPopupItemObject { text: "Option 1" },
-                    DPopupItemObject { text: "Option 2" },
-                    DPopupItemObject { text: "Option 3" },
-                    DPopupItemObject { text: "Option 4" },
-                    DPopupItemObject { text: "Option 5" }
+                    DPopupItemObject { text: "string" },
+                    DPopupItemObject { text: "int" },
+                    DPopupItemObject { text: "bool" },
+                    DPopupItemObject { text: "double" },
+                    DPopupItemObject { text: "var" },
+                    DPopupItemObject { text: "QtObject" }
                 ]
+
+                onKeyEvent: {
+                    switch (event.key) {
+                        case Qt.Key_Escape:
+                            // Reset
+                            propertyEditorRoot.dismissPane(true);
+                        break;
+
+                        case Qt.Key_Tab:
+                            // Set Focus
+                            nameEditor.setEditorFocus(true, true);
+                        break;
+                    }
+                }
             }
         }
     }

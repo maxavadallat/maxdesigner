@@ -2,7 +2,7 @@ import QtQuick 2.0
 
 import "style"
 
-NumberAnimation {
+PropertyAnimation {
     duration: DStyle.animDuration
     easing.type: Easing.InOutCubic
 }

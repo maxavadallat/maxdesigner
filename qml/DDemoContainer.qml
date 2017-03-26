@@ -45,13 +45,26 @@ DRectangle {
         height: 512
     }
 
-    Row {
+    DPropertyItem {
+        id: opiDelegateRoot
+        width: 300
+        anchors.centerIn: parent
+    }
+
+
+    Flow {
+        anchors.left: parent.left
+        anchors.leftMargin: 32
         anchors.right: parent.right
         anchors.rightMargin: 32
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 32
 
+        layoutDirection: Qt.RightToLeft
+
         spacing: DStyle.defaultSpacing
+
+        visible: false
 
         DButton {
             width: 128
@@ -62,6 +75,32 @@ DRectangle {
                     propertyEditor.show();
                 } else {
                     propertyEditor.reset(false);
+                }
+            }
+        }
+
+        DButton {
+            width: 128
+            text: signalEditor.state === signalEditor.stateCreate ? "Create Signal" : "Reset Signal"
+
+            onClicked: {
+                if (signalEditor.state === signalEditor.stateCreate) {
+                    signalEditor.show();
+                } else {
+                    signalEditor.reset(false);
+                }
+            }
+        }
+
+        DButton {
+            width: 196
+            text: signalParameterEditor.state === signalParameterEditor.stateCreate ? "Create Signal Parameter" : "Reset Signal Parameter"
+
+            onClicked: {
+                if (signalParameterEditor.state === signalParameterEditor.stateCreate) {
+                    signalParameterEditor.show();
+                } else {
+                    signalParameterEditor.reset(false);
                 }
             }
         }
@@ -80,6 +119,19 @@ DRectangle {
         }
 
         DButton {
+            width: 196
+            text: propertyChangesEditor.state === propertyChangesEditor.stateCreate ? "Create Property Changes" : "Reset Property Changes"
+
+            onClicked: {
+                if (propertyChangesEditor.state === propertyChangesEditor.stateCreate) {
+                    propertyChangesEditor.show();
+                } else {
+                    propertyChangesEditor.reset(false);
+                }
+            }
+        }
+
+        DButton {
             width: 168
             text: transitionEditor.state === transitionEditor.stateCreate ? "Create Transition" : "Reset Transition"
 
@@ -93,14 +145,14 @@ DRectangle {
         }
 
         DButton {
-            width: 188
-            text: propertyChangesEditor.state === propertyChangesEditor.stateCreate ? "Create Property Changes" : "Reset Property Changes"
+            width: 196
+            text: transitionNodeEditor.state === transitionNodeEditor.stateCreate ? "Create Transition Node" : "Reset Transition Node"
 
             onClicked: {
-                if (propertyChangesEditor.state === propertyChangesEditor.stateCreate) {
-                    propertyChangesEditor.show();
+                if (transitionNodeEditor.state === transitionNodeEditor.stateCreate) {
+                    transitionNodeEditor.show();
                 } else {
-                    propertyChangesEditor.reset(false);
+                    transitionNodeEditor.reset(false);
                 }
             }
         }
@@ -119,17 +171,62 @@ DRectangle {
         state: stateCreate
     }
 
+    // Signal Editor
+    DSignalEditor {
+        id: signalEditor
+
+        state: stateCreate
+
+        childPane: signalParameterEditor
+
+        onNewParameter: {
+            // Show Signal Parameter Editor
+            signalParameterEditor.show();
+        }
+    }
+
+    // Signal Parameter Editor
+    DSignalParameterEditor {
+        id: signalParameterEditor
+
+        state: stateCreate
+
+        parentPane: signalEditor
+
+        initialX: signalEditor.x + signalEditor.width * 0.5
+        initialY: signalEditor.y + signalEditor.height
+
+        creationX: initialX - signalParameterEditor.width * 0.5
+        creationY: initialY + 32
+    }
+
     // State Editor
     DStateEditor {
         id: stateEditor
 
         state: stateCreate
+
+        childPane: propertyChangesEditor
+
+        onNewPropertyChange: {
+            // Show Property Changes Editor
+            propertyChangesEditor.show();
+        }
     }
 
+    // Property Changes Editor
     DPropertyChangesEditor {
         id: propertyChangesEditor
 
         state: stateCreate
+
+        parentPane: stateEditor
+
+        initialX: stateEditor.x + stateEditor.width * 0.5
+        initialY: stateEditor.y + stateEditor.height
+
+        creationX: initialX - propertyChangesEditor.width * 0.5
+        creationY: initialY + 32
     }
 
     // Transition Editor
@@ -137,23 +234,109 @@ DRectangle {
         id: transitionEditor
 
         state: stateCreate
+
+        childPane: transitionNodeEditor
+
+        onNewTransitionNode: {
+            // Set Node Type
+            transitionNodeEditor.nodeType = nodeType;
+            // Check Node Type
+            if (nodeType > 2) {
+                // Show Transition Node Editor
+                transitionNodeEditor.show();
+            }
+        }
     }
 
+    // Transition Node Editor
+    DTransitionNodeEditor {
+        id: transitionNodeEditor
 
+        state: stateCreate
+
+        parentPane: transitionEditor
+
+        initialX: transitionEditor.x + transitionEditor.width * 0.5
+        initialY: transitionEditor.y + transitionEditor.height
+
+        creationX: initialX - transitionNodeEditor.width * 0.5
+        creationY: initialY + 32
+    }
 
 /*
-    DOption {
+    Column {
         anchors.centerIn: parent
+        spacing: DStyle.defaultSpacing
 
-        currentIndex: 0
+        DButton {
+            //onClicked: checked = !checked;
+            //enabled: propertiesPaneRoot.parent.enabled
+            enabled: parent.enabled
+        }
 
-        model: [
-            DPopupItemObject { text: "Option 1" },
-            DPopupItemObject { text: "Option 2" },
-            DPopupItemObject { text: "Option 3" },
-            DPopupItemObject { text: "Option 4" },
-            DPopupItemObject { text: "Option 5" }
-        ]
+        DButton {
+            //onClicked: checked = !checked;
+            checked: true
+            enabled: parent.enabled
+        }
+
+        DCheckBox {
+            text: "CheckBox"
+            onClicked: checked = !checked;
+            enabled: parent.enabled
+        }
+
+        DCheckBox {
+            rightAligned: true
+            text: "CheckBox"
+            onClicked: checked = !checked;
+            enabled: parent.enabled
+        }
+
+        DSwitch {
+            text: "Switch"
+            onClicked: checked = !checked;
+            enabled: parent.enabled
+        }
+
+        DSwitch {
+            rightAligned: true
+            text: "Switch"
+            onClicked: checked = !checked;
+            enabled: parent.enabled
+        }
+
+        DRadioButtonGroup {
+            model: [
+                DRadioButtonGroupItem { title: "Item 1" },
+                DRadioButtonGroupItem { title: "Item 2" },
+                DRadioButtonGroupItem { title: "Item 3" },
+                DRadioButtonGroupItem { title: "Item 4" }
+            ]
+
+            onButtonSelected: {
+                //console.log("onButtonSelected - buttonIndex: " + buttonIndex);
+                // Set Current Index
+                currentIndex = buttonIndex;
+            }
+        }
+
+        DRadioButtonGroup {
+            rightAligned: true
+            model: [
+                DRadioButtonGroupItem { title: "Item 1" },
+                DRadioButtonGroupItem { title: "Item 2" },
+                DRadioButtonGroupItem { title: "Item 3" },
+                DRadioButtonGroupItem { title: "Item 4" }
+            ]
+
+            onButtonSelected: {
+                //console.log("onButtonSelected - buttonIndex: " + buttonIndex);
+                // Set Current Index
+                currentIndex = buttonIndex;
+            }
+        }
+
     }
 */
 /*

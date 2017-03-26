@@ -19,6 +19,7 @@ ComponentCategoryModel::ComponentCategoryModel(QObject* aParent)
 //==============================================================================
 void ComponentCategoryModel::init()
 {
+    // Append Categories
     mCategories << COMPONENT_CATEGORY_VISUAL;
     mCategories << COMPONENT_CATEGORY_NONVISUAL;
     mCategories << COMPONENT_CATEGORY_LAYOUT;

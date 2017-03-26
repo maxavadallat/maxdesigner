@@ -13,19 +13,36 @@ DPaneBase {
     hideToSide: hideToRight
 
     creationWidth: 440
-    creationHeight: 128
+    creationHeight: 118
 
     minWidth: 440
-    minHeight: 128
+    minHeight: 118
 
-    property ComponentInfo componentInfo: null
+    enableResize: false
 
-    signal accepted()
-    signal rejected()
+    //property ComponentInfo componentInfo: null
 
-    onAccepted: {
-        // Reset
-        transitionEditorRoot.reset(false);
+    //property var stateModel: []
+
+    signal newTransitionNode(var nodeType)
+    signal editTransitionNode()
+
+    onTransitionFinished: {
+        if (newState === stateShown) {
+            // Set Option Focus
+            fromOption.setOptionFocus(true);
+        }
+    }
+
+    onChildTransitionFinished: {
+        if (newState === stateCreate) {
+            // Set Option Current Index
+            addTransitionOption.currentIndex = 0;
+            // Set Enabled
+            addTransitionOption.enabled = true;
+            // Set Option Focus
+            addTransitionOption.setOptionFocus(true);
+        }
     }
 
     DDisc {
@@ -70,6 +87,23 @@ DPaneBase {
                 DPopupItemObject { text: "Option 4" },
                 DPopupItemObject { text: "Option 5" }
             ]
+
+            onZChanged: {
+                parent.z = fromOption.z;
+            }
+
+            onKeyEvent: {
+                switch (event.key) {
+                    case Qt.Key_Escape:
+                        // Dismiss Pane
+                        transitionEditorRoot.dismissPane(true);
+                    break;
+
+                    case Qt.Key_Tab:
+                        toOption.setOptionFocus(true);
+                    break;
+                }
+            }
         }
 
         DText {
@@ -91,12 +125,32 @@ DPaneBase {
                 DPopupItemObject { text: "Option 4" },
                 DPopupItemObject { text: "Option 5" }
             ]
-        }
 
+            onZChanged: {
+                parent.z = toOption.z;
+            }
+
+            onKeyEvent: {
+                switch (event.key) {
+                    case Qt.Key_Escape:
+                        // Dismiss Pane
+                        transitionEditorRoot.dismissPane(true);
+                    break;
+
+                    case Qt.Key_Tab:
+                        addTransitionOption.setOptionFocus(true);
+                    break;
+                }
+            }
+        }
     }
 
+
+    // ...
+
+
     DOption {
-        id: addTransitionRow
+        id: addTransitionOption
         width: fromToRow.width
         anchors.left: parent.left
         anchors.leftMargin: DStyle.defaultMargin
@@ -104,6 +158,7 @@ DPaneBase {
         anchors.bottomMargin: DStyle.defaultMargin
         currentIndex: 0
         model: [
+            DPopupItemObject { text: "Add New Node" },
             DPopupItemObject { text: "Add Sequential Animation" },
             DPopupItemObject { text: "Add Parallel Animation" },
             DPopupItemObject { text: "Add Property Animation" },
@@ -111,7 +166,25 @@ DPaneBase {
             DPopupItemObject { text: "Add Script Action" },
             DPopupItemObject { text: "Add Pause Animation" }
         ]
+
+        onKeyEvent: {
+            switch (event.key) {
+                case Qt.Key_Escape:
+                    // Dismiss Pane
+                    transitionEditorRoot.dismissPane(true);
+                break;
+
+                case Qt.Key_Tab:
+                    fromOption.setOptionFocus(true);
+                break;
+            }
+        }
+
+        onItemSelected: {
+            // Set Enabled
+            addTransitionOption.enabled = false;
+            // Signal New Transition Node
+            transitionEditorRoot.newTransitionNode(itemIndex);
+        }
     }
-
-
 }

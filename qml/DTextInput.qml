@@ -11,21 +11,36 @@ DControl {
 
     property alias editor: textInput
     property alias text: textInput.text
+    property alias editorFocus: textInput.focus
     property alias pixelSize: textInput.font.pixelSize
+    property alias wrapMode: textInput.wrapMode
+    property alias mouseSelection: textInput.selectByMouse
 
     property bool showClearButton: true
-
     property bool fixTextSize: false
-
-    property alias wrapMode: textInput.wrapMode
 
     clip: true
 
     signal keyEvent(var event)
+    signal accepted()
 
     // Set Editor Focus
-    function setEditorFocus(aFocus) {
+    function setEditorFocus(aFocus, aSelect) {
+        console.log("DTextInput.setEditorFocus - aFocus: " + aFocus + " - aSelect: " + aSelect);
+        //textInput.activeFocus = aFocus;
         textInput.focus = aFocus;
+        //textInput.forceActiveFocus();
+        if (aSelect) {
+            selectAll();
+        }
+    }
+
+    function enableMouseSelection(aEnable) {
+        textInput.selectByMouse = aEnable;
+    }
+
+    function selectAll() {
+        textInput.selectAll();
     }
 
     DEditorBackground {
@@ -67,6 +82,11 @@ DControl {
 //            border.color: "purple"
 //        }
 
+        onAccepted: {
+            // Emit Accepted Signal
+            textInputRoot.accepted();
+        }
+
         Keys.onPressed: {
             // Check if Auto Repeat
             if (event.isAutoRepeat) {
@@ -76,10 +96,15 @@ DControl {
         }
 
         Keys.onReleased: {
-            // Check Key
-            if (event.key === Qt.Key_Escape) {
-                // Reset Focus
-                textInput.focus = false;
+            // Switch Key
+            switch (event.key) {
+                case Qt.Key_Escape:
+                    // Reset Focus
+                    textInput.focus = false;
+                break;
+
+                default:
+                break;
             }
 
             // Emit Key Event Signal

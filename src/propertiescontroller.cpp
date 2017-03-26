@@ -282,46 +282,19 @@ void PropertiesController::requestCHeight(const QString& aHeight)
 //==============================================================================
 // Add Own Property
 //==============================================================================
-void PropertiesController::addOwnProperty(const QString& aName, PropertiesController::EPropertyType aType)
+void PropertiesController::addOwnComponentProperty(const QString& aName, const int& aType)
 {
     // Check Focused Component
     if (mFocusedComponent) {
-        // Switch Type
-        switch (aType) {
-            default:
-            case PropertiesController::EPropertyType::EPTString:
-                // Set Property
-                mFocusedComponent->setComponentProperty(aName, QVariant(QVariant::String));
-            break;
-
-            case PropertiesController::EPropertyType::EPTBool:
-                // Set Property
-                mFocusedComponent->setComponentProperty(aName, QVariant(QVariant::Bool));
-            break;
-
-            case PropertiesController::EPropertyType::EPTInt:
-                // Set Property
-                mFocusedComponent->setComponentProperty(aName, QVariant(QVariant::Int));
-            break;
-
-            case PropertiesController::EPropertyType::EPTReal:
-            case PropertiesController::EPropertyType::EPTDouble:
-                // Set Property
-                mFocusedComponent->setComponentProperty(aName, QVariant(QVariant::Double));
-            break;
-
-            case PropertiesController::EPropertyType::EPTVar:
-                // Set Property
-                mFocusedComponent->setComponentProperty(aName, QJsonObject());
-            break;
-        }
+        // Add Own Property
+        mFocusedComponent->addComponentOwnProperty(aName, (ComponentInfo::EPropertyType)aType);
     }
 }
 
 //==============================================================================
 // Remove Own Property
 //==============================================================================
-void PropertiesController::removeOwnProperty(const QString& aName)
+void PropertiesController::removeComponentProperty(const QString& aName)
 {
     // Check Focused Component
     if (mFocusedComponent) {
@@ -333,7 +306,7 @@ void PropertiesController::removeOwnProperty(const QString& aName)
 //==============================================================================
 // Set Property
 //==============================================================================
-void PropertiesController::setProperty(const QString& aName, const QString& aValue)
+void PropertiesController::setComponentProperty(const QString& aName, const QVariant& aValue)
 {
     // Check Focused Component
     if (mFocusedComponent) {
@@ -345,7 +318,7 @@ void PropertiesController::setProperty(const QString& aName, const QString& aVal
 //==============================================================================
 // Clear Property
 //==============================================================================
-void PropertiesController::clearProperty(const QString& aName)
+void PropertiesController::clearComponentProperty(const QString& aName)
 {
     // Check Focused Component
     if (mFocusedComponent) {

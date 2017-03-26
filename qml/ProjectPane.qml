@@ -12,8 +12,11 @@ DPane {
 
     title: "Project" + (mainController.currentProject ? (" - " + mainController.currentProject.projectName) : "")
 
+    creationWidth: 360
+    creationHeight: 600
+
     minWidth: 300
-    minHeight: 200
+    minHeight: 400
 
     enablePaneContent: true
 

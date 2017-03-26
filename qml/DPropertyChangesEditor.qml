@@ -11,20 +11,23 @@ DPaneBase {
 
     hideToSide: hideToTop
 
-    creationWidth: 440
+    creationWidth: 290
     creationHeight: 152
 
-    minWidth: 440
+    minWidth: 290
     minHeight: 152
+
+    enableResize: false
+    enableHideButton: false
 
     property ComponentInfo componentInfo: null
 
-    signal accepted()
-    signal rejected()
+    state: stateCreate
 
-    onAccepted: {
-        // Reset
-        propertyChangesEditorRoot.reset(false);
+    onTransitionFinished: {
+        if (newState === stateShown) {
+            targetEditor.setEditorFocus(true, true);
+        }
     }
 
     DDisc {
@@ -60,6 +63,19 @@ DPaneBase {
 
             DTextInput {
                 id: targetEditor
+                width: 120
+                onKeyEvent: {
+                    switch (event.key) {
+                        case Qt.Key_Escape:
+                            // Dismiss Pane
+                            propertyChangesEditorRoot.dismissPane(true);
+                        break;
+
+                        case Qt.Key_Tab:
+                            propertyEditor.setEditorFocus(true, true);
+                        break;
+                    }
+                }
             }
         }
 
@@ -75,6 +91,19 @@ DPaneBase {
 
             DTextInput {
                 id: propertyEditor
+                width: 120
+                onKeyEvent: {
+                    switch (event.key) {
+                        case Qt.Key_Escape:
+                            // Dismiss Pane
+                            propertyChangesEditorRoot.dismissPane(true);
+                        break;
+
+                        case Qt.Key_Tab:
+                            valueEditor.setEditorFocus(true, true);
+                        break;
+                    }
+                }
             }
         }
 
@@ -91,6 +120,19 @@ DPaneBase {
 
             DTextInput {
                 id: valueEditor
+                width: 120
+                onKeyEvent: {
+                    switch (event.key) {
+                        case Qt.Key_Escape:
+                            // Dismiss Pane
+                            propertyChangesEditorRoot.dismissPane(true);
+                        break;
+
+                        case Qt.Key_Tab:
+                            targetEditor.setEditorFocus(true, true);
+                        break;
+                    }
+                }
             }
         }
     }

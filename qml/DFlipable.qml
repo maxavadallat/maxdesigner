@@ -10,9 +10,14 @@ DMouseArea {
 
     property bool flipped: false
 
+    property bool handleDoubleClick: true
+
     onDoubleClicked: {
-        // Toggle Flipped
-        flipableRoot.flipped = !flipableRoot.flipped;
+        // Check To Handle Double Click
+        if (handleDoubleClick) {
+            // Toggle Flipped
+            flipableRoot.flipped = !flipableRoot.flipped;
+        }
     }
 
     // Flipable
@@ -44,7 +49,7 @@ DMouseArea {
             State {
                 name: flipable.stateBack
                 when: flipableRoot.flipped
-                PropertyChanges { target: rotation; angle: 180 }
+                PropertyChanges { target: rotation; angle: -180 }
             }
         ]
 

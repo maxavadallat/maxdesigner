@@ -720,25 +720,41 @@ QJsonObject ComponentInfo::toJSONObject()
 
     // ...
 
-    // Set Own Properties
-    ciObject[JSON_KEY_COMPONENT_OWN_PROPERTIES] = mOwnProperties;
-    // Set Properties
-    ciObject[JSON_KEY_COMPONENT_PROPERTIES]     = mProperties;
+    // Check Own Properties
+    if (!mOwnProperties.isEmpty()) {
+        // Set Own Properties
+        ciObject[JSON_KEY_COMPONENT_OWN_PROPERTIES] = mOwnProperties;
+    }
+
+    // Check Properties
+    if (!mProperties.isEmpty()) {
+        // Set Properties
+        ciObject[JSON_KEY_COMPONENT_PROPERTIES] = mProperties;
+    }
 
     // Check Parent Component
     if (mParent) {
         // Save Parent
-        ciObject[JSON_KEY_COMPONENT_PARENT]     = mParent->componentName();
+        ciObject[JSON_KEY_COMPONENT_PARENT] = mParent->componentName();
     }
 
-    // Set Signals
-    ciObject[JSON_KEY_COMPONENT_SIGNALS]        = mSignals;
+    // Check Signals
+    if (!mSignals.isEmpty()) {
+        // Set Signals
+        ciObject[JSON_KEY_COMPONENT_SIGNALS] = mSignals;
+    }
 
-    // Set States
-    ciObject[JSON_KEY_COMPONENT_STATES]         = mStates;
+    // Check States
+    if (!mStates.isEmpty()) {
+        // Set States
+        ciObject[JSON_KEY_COMPONENT_STATES] = mStates;
+    }
 
-    // Set Transitions
-    ciObject[JSON_KEY_COMPONENT_TRANSITIONS]    = mTransitions;
+    // Check Transitions
+    if (!mTransitions.isEmpty()) {
+        // Set Transitions
+        ciObject[JSON_KEY_COMPONENT_TRANSITIONS] = mTransitions;
+    }
 
     // Get Children Count
     int cCount = mChildren.count();
@@ -875,7 +891,7 @@ QVariant ComponentInfo::componentProperty(const QString& aName)
 {
     // Check Own Properties First
     if (mOwnProperties.keys().indexOf(aName) >= 0) {
-        return mOwnProperties[aName].toVariant();
+        return mOwnProperties[aName].toString().split(":")[1];
     }
 
     // Check Property Keys
@@ -889,6 +905,26 @@ QVariant ComponentInfo::componentProperty(const QString& aName)
 }
 
 //==============================================================================
+// Add Own Property
+//==============================================================================
+void ComponentInfo::addComponentOwnProperty(const QString& aName, const EPropertyType& aType, const QVariant& aDefault)
+{
+    // Switch Type
+    switch (aType) {
+        default:
+        case EPropertyType::EPTString:          mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING).arg(aDefault.toString()); break;
+        case EPropertyType::EPTBool:            mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_BOOL).arg(aDefault.toString()); break;
+        case EPropertyType::EPTInt:             mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_INT).arg(aDefault.toString()); break;
+        case EPropertyType::EPTDouble:          mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_DOUBLE).arg(aDefault.toString()); break;
+        case EPropertyType::EPTReal:            mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_REAL).arg(aDefault.toString()); break;
+        case EPropertyType::EPTVar:             mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_VAR).arg(aDefault.toString()); break;
+        case EPropertyType::EPTQtObject:        mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_OBJECT).arg(aDefault.toString()); break;
+        case EPropertyType::EPTQtObjectList:    mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_LIST).arg(aDefault.toString()); break;
+        break;
+    }
+}
+
+//==============================================================================
 // Set Property
 //==============================================================================
 void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& aValue)
@@ -897,27 +933,41 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
     QStringList baseProperties = mBase ? mBase->componentProperties() : QStringList();
     // Get Base Key Index
     int bpkIndex = baseProperties.indexOf(aName);
+
     // Check Base Key Index
     if (bpkIndex < 0) {
         qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - OWN";
+
+        // Init Type Prefix
+        QString tPrefix = mOwnProperties[aName].toString().split(":")[0];
+
+        // Check Prefix
+        if (tPrefix.isEmpty()) {
+            // Switch Type
+            switch (aValue.type()) {
+                default:
+                case QVariant::String:  tPrefix = JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING;   break;
+                case QVariant::Bool:    tPrefix = JSON_VALUE_PROPERTY_TYPE_PREFIX_BOOL;     break;
+                case QVariant::UInt:
+                case QVariant::Int:     tPrefix = JSON_VALUE_PROPERTY_TYPE_PREFIX_INT;      break;
+                case QVariant::Double:  tPrefix = JSON_VALUE_PROPERTY_TYPE_PREFIX_DOUBLE;   break;
+                break;
+            }
+        }
+
         // Set Own Property
-        //mOwnProperties[aName] = aValue.type() == QVariant::Int ? aValue.toString() : aValue.toJsonValue();
-        mOwnProperties[aName] = aValue.toString();
+        mOwnProperties[aName] = QString("%1:%2").arg(tPrefix).arg(aValue.toString());
 
-        // Set Dirty
-        setDirty(true);
+    } else {
+        qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - BASE";
 
-        return;
+        // Set Property
+        //mProperties[aName] = aValue.type() == QVariant::Int ? aValue.toString() : aValue.toJsonValue();
+        mProperties[aName] = aValue.toString();
     }
-
-    qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - BASE";
 
     // Set Dirty
     setDirty(true);
-
-    // Set Property
-    //mProperties[aName] = aValue.type() == QVariant::Int ? aValue.toString() : aValue.toJsonValue();
-    mProperties[aName] = aValue.toString();
 }
 
 //==============================================================================
@@ -939,6 +989,9 @@ void ComponentInfo::removeProperty(const QString& aName)
         // Remove Value
         mProperties.remove((aName));
     }
+
+    // Set Dirty
+    setDirty(true);
 }
 
 //==============================================================================
@@ -950,6 +1003,8 @@ void ComponentInfo::addChild(ComponentInfo* aChild)
     if (aChild) {
         // Append Child
         mChildren << aChild;
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -975,6 +1030,9 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
         } else {
             qWarning() << "ComponentInfo::removeChild - aChild: " << aChild << " - CHILD COMPONENT NOT FOUND!";
         }
+
+        // Set Dirty
+        setDirty(true);
     }
 }
 

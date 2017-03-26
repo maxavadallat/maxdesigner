@@ -1,13 +1,20 @@
 import QtQuick 2.0
 
+import "DConstants.js" as CONSTS
 import "style"
 
 DSwipeGesture {
     id: propertyItemRoot
 
-    property int itemIndex: 0
+    width: 300
+    height: CONSTS.defaultPaneItemHeight
 
-    default property alias contentChildren: contentContainer.children
+    property int itemIndex: 0
+    property bool markFordeletion: false
+    property bool swipeWasOn: false
+
+    property bool deleteButtonClicked: false
+    property bool formulaEditButtonClicked: false
 
     enableSwipe: true
 
@@ -15,17 +22,18 @@ DSwipeGesture {
     swipeThreshold: propertyItemRoot.width - deleteButton.width * 0.7
     swipeOnFinalPosX: deleteButton.showPosX
 
-    property bool markFordeletion: false
-
-    property bool swipeWasOn: false
-
     clip: true
 
     signal deleteItemClicked(var itemIndex)
+    signal formulaEditClicked(var itemIndex)
 
     onPressed: {
         // Set Behavior Duration
         deleteButton.behaviorDuration = 0;
+        // Reset Delete Button Clicked
+        propertyItemRoot.deleteButtonClicked = false;
+        // Reset Formula Edit Button Clicked
+        propertyItemRoot.formulaEditButtonClicked = false;
     }
 
     onSwipeOnChanged: {
@@ -34,24 +42,19 @@ DSwipeGesture {
             // Set Mark For Deletion
             propertyItemRoot.markFordeletion = propertyItemRoot.swipeOn;
         }
-    }
 
-    onDeltaXChanged: {
-//        if (pressed) {
-//            if (swipeWasOn) {
-//                deleteButton.x = Math.min(deleteButton.showPosX + propertyItemRoot.deltaX, deleteButton.hiddenPosX);
-//            } else {
-//                deleteButton.x = Math.max(deleteButton.hiddenPosX + propertyItemRoot.deltaX, deleteButton.showPosX);
-//            }
-//        }
+        // Reset Delete Button Clicked
+        propertyItemRoot.deleteButtonClicked = false;
+        // Reset Formula Edit Button Clicked
+        propertyItemRoot.formulaEditButtonClicked = false;
     }
 
     onSwipePosXChanged: {
+        // Set Delete Button Position
         deleteButton.x = propertyItemRoot.swipePosX;
     }
 
     onReleased: {
-        //console.log("DPropertyItem.onReleased");
         // Set Mark For Deletion
         propertyItemRoot.markFordeletion = propertyItemRoot.swipeOn;
         // Set Behavior Duration
@@ -62,23 +65,42 @@ DSwipeGesture {
         })
     }
 
-    // Content Container
-    Item {
-        id: contentContainer
-        anchors.fill: parent
-        enabled: !propertyItemRoot.markFordeletion
-
-        DCheckBox {
-            anchors.centerIn: parent
-            text: "Checkbox"
+    onManualDoubleClick: {
+        //console.log("DPropertyItem.onManualDoubleClick");
+        // Check Delete Button Clicked
+        if (!propertyItemRoot.deleteButtonClicked && !propertyItemRoot.formulaEditButtonClicked) {
+            // Flip
+            propertyItemFlipable.flipped = !propertyItemFlipable.flipped;
         }
+
+        // Reset Delete Button Clicked
+        propertyItemRoot.deleteButtonClicked = false;
+        // Reset Formula Edit Button Clicked
+        propertyItemRoot.formulaEditButtonClicked = false;
     }
 
-    Rectangle {
+    DFlipable {
+        id: propertyItemFlipable
         anchors.fill: parent
-        color: "transparent"
-        border.color: swipeOn ? "orange" : "gray"
-        radius: DStyle.defaultRadius
+        handleDoubleClick: false
+
+        front: DPropertyItemValue {
+            width: propertyItemFlipable.width
+            height: propertyItemFlipable.height
+            editorMouseSelection: false
+            editorFocus: !propertyItemRoot.markFordeletion
+        }
+
+        back: DPropertyItemFormula {
+            width: propertyItemFlipable.width
+            height: propertyItemFlipable.height
+            onFormulaEditClicked: {
+                // Set Formula Edit Button Clicked
+                propertyItemRoot.formulaEditButtonClicked = true;
+                // Emit Formula Edit Clicked Signal
+                propertyItemRoot.formulaEditClicked(propertyItemRoot.itemIndex);
+            }
+        }
     }
 
     // Content Fade Curtain
@@ -110,17 +132,13 @@ DSwipeGesture {
         highlightColor: DStyle.colorCancelHighLight
         text: "Delete"
 
-        onXChanged: {
-//            console.log("DPropertyItem.deleteButton.onXChanged - hpx: " + (deleteButton.hiddenPosX));
-//            console.log("DPropertyItem.deleteButton.onXChanged - spx: " + (deleteButton.showPosX));
-//            console.log("DPropertyItem.deleteButton.onXChanged - hpx - x: " + (deleteButton.hiddenPosX - deleteButton.x));
-        }
-
         onClicked: {
+            // Set Delete Button Clicked
+            propertyItemRoot.deleteButtonClicked = true;
+
             // Reset Swipe On
-            propertyItemRoot.swipeOn = false;
-            // Reset Mark For Deletion
-            //propertyItemRoot.markFordeletion = false;
+            //propertyItemRoot.swipeOn = false;
+
             // Emit Delete Item Clicked Signal
             propertyItemRoot.deleteItemClicked(propertyItemRoot.itemIndex);
         }

@@ -31,14 +31,22 @@ DMouseArea {
 
     property bool swiped: false
 
+    property bool dragActive: false
+
+    property int clickCounter: 0
+
     drag.filterChildren: true
 
-    onDeltaXChanged: {
-        //console.log("DSwipeGesture.onDeltaXChanged - deltaX: " + deltaX);
-    }
+    signal manualDoubleClick()
 
-    onSwipeOnChanged: {
-        //console.log("DSwipeGesture.onSwipeOnChanged - swipeOn: " + swipeOn);
+    onPressedChanged: {
+        // Start Double Click Timer
+        doubleClickTimer.running = true;
+
+        // Ins Click Counter
+        clickCounter++;
+
+        //console.log("DSwipeGesture.onPressedChanged - pressed: " + pressed + " - clickCounter: " + clickCounter);
     }
 
     onPressed: {
@@ -52,14 +60,23 @@ DMouseArea {
     }
 
     onPositionChanged: {
+        // Check If Swipe Enabled
         if (!enableSwipe) {
             return;
         }
 
+        // Check If Pressed
         if (swipeGestureRoot.pressed) {
             //console.log("DSwipeGesture.onPositionChanged - mouse[" + mouse.x + ":" + mouse.y + "]");
+
             // Calculate Delta X
             swipeGestureRoot.deltaX = mouse.x - swipeGestureRoot.pressX;
+
+            // Check Drag Active
+            if (!swipeGestureRoot.dragActive) {
+                // Set Drag Active
+                swipeGestureRoot.dragActive = true;
+            }
 
             // Check Last Pos X
             if (swipeGestureRoot.lastPosX !== mouse.x) {
@@ -75,7 +92,17 @@ DMouseArea {
         }
     }
 
+    onCanceled: {
+        //console.log("#### DSwipeGesture.onCanceled");
+        // Reset Swipe Pos
+        resetSwipePos();
+
+        // Reset Drag Active
+        //swipeGestureRoot.dragActive = false;
+    }
+
     onReleased: {
+        // Check If Swipe Enabled
         if (!enableSwipe) {
             return;
         }
@@ -83,9 +110,13 @@ DMouseArea {
         //console.log("DSwipeGesture.onReleased - mouse[" + mouse.x + ":" + mouse.y + "]");
         // Reset Swipe Pos
         resetSwipePos();
+
+        // Reset Drag Active
+        swipeGestureRoot.dragActive = false;
     }
 
     onClicked: {
+        // Check If Swipe Enabled
         if (!enableSwipe) {
             return;
         }
@@ -98,10 +129,6 @@ DMouseArea {
 
         // Reset Swipe Pos
         resetSwipePos();
-    }
-
-    onPressAndHold: {
-        // ...
     }
 
     function resetSwipe(mouse) {
@@ -179,6 +206,27 @@ DMouseArea {
             anchors.left: swipeGestureRoot.swipeDirection > 0 ? parent.left : undefined
             anchors.verticalCenter: parent.verticalCenter
             color: DStyle.colorTrace
+        }
+    }
+
+    Timer {
+        id: doubleClickTimer
+        interval: 300
+
+//        onRunningChanged: {
+//            console.log("doubleClickTimer.running: " + running);
+//        }
+
+        onTriggered: {
+            // Check Click Counter
+            if (swipeGestureRoot.clickCounter >= 4) {
+                //console.log("DSwipeGesture.doubleClickTimer.onTriggered - clickCounter: " + swipeGestureRoot.clickCounter);
+                // Emit Manual Double CLick Signal
+                swipeGestureRoot.manualDoubleClick();
+            }
+
+            // Reset Click Counter
+            swipeGestureRoot.clickCounter = 0;
         }
     }
 }

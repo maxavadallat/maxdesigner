@@ -28,6 +28,17 @@
 // File Sort Filter Proxy
 #define DEFAULT_MAIN_QML_COMPONENTS_FILE_SORT_FILTER        "FileSortFilterProxy"
 
+// Component Properties Model
+#define DEFAULT_MAIN_QML_COMPONENTS_PROPERTIES_MODEL        "ComponentPropertiesModel"
+// Component Anchors Model
+#define DEFAULT_MAIN_QML_COMPONENTS_ANCHORS_MODEL           "ComponentAnchorsModel"
+// Component Signals Model
+#define DEFAULT_MAIN_QML_COMPONENTS_SIGNALS_MODEL           "ComponentSignalsModel"
+// Component States Model
+#define DEFAULT_MAIN_QML_COMPONENTS_STATES_MODEL            "ComponentStatesModel"
+// Component Transitions Model
+#define DEFAULT_MAIN_QML_COMPONENTS_TRANSITIONS_MODEL       "ComponentTransitionsModel"
+
 
 // Main Controller Name
 #define DEFAULT_MAIN_CONTROLLER_NAME                        "mainController"
@@ -174,6 +185,15 @@
 #define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_ETYPE      "componentTransitionPAnimationEType"
 
 
+#define JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING              "string"
+#define JSON_VALUE_PROPERTY_TYPE_PREFIX_BOOL                "bool"
+#define JSON_VALUE_PROPERTY_TYPE_PREFIX_INT                 "int"
+#define JSON_VALUE_PROPERTY_TYPE_PREFIX_DOUBLE              "double"
+#define JSON_VALUE_PROPERTY_TYPE_PREFIX_REAL                "real"
+#define JSON_VALUE_PROPERTY_TYPE_PREFIX_VAR                 "var"
+#define JSON_VALUE_PROPERTY_TYPE_PREFIX_OBJECT              "QtObject"
+#define JSON_VALUE_PROPERTY_TYPE_PREFIX_LIST                "list<QtObject>"
+
 
 // Default/Basec JSON Keys For Component Properties
 #define JSON_KEY_COMPONENT_PROPERTY_ID                      "id"
@@ -205,11 +225,21 @@
 
 #define JSON_KEY_COMPONENT_PROPERTY_STATE                   "state"
 
-/*
 #define JSON_KEY_COMPONENT_PROPERTY_OPACITY                 "opacity"
 #define JSON_KEY_COMPONENT_PROPERTY_VISIBLE                 "visible"
-#define JSON_KEY_COMPONENT_PROPERTY_SCALE                   "scale"
 
+#define JSON_KEY_COMPONENT_PROPERTY_SCALE                   "scale"
+#define JSON_KEY_COMPONENT_PROPERTY_ROTATION                "rotation"
+
+#define JSON_KEY_COMPONENT_PROPERTY_FOCUS                   "focus"
+#define JSON_KEY_COMPONENT_PROPERTY_CLIP                    "clip"
+
+#define JSON_KEY_COMPONENT_PROPERTY_ENABLED                 "enabled"
+
+#define JSON_KEY_COMPONENT_PROPERTY_STATES                  "states"
+#define JSON_KEY_COMPONENT_PROPERTY_TRANSITIONS             "transitions"
+
+/*
 #define JSON_KEY_COMPONENT_PROPERTY_RADIUS                  "radius"
 #define JSON_KEY_COMPONENT_PROPERTY_SPACING                 "spacing"
 #define JSON_KEY_COMPONENT_PROPERTY_COLOR                   "color"

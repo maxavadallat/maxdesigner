@@ -21,6 +21,9 @@ DControl {
 
     state: stateClosed
 
+    signal itemSelected(var itemIndex)
+    signal keyEvent(var event)
+
     onModelChanged: {
         // Set Current Index
         optionRoot.currentIndex = (optionRoot.model.length > 0 ? 0 : -1)
@@ -31,7 +34,15 @@ DControl {
         setItemChecked(optionRoot.currentIndex);
     }
 
-    signal itemSelected(var itemIndex)
+    onItemSelected: {
+        // Set State
+        optionRoot.state = optionRoot.stateClosed;
+    }
+
+    // Set Option Focus
+    function setOptionFocus(aFocus) {
+        optionPopup.focus = aFocus;
+    }
 
     // Item Clicked
     function itemClicked(itemIndex) {
@@ -44,8 +55,6 @@ DControl {
             optionRoot.currentIndex = itemIndex;
             // Emit Item Selected Signal
             optionRoot.itemSelected(optionRoot.currentIndex);
-            // Set State
-            optionRoot.state = optionRoot.stateClosed;
         }
     }
 
@@ -73,10 +82,40 @@ DControl {
         }
 
         Keys.onReleased: {
-            if (event.key === Qt.Key_Escape) {
-                // Reset Focus
-                optionPopup.focus = false;
+            // Switch Key
+            switch (event.key) {
+                case Qt.Key_Escape:
+                    // Reset Focus
+                    optionPopup.focus = false;
+                break;
+
+                case Qt.Key_Up:
+                    if (optionRoot.currentIndex > 0) {
+                        optionRoot.currentIndex--;
+                    }
+                break;
+
+                case Qt.Key_Down:
+                    if (optionRoot.currentIndex < optionRoot.model.length - 1) {
+                        optionRoot.currentIndex++;
+                    }
+                break;
+
+                case Qt.Key_Space:
+                    if (optionRoot.state === optionRoot.stateClosed) {
+                        optionRoot.state = optionRoot.stateOpen;
+                    } else {
+                        optionRoot.state = optionRoot.stateClosed;
+                    }
+                break;
+
+                case Qt.Key_Return:
+                    optionRoot.itemSelected(optionRoot.currentIndex);
+                break;
             }
+
+            // Emit Key Event
+            optionRoot.keyEvent(event);
         }
 
         Behavior on y { DAnimation { } }
@@ -127,6 +166,7 @@ DControl {
 
             PropertyChanges { target: optionRoot; unCheckedOpacity: 0.0 }
             PropertyChanges { target: optionRoot; unCheckedHeight: 0 }
+            //PropertyChanges { target: optionRoot; z: 0.0 }
             PropertyChanges { target: optionPopup; y: 0 }
             PropertyChanges { target: optionPopup; height: optionRoot.height }
         },
@@ -136,6 +176,7 @@ DControl {
 
             PropertyChanges { target: optionRoot; unCheckedOpacity: 1.0 }
             PropertyChanges { target: optionRoot; unCheckedHeight: optionRoot.height }
+            //PropertyChanges { target: optionRoot; z: 1.0 }
             PropertyChanges { target: optionPopup; y: -optionRoot.height * optionRoot.currentIndex }
             PropertyChanges { target: optionPopup; height: optionRoot.height * optionRepeater.count }
         }
@@ -150,6 +191,12 @@ DControl {
                     DAnimation { target: optionRoot; properties: "unCheckedOpacity, unCheckedHeight"; easing.type: Easing.Linear }
                     DAnimation { target: optionPopup; properties: "y, height"; easing.type: Easing.Linear }
                 }
+
+                ScriptAction {
+                    script: {
+                        optionRoot.z = 0.0;
+                    }
+                }
             }
         },
 
@@ -157,6 +204,12 @@ DControl {
             to: stateOpen
 
             SequentialAnimation {
+                ScriptAction {
+                    script: {
+                        optionRoot.z = 1.0;
+                    }
+                }
+
                 ParallelAnimation {
                     DAnimation { target: optionRoot; properties: "unCheckedOpacity, unCheckedHeight"; easing.type: Easing.Linear }
                     DAnimation { target: optionPopup; properties: "y, height"; easing.type: Easing.Linear }

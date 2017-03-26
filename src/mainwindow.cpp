@@ -35,6 +35,12 @@
 
 #include "componentcategorymodel.h"
 
+#include "componentanchorsmodel.h"
+#include "componentpropertiesmodel.h"
+#include "componentsignalsmodel.h"
+#include "componentstatesmodel.h"
+#include "componenttransitionsmodel.h"
+
 #include "settingskeys.h"
 #include "constants.h"
 
@@ -1012,6 +1018,20 @@ void MainWindow::updateProject()
     mProjectModel->setMainQMLFile(mProjectPropertiesDiaog->mainQMLFile());
     // Set QML Dir
     mProjectModel->setQmlDir(mProjectPropertiesDiaog->qmlDir());
+
+    // Get QML Dir Path
+    QString qmlDir = mProjectModel->qmlDir();
+    // Get Project Dir Path
+    QString projectDir = mProjectModel->projectDir();
+
+    // Check QML Dir
+    if (!qmlDir.startsWith(projectDir)) {
+        // Init File Info For QML Dir
+        QFileInfo qmlDirInfo(qmlDir);
+        // Create Link
+        system(QString("ln -s \"%1\" \"%2\"").arg(qmlDir).arg(qmlDirInfo.fileName()).toLocal8Bit());
+    }
+
     // Set JS Dir
     mProjectModel->setJsDir(mProjectPropertiesDiaog->jsDir());
     // Set Images Dir

@@ -2,6 +2,7 @@
 #define PROPERTIESCONTROLLER_H
 
 #include <QObject>
+#include <QThread>
 
 class ProjectModel;
 class ComponentInfo;
@@ -21,7 +22,9 @@ class PropertiesController : public QObject
     Q_PROPERTY(ProjectModel* currentProject READ currentProject NOTIFY currentProjectChanged)
     Q_PROPERTY(ComponentInfo* focusedComponent READ focusedComponent WRITE setFocusedComponent NOTIFY focusedComponentChanged)
 
-    Q_PROPERTY(QString cID READ cID  NOTIFY cIDChanged)
+    // ...
+
+    Q_PROPERTY(QString cID READ cID NOTIFY cIDChanged)
     Q_PROPERTY(QString cObjectName READ cObjectName NOTIFY cObjectNameChanged)
 
     Q_PROPERTY(QString cX READ cX NOTIFY cXChanged)
@@ -32,19 +35,6 @@ class PropertiesController : public QObject
     Q_PROPERTY(QString cHeight READ cHeight NOTIFY cHeightChanged)
 
     // ...
-
-public:
-    // Property Type
-    enum class EPropertyType {
-        EPTString   = 0,
-        EPTBool,
-        EPTInt,
-        EPTDouble,
-        EPTReal,
-        EPTVar
-    };
-
-    Q_ENUM(EPropertyType)
 
 public:
     // Constructor
@@ -96,13 +86,13 @@ public:
     Q_INVOKABLE void requestCHeight(const QString& aHeight);
 
     // Add Own Property
-    Q_INVOKABLE void addOwnProperty(const QString& aName, PropertiesController::EPropertyType aType);
+    Q_INVOKABLE void addOwnComponentProperty(const QString& aName, const int& aType);
     // Remove Own Property
-    Q_INVOKABLE void removeOwnProperty(const QString& aName);
+    Q_INVOKABLE void removeComponentProperty(const QString& aName);
     // Set Property
-    Q_INVOKABLE void setProperty(const QString& aName, const QString& aValue);
+    Q_INVOKABLE void setComponentProperty(const QString& aName, const QVariant& aValue);
     // Clear Property
-    Q_INVOKABLE void clearProperty(const QString& aName);
+    Q_INVOKABLE void clearComponentProperty(const QString& aName);
 
     // Add Signal
     Q_INVOKABLE void addSignal(const QString& aSignalDef);

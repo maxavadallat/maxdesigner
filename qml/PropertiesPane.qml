@@ -13,8 +13,11 @@ DPane {
 
     title: "Properties" + (propertiesController.focusedComponent ? (" - " + propertiesController.focusedComponent.componentName) : "")
 
+    creationWidth: 300
+    creationHeight: 600
+
     minWidth: 300
-    minHeight: 200
+    minHeight: 400
 
     enablePaneContent: propertiesController.focusedComponent !== null
 
@@ -63,17 +66,21 @@ DPane {
         }
     }
 
-    signal newPropertyLaunch(var componentInfo)
-    signal propertyEditLaunch(var componentInfo)
+    signal newPropertyLaunch()
+    signal editPropertyLaunch()
 
-    signal formulaEditLaunch(var componentInfo)
+    signal newSignalLaunch()
+    signal editSignalLaunch()
 
-    signal newStateLaunch(var componentInfo)
-    signal stateEditLaunch(var componentInfo)
-    signal stateSelectionLaunch(var componentInfo)
+    signal editFormulaLaunch()
 
-    signal newTransitionLaunch(var componentInfo)
-    signal transitionEditLaunch(var componentInfo)
+    signal newStateLaunch()
+    signal editStateLaunch()
+
+    signal stateSelectionLaunch()
+
+    signal newTransitionLaunch()
+    signal editTransitionLaunch()
 
 
     Row {
@@ -108,7 +115,8 @@ DPane {
     }
 
     Item {
-        width: 1
+        id: spacer
+        width: propertiesPaneRoot.contentWidth
         height: DStyle.defaultSpacing
     }
 
@@ -405,7 +413,22 @@ DPane {
             width: propertiesPaneRoot.contentWidth
             height: 0
 
-            // ...
+            ListView {
+                id: ownPropertiesListView
+                width: parent.width
+
+                delegate: DPropertyItem {
+                    id: opiDelegateRoot
+                    width: ownPropertiesListView.width
+
+                    DFlipable {
+                        id: opiFlipable
+                        anchors.fill: parent
+                        //front:
+                        //back:
+                    }
+                }
+            }
         }
 
         DButton {
@@ -414,7 +437,7 @@ DPane {
             text: "Add Property"
             onClicked: {
                 // Emit New Property Launch
-                propertiesPaneRoot.newPropertyLaunch(propertiesController.focusedComponent);
+                propertiesPaneRoot.newPropertyLaunch();
             }
         }
     }
@@ -438,6 +461,11 @@ DPane {
             id: addSignalButton
             width: propertiesPaneRoot.contentWidth
             text: "Add Signal"
+
+            onClicked: {
+                // Emit New Signal Launch
+                propertiesPaneRoot.newSignalLaunch();
+            }
         }
     }
 
@@ -462,6 +490,11 @@ DPane {
             id: addStateButton
             width: propertiesPaneRoot.contentWidth
             text: "Add State"
+
+            onClicked: {
+                // Emit New State Launch
+                propertiesPaneRoot.newStateLaunch();
+            }
         }
     }
 
@@ -486,84 +519,20 @@ DPane {
             id: addTransitionButton
             width: propertiesPaneRoot.contentWidth
             text: "Add Transition"
+
+            onClicked: {
+                // Emit New Transition Launch
+                propertiesPaneRoot.newTransitionLaunch();
+            }
         }
     }
 
     DSection {
-        id: parentSection
+        id: basePropertiesSection
         width: propertiesPaneRoot.contentWidth
         title: "Item"
 
         state: stateHidden
         //state: stateOpen
-
-        DButton {
-            //onClicked: checked = !checked;
-            //enabled: propertiesPaneRoot.parent.enabled
-            enabled: parent.enabled
-        }
-
-        DButton {
-            //onClicked: checked = !checked;
-            checked: true
-            enabled: parent.enabled
-        }
-
-        DCheckBox {
-            text: "CheckBox"
-            onClicked: checked = !checked;
-            enabled: parent.enabled
-        }
-
-        DCheckBox {
-            rightAligned: true
-            text: "CheckBox"
-            onClicked: checked = !checked;
-            enabled: parent.enabled
-        }
-
-        DSwitch {
-            text: "Switch"
-            onClicked: checked = !checked;
-            enabled: parent.enabled
-        }
-
-        DSwitch {
-            rightAligned: true
-            text: "Switch"
-            onClicked: checked = !checked;
-            enabled: parent.enabled
-        }
-
-        DRadioButtonGroup {
-            model: [
-                DRadioButtonGroupItem { title: "Item 1" },
-                DRadioButtonGroupItem { title: "Item 2" },
-                DRadioButtonGroupItem { title: "Item 3" },
-                DRadioButtonGroupItem { title: "Item 4" }
-            ]
-
-            onButtonSelected: {
-                //console.log("onButtonSelected - buttonIndex: " + buttonIndex);
-                // Set Current Index
-                currentIndex = buttonIndex;
-            }
-        }
-
-        DRadioButtonGroup {
-            rightAligned: true
-            model: [
-                DRadioButtonGroupItem { title: "Item 1" },
-                DRadioButtonGroupItem { title: "Item 2" },
-                DRadioButtonGroupItem { title: "Item 3" },
-                DRadioButtonGroupItem { title: "Item 4" }
-            ]
-
-            onButtonSelected: {
-                //console.log("onButtonSelected - buttonIndex: " + buttonIndex);
-                // Set Current Index
-                currentIndex = buttonIndex;
-            }
-        }
     }
 }

@@ -25,6 +25,11 @@ DContainer {
 
     property bool dragActive: false
 
+    property QtObject parentPane: null
+    property QtObject childPane: null
+
+    property QtObject transitionTarget: null
+
     property int lastShownX: creationX
     property int lastShownY: creationY
 
@@ -52,7 +57,7 @@ DContainer {
     }
 
     property int creationX: {
-        if (hideToSide === hideToTop) {
+        if (hideToSide === hideToTop || hideToSide === hideToBottom) {
             return initialX - creationWidth * 0.5;
         }
 
@@ -74,8 +79,8 @@ DContainer {
     property int creationWidth: 320
     property int creationHeight: 200
 
-    property int parentWidth: parent.width
-    property int parentHeight: parent.height
+    property int parentWidth: parent ? parent.width : 320
+    property int parentHeight: parent ? parent.height : 200
 
     property int resetWidth: 0
     property int resetHeight: 0
@@ -109,7 +114,6 @@ DContainer {
     property alias paneContainer: contentContainer
     default property alias paneContainerChildren: contentContainer.children
 
-
     property alias enablePaneContent: contentContainer.enabled
 
     property alias titleLabel: titleTextLabel
@@ -127,6 +131,8 @@ DContainer {
 
     property bool destroyOnResetFinished: false
 
+    property bool enableHideButton: true
+
     property Connections parentConnections: Connections {
         target: parent
 
@@ -139,13 +145,66 @@ DContainer {
         }
     }
 
+    property bool hideWaitingForChildReset: false
+
+    property bool resetWaitingForChildReset: false
+
+    property Connections parentPaneConnections: Connections {
+        target: parentPane
+
+        onTransitionFinished: {
+            // Emit Parent Transition Finished Signal
+            paneBaseRoot.parentTransitionFinished(newState);
+        }
+
+        onResetChildRequest: {
+            // Reset
+            paneBaseRoot.reset(false);
+        }
+    }
+
+    property Connections childPaneConnections: Connections {
+        target: childPane
+
+        onTransitionFinished: {
+            if (newState === stateCreate) {
+                // Check Hide Waiting For Child Reset
+                if (paneBaseRoot.hideWaitingForChildReset) {
+                    // Hide
+                    paneBaseRoot.hide();
+                }
+
+                // Check Reset Waiting For Child Reset
+                if (paneBaseRoot.resetWaitingForChildReset) {
+                    // Reset
+                    paneBaseRoot.reset(false);
+                }
+            }
+
+            // Reset Hide Waiting For Reset
+            paneBaseRoot.hideWaitingForChildReset = false;
+            // Reset Reset Waiting For Child Reset
+            paneBaseRoot.resetWaitingForChildReset = false;
+            // Emit Child Transmition Finished Signal
+            paneBaseRoot.childTransitionFinished(newState);
+        }
+    }
+
     enableSizeOverlay: false
     enablePosOverlay: false
 
     clipContent: true
 
+    signal accepted()
+    signal rejected()
+
     signal transitionFinished(var newState)
     signal transitionStarted(var newState)
+
+    signal resetChildRequest()
+
+    signal childTransitionFinished(var newState)
+    signal parentTransitionFinished(var newState)
 
     onXChanged: {
 //        // Check State
@@ -219,6 +278,16 @@ DContainer {
         // ...
     }
 
+    onAccepted: {
+        // Reset
+        paneBaseRoot.reset(false);
+    }
+
+    onRejected: {
+        // Reset
+        paneBaseRoot.reset(false);
+    }
+
     // Reset To Create State
     function reset(destroyOnFinished) {
         // Check Hide To Sie
@@ -285,6 +354,31 @@ DContainer {
     function bringToFront() {
         if (paneBaseRoot.parent.bringToFront !== undefined) {
             paneBaseRoot.parent.bringToFront(paneBaseRoot);
+        }
+    }
+
+    // Dismiss Pane
+    function dismissPane(reset) {
+        if (childPane && childPane.state === stateShown) {
+            // Check Reset
+            if (reset) {
+                // Set Reset Waiting For Reset
+                paneBaseRoot.resetWaitingForChildReset = true;
+            } else {
+                // Set Hide Waiting For Reset
+                paneBaseRoot.hideWaitingForChildReset = true;
+            }
+
+            // Emit Reset Child Request Signal
+            paneBaseRoot.resetChildRequest();
+        } else {
+            if (reset) {
+                // Reset
+                paneBaseRoot.rejected();
+            } else {
+                // Hide
+                paneBaseRoot.hide();
+            }
         }
     }
 
@@ -413,8 +507,18 @@ DContainer {
             onClicked: {
                 // Check State
                 if (paneBaseRoot.state !== stateHidden) {
-                    // Set State
-                    paneBaseRoot.hide();
+                    // Dismiss Pane
+                    paneBaseRoot.dismissPane(false);
+//                    // Check Child Pane
+//                    if (childPane && childPane.state === stateShown) {
+//                        // Set Hide Waiting For Child Reset
+//                        paneBaseRoot.hideWaitingForChildReset = true;
+//                        // Emit Reset Child Request Signal
+//                        paneBaseRoot.resetChildRequest();
+//                    } else {
+//                        // Set State
+//                        paneBaseRoot.hide();
+//                    }
                 } else {
                     // Set State
                     paneBaseRoot.show();
@@ -447,7 +551,7 @@ DContainer {
             PropertyChanges { target: paneBaseRoot; x: paneBaseRoot.lastShownX; y: paneBaseRoot.lastShownY }
             PropertyChanges { target: paneBaseRoot; width: paneBaseRoot.creationWidth; height: paneBaseRoot.creationHeight }
             PropertyChanges { target: titleTextLabel; opacity: 1.0 }
-            PropertyChanges { target: hideShowButton; opacity: 1.0 }
+            PropertyChanges { target: hideShowButton; opacity: paneBaseRoot.enableHideButton ? 1.0 : 0.0 }
         },
 
         State {
@@ -456,7 +560,7 @@ DContainer {
             PropertyChanges { target: paneBaseRoot; x: paneBaseRoot.hiddenX; y: paneBaseRoot.hiddenY }
             PropertyChanges { target: paneBaseRoot; width: paneBaseRoot.creationWidth; height: paneBaseRoot.creationHeight }
             PropertyChanges { target: titleTextLabel; opacity: 1.0 }
-            PropertyChanges { target: hideShowButton; opacity: 1.0 }
+            PropertyChanges { target: hideShowButton; opacity: paneBaseRoot.enableHideButton ? 1.0 : 0.0 }
         },
 
         State {
@@ -478,8 +582,8 @@ DContainer {
                     PropertyAction { target: paneBaseRoot; properties: "width, height"; value: 0 }
                     PropertyAction { target: paneBaseRoot; property: "x"; value: paneBaseRoot.initialX }
                     PropertyAction { target: paneBaseRoot; property: "y"; value: paneBaseRoot.initialY }
-                    DFadeAnimation { target: titleTextLabel; to: 0.0 }
-                    DFadeAnimation { target: hideShowButton; to: 0.0 }
+                    DFadeAnimation { target: titleTextLabel }
+                    DFadeAnimation { target: hideShowButton }
                 }
             }
         },
@@ -505,41 +609,42 @@ DContainer {
 
                 PauseAnimation { duration: 200 }
 
-                PropertyAction { target: hideToSide === hideToTop ? paneBaseRoot : dummy; property: "width"; value: 1 }
-                PropertyAction { target: hideToSide !== hideToTop ? paneBaseRoot : dummy; property: "height"; value: 1 }
+                PropertyAction { target: (hideToSide !== hideToTop ? paneBaseRoot : dummy); property: "height"; value: 1 }
+                PropertyAction { target: (hideToSide === hideToTop ? paneBaseRoot : dummy); property: "width"; value: 1 }
 
                 PropertyAction { target: paneBaseRoot; property: "x"; value: paneBaseRoot.initialX }
                 PropertyAction { target: paneBaseRoot; property: "y"; value: paneBaseRoot.initialY }
 
                 ParallelAnimation {
-                    DAnimation { target: hideToSide === hideToLeft ? paneBaseRoot : dummy; property: "width"; to: paneBaseRoot.creationX + paneBaseRoot.creationWidth }
+                    DAnimation { target: (hideToSide === hideToLeft ? paneBaseRoot : dummy); property: "width"; to: paneBaseRoot.creationWidth + paneBaseRoot.creationX - paneBaseRoot.initialX }
 
-                    DAnimation { target: hideToSide === hideToRight ? paneBaseRoot : dummy; property: "x"; to: paneBaseRoot.creationX }
-                    DAnimation { target: hideToSide === hideToRight ? paneBaseRoot : dummy; property: "width"; to: paneBaseRoot.initialX - paneBaseRoot.creationX }
+                    DAnimation { target: (hideToSide === hideToRight ? paneBaseRoot : dummy); property: "x"; to: paneBaseRoot.creationX }
+                    DAnimation { target: (hideToSide === hideToRight ? paneBaseRoot : dummy); property: "width"; to: paneBaseRoot.initialX - paneBaseRoot.creationX }
 
-                    DAnimation { target: hideToSide === hideToBottom ? paneBaseRoot : dummy; property: "width"; to: paneBaseRoot.creationX + paneBaseRoot.creationWidth - paneBaseRoot.initialX }
+                    DAnimation { target: (hideToSide === hideToBottom ? paneBaseRoot : dummy); property: "width"; to: paneBaseRoot.creationWidth + paneBaseRoot.creationX - paneBaseRoot.initialX }
 
-                    DAnimation { target: hideToSide === hideToTop ? paneBaseRoot : dummy; property: "height"; to: paneBaseRoot.creationY + paneBaseRoot.creationHeight }
+                    DAnimation { target: (hideToSide === hideToTop ? paneBaseRoot : dummy); property: "height"; to: paneBaseRoot.creationY + paneBaseRoot.creationHeight - paneBaseRoot.initialY }
                 }
 
                 ParallelAnimation {
-                    DAnimation { target: hideToSide !== hideToTop ? paneBaseRoot : dummy; property: "width"; to: paneBaseRoot.creationWidth }
-                    DAnimation { target: hideToSide !== hideToTop ? paneBaseRoot : dummy; property: "x"; to: paneBaseRoot.creationX }
-                    DAnimation { target: hideToSide === hideToTop ? paneBaseRoot : dummy; property: "height"; to: paneBaseRoot.creationHeight }
-                    DAnimation { target: hideToSide === hideToTop ? paneBaseRoot : dummy; property: "y"; to: paneBaseRoot.creationY }
+                    DAnimation { target: (hideToSide !== hideToTop ? paneBaseRoot : dummy); property: "width" }
+                    DAnimation { target: (hideToSide !== hideToTop ? paneBaseRoot : dummy); property: "x" }
+
+                    DAnimation { target: (hideToSide === hideToTop ? paneBaseRoot : dummy); property: "height"; to: paneBaseRoot.creationHeight }
+                    DAnimation { target: (hideToSide === hideToTop ? paneBaseRoot : dummy); property: "y"; to: paneBaseRoot.creationY }
                 }
 
                 ParallelAnimation {
-                    DAnimation { target: hideToSide !== hideToTop ? paneBaseRoot : dummy; property: "y"; to: paneBaseRoot.creationY }
-                    DAnimation { target: hideToSide !== hideToTop ? paneBaseRoot : dummy; property: "height"; to: paneBaseRoot.creationHeight }
-                    DAnimation { target: hideToSide === hideToTop ? paneBaseRoot : dummy; property: "x"; to: paneBaseRoot.creationX }
-                    DAnimation { target: hideToSide === hideToTop ? paneBaseRoot : dummy; property: "width"; to: paneBaseRoot.creationWidth }
+                    DAnimation { target: (hideToSide !== hideToTop ? paneBaseRoot : dummy); property: "y" }
+                    DAnimation { target: (hideToSide !== hideToTop ? paneBaseRoot : dummy); property: "height" }
 
-                    DFadeAnimation { target: hideShowButton; to: 1.0 }
+                    DAnimation { target: (hideToSide === hideToTop ? paneBaseRoot : dummy); property: "x" }
+                    DAnimation { target: (hideToSide === hideToTop ? paneBaseRoot : dummy); property: "width" }
+
+                    DFadeAnimation { target: hideShowButton }
                 }
 
                 PropertyAction { target: titleTextLabel; property: "opacity"; value: 1.0 }
-                //PropertyAction { target: hideShowButton; property: "opacity"; value: 1.0 }
 
                 PropertyAction { target: paneBaseRoot; property: "enableSizeOverlay"; value: paneBaseRoot.enableSizeOverlayOnShow }
                 PropertyAction { target: paneBaseRoot; property: "focus"; value: paneBaseRoot.focusOnShow }
@@ -576,7 +681,6 @@ DContainer {
 
                 PropertyAction { target: paneBaseRoot; property: "enableSizeOverlay"; value: false }
                 PropertyAction { target: titleTextLabel; property: "opacity"; value: 0.0 }
-                //PropertyAction { target: hideShowButton; property: "opacity"; value: 0.0 }
 
                 ParallelAnimation {
                     DAnimation { target: hideToSide !== hideToTop ? paneBaseRoot : dummy; property: "y"; to: paneBaseRoot.y + paneBaseRoot.height * 0.5 }
@@ -585,7 +689,7 @@ DContainer {
                     DAnimation { target: hideToSide === hideToTop ? paneBaseRoot : dummy; property: "x"; to: paneBaseRoot.x + paneBaseRoot.width * 0.5 }
                     DAnimation { target: hideToSide === hideToTop ? paneBaseRoot : dummy; property: "width"; to: 1 }
 
-                    DFadeAnimation { target: hideShowButton; to: 0.0 }
+                    DFadeAnimation { target: hideShowButton }
                 }
 
                 ParallelAnimation {
@@ -718,4 +822,5 @@ DContainer {
             }
         }
     ]
+
 }

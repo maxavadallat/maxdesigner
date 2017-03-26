@@ -35,7 +35,9 @@ SOURCES             += src/settingscontroller.cpp \
                     src/componenttransitionsmodel.cpp \
                     src/componentanchorsmodel.cpp \
                     src/componentsignalsmodel.cpp \
-                    src/componentpropertiesmodel.cpp
+                    src/componentpropertiesmodel.cpp \
+                    src/componentownpropertiesmodel.cpp \
+                    src/componentownpropertiesfilter.cpp
 
 # Views/Dialog Sources
 SOURCES             += src/mainwindow.cpp \
@@ -80,7 +82,9 @@ HEADERS             += src/settingscontroller.h \
                     src/componenttransitionsmodel.h \
                     src/componentanchorsmodel.h \
                     src/componentsignalsmodel.h \
-                    src/componentpropertiesmodel.h
+                    src/componentpropertiesmodel.h \
+                    src/componentownpropertiesmodel.h \
+                    src/componentownpropertiesfilter.h
 
 # View/Dialog Headers
 HEADERS             += src/mainwindow.h \
@@ -122,9 +126,9 @@ ICON                = assets/icons/designer.03.icns
 # Other Files
 OTHER_FILES         += README.md
 
-# Output Dirs
+# Output/Intermediate Dirs
 OBJECTS_DIR         = ./objs
+OBJMOC              = ./objs
 MOC_DIR             = ./objs
 UI_DIR              = ./objs
 RCC_DIR             = ./objs
-

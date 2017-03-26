@@ -75,5 +75,11 @@
         <file>qml/DStateDelegate.qml</file>
         <file>qml/DTransitionDelegate.qml</file>
         <file>qml/DTransitionNodeDelegate.qml</file>
+        <file>qml/DSignalEditor.qml</file>
+        <file>qml/DTransitionNodeEditor.qml</file>
+        <file>qml/DSignalParameterEditor.qml</file>
+        <file>qml/DSourceCodeEditor.qml</file>
+        <file>qml/DPropertyItemFormula.qml</file>
+        <file>qml/DPropertyItemValue.qml</file>
     </qresource>
 </RCC>

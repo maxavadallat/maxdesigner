@@ -3,7 +3,8 @@ var defaultPaneWidth                            = 300;
 // Default Pane Height
 var defaultPaneHeight                           = 400;
 
-var defaultPaneItemHeight                       = 32;
+// Default Pane Item Height
+var defaultPaneItemHeight                       = 40;
 
 // Default Pane Hide Button Size
 var defaultPaneHideButtonWidth                  = 32;

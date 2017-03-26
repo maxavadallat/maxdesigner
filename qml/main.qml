@@ -51,7 +51,7 @@ Item {
         object.creationHeight = height > 0 ? height : CONSTS.defaultNonVisualComponentHeight;
 
         // Push Object To Root Components
-        mainRoot.rootComponents.push(object);
+        //mainRoot.rootComponents.push(object);
 
         // Show
         object.show();
@@ -240,20 +240,15 @@ Item {
 
         DComponentRootContainer {
             id: newComponentRootContainer
-            initialX: projectPane.x + projectPane.width
-            initialY: Math.max(Math.min(mainGrabArea.height / 2, projectPane.y + projectPane.height - DStyle.defaultMargin), projectPane.y + DStyle.defaultMargin)
-
-            creationWidth: 400
-            creationHeight: 600
-
-            creationX: parentWidth / 2 - creationWidth / 2
-            creationY: initialY - creationHeight / 2
-
-            lastShownX: newComponentRootContainer.creationX
-            lastShownY: newComponentRootContainer.creationY
 
             parentWidth: mainGrabArea.width
             parentHeight: mainGrabArea.height
+
+            initialX: projectPane.x + projectPane.width
+            initialY: Math.max(Math.min(mainGrabArea.height / 2, projectPane.y + projectPane.height - DStyle.defaultMargin), projectPane.y + DStyle.defaultMargin)
+
+            creationX: parentWidth * 0.5 - creationWidth * 0.5
+            creationY: parentHeight * 0.5 - creationHeight * 0.5
 
             state: stateCreate
         }
@@ -292,29 +287,12 @@ Item {
         id: mainGrabArea
 
         anchors.fill: parent
-        //visible: false
 
         // Project Pane
         ProjectPane {
             id: projectPane
 
-            initialX: 0
-            initialY: mainGrabArea.height / 2
-
-            creationWidth: 360
-            creationHeight: 600
-
-            creationX: DStyle.defaultMargin * 2
-            creationY: parentHeight / 2 - creationHeight / 2
-
-            lastShownX: projectPane.creationX
-            lastShownY: projectPane.creationY
-
-            parentWidth: mainGrabArea.width
-            parentHeight: mainGrabArea.height
-
             state: stateCreate
-            //state: stateShown
 
             onTransitionFinished: {
                 // Check New State
@@ -334,49 +312,101 @@ Item {
         PropertiesPane {
             id: propertiesPane
 
-            initialX: mainGrabArea.width
-            initialY: mainGrabArea.height / 2
-
-            creationWidth: 300
-            creationHeight: 600
-
-            creationX: parentWidth - creationWidth - DStyle.defaultMargin * 2
-            creationY: parentHeight / 2 - creationHeight / 2
-
-            lastShownX: propertiesPane.creationX
-            lastShownY: propertiesPane.creationY
-
-            parentWidth: mainGrabArea.width
-            parentHeight: mainGrabArea.height
-
             state: stateCreate
-            //state: stateShown
 
             onNewPropertyLaunch: {
                 // Show Property Editor
                 propertyEditor.show();
             }
+
+            onEditPropertyLaunch: {
+                // Show Property Editor
+                propertyEditor.show();
+            }
+
+            onNewSignalLaunch: {
+                // Show Signal Editor
+                signalEditor.show();
+            }
+
+            onEditSignalLaunch: {
+                // Show Signal Editor
+                signalEditor.show();
+            }
+
+            onNewStateLaunch: {
+                // Show State Editor
+                stateEditor.show();
+            }
+
+            onEditStateLaunch: {
+                // Show State Editor
+                stateEditor.show();
+            }
+
+            onNewTransitionLaunch: {
+                // Show Transition Editor
+                transitionEditor.show();
+            }
+
+            onEditTransitionLaunch: {
+                // Show Transition Editor
+                transitionEditor.show();
+            }
+
+            // ...
+
         }
 
         // Property Editor
         DPropertyEditor {
             id: propertyEditor
 
-//            creationWidth: 320
-//            creationHeight: 200
+            initialX: propertiesPane.x
+            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+
+            creationX: initialX - propertyEditor.width - 32
+            creationY: initialY - propertyEditor.height * 0.5
+
+            // ...
+
+            state: stateCreate
+        }
+
+        // Signal Editor
+        DSignalEditor {
+            id: signalEditor
 
             initialX: propertiesPane.x
-//            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
-            initialY: propertiesPane.y + propertiesPane.height / 2
+            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
 
-//            creationX: propertiesPane.x - creationWidth - 32
-//            creationY: initialY - creationHeight / 2
+            creationX: initialX - signalEditor.width - 32
+            creationY: initialY - signalEditor.height * 0.5
 
-//            lastShownX: formulaEditor.creationX
-//            lastShownY: formulaEditor.creationY
+            childPane: signalParameterEditor
 
-//            parentWidth: mainGrabArea.width
-//            parentHeight: mainGrabArea.height
+            // ...
+
+            state: stateCreate
+
+            onNewParameter: {
+                // Show Signal Parameter Editor
+                signalParameterEditor.show();
+            }
+
+        }
+
+        // Signal Parameter Editor
+        DSignalParameterEditor {
+            id: signalParameterEditor
+
+            initialX: signalEditor.x + signalEditor.width * 0.5
+            initialY: signalEditor.y + signalEditor.height
+
+            creationX: initialX - signalParameterEditor.width * 0.5
+            creationY: initialY + 32
+
+            parentPane: signalEditor
 
             state: stateCreate
         }
@@ -388,17 +418,10 @@ Item {
             initialX: propertiesPane.x
             initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
 
-            creationWidth: 320
-            creationHeight: 200
+            creationX: initialX - formulaEditor.width - 32
+            creationY: initialY - formulaEditor.height * 0.5
 
-            creationX: propertiesPane.x - creationWidth - 32
-            creationY: initialY - creationHeight / 2
-
-            lastShownX: formulaEditor.creationX
-            lastShownY: formulaEditor.creationY
-
-            parentWidth: mainGrabArea.width
-            parentHeight: mainGrabArea.height
+            // ...
 
             state: stateCreate
             //state: stateShown
@@ -408,30 +431,93 @@ Item {
         DStateEditor {
             id: stateEditor
 
-            parentWidth: mainGrabArea.width
-            parentHeight: mainGrabArea.height
+            initialX: propertiesPane.x
+            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+
+            creationX: initialX - stateEditor.width - 32
+            creationY: initialY - stateEditor.height * 0.5
+
+            childPane: propertyChangesEditor
+
+            // ...
 
             state: stateCreate
+
+            onNewPropertyChange: {
+                // Show Property Changes Editor
+                propertyChangesEditor.show();
+            }
+        }
+
+        DPropertyChangesEditor {
+            id: propertyChangesEditor
+
+            initialX: stateEditor.x + stateEditor.width * 0.5
+            initialY: stateEditor.y + stateEditor.height
+
+            creationX: initialX - propertyChangesEditor.width * 0.5
+            creationY: initialY + 32
+
+            parentPane: stateEditor
+
+            state: stateCreate
+
+            // ...
+
         }
 
         // State Selector
         DStateSelector {
             id: stateSelector
 
-            parentWidth: mainGrabArea.width
-            parentHeight: mainGrabArea.height
+            initialX: propertiesPane.x
+            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+
 
             state: stateCreate
+
+            // ...
+
         }
 
         // Transition Editor
         DTransitionEditor {
             id: transitionEditor
 
-            parentWidth: mainGrabArea.width
-            parentHeight: mainGrabArea.height
+            initialX: propertiesPane.x
+            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+
+            creationX: initialX - transitionEditor.width - 32
+            creationY: initialY - transitionEditor.height * 0.5
+
+            childPane: transitionNodeEditor
 
             state: stateCreate
+
+            // ...
+
+            onNewTransitionNode: {
+                // Show Transition Node Editor
+                transitionNodeEditor.show();
+            }
+        }
+
+        // Transition Node Editor
+        DTransitionNodeEditor {
+            id: transitionNodeEditor
+
+            initialX: transitionEditor.x + transitionEditor.width * 0.5
+            initialY: transitionEditor.y + transitionEditor.height
+
+            creationX: initialX - transitionNodeEditor.width * 0.5
+            creationY: initialY + 32
+
+            parentPane: transitionEditor
+
+            state: stateCreate
+
+            // ...
+
         }
 
         // ...
@@ -442,7 +528,6 @@ Item {
         id: welcomScreen
         anchors.centerIn: parent
         state: stateShown
-        //state: stateHidden
     }
 
     DMinimizedComponents {

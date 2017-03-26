@@ -17,6 +17,7 @@ class QMLParser;
 
 class ComponentAnchorsModel;
 class ComponentPropertiesModel;
+class ComponentOwnPropertiesModel;
 class ComponentSignalsModel;
 class ComponentStatesModel;
 class ComponentTransitionsModel;
@@ -71,6 +72,21 @@ class ComponentInfo : public QObject
     // States
 
     // Transitions
+
+public:
+    // Property Type
+    enum class EPropertyType {
+        EPTString   = 0,
+        EPTBool,
+        EPTInt,
+        EPTDouble,
+        EPTReal,
+        EPTVar,
+        EPTQtObject,
+        EPTQtObjectList
+    };
+
+    Q_ENUM(EPropertyType)
 
 public:
     // Create Component From QML File
@@ -165,35 +181,53 @@ public:
 
     // Get Component Property
     QVariant componentProperty(const QString& aName);
+    // Add Own Property
+    void addComponentOwnProperty(const QString& aName, const EPropertyType& aType = EPropertyType::EPTString, const QVariant& aDefault = QVariant());
     // Set Component Property
     void setComponentProperty(const QString& aName, const QVariant& aValue);
     // Remove Own Property
     void removeProperty(const QString& aName);
+
+    // Add Signal
+    void addSignal(const QString& aName, const QStringList& aParameters = QStringList());
+    // Remove Signal
+    void removeSignal(const QString& aName);
+
 
     // Add State
     void addState(const QString& aName);
     // Remove State
     void removeState(const QString& aName);
 
-    // Add Property Change
-    void addPropertyChange(const QString& aStateName, const QString& aTarget, const QString& aProperty, const QVariant& aValue, const int& aIndex = -1);
-    // Remove Property Change
-    void removePropertyChange(const int& aIndex);
+//    // Add Property Change
+//    void addPropertyChange(const QString& aStateName, const QString& aTarget, const QString& aProperty, const QVariant& aValue, const int& aIndex = -1);
+//    // Remove Property Change
+//    void removePropertyChange(const int& aIndex);
 
     // Add Transition
     void addTransition(const QString& aStateFrom, const QString& aStateTo);
     // Remove Transition
-    void removeTransition(const int& aIndex);
+    void removeTransition(const QString& aStateFrom, const QString& aStateTo);
 
-    // Add Property Action
-    void addPropertyAction(const QString& aStateFrom, const QString& aStateTo, const QString& aTarget, const QString& aProperty, const QVariant& aValue, const int& aIndex = -1);
-    // Remove Property Action
-    void removePropertyAction(const int& aIndex);
+//    // Add Property Action
+//    void addPropertyAction(const QString& aStateFrom, const QString& aStateTo, const QString& aTarget, const QString& aProperty, const QVariant& aValue, const int& aIndex = -1);
+//    // Remove Property Action
+//    void removePropertyAction(const int& aIndex);
 
-    // Add Property Animation
-    void addPropertyAnimation(const QString& aStateFrom, const QString& aStateTo, const QString& aTarget, const QString& aProperty, const QVariant& aFrom, const QVariant& aTo, const int& aIndex = -1);
-    // Remove Property Animation
-    void removePropertyAnimation(const int& aIndex);
+//    // Add Property Animation
+//    void addPropertyAnimation(const QString& aStateFrom, const QString& aStateTo, const QString& aTarget, const QString& aProperty, const QVariant& aFrom, const QVariant& aTo, const int& aIndex = -1);
+//    // Remove Property Animation
+//    void removePropertyAnimation(const int& aIndex);
+
+//    // Add Pause Animation
+//    void addPauseAnimation(const QString& aStateFrom, const QString& aStateTo, const int& aDuration);
+//    // Remove Pause Animation
+//    void removePauseAnimation(const int& aIndex);
+
+//    // Add Script Action
+
+//    // Remove Script Action
+
 
     // Add Child
     Q_INVOKABLE void addChild(ComponentInfo* aChild);
@@ -263,6 +297,7 @@ signals:
 
     // ...
 
+//public:
 protected:
     friend class ProjectModel;
     friend class BaseComponentsModel;
@@ -351,6 +386,8 @@ protected: // Data
     friend class ComponentSignalsModel;
     friend class ComponentStatesModel;
     friend class ComponentTransitionsModel;
+    friend class ComponentPropertiesModel;
+    friend class ComponentOwnPropertiesModel;
 
     // Project Model
     ProjectModel*           mProject;
@@ -399,8 +436,6 @@ protected: // Data
     QJsonObject             mOwnProperties;
     // Properties
     QJsonObject             mProperties;
-    // Anchors
-    QJsonObject             mAnchors;
     // Signals
     QJsonArray              mSignals;
     // States
