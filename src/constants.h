@@ -28,6 +28,8 @@
 // File Sort Filter Proxy
 #define DEFAULT_MAIN_QML_COMPONENTS_FILE_SORT_FILTER        "FileSortFilterProxy"
 
+// Component Own Properties Model
+#define DEFAULT_MAIN_QML_COMPONENTS_OWN_PROPERTIES_MODEL    "ComponentOwnPropertiesModel"
 // Component Properties Model
 #define DEFAULT_MAIN_QML_COMPONENTS_PROPERTIES_MODEL        "ComponentPropertiesModel"
 // Component Anchors Model
@@ -38,6 +40,10 @@
 #define DEFAULT_MAIN_QML_COMPONENTS_STATES_MODEL            "ComponentStatesModel"
 // Component Transitions Model
 #define DEFAULT_MAIN_QML_COMPONENTS_TRANSITIONS_MODEL       "ComponentTransitionsModel"
+
+
+// Own Properties Filter Proxy
+#define DEFAULT_MAIN_QML_COMPONENTS_OWN_COMPONENTS_FILTER   "ComponentOwnPropertiesFilter"
 
 
 // Main Controller Name

@@ -5,20 +5,6 @@
 #include "constants.h"
 
 //==============================================================================
-// From JSON Array
-//==============================================================================
-ComponentSignalsModel* ComponentSignalsModel::fromJSONArray(ComponentInfo* aComponent, const QJsonArray& aArray)
-{
-    // Init New Component Signals Model
-    ComponentSignalsModel* newComponentSignalsModel = new ComponentSignalsModel(aComponent);
-
-    // Load Compoennt Signals
-    newComponentSignalsModel->loadComponentSignals(aArray);
-
-    return newComponentSignalsModel;
-}
-
-//==============================================================================
 // Constructor
 //==============================================================================
 ComponentSignalsModel::ComponentSignalsModel(ComponentInfo* aComponent, QObject* aParent)
@@ -34,6 +20,8 @@ ComponentSignalsModel::ComponentSignalsModel(ComponentInfo* aComponent, QObject*
 //==============================================================================
 void ComponentSignalsModel::init()
 {
+    // Load Component Signals
+
     // ...
 }
 
@@ -104,6 +92,9 @@ void ComponentSignalsModel::setCurrentComponent(ComponentInfo* aComponent)
         mComponent = aComponent;
         // Emit Current Component Changed Signal
         emit currentComponentChanged(mComponent);
+
+        // Load Component Signals
+
     }
 }
 

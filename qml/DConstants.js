@@ -45,3 +45,5 @@ var defaultNonVisualComponentHeight             = 200;
 var defaultDiscWidth                            = 56;
 var defaultDiscHeight                           = defaultDiscWidth;
 
+// Default Properties Name Column Width
+var defaultNamesColumnWidth                     = 96;

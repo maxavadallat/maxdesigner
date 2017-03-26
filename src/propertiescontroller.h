@@ -6,9 +6,10 @@
 
 class ProjectModel;
 class ComponentInfo;
+class ComponentOwnPropertiesModel;
 class ComponentPropertiesModel;
-class ComponentSignalsModel;
 class ComponentAnchorsModel;
+class ComponentSignalsModel;
 class ComponentStatesModel;
 class ComponentTransitionsModel;
 
@@ -22,8 +23,6 @@ class PropertiesController : public QObject
     Q_PROPERTY(ProjectModel* currentProject READ currentProject NOTIFY currentProjectChanged)
     Q_PROPERTY(ComponentInfo* focusedComponent READ focusedComponent WRITE setFocusedComponent NOTIFY focusedComponentChanged)
 
-    // ...
-
     Q_PROPERTY(QString cID READ cID NOTIFY cIDChanged)
     Q_PROPERTY(QString cObjectName READ cObjectName NOTIFY cObjectNameChanged)
 
@@ -33,6 +32,13 @@ class PropertiesController : public QObject
 
     Q_PROPERTY(QString cWidth READ cWidth NOTIFY cWidthChanged)
     Q_PROPERTY(QString cHeight READ cHeight NOTIFY cHeightChanged)
+
+    Q_PROPERTY(ComponentOwnPropertiesModel* ownPropertiesModel READ ownPropertiesModel NOTIFY ownPropertiesModelChanged)
+    Q_PROPERTY(ComponentAnchorsModel* anchorsModel READ anchorsModel NOTIFY anchorsModelChanged)
+    Q_PROPERTY(ComponentSignalsModel* signalsModel READ signalsModel NOTIFY signalsModelChanged)
+    Q_PROPERTY(ComponentStatesModel* statesModel READ statesModel NOTIFY statesModelChanged)
+    Q_PROPERTY(ComponentTransitionsModel* transitionsModel READ transitionsModel NOTIFY transitionsModelChanged)
+    Q_PROPERTY(ComponentPropertiesModel* propertiesModel READ propertiesModel NOTIFY propertiesModelChanged)
 
     // ...
 
@@ -85,6 +91,19 @@ public:
     // Request Component Height
     Q_INVOKABLE void requestCHeight(const QString& aHeight);
 
+    // Get Anchors Model
+    ComponentAnchorsModel* anchorsModel();
+    // Get Own Properties Model
+    ComponentOwnPropertiesModel* ownPropertiesModel();
+    // Get Signals Model
+    ComponentSignalsModel* signalsModel();
+    // Get States Model
+    ComponentStatesModel* statesModel();
+    // Get Transitins Model
+    ComponentTransitionsModel* transitionsModel();
+    // Get Properties Model
+    ComponentPropertiesModel* propertiesModel();
+
     // Add Own Property
     Q_INVOKABLE void addOwnComponentProperty(const QString& aName, const int& aType);
     // Remove Own Property
@@ -135,6 +154,19 @@ signals:
     // Component Height Changed Signal
     void cHeightChanged(const QString& aHeight);
 
+    // Anchors Model Changed Signal
+    void anchorsModelChanged(ComponentAnchorsModel* aAncorsModel);
+    // Own Properties Model Changed Signal
+    void ownPropertiesModelChanged(ComponentOwnPropertiesModel* aOwnPropertiesModel);
+    // Properties Model Changed Signal
+    void propertiesModelChanged(ComponentPropertiesModel* aPropertiesModel);
+    // Singals Model Changed Signal
+    void signalsModelChanged(ComponentSignalsModel* aSignalsModel);
+    // States Model Changed Signal
+    void statesModelChanged(ComponentStatesModel* aStatesModel);
+    // Transitions Model Changed Signal
+    void transitionsModelChanged(ComponentTransitionsModel* aTransitionsModel);
+
     // ...
 
 private:
@@ -143,23 +175,38 @@ private:
     // Clear
     void clear();
 
+    // Set Anchors Model
+    void setAnchorsModel(ComponentAnchorsModel* aAnchorsModel);
+    // Set Own Properties Model
+    void setOwnPropertiesModel(ComponentOwnPropertiesModel* aOwnPropertiesModel);
+    // Set Properties Model
+    void setPropertiesModel(ComponentPropertiesModel* aPropertiesModel);
+    // Set Signals Model
+    void setSignalsModel(ComponentSignalsModel* aSignalsModel);
+    // Set States Model
+    void setStatesModel(ComponentStatesModel* aStatesModel);
+    // Set Transitions Model
+    void setTransitionsModel(ComponentTransitionsModel* aTransitionsModel);
+
 private: // Data
     // Project Model
-    ProjectModel*               mProject;
+    ProjectModel*                   mProject;
 
     // Focused Component
-    ComponentInfo*              mFocusedComponent;
+    ComponentInfo*                  mFocusedComponent;
 
     // Anchors
-    ComponentAnchorsModel*      mComponentAnchors;
+    ComponentAnchorsModel*          mComponentAnchors;
+    // Own Properties
+    ComponentOwnPropertiesModel*    mComponentOwnProperties;
     // Signals
-    ComponentSignalsModel*      mComponentSignals;
-    // Properties
-    ComponentPropertiesModel*   mComponentProperties;
+    ComponentSignalsModel*          mComponentSignals;
     // States
-    ComponentStatesModel*       mComponentStates;
+    ComponentStatesModel*           mComponentStates;
     // Transitions
-    ComponentTransitionsModel*  mComponentTransitions;
+    ComponentTransitionsModel*      mComponentTransitions;
+    // Properties
+    ComponentPropertiesModel*       mComponentProperties;
 };
 
 #endif // PROPERTIESCONTROLLER_H

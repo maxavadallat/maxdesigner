@@ -1,5 +1,8 @@
 #include <QDebug>
+
 #include "componentpropertiesmodel.h"
+#include "componentownpropertiesmodel.h"
+#include "componentinfo.h"
 
 //==============================================================================
 // Constructor
@@ -8,6 +11,8 @@ ComponentPropertiesModel::ComponentPropertiesModel(QObject* aParent)
     : QAbstractListModel(aParent)
     , mComponent(NULL)
 {
+    qDebug() << "ComponentPropertiesModel created.";
+
     // Init
     init();
 }
@@ -17,6 +22,9 @@ ComponentPropertiesModel::ComponentPropertiesModel(QObject* aParent)
 //==============================================================================
 void ComponentPropertiesModel::init()
 {
+    // Load Component Properties
+    loadComponentProperties();
+
     // ...
 }
 
@@ -27,11 +35,21 @@ void ComponentPropertiesModel::clear()
 {
     // Begin Reset Model
     beginResetModel();
-
     // Clear
-
+    mHierarchy.clear();
     // End Reset Model
     endResetModel();
+}
+
+//==============================================================================
+// Load Component Properties
+//==============================================================================
+void ComponentPropertiesModel::loadComponentProperties()
+{
+    // Clear
+    clear();
+
+    // ...
 }
 
 //==============================================================================
@@ -49,15 +67,12 @@ void ComponentPropertiesModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
-        // Save Component Properties
-
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Component Changed Signal
         emit currentComponentChanged(mComponent);
-
         // Load Component Properties
-
+        loadComponentProperties();
     }
 }
 
@@ -66,8 +81,7 @@ void ComponentPropertiesModel::setCurrentComponent(ComponentInfo* aComponent)
 //==============================================================================
 int ComponentPropertiesModel::rowCount(const QModelIndex& ) const
 {
-
-    return 0;
+    return mHierarchy.count();
 }
 
 //==============================================================================
@@ -75,8 +89,17 @@ int ComponentPropertiesModel::rowCount(const QModelIndex& ) const
 //==============================================================================
 QVariant ComponentPropertiesModel::data(const QModelIndex& index, int role) const
 {
-    Q_UNUSED(index);
-    Q_UNUSED(role);
+    // Get Row
+    int pmRow = index.row();
+
+    // Check Row
+    if (pmRow >= 0 && pmRow < rowCount()) {
+        // Switch Role
+        switch (role) {
+            default:
+            case ESMRBaseName:  return mHierarchy[pmRow]->componentName();
+        }
+    }
 
     return QVariant();
 }
@@ -89,7 +112,8 @@ QHash<int, QByteArray> ComponentPropertiesModel::roleNames() const
     // Init New Role Names
     QHash<int, QByteArray> rNames;
 
-    // ...
+    // Set Up Role Names
+    rNames[ESMRBaseName]    = "baseName";
 
     return rNames;
 }
@@ -103,4 +127,6 @@ ComponentPropertiesModel::~ComponentPropertiesModel()
     clear();
 
     // ...
+
+    qDebug() << "ComponentPropertiesModel deleted.";
 }

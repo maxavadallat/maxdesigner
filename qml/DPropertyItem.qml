@@ -16,6 +16,8 @@ DSwipeGesture {
     property bool deleteButtonClicked: false
     property bool formulaEditButtonClicked: false
 
+    property int namesColumnWidth: CONSTS.defaultNamesColumnWidth
+
     enableSwipe: true
 
     swipeDirection: -1
@@ -87,6 +89,7 @@ DSwipeGesture {
         front: DPropertyItemValue {
             width: propertyItemFlipable.width
             height: propertyItemFlipable.height
+            namesColumnWidth: propertyItemRoot.namesColumnWidth
             editorMouseSelection: false
             editorFocus: !propertyItemRoot.markFordeletion
         }

@@ -57,6 +57,52 @@ void ComponentStatesModel::clear()
 }
 
 //==============================================================================
+// Load Component States
+//==============================================================================
+void ComponentStatesModel::loadComponentStates()
+{
+    // Begin Reset Model
+    beginResetModel();
+
+    // ...
+
+    // End Reset Model
+    endResetModel();
+}
+
+//==============================================================================
+// Save Component States
+//==============================================================================
+void ComponentStatesModel::saveComponentStates()
+{
+
+}
+
+//==============================================================================
+// Get Current Component
+//==============================================================================
+ComponentInfo* ComponentStatesModel::currentComponent()
+{
+    return mComponent;
+}
+
+//==============================================================================
+// Set Current Component
+//==============================================================================
+void ComponentStatesModel::setCurrentComponent(ComponentInfo* aComponent)
+{
+    // Check Current Component
+    if (mComponent != aComponent) {
+        // Set Current Component
+        mComponent = aComponent;
+        // Emit Current Component Changed Signal
+        emit currentComponentChanged(mComponent);
+        // Load Component States
+        loadComponentStates();
+    }
+}
+
+//==============================================================================
 // Add State
 //==============================================================================
 void ComponentStatesModel::addState(const QString& aStateName)

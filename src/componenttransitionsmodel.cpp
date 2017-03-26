@@ -198,7 +198,13 @@ void ComponentTransitionsModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
+        // Set Current Component
+        mComponent = aComponent;
+        // Emit Current Compoennt Changed Signal
+        emit currentComponentChanged(mComponent);
 
+        // Load Component Transitions
+        loadComponentTransitions();
     }
 }
 

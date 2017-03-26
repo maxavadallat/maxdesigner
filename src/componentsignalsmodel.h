@@ -20,8 +20,6 @@ class ComponentSignalsModel : public QAbstractListModel
     Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent WRITE setCurrentComponent NOTIFY currentComponentChanged)
 
 public:
-    // From JSON Array
-    static ComponentSignalsModel* fromJSONArray(ComponentInfo* aComponent, const QJsonArray& aArray);
     // Constructor
     explicit ComponentSignalsModel(ComponentInfo* aComponent, QObject* aParent = NULL);
 

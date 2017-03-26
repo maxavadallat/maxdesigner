@@ -3,6 +3,7 @@
 #include "propertiescontroller.h"
 #include "projectmodel.h"
 #include "componentinfo.h"
+#include "componentownpropertiesmodel.h"
 #include "componentpropertiesmodel.h"
 #include "componentsignalsmodel.h"
 #include "componentanchorsmodel.h"
@@ -18,10 +19,11 @@ PropertiesController::PropertiesController(ProjectModel* aProjectModel, QObject*
     , mProject(aProjectModel)
     , mFocusedComponent(NULL)
     , mComponentAnchors(NULL)
+    , mComponentOwnProperties(NULL)
     , mComponentSignals(NULL)
-    , mComponentProperties(NULL)
     , mComponentStates(NULL)
     , mComponentTransitions(NULL)
+    , mComponentProperties(NULL)
 {
     qDebug() << "PropertiesController created.";
     // Init
@@ -48,18 +50,18 @@ void PropertiesController::clear()
         mComponentAnchors = NULL;
     }
 
+    // Check Component Own Properties Model
+    if (mComponentOwnProperties) {
+        // Delete Component Own Properties Model
+        delete mComponentOwnProperties;
+        mComponentOwnProperties = NULL;
+    }
+
     // Check Component Signals Model
     if (mComponentSignals) {
         // Delete Component Signals Model
         delete mComponentSignals;
         mComponentSignals = NULL;
-    }
-
-    // Check Component Properties Model
-    if (mComponentProperties) {
-        // Delete Component Properties Model
-        delete mComponentProperties;
-        mComponentProperties = NULL;
     }
 
     // Check Component States Model
@@ -76,7 +78,98 @@ void PropertiesController::clear()
         mComponentTransitions = NULL;
     }
 
+    // Check Component Properties Model
+    if (mComponentProperties) {
+        // Delete Component Properties Model
+        delete mComponentProperties;
+        mComponentProperties = NULL;
+    }
+
     // ...
+}
+
+//==============================================================================
+// Set Anchors Model
+//==============================================================================
+void PropertiesController::setAnchorsModel(ComponentAnchorsModel* aAnchorsModel)
+{
+    // Check Component Anchors Model
+    if (mComponentAnchors != aAnchorsModel) {
+        // Set Component Anchors Model
+        mComponentAnchors = aAnchorsModel;
+        // Emit Component Anchors Model Changed Signal
+        emit anchorsModelChanged(mComponentAnchors);
+    }
+}
+
+//==============================================================================
+// Set Own Properties Model
+//==============================================================================
+void PropertiesController::setOwnPropertiesModel(ComponentOwnPropertiesModel* aOwnPropertiesModel)
+{
+    // Check Component Own Properties Model
+    if (mComponentOwnProperties != aOwnPropertiesModel) {
+        // Set Component Own Properties Model
+        mComponentOwnProperties = aOwnPropertiesModel;
+        // Emit Component Own Properties Model Changed Signal
+        emit ownPropertiesModelChanged(mComponentOwnProperties);
+    }
+}
+
+//==============================================================================
+// Set Properties Model
+//==============================================================================
+void PropertiesController::setPropertiesModel(ComponentPropertiesModel* aPropertiesModel)
+{
+    // Check Component Properties Model
+    if (mComponentProperties != aPropertiesModel) {
+        // Set Component Properties Model
+        mComponentProperties = aPropertiesModel;
+        // Emit Component Properties Model Changed Signal
+        emit propertiesModelChanged(mComponentProperties);
+    }
+}
+
+//==============================================================================
+// Set Signals Model
+//==============================================================================
+void PropertiesController::setSignalsModel(ComponentSignalsModel* aSignalsModel)
+{
+    // Check Component Signals Model
+    if (mComponentSignals != aSignalsModel) {
+        // Set Component Signals Model
+        mComponentSignals = aSignalsModel;
+        // Emit Component Signals Model Changed Signal
+        emit signalsModelChanged(mComponentSignals);
+    }
+}
+
+//==============================================================================
+// Set States Model
+//==============================================================================
+void PropertiesController::setStatesModel(ComponentStatesModel* aStatesModel)
+{
+    // Check Component States Model
+    if (mComponentStates != aStatesModel) {
+        // Set Component States Model
+        mComponentStates = aStatesModel;
+        // Emit Component States Model Changed Signal
+        emit statesModelChanged(mComponentStates);
+    }
+}
+
+//==============================================================================
+// Set Transitions Model
+//==============================================================================
+void PropertiesController::setTransitionsModel(ComponentTransitionsModel* aTransitionsModel)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions != aTransitionsModel) {
+        // Set Component Transitions Model
+        mComponentTransitions = aTransitionsModel;
+        // Emit Component Transitions Model Changed Signal
+        emit transitionsModelChanged(mComponentTransitions);
+    }
 }
 
 //==============================================================================
@@ -129,9 +222,41 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
         // Emit Focused Component Changed Signal
         emit focusedComponentChanged(mFocusedComponent);
 
-        // Load Models
+        // Check Own Properties Model
+        if (mComponentOwnProperties) {
+            // Set Current Component
+            mComponentOwnProperties->setCurrentComponent(aComponent);
+        }
 
-        // Emit Changes For All Properties
+        // Check Anchors Model
+        if (mComponentAnchors) {
+            // Set Current Component
+            mComponentAnchors->setCurrentComponent(aComponent);
+        }
+
+        // Check Signals Model
+        if (mComponentSignals) {
+            // Set Current Component
+            mComponentSignals->setCurrentComponent(aComponent);
+        }
+
+        // Check Component States
+        if (mComponentStates) {
+            // Set Current Component
+            mComponentStates->setCurrentComponent(aComponent);
+        }
+
+        // Check Transitions Model
+        if (mComponentTransitions) {
+            // Set Current Component
+            mComponentTransitions->setCurrentComponent(aComponent);
+        }
+
+        // Check Properties Model
+        if (mComponentProperties) {
+            // Set Current Component
+            mComponentProperties->setCurrentComponent(aComponent);
+        }
 
         // ...
     }
@@ -277,7 +402,53 @@ void PropertiesController::requestCHeight(const QString& aHeight)
     }
 }
 
-// ...
+//==============================================================================
+// Get Anchors Model
+//==============================================================================
+ComponentAnchorsModel* PropertiesController::anchorsModel()
+{
+    return mComponentAnchors;
+}
+
+//==============================================================================
+// Get Own Properties Model
+//==============================================================================
+ComponentOwnPropertiesModel* PropertiesController::ownPropertiesModel()
+{
+    return mComponentOwnProperties;
+}
+
+//==============================================================================
+// Get Signals Model
+//==============================================================================
+ComponentSignalsModel* PropertiesController::signalsModel()
+{
+    return mComponentSignals;
+}
+
+//==============================================================================
+// Get States Model
+//==============================================================================
+ComponentStatesModel* PropertiesController::statesModel()
+{
+    return mComponentStates;
+}
+
+//==============================================================================
+// Get Transitins Model
+//==============================================================================
+ComponentTransitionsModel* PropertiesController::transitionsModel()
+{
+    return mComponentTransitions;
+}
+
+//==============================================================================
+// Get Properties Model
+//==============================================================================
+ComponentPropertiesModel* PropertiesController::propertiesModel()
+{
+    return mComponentProperties;
+}
 
 //==============================================================================
 // Add Own Property

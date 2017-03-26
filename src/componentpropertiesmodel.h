@@ -8,6 +8,7 @@
 #include <QJsonObject>
 
 class ComponentInfo;
+class ComponentOwnPropertiesModel;
 
 //==============================================================================
 // Component Properties Model
@@ -26,6 +27,8 @@ public:
     ComponentInfo* currentComponent();
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
+
+    // Get Base Properties
 
     // Destructor
     ~ComponentPropertiesModel();
@@ -48,9 +51,22 @@ protected:
     // Clear
     void clear();
 
+    // Load Component Properties
+    void loadComponentProperties();
+//    // Save Component Properties
+//    void saveComponentProperties();
+
+public:
+    // Properties Model Roles
+    enum PMRoles {
+        ESMRBaseName   =   Qt::UserRole + 1
+    };
+
 protected: // Data
     // Current Component
-    ComponentInfo*  mComponent;
+    ComponentInfo*          mComponent;
+    // Component Bases/Hierarchy
+    QList<ComponentInfo*>   mHierarchy;
 };
 
 #endif // COMPONENTPROPERTIESMODEL_H

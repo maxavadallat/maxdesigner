@@ -9,7 +9,7 @@ Item {
     width: 300
     height: CONSTS.defaultPaneItemHeight
 
-    property int nameLabelWidth: 96
+    property int namesColumnWidth: CONSTS.defaultNamesColumnWidth
 
     property string propertyName: "name"
     property string propertyType: "type"
@@ -44,13 +44,6 @@ Item {
     }
 
 
-    Rectangle {
-        anchors.fill: parent
-        color: "transparent"
-        //color: Qt.hsla(Math.random(), Math.random(), 0.5, 0.5)
-        border.color: "purple"
-    }
-
     Row {
         id: propertyItemValueRow
         anchors.right: parent.right
@@ -60,7 +53,7 @@ Item {
 
         DText {
             id: nameLabel
-            width: propertyItemValueRoot.nameLabelWidth
+            width: propertyItemValueRoot.namesColumnWidth
             //width: propertyItemValueRoot.width - propertyValueEditor.width - DStyle.defaultSpacing - DStyle.defaultMargin * 2
             anchors.verticalCenter: parent.verticalCenter
             text: propertyItemValueRoot.propertyName + ":"

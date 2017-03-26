@@ -12,6 +12,8 @@ ComponentOwnPropertiesModel::ComponentOwnPropertiesModel(QObject* aParent)
     : QAbstractListModel(aParent)
     , mComponent(NULL)
 {
+    qDebug() << "ComponentOwnPropertiesModel created.";
+
     // Init
     init();
 }
@@ -21,7 +23,7 @@ ComponentOwnPropertiesModel::ComponentOwnPropertiesModel(QObject* aParent)
 //==============================================================================
 void ComponentOwnPropertiesModel::init()
 {
-
+    // ...
 }
 
 //==============================================================================
@@ -29,7 +31,7 @@ void ComponentOwnPropertiesModel::init()
 //==============================================================================
 void ComponentOwnPropertiesModel::clear()
 {
-
+    // ...
 }
 
 //==============================================================================
@@ -47,12 +49,14 @@ void ComponentOwnPropertiesModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
+        // Begin Reset Model
+        beginResetModel();
         // Set Current Component
         mComponent = aComponent;
+        // End Reset Model
+        endResetModel();
         // Emit Current Component Changed Signal
         emit currentComponentChanged(mComponent);
-
-        // ...
     }
 }
 
@@ -123,5 +127,5 @@ ComponentOwnPropertiesModel::~ComponentOwnPropertiesModel()
     // Clear
     clear();
 
-    // ...
+    qDebug() << "ComponentOwnPropertiesModel deleted.";
 }

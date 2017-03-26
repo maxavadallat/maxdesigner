@@ -11,26 +11,6 @@ DPane {
     width: 300
     height: 600
 
-    title: "Properties" + (propertiesController.focusedComponent ? (" - " + propertiesController.focusedComponent.componentName) : "")
-
-    creationWidth: 300
-    creationHeight: 600
-
-    minWidth: 300
-    minHeight: 400
-
-    enablePaneContent: propertiesController.focusedComponent !== null
-
-    setFocusOnResize: false
-
-    topMouseAreaVisible: true
-
-    hideToSide: hideToRight
-
-    borderColor: DStyle.colorBorder
-
-    //state: stateShown
-
     property Connections propertiesControllerConnection: Connections {
         target: propertiesController
 
@@ -65,6 +45,28 @@ DPane {
             console.log("PropertiesPane.focusedComponentConnection.onHeightChanged - height: " + propertiesController.focusedComponent.height);
         }
     }
+
+    property int namesColumnWidth: CONSTS.defaultNamesColumnWidth
+
+    title: "Properties" + (propertiesController.focusedComponent ? (" - " + propertiesController.focusedComponent.componentName) : "")
+
+    creationWidth: 300
+    creationHeight: 600
+
+    minWidth: 300
+    minHeight: 400
+
+    enablePaneContent: propertiesController.focusedComponent !== null
+
+    setFocusOnResize: false
+
+    topMouseAreaVisible: true
+
+    hideToSide: hideToRight
+
+    borderColor: DStyle.colorBorder
+
+    state: stateCreate
 
     signal newPropertyLaunch()
     signal editPropertyLaunch()
@@ -413,19 +415,29 @@ DPane {
             width: propertiesPaneRoot.contentWidth
             height: 0
 
-            ListView {
+            DListView {
                 id: ownPropertiesListView
-                width: parent.width
+                anchors.fill: parent
+
+                model: ComponentOwnPropertiesFilter {
+                    //sourceModel:
+                }
 
                 delegate: DPropertyItem {
                     id: opiDelegateRoot
                     width: ownPropertiesListView.width
+                    namesColumnWidth: propertiesPaneRoot.namesColumnWidth
 
-                    DFlipable {
-                        id: opiFlipable
-                        anchors.fill: parent
-                        //front:
-                        //back:
+                    onDeleteItemClicked: {
+                        console.log("ownPropertiesListView.delegate.onDeleteItemClicked - itemIndex: " + itemIndex);
+
+                        // ...
+                    }
+
+                    onFormulaEditClicked: {
+                        console.log("ownPropertiesListView.delegate.onDeleteItemClicked - itemIndex: " + itemIndex);
+
+                        // ...
                     }
                 }
             }

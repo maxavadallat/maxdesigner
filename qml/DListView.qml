@@ -12,6 +12,41 @@ DControl {
         id: listView
         anchors.fill: parent
 
+        add: Transition {
+            NumberAnimation {
+                properties: "height"; duration: DStyle.animDuration
+            }
+        }
+
+        addDisplaced: Transition {
+            NumberAnimation {
+                properties: "x, y"; duration: DStyle.animDuration
+            }
+        }
+
+        move: Transition {
+            NumberAnimation {
+                properties: "x, y"; duration: DStyle.animDuration
+            }
+        }
+
+        moveDisplaced: Transition {
+            NumberAnimation {
+                properties: "x, y"; duration: DStyle.animDuration
+            }
+        }
+
+        remove: Transition {
+            NumberAnimation {
+                properties: "height"; duration: DStyle.animDuration
+            }
+        }
+
+        removeDisplaced: Transition {
+            NumberAnimation {
+                properties: "x, y"; duration: DStyle.animDuration
+            }
+        }
     }
 
     DScrollIndicator {

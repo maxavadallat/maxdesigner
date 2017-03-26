@@ -12,6 +12,8 @@ class ComponentPropertyAction;
 class ComponentPropertyAnimation;
 class ComponentTransitionNode;
 
+class PropertiesController;
+
 //==============================================================================
 // Component Transitions Node Type
 //==============================================================================
@@ -89,9 +91,11 @@ signals:
 
 protected:
     friend class ComponentInfo;
+    friend class PropertiesController;
 
     // Constructor
     explicit ComponentTransitionsModel(ComponentInfo* aComponent, QObject* aParent = NULL);
+
     // Init
     void init();
     // Clear

@@ -18,9 +18,13 @@ class ComponentStatesModel : public QAbstractListModel
 {
     Q_OBJECT
 
+    Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent WRITE setCurrentComponent NOTIFY currentComponentChanged)
+
 public:
-    // From JSON Array
-    //static ComponentStatesModel* fromJSONArray(ComponentInfo* aComponent, const QJsonArray& aArray);
+    // Get Current Component
+    ComponentInfo* currentComponent();
+    // Set Current Component
+    void setCurrentComponent(ComponentInfo* aComponent);
 
     // Add State
     void addState(const QString& aStateName);
@@ -51,6 +55,10 @@ public:
     // Destructor
     ~ComponentStatesModel();
 
+signals:
+    // Current Component Changed Signal
+    void currentComponentChanged(ComponentInfo* aComponent);
+
 protected:
     friend class ComponentInfo;
 
@@ -60,6 +68,11 @@ protected:
     void init();
     // Clear
     void clear();
+
+    // Load Component States
+    void loadComponentStates();
+    // Save Component States
+    void saveComponentStates();
 
 public: // from QAbstractListModel
     // Row Count

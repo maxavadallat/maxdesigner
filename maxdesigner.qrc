@@ -4,82 +4,83 @@
         <file>qml/style/Designer.js</file>
         <file>qml/style/Developer.js</file>
         <file>qml/style/qmldir</file>
-        <file>qml/DConstants.js</file>
-        <file>qml/main.qml</file>
-        <file>qml/ProjectPane.qml</file>
-        <file>qml/PropertiesPane.qml</file>
-        <file>qml/DMouseArea.qml</file>
-        <file>qml/DRectangle.qml</file>
-        <file>qml/DText.qml</file>
-        <file>qml/DButton.qml</file>
-        <file>qml/DTextInput.qml</file>
-        <file>qml/MainGrabArea.qml</file>
-        <file>qml/DCheckBox.qml</file>
-        <file>qml/DSpinner.qml</file>
-        <file>qml/DEditorBackground.qml</file>
-        <file>qml/DPane.qml</file>
-        <file>qml/DTracer.qml</file>
-        <file>qml/DSwitch.qml</file>
-        <file>qml/DRadioButton.qml</file>
-        <file>qml/DRadioButtonGroup.qml</file>
-        <file>qml/DScrollIndicator.qml</file>
-        <file>qml/DControl.qml</file>
-        <file>qml/DButtonBase.qml</file>
-        <file>qml/DRadioButtonGroupItem.qml</file>
-        <file>qml/DSection.qml</file>
+        <file>qml/DActivityIndicator.qml</file>
         <file>qml/DAnimation.qml</file>
+        <file>qml/DAssetContainer.qml</file>
+        <file>qml/DBuiltInComponentFactory.qml</file>
+        <file>qml/DButton.qml</file>
+        <file>qml/DButtonBase.qml</file>
+        <file>qml/DCarousel.qml</file>
+        <file>qml/DCarouselDelegate.qml</file>
+        <file>qml/DCheckBox.qml</file>
+        <file>qml/DComponentChildContainer.qml</file>
+        <file>qml/DComponentItem.qml</file>
+        <file>qml/DComponentRootContainer.qml</file>
+        <file>qml/DConstants.js</file>
+        <file>qml/DContainer.qml</file>
+        <file>qml/DControl.qml</file>
+        <file>qml/DDemoContainer.qml</file>
+        <file>qml/DDisc.qml</file>
+        <file>qml/DEditorBackground.qml</file>
         <file>qml/DFadeAnimation.qml</file>
         <file>qml/DFlickable.qml</file>
-        <file>qml/DContainer.qml</file>
-        <file>qml/DResizeArea.qml</file>
-        <file>qml/DViewContainer.qml</file>
+        <file>qml/DFlipable.qml</file>
+        <file>qml/DFlow.qml</file>
+        <file>qml/DFormulaEditor.qml</file>
+        <file>qml/DGrid.qml</file>
+        <file>qml/DImage.qml</file>
+        <file>qml/DListView.qml</file>
+        <file>qml/DMinimizedComponents.qml</file>
+        <file>qml/DMouseArea.qml</file>
+        <file>qml/DNoContent.qml</file>
+        <file>qml/DOption.qml</file>
+        <file>qml/DPane.qml</file>
+        <file>qml/DPaneBase.qml</file>
         <file>qml/DPopup.qml</file>
+        <file>qml/DPopupArea.qml</file>
         <file>qml/DPopupItem.qml</file>
         <file>qml/DPopupItemObject.qml</file>
-        <file>qml/DPopupArea.qml</file>
         <file>qml/DPosIndicator.qml</file>
-        <file>qml/DFlipable.qml</file>
-        <file>qml/DFormulaEditor.qml</file>
-        <file>qml/DSizeIndicator.qml</file>
-        <file>qml/DWelcome.qml</file>
-        <file>qml/DActivityIndicator.qml</file>
-        <file>qml/DPropertyItem.qml</file>
-        <file>qml/DSwipeGesture.qml</file>
-        <file>qml/DMinimizedComponents.qml</file>
-        <file>qml/DComponentRootContainer.qml</file>
-        <file>qml/DPaneBase.qml</file>
-        <file>qml/DComponentItem.qml</file>
-        <file>qml/DComponentChildContainer.qml</file>
-        <file>qml/DListView.qml</file>
-        <file>qml/DTreeView.qml</file>
-        <file>qml/DNoContent.qml</file>
-        <file>qml/style/DColorTest.qml</file>
-        <file>qml/DStateEditor.qml</file>
-        <file>qml/DTransitionEditor.qml</file>
-        <file>qml/DFlow.qml</file>
-        <file>qml/DGrid.qml</file>
-        <file>qml/DAssetContainer.qml</file>
-        <file>qml/DSourceContainer.qml</file>
-        <file>qml/DBuiltInComponentFactory.qml</file>
-        <file>qml/DDemoContainer.qml</file>
-        <file>qml/DCarousel.qml</file>
-        <file>qml/DOption.qml</file>
-        <file>qml/DCarouselDelegate.qml</file>
-        <file>qml/DPropertyEditor.qml</file>
-        <file>qml/DStateSelector.qml</file>
-        <file>qml/DImage.qml</file>
-        <file>qml/DDisc.qml</file>
         <file>qml/DPropertyChangesEditor.qml</file>
-        <file>qml/DPropertyChangeDelegate.qml</file>
-        <file>qml/DSignalDelegate.qml</file>
-        <file>qml/DStateDelegate.qml</file>
-        <file>qml/DTransitionDelegate.qml</file>
-        <file>qml/DTransitionNodeDelegate.qml</file>
-        <file>qml/DSignalEditor.qml</file>
-        <file>qml/DTransitionNodeEditor.qml</file>
-        <file>qml/DSignalParameterEditor.qml</file>
-        <file>qml/DSourceCodeEditor.qml</file>
+        <file>qml/DPropertyEditor.qml</file>
+        <file>qml/DPropertyItem.qml</file>
         <file>qml/DPropertyItemFormula.qml</file>
         <file>qml/DPropertyItemValue.qml</file>
+        <file>qml/DRadioButton.qml</file>
+        <file>qml/DRadioButtonGroup.qml</file>
+        <file>qml/DRadioButtonGroupItem.qml</file>
+        <file>qml/DRectangle.qml</file>
+        <file>qml/DResizeArea.qml</file>
+        <file>qml/DScrollIndicator.qml</file>
+        <file>qml/DSection.qml</file>
+        <file>qml/DSignalEditor.qml</file>
+        <file>qml/DSignalItemDelegate.qml</file>
+        <file>qml/DSignalItemDelegateNode.qml</file>
+        <file>qml/DSignalParameterEditor.qml</file>
+        <file>qml/DSizeIndicator.qml</file>
+        <file>qml/DSourceCodeEditor.qml</file>
+        <file>qml/DSourceContainer.qml</file>
+        <file>qml/DSpinner.qml</file>
+        <file>qml/DStateDelegate.qml</file>
+        <file>qml/DStateEditor.qml</file>
+        <file>qml/DStateItemDelegate.qml</file>
+        <file>qml/DStateItemDelegateNode.qml</file>
+        <file>qml/DStateSelector.qml</file>
+        <file>qml/DSwipeGesture.qml</file>
+        <file>qml/DSwitch.qml</file>
+        <file>qml/DText.qml</file>
+        <file>qml/DTextInput.qml</file>
+        <file>qml/DTracer.qml</file>
+        <file>qml/DTransitionEditor.qml</file>
+        <file>qml/DTransitionItemDelegate.qml</file>
+        <file>qml/DTransitionItemDelegateNode.qml</file>
+        <file>qml/DTransitionNodeEditor.qml</file>
+        <file>qml/DTreeView.qml</file>
+        <file>qml/DViewContainer.qml</file>
+        <file>qml/DWelcome.qml</file>
+        <file>qml/main.qml</file>
+        <file>qml/MainGrabArea.qml</file>
+        <file>qml/ProjectPane.qml</file>
+        <file>qml/PropertiesPane.qml</file>
     </qresource>
 </RCC>

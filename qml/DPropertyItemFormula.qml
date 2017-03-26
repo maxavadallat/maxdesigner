@@ -9,16 +9,11 @@ Item {
     width: 300
     height: CONSTS.defaultPaneItemHeight
 
+    property int namesColumnWidth: CONSTS.defaultNamesColumnWidth
+
     property string propertyFormula: "Formula"
 
     signal formulaEditClicked()
-
-    Rectangle {
-        anchors.fill: parent
-        color: "transparent"
-        //color: Qt.hsla(Math.random(), Math.random(), 0.5, 0.5)
-        border.color: "red"
-    }
 
     Row {
         id: propertyItemFormulaRow
@@ -27,6 +22,7 @@ Item {
 
         DText {
             id: formulaTitleLabel
+            width: propertyItemFormuleRoot.namesColumnWidth
             anchors.verticalCenter: parent.verticalCenter
             text: "formula:"
         }
