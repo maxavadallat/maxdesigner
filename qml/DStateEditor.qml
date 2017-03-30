@@ -12,10 +12,10 @@ DPaneBase {
 
     title: "State Editor"
 
-    creationWidth: 332
+    creationWidth: 460
     creationHeight: 118
 
-    minWidth: 332
+    minWidth: 460
     minHeight: 118
 
     enableResize: false
@@ -74,6 +74,32 @@ DPaneBase {
 
         DTextInput {
             id: nameEditor
+            width: 84
+            anchors.verticalCenter: parent.verticalCenter
+            onKeyEvent: {
+                switch (event.key) {
+                    case Qt.Key_Escape:
+                        // Dismiss Pane
+                        stateEditorRoot.dismissPane(true);
+                    break;
+
+                    case Qt.Key_Tab:
+                        whenEditor.setEditorFocus(true, true);
+                    break;
+                }
+            }
+        }
+
+        DText {
+            id: whenLabel
+            //width: 58
+            anchors.verticalCenter: parent.verticalCenter
+            horizontalAlignment: Text.AlignRight
+            text: "when:"
+        }
+
+        DTextInput {
+            id: whenEditor
             width: 168
             anchors.verticalCenter: parent.verticalCenter
             onKeyEvent: {
@@ -84,7 +110,7 @@ DPaneBase {
                     break;
 
                     case Qt.Key_Tab:
-                        //propertyEditor.setEditorFocus(true, true);
+                        nameEditor.setEditorFocus(true, true);
                     break;
                 }
             }

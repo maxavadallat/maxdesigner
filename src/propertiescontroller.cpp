@@ -9,6 +9,7 @@
 #include "componentanchorsmodel.h"
 #include "componentstatesmodel.h"
 #include "componenttransitionsmodel.h"
+#include "componentfunctionsmodel.h"
 #include "constants.h"
 
 //==============================================================================
@@ -24,6 +25,7 @@ PropertiesController::PropertiesController(ProjectModel* aProjectModel, QObject*
     , mComponentStates(NULL)
     , mComponentTransitions(NULL)
     , mComponentProperties(NULL)
+    , mComponentFunctions(NULL)
 {
     qDebug() << "PropertiesController created.";
     // Init
@@ -48,6 +50,8 @@ void PropertiesController::clear()
         // Delete Component Anchors Model
         delete mComponentAnchors;
         mComponentAnchors = NULL;
+        // Set Component Anchors Model
+        setAnchorsModel(NULL);
     }
 
     // Check Component Own Properties Model
@@ -55,6 +59,8 @@ void PropertiesController::clear()
         // Delete Component Own Properties Model
         delete mComponentOwnProperties;
         mComponentOwnProperties = NULL;
+        // Set Component Own Properties Model
+        setOwnPropertiesModel(NULL);
     }
 
     // Check Component Signals Model
@@ -62,6 +68,8 @@ void PropertiesController::clear()
         // Delete Component Signals Model
         delete mComponentSignals;
         mComponentSignals = NULL;
+        // Set Component Signals Model
+        setSignalsModel(NULL);
     }
 
     // Check Component States Model
@@ -69,6 +77,8 @@ void PropertiesController::clear()
         // Delete Component States Model
         delete mComponentStates;
         mComponentStates = NULL;
+        // Set Component States Model
+        setStatesModel(NULL);
     }
 
     // Check Component Transitions Model
@@ -76,6 +86,8 @@ void PropertiesController::clear()
         // Delete Component Transitions Model
         delete mComponentTransitions;
         mComponentTransitions = NULL;
+        // Set Component Transitions Model
+        setTransitionsModel(NULL);
     }
 
     // Check Component Properties Model
@@ -83,6 +95,17 @@ void PropertiesController::clear()
         // Delete Component Properties Model
         delete mComponentProperties;
         mComponentProperties = NULL;
+        // Set Component Properties Model
+        setPropertiesModel(NULL);
+    }
+
+    // Check Component Functions Model
+    if (mComponentFunctions) {
+        // Delete Component Functions Model
+        delete mComponentFunctions;
+        mComponentFunctions = NULL;
+        // Set Component Functions Model
+        setFunctionsModel(NULL);
     }
 
     // ...
@@ -173,6 +196,20 @@ void PropertiesController::setTransitionsModel(ComponentTransitionsModel* aTrans
 }
 
 //==============================================================================
+// Set Functions Model
+//==============================================================================
+void PropertiesController::setFunctionsModel(ComponentFunctionsModel* aFunctionsModel)
+{
+    // Check Component Functions Model
+    if (mComponentFunctions != aFunctionsModel) {
+        // Set Component Functions Model
+        mComponentFunctions = aFunctionsModel;
+        // Emit Component Functions Model Changed Signal
+        emit functionsModelChanged(mComponentFunctions);
+    }
+}
+
+//==============================================================================
 // Get Current Project
 //==============================================================================
 ProjectModel* PropertiesController::currentProject()
@@ -226,36 +263,59 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
         if (mComponentOwnProperties) {
             // Set Current Component
             mComponentOwnProperties->setCurrentComponent(aComponent);
+        } else {
+            // Create New Component Own Properties Model
+            ComponentOwnPropertiesModel* newOwnProperties = new ComponentOwnPropertiesModel(mFocusedComponent);
+            // Set Component Own Properties Model
+            setOwnPropertiesModel(newOwnProperties);
         }
 
         // Check Anchors Model
         if (mComponentAnchors) {
             // Set Current Component
             mComponentAnchors->setCurrentComponent(aComponent);
+        } else {
+
         }
 
         // Check Signals Model
         if (mComponentSignals) {
             // Set Current Component
             mComponentSignals->setCurrentComponent(aComponent);
+        } else {
+
         }
 
         // Check Component States
         if (mComponentStates) {
             // Set Current Component
             mComponentStates->setCurrentComponent(aComponent);
+        } else {
+
         }
 
         // Check Transitions Model
         if (mComponentTransitions) {
             // Set Current Component
             mComponentTransitions->setCurrentComponent(aComponent);
+        } else {
+
         }
 
         // Check Properties Model
         if (mComponentProperties) {
             // Set Current Component
             mComponentProperties->setCurrentComponent(aComponent);
+        } else {
+
+        }
+
+        // Check Component Functions Model
+        if (mComponentFunctions) {
+            // Set Current Component
+            mComponentFunctions->setCurrentComponent(aComponent);
+        } else {
+
         }
 
         // ...
@@ -448,6 +508,14 @@ ComponentTransitionsModel* PropertiesController::transitionsModel()
 ComponentPropertiesModel* PropertiesController::propertiesModel()
 {
     return mComponentProperties;
+}
+
+//==============================================================================
+// Get Functions Model
+//==============================================================================
+ComponentFunctionsModel* PropertiesController::functionsModel()
+{
+    return mComponentFunctions;
 }
 
 //==============================================================================

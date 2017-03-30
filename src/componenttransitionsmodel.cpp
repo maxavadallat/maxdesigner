@@ -5,28 +5,6 @@
 #include "componentinfo.h"
 #include "constants.h"
 
-
-
-//==============================================================================
-// From JSON Array
-//==============================================================================
-//ComponentTransitionsModel* ComponentTransitionsModel::fromJSONArray(ComponentInfo* aComponent, const QJsonArray& aArray)
-//{
-//    // Get Array Count
-//    int jsaCount = aArray.count();
-//    // Check Array
-//    if (jsaCount == 0 || !aComponent) {
-//        return NULL;
-//    }
-
-//    // Create New Transitions Model
-//    ComponentTransitionsModel* newTransitionsModel = new ComponentTransitionsModel(aComponent);
-
-//    // ...
-
-//    return newTransitionsModel;
-//}
-
 //==============================================================================
 // Constructor
 //==============================================================================

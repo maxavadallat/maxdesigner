@@ -42,6 +42,7 @@
 #include "componentsignalsmodel.h"
 #include "componentstatesmodel.h"
 #include "componenttransitionsmodel.h"
+#include "componentfunctionsmodel.h"
 
 #include "settingskeys.h"
 #include "constants.h"
@@ -202,6 +203,8 @@ void MainWindow::init()
     qmlRegisterUncreatableType<ComponentTransitionsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_TRANSITIONS_MODEL, "");
     // Register Component Properties Model
     qmlRegisterUncreatableType<ComponentPropertiesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_PROPERTIES_MODEL, "");
+    // Register Component Functions Model
+    qmlRegisterUncreatableType<ComponentFunctionsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_FUNCTIONS_MODEL, "");
 
     // Get Engine
     QQmlEngine* engine = ui->mainQuickWidget->engine();

@@ -8,6 +8,7 @@
 #include <QJsonObject>
 
 class ComponentInfo;
+class PropertiesController;
 
 //==============================================================================
 // Component Own Properties Model
@@ -19,9 +20,6 @@ class ComponentOwnPropertiesModel : public QAbstractListModel
     Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent WRITE setCurrentComponent NOTIFY currentComponentChanged)
 
 public:
-    // Constructor
-    explicit ComponentOwnPropertiesModel(QObject* aParent = NULL);
-
     // Get Current Component
     ComponentInfo* currentComponent();
     // Set Current Component
@@ -43,6 +41,11 @@ public: // from QAbstractListModel
     virtual QHash<int, QByteArray> roleNames() const;
 
 protected:
+    friend class PropertiesController;
+
+    // Constructor
+    explicit ComponentOwnPropertiesModel(ComponentInfo* aComponent, QObject* aParent = NULL);
+
     // Init
     void init();
     // Clear
@@ -50,12 +53,11 @@ protected:
 
 public:
     // Item Field Roles
-    enum ItemRoles {
+    enum OPMRoles {
         PropertyNameRole = Qt::UserRole + 1,
         PropertyTypeRole,
         PropertyValueRole
     };
-
 
 protected: // Data
     // Current Component

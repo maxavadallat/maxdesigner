@@ -11,12 +11,25 @@
 //==============================================================================
 // Create/Update QML
 //==============================================================================
-void QMLGenerator::updateQML(const QString& aQMLPath, ComponentInfo* aComponent)
+void QMLGenerator::updateQML(ComponentInfo* aComponent, const QString& aQMLPath)
 {
     Q_UNUSED(aQMLPath);
     Q_UNUSED(aComponent);
 
     // ...
+
+}
+
+//==============================================================================
+// Generate QML Source
+//==============================================================================
+void QMLGenerator::generateQML(ComponentInfo* aComponent, const QString& aQMLPath)
+{
+    Q_UNUSED(aQMLPath);
+    Q_UNUSED(aComponent);
+
+    // ...
+
 }
 
 //==============================================================================

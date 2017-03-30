@@ -26,7 +26,7 @@ DControl {
 
     // Set Editor Focus
     function setEditorFocus(aFocus, aSelect) {
-        console.log("DTextInput.setEditorFocus - aFocus: " + aFocus + " - aSelect: " + aSelect);
+        //console.log("DTextInput.setEditorFocus - aFocus: " + aFocus + " - aSelect: " + aSelect);
         //textInput.activeFocus = aFocus;
         textInput.focus = aFocus;
         //textInput.forceActiveFocus();
@@ -45,7 +45,7 @@ DControl {
 
     DEditorBackground {
         anchors.fill: parent
-        editorFocus: editor.focus
+        editorFocus: textInput.activeFocus
     }
 
     TextInput {
@@ -120,7 +120,7 @@ DControl {
         anchors.rightMargin: DStyle.defaultMargin * 0.7
         anchors.verticalCenter: parent.verticalCenter
 
-        opacity: (textInput.text.length > 0 && textInputRoot.showClearButton) ? 1.0 : 0.0
+        opacity: (textInput.text.length > 0 && textInput.activeFocus && textInputRoot.showClearButton) ? 1.0 : 0.0
         Behavior on opacity { DFadeAnimation { } }
         visible: opacity > 0.0
         text: "X"

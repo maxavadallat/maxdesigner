@@ -12,6 +12,7 @@
 #include "componentinfo.h"
 #include "projectmodel.h"
 #include "qmlparser.h"
+#include "qmlgenerator.h"
 #include "constants.h"
 
 //==============================================================================
@@ -683,22 +684,12 @@ QStringList ComponentInfo::hierarchy()
 }
 
 //==============================================================================
-// Set Parent
-//==============================================================================
-void ComponentInfo::setParent(ComponentInfo* aParent)
-{
-    // Set Parent
-    mParent = aParent;
-}
-
-//==============================================================================
 // Export To QML
 //==============================================================================
 void ComponentInfo::exportToQML(const QString& aFilePath)
 {
-    Q_UNUSED(aFilePath);
-
-    // ...
+    // Generate QML
+    QMLGenerator::generateQML(this, aFilePath);
 }
 
 //==============================================================================

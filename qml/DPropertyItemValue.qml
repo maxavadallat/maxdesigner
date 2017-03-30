@@ -1,4 +1,4 @@
-import QtQuick 2.7
+import QtQuick 2.0
 
 import "DConstants.js" as CONSTS
 import "style"
@@ -31,23 +31,22 @@ Item {
 
     // Set Editor Focus
     function setEditorFocus(aFocus) {
-        console.log("DPropertyItemValue.setEditorFocus - aFocus: " + aFocus);
+        //console.log("DPropertyItemValue.setEditorFocus - aFocus: " + aFocus);
         // Set Value Editor Focus
-        propertyValueEditor.setEditorFocus(false, false);
+        propertyValueEditor.setEditorFocus(aFocus, false);
     }
 
     // Enable Mouse Selection
     function enableMouseSelection(aEnable) {
-        console.log("DPropertyItemValue.enableMouseSelection - aEnable: " + aEnable);
+        //console.log("DPropertyItemValue.enableMouseSelection - aEnable: " + aEnable);
         // Set Mouse Selection
         propertyValueEditor.mouseSelection = aEnable;
     }
 
-
     Row {
         id: propertyItemValueRow
-        anchors.right: parent.right
-        anchors.rightMargin: DStyle.defaultMargin
+        //anchors.right: parent.right
+        //anchors.rightMargin: DStyle.defaultMargin
         anchors.verticalCenter: parent.verticalCenter
         spacing: DStyle.defaultSpacing
 
@@ -64,7 +63,7 @@ Item {
 
         DTextInput {
             id: propertyValueEditor
-            width: propertyItemValueRoot.width - nameLabel.width - DStyle.defaultSpacing - DStyle.defaultMargin * 2
+            width: propertyItemValueRoot.width - nameLabel.width - DStyle.defaultSpacing - DStyle.defaultMargin * 0
             anchors.verticalCenter: parent.verticalCenter
             text: propertyItemValueRoot.propertyValue
             onAccepted: {

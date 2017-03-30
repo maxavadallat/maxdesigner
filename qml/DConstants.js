@@ -47,3 +47,9 @@ var defaultDiscHeight                           = defaultDiscWidth;
 
 // Default Properties Name Column Width
 var defaultNamesColumnWidth                     = 96;
+
+// Default Own Properties Max
+var defaultOwnPropertiesMax                     = 7;
+
+// Default Swipe Area Width
+var defaultSwipeAreaWidth                       = 16;

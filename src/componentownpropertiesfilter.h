@@ -5,6 +5,7 @@
 #include <QSortFilterProxyModel>
 #include <QStringList>
 
+class PropertiesController;
 class ComponentOwnPropertiesModel;
 
 //==============================================================================

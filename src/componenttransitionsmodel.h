@@ -39,9 +39,6 @@ class ComponentTransitionsModel : public QAbstractListModel
     Q_PROPERTY(ComponentTransitionNode* currentTransitionNode READ currentTransitionNode WRITE setCurrentTransitionNode NOTIFY currentTransitionNodeChanged)
 
 public:
-    // From JSON Array
-    //static ComponentTransitionsModel* fromJSONArray(ComponentInfo* aComponent, const QJsonArray& aArray);
-
     // Add Transition
     void addTransition(const QString& aFrom, const QString& aTo);
     // Set Transition

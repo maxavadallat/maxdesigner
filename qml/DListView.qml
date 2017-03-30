@@ -7,6 +7,10 @@ DControl {
 
     property alias model: listView.model
     property alias delegate: listView.delegate
+    property alias count: listView.count
+    property alias currentIndex: listView.currentIndex
+
+    clip: true
 
     ListView {
         id: listView

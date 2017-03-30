@@ -12,6 +12,7 @@ class ComponentAnchorsModel;
 class ComponentSignalsModel;
 class ComponentStatesModel;
 class ComponentTransitionsModel;
+class ComponentFunctionsModel;
 
 //==============================================================================
 // Properties Controller Class
@@ -39,6 +40,7 @@ class PropertiesController : public QObject
     Q_PROPERTY(ComponentStatesModel* statesModel READ statesModel NOTIFY statesModelChanged)
     Q_PROPERTY(ComponentTransitionsModel* transitionsModel READ transitionsModel NOTIFY transitionsModelChanged)
     Q_PROPERTY(ComponentPropertiesModel* propertiesModel READ propertiesModel NOTIFY propertiesModelChanged)
+    Q_PROPERTY(ComponentFunctionsModel* functionsModel READ functionsModel WRITE setFunctionsModel NOTIFY functionsModelChanged)
 
     // ...
 
@@ -103,6 +105,8 @@ public:
     ComponentTransitionsModel* transitionsModel();
     // Get Properties Model
     ComponentPropertiesModel* propertiesModel();
+    // Get Functions Model
+    ComponentFunctionsModel* functionsModel();
 
     // Add Own Property
     Q_INVOKABLE void addOwnComponentProperty(const QString& aName, const int& aType);
@@ -166,6 +170,8 @@ signals:
     void statesModelChanged(ComponentStatesModel* aStatesModel);
     // Transitions Model Changed Signal
     void transitionsModelChanged(ComponentTransitionsModel* aTransitionsModel);
+    // Functions Model Changed Signal
+    void functionsModelChanged(ComponentFunctionsModel* aFunctionsModel);
 
     // ...
 
@@ -187,6 +193,8 @@ private:
     void setStatesModel(ComponentStatesModel* aStatesModel);
     // Set Transitions Model
     void setTransitionsModel(ComponentTransitionsModel* aTransitionsModel);
+    // Set Functions Model
+    void setFunctionsModel(ComponentFunctionsModel* aFunctionsModel);
 
 private: // Data
     // Project Model
@@ -207,6 +215,8 @@ private: // Data
     ComponentTransitionsModel*      mComponentTransitions;
     // Properties
     ComponentPropertiesModel*       mComponentProperties;
+    // Functions
+    ComponentFunctionsModel*        mComponentFunctions;
 };
 
 #endif // PROPERTIESCONTROLLER_H

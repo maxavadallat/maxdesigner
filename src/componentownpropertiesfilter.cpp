@@ -44,7 +44,7 @@ void ComponentOwnPropertiesFilter::clear()
 void ComponentOwnPropertiesFilter::updateRoles()
 {
     // Set Filter Role
-    setFilterRole((int)ComponentOwnPropertiesModel::ItemRoles::PropertyNameRole);
+    setFilterRole((int)ComponentOwnPropertiesModel::OPMRoles::PropertyNameRole);
 }
 
 //==============================================================================

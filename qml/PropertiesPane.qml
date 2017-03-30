@@ -74,6 +74,9 @@ DPane {
     signal newSignalLaunch()
     signal editSignalLaunch()
 
+    signal newFunctionLaunch()
+    signal editFunctionLaunch()
+
     signal editFormulaLaunch()
 
     signal newStateLaunch()
@@ -413,22 +416,27 @@ DPane {
         Item {
             id: ownPropertiesContainer
             width: propertiesPaneRoot.contentWidth
-            height: 0
+            height: CONSTS.defaultPaneItemHeight * Math.min(CONSTS.defaultOwnPropertiesMax, ownPropertiesListView.count)
 
             DListView {
                 id: ownPropertiesListView
                 anchors.fill: parent
 
-                model: ComponentOwnPropertiesFilter {
-                    //sourceModel:
-                }
+//                model: ComponentOwnPropertiesFilter {
+//                    sourceModel: propertiesController.ownPropertiesModel
+//                }
+                model: propertiesController.ownPropertiesModel
 
                 delegate: DPropertyItem {
                     id: opiDelegateRoot
                     width: ownPropertiesListView.width
                     namesColumnWidth: propertiesPaneRoot.namesColumnWidth
 
-                    onDeleteItemClicked: {
+                    propertyName: pName
+                    propertyType: pType
+                    propertyValue: pValue
+
+                    onItemActionClicked: {
                         console.log("ownPropertiesListView.delegate.onDeleteItemClicked - itemIndex: " + itemIndex);
 
                         // ...
@@ -441,6 +449,11 @@ DPane {
                     }
                 }
             }
+        }
+
+        Item {
+            width: propertiesPaneRoot.contentWidth
+            height: DStyle.defaultMargin
         }
 
         DButton {
@@ -469,6 +482,11 @@ DPane {
             // ...
         }
 
+        Item {
+            width: propertiesPaneRoot.contentWidth
+            height: DStyle.defaultMargin
+        }
+
         DButton {
             id: addSignalButton
             width: propertiesPaneRoot.contentWidth
@@ -477,6 +495,38 @@ DPane {
             onClicked: {
                 // Emit New Signal Launch
                 propertiesPaneRoot.newSignalLaunch();
+            }
+        }
+    }
+
+    DSection {
+        id: functionsSection
+        width: propertiesPaneRoot.contentWidth
+        title: "Functions"
+        minHeight: functionsContainer.height + addSignalButton.height
+
+        // Signals
+        Item {
+            id: functionsContainer
+            width: propertiesPaneRoot.contentWidth
+            height: 0
+
+            // ...
+        }
+
+        Item {
+            width: propertiesPaneRoot.contentWidth
+            height: DStyle.defaultMargin
+        }
+
+        DButton {
+            id: addFunctionButton
+            width: propertiesPaneRoot.contentWidth
+            text: "Add Function"
+
+            onClicked: {
+                // Emit New Function Launch
+                propertiesPaneRoot.newFunctionLaunch();
             }
         }
     }
@@ -496,6 +546,11 @@ DPane {
             height: 0
 
             // ...
+        }
+
+        Item {
+            width: propertiesPaneRoot.contentWidth
+            height: DStyle.defaultMargin
         }
 
         DButton {
@@ -525,6 +580,11 @@ DPane {
             height: 0
 
             // ...
+        }
+
+        Item {
+            width: propertiesPaneRoot.contentWidth
+            height: DStyle.defaultMargin
         }
 
         DButton {

@@ -21,6 +21,7 @@ class ComponentOwnPropertiesModel;
 class ComponentSignalsModel;
 class ComponentStatesModel;
 class ComponentTransitionsModel;
+class ComponentFunctionsModel;
 
 //==============================================================================
 // Component Info Class
@@ -176,9 +177,6 @@ public:
     // Get Component Hierarchy
     QStringList hierarchy();
 
-    // Set Parent
-    void setParent(ComponentInfo* aParent);
-
     // Get Component Property
     QVariant componentProperty(const QString& aName);
     // Add Own Property
@@ -188,26 +186,26 @@ public:
     // Remove Own Property
     void removeProperty(const QString& aName);
 
-    // Add Signal
-    void addSignal(const QString& aName, const QStringList& aParameters = QStringList());
-    // Remove Signal
-    void removeSignal(const QString& aName);
+//    // Add Signal
+//    void addSignal(const QString& aName, const QStringList& aParameters = QStringList());
+//    // Remove Signal
+//    void removeSignal(const QString& aName);
 
 
-    // Add State
-    void addState(const QString& aName);
-    // Remove State
-    void removeState(const QString& aName);
+//    // Add State
+//    void addState(const QString& aName);
+//    // Remove State
+//    void removeState(const QString& aName);
 
 //    // Add Property Change
 //    void addPropertyChange(const QString& aStateName, const QString& aTarget, const QString& aProperty, const QVariant& aValue, const int& aIndex = -1);
 //    // Remove Property Change
 //    void removePropertyChange(const int& aIndex);
 
-    // Add Transition
-    void addTransition(const QString& aStateFrom, const QString& aStateTo);
-    // Remove Transition
-    void removeTransition(const QString& aStateFrom, const QString& aStateTo);
+//    // Add Transition
+//    void addTransition(const QString& aStateFrom, const QString& aStateTo);
+//    // Remove Transition
+//    void removeTransition(const QString& aStateFrom, const QString& aStateTo);
 
 //    // Add Property Action
 //    void addPropertyAction(const QString& aStateFrom, const QString& aStateTo, const QString& aTarget, const QString& aProperty, const QVariant& aValue, const int& aIndex = -1);
@@ -228,6 +226,9 @@ public:
 
 //    // Remove Script Action
 
+//    // Add Function
+
+//    // Remove Function
 
     // Add Child
     Q_INVOKABLE void addChild(ComponentInfo* aChild);
@@ -388,6 +389,7 @@ protected: // Data
     friend class ComponentTransitionsModel;
     friend class ComponentPropertiesModel;
     friend class ComponentOwnPropertiesModel;
+    friend class ComponentFunctionsModel;
 
     // Project Model
     ProjectModel*           mProject;
@@ -442,6 +444,8 @@ protected: // Data
     QJsonArray              mStates;
     // Transitions
     QJsonArray              mTransitions;
+    // Functions
+    QJsonArray              mFunctions;
 };
 
 #endif // COMPONENTINFO_H

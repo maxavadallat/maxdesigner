@@ -40,6 +40,8 @@
 #define DEFAULT_MAIN_QML_COMPONENTS_STATES_MODEL            "ComponentStatesModel"
 // Component Transitions Model
 #define DEFAULT_MAIN_QML_COMPONENTS_TRANSITIONS_MODEL       "ComponentTransitionsModel"
+// Component Functions Model
+#define DEFAULT_MAIN_QML_COMPONENTS_FUNCTIONS_MODEL         "ComponentFunctionsModel"
 
 
 // Own Properties Filter Proxy
@@ -199,6 +201,7 @@
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_VAR                 "var"
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_OBJECT              "QtObject"
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_LIST                "list<QtObject>"
+#define JSON_VALUE_PROPERTY_TYPE_PREFIX_FORMULA             "formula"
 
 
 // Default/Basec JSON Keys For Component Properties

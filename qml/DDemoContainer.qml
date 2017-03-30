@@ -51,7 +51,6 @@ DRectangle {
         anchors.centerIn: parent
     }
 
-
     Flow {
         anchors.left: parent.left
         anchors.leftMargin: 32
@@ -63,8 +62,6 @@ DRectangle {
         layoutDirection: Qt.RightToLeft
 
         spacing: DStyle.defaultSpacing
-
-        visible: false
 
         DButton {
             width: 128

@@ -8,9 +8,9 @@
 //==============================================================================
 // Constructor
 //==============================================================================
-ComponentOwnPropertiesModel::ComponentOwnPropertiesModel(QObject* aParent)
+ComponentOwnPropertiesModel::ComponentOwnPropertiesModel(ComponentInfo* aComponent, QObject* aParent)
     : QAbstractListModel(aParent)
-    , mComponent(NULL)
+    , mComponent(aComponent)
 {
     qDebug() << "ComponentOwnPropertiesModel created.";
 

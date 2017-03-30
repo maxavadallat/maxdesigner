@@ -5,20 +5,6 @@
 #include "componentinfo.h"
 #include "constants.h"
 
-
-//==============================================================================
-// From JSON Array
-//==============================================================================
-//ComponentStatesModel* ComponentStatesModel::fromJSONArray(ComponentInfo* aComponent, const QJsonArray& aArray)
-//{
-//    // Create New Component States Model
-//    ComponentStatesModel* newStatesModel = new ComponentStatesModel(aComponent);
-
-//    // ...
-
-//    return newStatesModel;
-//}
-
 //==============================================================================
 // Constructor
 //==============================================================================
