@@ -186,6 +186,9 @@ public:
     // Remove Own Property
     void removeProperty(const QString& aName);
 
+    // Check If Has Property
+    Q_INVOKABLE bool hasProperty(const QString& aName);
+
 //    // Add Signal
 //    void addSignal(const QString& aName, const QStringList& aParameters = QStringList());
 //    // Remove Signal

@@ -2,6 +2,7 @@
 #define PROPERTIESCONTROLLER_H
 
 #include <QObject>
+#include <QVariant>
 #include <QThread>
 
 class ProjectModel;
@@ -33,6 +34,8 @@ class PropertiesController : public QObject
 
     Q_PROPERTY(QString cWidth READ cWidth NOTIFY cWidthChanged)
     Q_PROPERTY(QString cHeight READ cHeight NOTIFY cHeightChanged)
+
+    Q_PROPERTY(QStringList filteredProperties READ filteredProperties WRITE setFilteredProperties NOTIFY filteredPropertiesChanged)
 
     Q_PROPERTY(ComponentOwnPropertiesModel* ownPropertiesModel READ ownPropertiesModel NOTIFY ownPropertiesModelChanged)
     Q_PROPERTY(ComponentAnchorsModel* anchorsModel READ anchorsModel NOTIFY anchorsModelChanged)
@@ -93,6 +96,9 @@ public:
     // Request Component Height
     Q_INVOKABLE void requestCHeight(const QString& aHeight);
 
+    // Get Filtered Properties
+    QStringList filteredProperties();
+
     // Get Anchors Model
     ComponentAnchorsModel* anchorsModel();
     // Get Own Properties Model
@@ -109,7 +115,7 @@ public:
     ComponentFunctionsModel* functionsModel();
 
     // Add Own Property
-    Q_INVOKABLE void addOwnComponentProperty(const QString& aName, const int& aType);
+    Q_INVOKABLE void addOwnComponentProperty(const QString& aName, const int& aType, const QVariant& aDefaultValue = QVariant());
     // Remove Own Property
     Q_INVOKABLE void removeComponentProperty(const QString& aName);
     // Set Property
@@ -157,6 +163,8 @@ signals:
     void cWidthChanged(const QString& aWidth);
     // Component Height Changed Signal
     void cHeightChanged(const QString& aHeight);
+    // Filtered Properties Changed Signal
+    void filteredPropertiesChanged(const QStringList& aProperties);
 
     // Anchors Model Changed Signal
     void anchorsModelChanged(ComponentAnchorsModel* aAncorsModel);
@@ -181,6 +189,9 @@ private:
     // Clear
     void clear();
 
+    // Set Filtered Properties
+    void setFilteredProperties(const QStringList& aProperties);
+
     // Set Anchors Model
     void setAnchorsModel(ComponentAnchorsModel* aAnchorsModel);
     // Set Own Properties Model
@@ -202,6 +213,9 @@ private: // Data
 
     // Focused Component
     ComponentInfo*                  mFocusedComponent;
+
+    // Filtered Properties
+    QStringList                     mFilteredProperties;
 
     // Anchors
     ComponentAnchorsModel*          mComponentAnchors;

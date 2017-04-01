@@ -4,6 +4,8 @@
         <file>qml/style/Designer.js</file>
         <file>qml/style/Developer.js</file>
         <file>qml/style/qmldir</file>
+        <file>qml/system/DSystemModel.qml</file>
+        <file>qml/system/qmldir</file>
         <file>qml/DActivityIndicator.qml</file>
         <file>qml/DAnimation.qml</file>
         <file>qml/DAssetContainer.qml</file>

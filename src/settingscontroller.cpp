@@ -32,6 +32,7 @@ SettingsController::SettingsController(QObject* aParent)
     : QObject(aParent)
     , mRefCounter(1)
     , mTracerVisible(DEFAULT_SETTINGS_VALUE_TRACER_VISIBLE)
+    , mComponentNamesVisible(DEFAULT_SETTINGS_VALUE_COMPONENT_NAMES_VISIBLE)
     , mSlowMotion(DEFAULT_SETTINGS_VALUE_SLOW_MOTION)
     , mMainWindowState(DEFAULT_SETTINGS_VALUE_MAIN_WINDOW_STATE)
     , mDesignerMode(DEFAULT_SETTINGS_VALUE_DESIGNER_MODE)
@@ -71,6 +72,7 @@ void SettingsController::loadSettings()
     emit globalUpdateStarted();
 
     setTracerVisible(mSettings.value(SETTINGS_KEY_TRACER_VISIBLE, DEFAULT_SETTINGS_VALUE_TRACER_VISIBLE).toBool());
+    setComponentNamesVisible(mSettings.value(SETTINGS_KEY_COMPONENT_NAMES_VISIBLE, DEFAULT_SETTINGS_VALUE_COMPONENT_NAMES_VISIBLE).toBool());
 
     setMainWindowState(mSettings.value(SETTINGS_KEY_MAIN_WINDOW_STATE, DEFAULT_SETTINGS_VALUE_MAIN_WINDOW_STATE).toInt());
     setDesignerMode(mSettings.value(SETTINGS_KEY_DESIGNER_MODE, DEFAULT_SETTINGS_VALUE_DESIGNER_MODE).toString());
@@ -113,6 +115,7 @@ void SettingsController::saveSettings()
     qDebug() << "SettingsControler::saveSettings";
 
     mSettings.setValue(SETTINGS_KEY_TRACER_VISIBLE, mTracerVisible);
+    mSettings.setValue(SETTINGS_KEY_COMPONENT_NAMES_VISIBLE, mComponentNamesVisible);
     mSettings.setValue(SETTINGS_KEY_MAIN_WINDOW_STATE, mMainWindowState);
     mSettings.setValue(SETTINGS_KEY_DESIGNER_MODE, mDesignerMode);
 
@@ -274,6 +277,30 @@ void SettingsController::setSlowMotion(const bool& aSlowMotion)
         mSlowMotion = aSlowMotion;
         // Emit Slow Motion Changed Signal
         emit slowMotionChanged(mSlowMotion);
+    }
+}
+
+//==============================================================================
+// Get Component Names Visible
+//==============================================================================
+bool SettingsController::componentNamesVisible()
+{
+    return mComponentNamesVisible;
+}
+
+//==============================================================================
+// Set Component Names Visible
+//==============================================================================
+void SettingsController::setComponentNamesVisible(const bool& aNamesVisible)
+{
+    // Check Component Names Visible
+    if (mComponentNamesVisible != aNamesVisible) {
+        // Set Component Names Visible
+        mComponentNamesVisible = aNamesVisible;
+        // Emit Component Names Visible Changed Signal`
+        emit componentNamesVisibleChanged(mComponentNamesVisible);
+        // Set Dirty
+        setDirty(true);
     }
 }
 

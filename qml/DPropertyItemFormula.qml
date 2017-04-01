@@ -11,25 +11,27 @@ Item {
 
     property int namesColumnWidth: CONSTS.defaultNamesColumnWidth
 
+    property string propertyName: "name"
     property string propertyFormula: "Formula"
 
     signal formulaEditClicked()
 
     Row {
         id: propertyItemFormulaRow
-        anchors.centerIn: parent
+        anchors.verticalCenter: parent.verticalCenter
         spacing: DStyle.defaultSpacing
 
         DText {
             id: formulaTitleLabel
             width: propertyItemFormuleRoot.namesColumnWidth
             anchors.verticalCenter: parent.verticalCenter
-            text: "formula:"
+            horizontalAlignment: Text.AlignRight
+            text: propertyItemFormuleRoot.propertyName + ":"
         }
 
         DText {
             id: formulaLabel
-            width: propertyItemFormuleRoot.width - formulaTitleLabel.width - editFormulaButton.width - DStyle.defaultSpacing * 2 - DStyle.defaultMargin * 2
+            width: propertyItemFormuleRoot.width - formulaTitleLabel.width - editFormulaButton.width - DStyle.defaultSpacing * 2
             anchors.verticalCenter: parent.verticalCenter
             text: propertyItemFormuleRoot.propertyFormula
             elide: Text.ElideRight
@@ -37,7 +39,7 @@ Item {
 
         DButton {
             id: editFormulaButton
-            width: 64
+            width: 48
             anchors.verticalCenter: parent.verticalCenter
             text: "Edit"
             onClicked: propertyItemFormuleRoot.formulaEditClicked();

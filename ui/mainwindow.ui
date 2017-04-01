@@ -93,8 +93,12 @@
     <addaction name="actionGenerateQMLSources"/>
     <addaction name="separator"/>
     <addaction name="actionSwitchMode"/>
+    <addaction name="actionShowTracers"/>
+    <addaction name="actionShowComponentNames"/>
+    <addaction name="actionSlowMotion"/>
     <addaction name="separator"/>
     <addaction name="actionGoLive"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
@@ -134,6 +138,7 @@
     <addaction name="actionScreenshot"/>
     <addaction name="separator"/>
     <addaction name="actionRemoveView"/>
+    <addaction name="separator"/>
    </widget>
    <addaction name="menuMaxDesigner"/>
    <addaction name="menuFile"/>
@@ -390,6 +395,33 @@
    </property>
    <property name="shortcut">
     <string>F9</string>
+   </property>
+  </action>
+  <action name="actionShowTracers">
+   <property name="text">
+    <string>Show Tracers</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="actionShowComponentNames">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Show Component Names</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionSlowMotion">
+   <property name="text">
+    <string>Slow Motion</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
    </property>
   </action>
  </widget>

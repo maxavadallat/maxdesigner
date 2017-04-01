@@ -165,9 +165,9 @@ QtObject {
     readonly property int posIndicatorHeight:               sizeIndicatorHeight
 
     // Default Formule Editor Width
-    readonly property int formulaEdiorWidth:                218
+    readonly property int formulaEdiorWidth:                358
     // Default Formule Editor Height
-    readonly property int formulaEditorHeight:              72
+    readonly property int formulaEditorHeight:              118
 
     // Default Activity Indicator Width
     readonly property int activityIndicatorWidth:           56

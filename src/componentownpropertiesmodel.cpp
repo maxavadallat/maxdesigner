@@ -85,8 +85,10 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
     if (copRow >= 0 && copRow < rowCount() && mComponent) {
         // Get Key
         QString rKey = mComponent->mOwnProperties.keys()[copRow];
+        // Get Type & Value
+        QString rTypeValue =  mComponent->mOwnProperties[rKey].toString();
         // Get Type/Value Split
-        QStringList rtvList = mComponent->mOwnProperties[rKey].toString().split(":");
+        QStringList rtvList = rTypeValue.split(":");
         // Get Type
         QString rType = rtvList[0];
         // Get Value

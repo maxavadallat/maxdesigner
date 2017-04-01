@@ -131,6 +131,13 @@ private:
     // Launch Live Window
     void launchLiveWindow();
 
+    // Toggle Show Tracers
+    void toggleShowTracers();
+    // Toggle Show Component Names
+    void toggleShowComponentNames();
+    // Toggle Slow Motion
+    void toggleSlowMotion();
+
     // Create New Project
     void createNewProject();
     // Create New Component
@@ -175,7 +182,6 @@ private:
     void removePluginPath(const QString& aDirPath);
 
 private slots:
-
     // Import Path Added Slot
     void importPathAdded(const QString& aImportPath);
     // Import Path Removed Slot
@@ -247,11 +253,16 @@ private slots:
     void on_actionCloseAllComponents_triggered();
     // Action Go Live Triggered Slot
     void on_actionGoLive_triggered();
+    // Action Show Tracers Triggered Slot
+    void on_actionShowTracers_triggered();
+    // Action Show Component Names Triggered Slot
+    void on_actionShowComponentNames_triggered();
+    // Action Slow Motion Triggered Slot
+    void on_actionSlowMotion_triggered();
     // Action Quit Triggered Slot
     void on_actionQuit_triggered();
 
 protected: // from QMainWindow
-
     // Key Release Event
     virtual void keyReleaseEvent(QKeyEvent* aEvent);
 

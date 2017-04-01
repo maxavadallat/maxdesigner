@@ -37,7 +37,19 @@ DPaneBase {
 
     enableScaling: true
 
-    borderColor: dropArea.hovering || componentRootContainerRoot.focus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
+    borderColor: {
+        if (dropArea.hovering) {
+            return DStyle.colorBorder;
+        }
+
+        // Check Focused Component
+        if (propertiesController.focusedComponent === componentInfo) {
+            return DStyle.colorBorder;
+        }
+
+        return DStyle.colorBorderNoFocus;
+    }
+
     radius: 0
 
     // New Child Component
@@ -155,22 +167,37 @@ DPaneBase {
 
             // ...
         }
+
+        onWidthChanged: {
+            // Check Width
+            if (componentRootContainerRoot.width !== aWidth) {
+                // Calculate Center X
+                var centerX = componentRootContainerRoot.x + componentRootContainerRoot.width * 0.5;
+                // Set Pos X
+                componentRootContainerRoot.x = centerX - aWidth * 0.5;
+                // Set Width
+                componentRootContainerRoot.width = aWidth;
+            }
+        }
+
+        onHeightChanged: {
+            // Check Height
+            if (componentRootContainerRoot.height !== aHeight) {
+                // Calculate Center Y
+                var centerY = componentRootContainerRoot.y + componentRootContainerRoot.height * 0.5;
+                // Set Pos Y
+                componentRootContainerRoot.y = centerY - aHeight * 0.5;
+                // Set Height
+                componentRootContainerRoot.height = aHeight;
+            }
+        }
+
+        // ...
     }
 
     onFocusChanged: {
         // Check Focus & Component Info
         if (focus && componentInfo) {
-//            // Check Previous Scale Level
-//            if (componentRootContainerRoot.previousScale !== componentRootContainerRoot.scale) {
-//                // Set Scale Duration
-//                componentRootContainerRoot.scaleDuration = 100;
-//                // Reset Scale
-//                componentRootContainerRoot.scale = componentRootContainerRoot.previousScale;
-//            } else {
-//                // Reset Scale Duration
-//                componentRootContainerRoot.scaleDuration = 0;
-//            }
-
             // Reset Scale Duration
             componentRootContainerRoot.scaleDuration = 0;
 
@@ -181,13 +208,8 @@ DPaneBase {
             openFilesModel.focusedFile = componentRootContainerRoot.componentInfo ? componentRootContainerRoot.componentInfo.infoPath : "";
 
         } else {
-            // Reset Focused Component
-            //propertiesController.focusedComponent = null;
-
             // Set Scale Duration
             componentRootContainerRoot.scaleDuration = 100;
-//            // Save Previous Scale
-//            componentRootContainerRoot.previousScale = componentRootContainerRoot.scale;
             // Reset Scale Level
             componentRootContainerRoot.scale = 1.0;
         }

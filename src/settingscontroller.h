@@ -14,6 +14,7 @@ class SettingsController : public QObject
 
     Q_PROPERTY(bool tracerVisible READ tracerVisible WRITE setTracerVisible NOTIFY tracerVisibleChanged)
     Q_PROPERTY(bool slowMotion READ slowMotion WRITE setSlowMotion NOTIFY slowMotionChanged)
+    Q_PROPERTY(bool componentNamesVisible READ componentNamesVisible WRITE setComponentNamesVisible NOTIFY componentNamesVisibleChanged)
 
     Q_PROPERTY(int mainWindowState READ mainWindowState WRITE setMainWindowState NOTIFY mainWindowStateChanged)
 
@@ -76,6 +77,11 @@ public:
     bool slowMotion();
     // Set Slow Motion
     void setSlowMotion(const bool& aSlowMotion);
+
+    // Get Component Names Visible
+    bool componentNamesVisible();
+    // Set Component Names Visible
+    void setComponentNamesVisible(const bool& aNamesVisible);
 
     // Get Main Window State
     int mainWindowState();
@@ -160,6 +166,8 @@ signals:
     void tracerVisibleChanged(const bool& aVisible);
     // Slow Motion Changed Signal
     void slowMotionChanged(const bool& aSlowMotion);
+    // Component names Visible Changed Signal
+    void componentNamesVisibleChanged(const bool& aNamesVisible);
     // Main Window State Changed Signal
     void mainWindowStateChanged(const int& aWindowState);
     // Designer Mode Changed Signal
@@ -213,6 +221,8 @@ private:
 
     // Tracer Visible
     bool            mTracerVisible;
+    // Component Names Visible
+    bool            mComponentNamesVisible;
     // Slow Motion
     bool            mSlowMotion;
 

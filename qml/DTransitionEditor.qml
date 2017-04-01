@@ -181,8 +181,17 @@ DPaneBase {
         }
 
         onItemSelected: {
-            // Set Enabled
-            addTransitionOption.enabled = false;
+            // Check Selected Item Index
+            if (itemIndex === 0) {
+                return;
+            }
+
+            // Check Selected Item Index
+            if (itemIndex > 2) {
+                // Set Enabled
+                addTransitionOption.enabled = false;
+            }
+
             // Signal New Transition Node
             transitionEditorRoot.newTransitionNode(itemIndex);
         }

@@ -974,8 +974,11 @@ void ComponentInfo::removeProperty(const QString& aName)
     int opIndex = opKeys.indexOf(aName);
     // Check Own Property Index
     if (opIndex >= 0) {
-        // Remove Value
-        mOwnProperties.remove(aName);
+        // Check If Prototype
+        if (mProtoType) {
+            // Remove Value
+            mOwnProperties.remove(aName);
+        }
     } else {
         // Remove Value
         mProperties.remove((aName));
@@ -983,6 +986,29 @@ void ComponentInfo::removeProperty(const QString& aName)
 
     // Set Dirty
     setDirty(true);
+}
+
+//==============================================================================
+// Check If Has Property
+//==============================================================================
+bool ComponentInfo::hasProperty(const QString& aName)
+{
+    // Get Keys
+    QStringList opKeys = mOwnProperties.keys();
+    // Get Property Index
+    int opIndex = opKeys.indexOf(aName);
+
+    // Check Property Index
+    if (opIndex >= 0) {
+        return true;
+    }
+
+    // Check Parent
+    if (mParent && mParent->hasProperty(aName)) {
+        return true;
+    }
+
+    return false;
 }
 
 //==============================================================================

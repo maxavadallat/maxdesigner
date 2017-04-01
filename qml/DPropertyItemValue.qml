@@ -15,9 +15,14 @@ Item {
     property string propertyType: "type"
     property string propertyValue: "value"
 
+    property alias propertyValueMin: propertyValueSpinner.minValue
+    property alias propertyValueMax: propertyValueSpinner.maxValue
+
     property alias editorFocus: propertyValueEditor.editorFocus
     property alias editorEnabled: propertyValueEditor.enabled
     property alias editorMouseSelection: propertyValueEditor.mouseSelection
+
+    property int valueEditorWidth: width - nameLabel.width - DStyle.defaultSpacing
 
     signal accepted()
 
@@ -63,11 +68,58 @@ Item {
 
         DTextInput {
             id: propertyValueEditor
-            width: propertyItemValueRoot.width - nameLabel.width - DStyle.defaultSpacing - DStyle.defaultMargin * 0
+            width: propertyItemValueRoot.valueEditorWidth
             anchors.verticalCenter: parent.verticalCenter
             text: propertyItemValueRoot.propertyValue
+            visible: {
+                // Switch Property Type
+                switch (propertyItemValueRoot.propertyType) {
+                    case CONSTS.propertyTypes[1]:
+                    case CONSTS.propertyTypes[2]:
+                    case CONSTS.propertyTypes[3]:   return false;
+                }
+
+                return true;
+            }
+
             onAccepted: {
                 propertyItemValueRoot.accepted();
+            }
+        }
+
+        DSpinner {
+            id: propertyValueSpinner
+            width: propertyItemValueRoot.valueEditorWidth
+            visible: {
+                // Check Property Type
+                if (propertyItemValueRoot.propertyType === CONSTS.propertyTypes[1] ||
+                    propertyItemValueRoot.propertyType === CONSTS.propertyTypes[3]    ) {
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        Item {
+            width: propertyItemValueRoot.valueEditorWidth
+            height: CONSTS.defaultButtonHeight
+
+            visible: {
+                // Check Property Type
+                if (propertyItemValueRoot.propertyType === CONSTS.propertyTypes[2]) {
+                    return true;
+                }
+
+                return false;
+            }
+
+            DSwitch {
+                id: propertyValueSwitch
+                width: DStyle.switchWidth
+                anchors.right: parent.right
+                text: ""
+                checked: propertyItemValueRoot.propertyValue === "true"
             }
         }
     }

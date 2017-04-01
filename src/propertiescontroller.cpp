@@ -37,6 +37,9 @@ PropertiesController::PropertiesController(ProjectModel* aProjectModel, QObject*
 //==============================================================================
 void PropertiesController::init()
 {
+    // Set Filtered Properties
+    setFilteredProperties(QString("id,objectName,width,height,x,y,states,transitions,children").split(","));
+
     // ...
 }
 
@@ -108,7 +111,24 @@ void PropertiesController::clear()
         setFunctionsModel(NULL);
     }
 
+    // Clear Filtered Properties
+    mFilteredProperties.clear();
+
     // ...
+}
+
+//==============================================================================
+// Set Filtered Properties
+//==============================================================================
+void PropertiesController::setFilteredProperties(const QStringList& aProperties)
+{
+    // Check Filtered Properties
+    if (mFilteredProperties != aProperties) {
+        // Set Filtered Properties
+        mFilteredProperties = aProperties;
+        // Emit Filtered Properties Changed Signal
+        emit filteredPropertiesChanged(mFilteredProperties);
+    }
 }
 
 //==============================================================================
@@ -376,7 +396,7 @@ QString PropertiesController::cX()
 void PropertiesController::requestCX(const QString& aX)
 {
     // Check Focused Component
-    if (mFocusedComponent) {
+    if (mFocusedComponent && mFocusedComponent->mCategory != COMPONENT_CATEGORY_NONVISUAL) {
         // Set Pos X
         mFocusedComponent->setPosX(aX);
     }
@@ -396,7 +416,7 @@ QString PropertiesController::cY()
 void PropertiesController::requestCY(const QString& aY)
 {
     // Check Focused Component
-    if (mFocusedComponent) {
+    if (mFocusedComponent && mFocusedComponent->mCategory != COMPONENT_CATEGORY_NONVISUAL) {
         // Set Pos Y
         mFocusedComponent->setPosY(aY);
     }
@@ -416,7 +436,7 @@ QString PropertiesController::cZ()
 void PropertiesController::requestCZ(const QString& aZ)
 {
     // Check Focused Component
-    if (mFocusedComponent) {
+    if (mFocusedComponent && mFocusedComponent->mCategory != COMPONENT_CATEGORY_NONVISUAL) {
         // Set Pos Z
         mFocusedComponent->setPosZ(aZ);
     }
@@ -436,7 +456,7 @@ QString PropertiesController::cWidth()
 void PropertiesController::requestCWidth(const QString& aWidth)
 {
     // Check Focused Component
-    if (mFocusedComponent) {
+    if (mFocusedComponent && mFocusedComponent->mCategory != COMPONENT_CATEGORY_NONVISUAL) {
         // Set Width
         mFocusedComponent->setWidth(aWidth);
     }
@@ -456,10 +476,18 @@ QString PropertiesController::cHeight()
 void PropertiesController::requestCHeight(const QString& aHeight)
 {
     // Check Focused Component
-    if (mFocusedComponent) {
+    if (mFocusedComponent && mFocusedComponent->mCategory != COMPONENT_CATEGORY_NONVISUAL) {
         // Set Height
         mFocusedComponent->setHeight(aHeight);
     }
+}
+
+//==============================================================================
+// Get Filtered Properties
+//==============================================================================
+QStringList PropertiesController::filteredProperties()
+{
+    return mFilteredProperties;
 }
 
 //==============================================================================
@@ -521,12 +549,12 @@ ComponentFunctionsModel* PropertiesController::functionsModel()
 //==============================================================================
 // Add Own Property
 //==============================================================================
-void PropertiesController::addOwnComponentProperty(const QString& aName, const int& aType)
+void PropertiesController::addOwnComponentProperty(const QString& aName, const int& aType, const QVariant& aDefaultValue)
 {
     // Check Focused Component
     if (mFocusedComponent) {
         // Add Own Property
-        mFocusedComponent->addComponentOwnProperty(aName, (ComponentInfo::EPropertyType)aType);
+        mFocusedComponent->addComponentOwnProperty(aName, (ComponentInfo::EPropertyType)aType, aDefaultValue);
     }
 }
 

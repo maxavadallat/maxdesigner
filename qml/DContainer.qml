@@ -12,11 +12,7 @@ DMouseArea {
 
     default property alias mainContainer: contentContainer.children
 
-    //property bool focused: false
-
     property bool selected: false
-
-    property var model: null
 
     property int minWidth: 0
     property int minHeight: 0
@@ -33,36 +29,25 @@ DMouseArea {
     property alias enableContent: contentContainer.enabled
 
     property bool mainDrag: true
-
+    property bool enableDrag: true
+    property bool enablePanByKeys: true
     property bool enableResize: true
-
-    property bool setFocusOnResize: true
-
+    property bool setFocusOnResize: false
     property bool rootContainer: false
 
     property QtObject parentContainer: null
 
+    drag.target: enableDrag ? containerRoot : undefined
+    drag.minimumX: 0
+    drag.minimumY: 0
+    drag.maximumX: parent ? (parent.width - containerRoot.width) : 0
+    drag.maximumY: parent ? (parent.height - containerRoot.height) : 0
+    drag.threshold: 0
+    // For Some re
+    drag.filterChildren: true
+    //drag.smoothed: true
+
     signal resizePressed()
-
-    onPressed: {
-        //console.log("DContainer.onPressed");
-//        if (containerRoot.mainDrag && parent.setDragTarget !== undefined) {
-//            // Set Drag Target - ASSUMING Parent is MainGrabArea
-//            parent.setDragTarget(containerRoot);
-//        }
-    }
-
-    onReleased: {
-        //console.log("DContainer.onReleased");
-//        if (containerRoot.mainDrag && parent.clearDragTarget !== undefined) {
-//            // Clear Drag Target - ASSUMING Parent is MainGrabArea
-//            parent.clearDragTarget();
-//        }
-    }
-
-    onFocusChanged: {
-        //console.log("DContainer.onFocusChanged - focus: " + focus);
-    }
 
     Keys.onPressed: {
         //console.log("DContainer.Keys.onPressed - key: " + event.key);
@@ -70,7 +55,7 @@ DMouseArea {
         switch (event.key) {
             case Qt.Key_Left:
                 // Check Auto repeat
-                if (event.isAutoRepeat) {
+                if (enablePanByKeys && event.isAutoRepeat) {
                     // Move Left
                     containerRoot.x -= CONSTS.componentMoveStep;
                 }
@@ -78,7 +63,7 @@ DMouseArea {
 
             case Qt.Key_Right:
                 // Check Auto repeat
-                if (event.isAutoRepeat) {
+                if (enablePanByKeys && event.isAutoRepeat) {
                     // Move Left
                     containerRoot.x += CONSTS.componentMoveStep;
                 }
@@ -86,7 +71,7 @@ DMouseArea {
 
             case Qt.Key_Up:
                 // Check Auto repeat
-                if (event.isAutoRepeat) {
+                if (enablePanByKeys && event.isAutoRepeat) {
                     // Move Left
                     containerRoot.y -= CONSTS.componentMoveStep;
                 }
@@ -94,7 +79,7 @@ DMouseArea {
 
             case Qt.Key_Down:
                 // Check Auto repeat
-                if (event.isAutoRepeat) {
+                if (enablePanByKeys && event.isAutoRepeat) {
                     // Move Left
                     containerRoot.y += CONSTS.componentMoveStep;
                 }
@@ -121,7 +106,7 @@ DMouseArea {
 
             case Qt.Key_Left:
                 // Check Auto repeat
-                if (!event.isAutoRepeat) {
+                if (enablePanByKeys && !event.isAutoRepeat) {
                     // Move Left
                     containerRoot.x -= CONSTS.componentMoveStep;
                 }
@@ -129,7 +114,7 @@ DMouseArea {
 
             case Qt.Key_Right:
                 // Check Auto repeat
-                if (!event.isAutoRepeat) {
+                if (enablePanByKeys && !event.isAutoRepeat) {
                     // Move Left
                     containerRoot.x += CONSTS.componentMoveStep;
                 }
@@ -137,7 +122,7 @@ DMouseArea {
 
             case Qt.Key_Up:
                 // Check Auto repeat
-                if (!event.isAutoRepeat) {
+                if (enablePanByKeys && !event.isAutoRepeat) {
                     // Move Left
                     containerRoot.y -= CONSTS.componentMoveStep;
                 }
@@ -145,14 +130,10 @@ DMouseArea {
 
             case Qt.Key_Down:
                 // Check Auto repeat
-                if (!event.isAutoRepeat) {
+                if (enablePanByKeys && !event.isAutoRepeat) {
                     // Move Left
                     containerRoot.y += CONSTS.componentMoveStep;
                 }
-            break;
-
-            case Qt.Key_T:
-                settingsController.tracerVisible = !settingsController.tracerVisible;
             break;
 
             // ...
@@ -167,12 +148,19 @@ DMouseArea {
         border.color: containerRoot.borderColor
     }
 
+    // THIS IS ONLY FOR THE drag.filterChildren to work
+    MouseArea {
+        anchors.fill: parent
+    }
+
+    // Content Container
     Item {
         id: contentContainer
         anchors.fill: parent
         clip: true
     }
 
+    // Position Indicator
     DPosIndicator {
         id: posIndicator
         anchors.left: parent.left
@@ -182,6 +170,7 @@ DMouseArea {
         posY: containerRoot.y
     }
 
+    // Size Indicator
     DSizeIndicator {
         id: sizeIndicator
         anchors.centerIn: parent
@@ -190,6 +179,7 @@ DMouseArea {
         sizeH: containerRoot.height
     }
 
+    // Resize Area - Top Left
     DResizeArea {
         id: topLeftResizer
         width: DStyle.resizeAreaSize * 1.5
@@ -234,6 +224,7 @@ DMouseArea {
         }
     }
 
+    // Resize Area - Top Center
     DResizeArea {
         id: topResizer
         width: parent.width - DStyle.resizeAreaSize * 2
@@ -270,6 +261,7 @@ DMouseArea {
         }
     }
 
+    // Resize Area - Top Right
     DResizeArea {
         id: topRightResizer
         width: DStyle.resizeAreaSize * 1.5
@@ -314,6 +306,7 @@ DMouseArea {
         }
     }
 
+    // Resize Area - Left
     DResizeArea {
         id: leftResizer
         width: DStyle.resizeAreaSize
@@ -350,6 +343,7 @@ DMouseArea {
         }
     }
 
+    // Resize Area - Right
     DResizeArea {
         id: rightResizer
         width: DStyle.resizeAreaSize
@@ -385,6 +379,7 @@ DMouseArea {
         }
     }
 
+    // Resize Area - Bottom Left
     DResizeArea {
         id: bottomLeftResizer
         width: DStyle.resizeAreaSize * 1.5
@@ -428,6 +423,7 @@ DMouseArea {
         }
     }
 
+    // Resize Area - Bottom Center
     DResizeArea {
         id: bottomResizer
         width: parent.width - DStyle.resizeAreaSize * 2
@@ -463,6 +459,7 @@ DMouseArea {
         }
     }
 
+    // Resize Area - Bottom Right
     DResizeArea {
         id: bottomRightResizer
         width: DStyle.resizeAreaSize * 1.5

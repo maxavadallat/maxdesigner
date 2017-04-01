@@ -845,7 +845,50 @@ void MainWindow::launchCreateView()
 //==============================================================================
 void MainWindow::launchLiveWindow()
 {
-    // ...
+    // Check Live Window
+    if (!mLiveWindow) {
+        // Create Live Window
+        mLiveWindow = new LiveWindow();
+    }
+
+    // Show Live Window
+    mLiveWindow->show();
+}
+
+//==============================================================================
+// Toggle Show Tracers
+//==============================================================================
+void MainWindow::toggleShowTracers()
+{
+    // Check Settings
+    if (mSettings) {
+        // Set Show Tracers
+        mSettings->setTracerVisible(!mSettings->tracerVisible());
+    }
+}
+
+//==============================================================================
+// Toggle Show Component Names
+//==============================================================================
+void MainWindow::toggleShowComponentNames()
+{
+    // Check Settings
+    if (mSettings) {
+        // Set Show Component Names Visible
+        mSettings->setComponentNamesVisible(!mSettings->componentNamesVisible());
+    }
+}
+
+//==============================================================================
+// Toggle Slow Motion
+//==============================================================================
+void MainWindow::toggleSlowMotion()
+{
+    // Check Settings
+    if (mSettings) {
+        // Set Slow Motion
+        mSettings->setSlowMotion(!mSettings->slowMotion());
+    }
 }
 
 //==============================================================================
@@ -1076,6 +1119,7 @@ void MainWindow::updateComponent()
         return;
     }
 
+    // ...
 }
 
 //==============================================================================
@@ -1083,6 +1127,12 @@ void MainWindow::updateComponent()
 //==============================================================================
 void MainWindow::closeProject()
 {
+    // Check Open Fies Model
+    if (mOpenFiles) {
+        // Close Current Project
+        mOpenFiles->closeProject();
+    }
+
     // Check Project Model
     if (!mProjectModel) {
         return;
@@ -1091,8 +1141,7 @@ void MainWindow::closeProject()
     // Check Properties Controller
     if (mPropertiesController) {
         // Reset Focused Component
-        mPropertiesController->setFocusedComponent(NULL
-                                                   );
+        mPropertiesController->setFocusedComponent(NULL);
     }
 
     qDebug() << "MainWindow::closeProject";
@@ -1701,6 +1750,33 @@ void MainWindow::on_actionGoLive_triggered()
 }
 
 //==============================================================================
+// Action Show Tracers Triggered Slot
+//==============================================================================
+void MainWindow::on_actionShowTracers_triggered()
+{
+    // Toggle Show Tracers
+    toggleShowTracers();
+}
+
+//==============================================================================
+// Action Show Component Names Triggered Slot
+//==============================================================================
+void MainWindow::on_actionShowComponentNames_triggered()
+{
+    // Toggle Show Component Names
+    toggleShowComponentNames();
+}
+
+//==============================================================================
+// Action Slow Motion Triggered Slot
+//==============================================================================
+void MainWindow::on_actionSlowMotion_triggered()
+{
+    // Toggle Slow Motion
+    toggleSlowMotion();
+}
+
+//==============================================================================
 // Action Quit Triggered Slot
 //==============================================================================
 void MainWindow::on_actionQuit_triggered()
@@ -1862,3 +1938,4 @@ MainWindow::~MainWindow()
 
     qDebug() << "MainWindow deleted.";
 }
+

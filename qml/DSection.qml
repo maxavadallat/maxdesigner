@@ -27,6 +27,8 @@ Item {
 
     clip: false
 
+    visible: opacity > 0.0
+
     function open() {
         // Set State
         sectionRoot.state = sectionRoot.stateOpen;
@@ -113,18 +115,17 @@ Item {
     states: [
         State {
             name: sectionRoot.stateHidden
-            PropertyChanges { target: sectionRoot; height: 0 }
-            PropertyChanges { target: sectionRoot; opacity: 0.0 }
+            PropertyChanges { target: sectionRoot; height: 0; opacity: 0.0 }
         },
 
         State {
             name: sectionRoot.stateClosed
-            PropertyChanges { target: sectionRoot; height: DStyle.headerHeight }
+            PropertyChanges { target: sectionRoot; height: DStyle.headerHeight; opacity: 1.0 }
         },
 
         State {
             name: sectionRoot.stateOpen
-            PropertyChanges { target: sectionRoot; height: sectionRoot.openedHeight }
+            PropertyChanges { target: sectionRoot; height: sectionRoot.openedHeight; opacity: 1.0 }
         }
     ]
 

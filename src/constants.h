@@ -201,7 +201,6 @@
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_VAR                 "var"
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_OBJECT              "QtObject"
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_LIST                "list<QtObject>"
-#define JSON_VALUE_PROPERTY_TYPE_PREFIX_FORMULA             "formula"
 
 
 // Default/Basec JSON Keys For Component Properties

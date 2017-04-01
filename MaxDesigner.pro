@@ -38,7 +38,7 @@ SOURCES             += src/settingscontroller.cpp \
                     src/componentpropertiesmodel.cpp \
                     src/componentownpropertiesmodel.cpp \
                     src/componentownpropertiesfilter.cpp \
-		    src/componentfunctionsmodel.cpp
+                    src/componentfunctionsmodel.cpp
 
 # Views/Dialog Sources
 SOURCES             += src/mainwindow.cpp \
@@ -86,7 +86,7 @@ HEADERS             += src/settingscontroller.h \
                     src/componentpropertiesmodel.h \
                     src/componentownpropertiesmodel.h \
                     src/componentownpropertiesfilter.h \
-    		    src/componentfunctionsmodel.h
+                    src/componentfunctionsmodel.h
 
 # View/Dialog Headers
 HEADERS             += src/mainwindow.h \

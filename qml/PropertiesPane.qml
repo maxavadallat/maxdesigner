@@ -17,8 +17,37 @@ DPane {
         onFocusedComponentChanged: {
             // Check Focused Component
             if (propertiesController.focusedComponent !== null) {
-                // Open Sections
-                sizeAndPosSection.open();
+                // Check Focused Component
+                if (propertiesController.focusedComponent.componentCategory === "NonVisual") {
+                    // Hide Size And Pos Section
+                    sizeAndPosSection.hide();
+                    // Hide Anchors Section
+                    anchorsSection.hide();
+                } else {
+                    // Check If Root Component
+                    if (propertiesController.focusedComponent.isRoot) {
+                        // Set Position Row Height
+                        posRow.height = 0;
+                        // Hide Anchors Section
+                        anchorsSection.hide();
+                    } else {
+                        posRow.height = DStyle.spinnerHeight;
+                        // Open Anchors Section
+                        anchorsSection.open();
+                    }
+
+                    // Open Sections
+                    sizeAndPosSection.open();
+                }
+
+                // Check Focused Component
+                if (!propertiesController.focusedComponent.hasProperty("state")) {
+                    statesSection.hide();
+                    transitionsSection.hide();
+                } else {
+                    statesSection.close();
+                    transitionsSection.close();
+                }
 
             } else {
                 // Close All Sections
@@ -87,7 +116,7 @@ DPane {
     signal newTransitionLaunch()
     signal editTransitionLaunch()
 
-
+    // ID Row
     Row {
         id: idRow
         spacing: 2
@@ -99,10 +128,20 @@ DPane {
         }
 
         DTextInput {
+            id: idEditor
             width: propertiesPaneRoot.contentWidth - idTitle.width - 2
+            text: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentID : ""
+            onAccepted: {
+                // Request ID
+                propertiesController.requestCID(text);
+                // Bind To Focused Component ID
+                text = Qt.binding(function() {
+                    return propertiesController.focusedComponent ? propertiesController.focusedComponent.componentID : "";
+                })
+            }
         }
     }
-
+    // Object Name Row
     Row {
         id: objectNameRow
         spacing: 2
@@ -115,7 +154,17 @@ DPane {
         }
 
         DTextInput {
+            id: objectNameEditor
             width: propertiesPaneRoot.contentWidth - objectNameTitle.width - 2
+            text: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentObjectName : ""
+            onAccepted: {
+                // Request Object Name
+                propertiesController.requestCObjectName(text);
+                // Bind To Focused Component Object Name
+                text = Qt.binding(function() {
+                    return propertiesController.focusedComponent ? propertiesController.focusedComponent.componentObjectName : "";
+                })
+            }
         }
     }
 
@@ -124,7 +173,7 @@ DPane {
         width: propertiesPaneRoot.contentWidth
         height: DStyle.defaultSpacing
     }
-
+    // Size & Pos Section
     DSection {
         id: sizeAndPosSection
         width: propertiesPaneRoot.contentWidth
@@ -132,7 +181,6 @@ DPane {
         minHeight: sizeAndPosFlow.height
 
         state: stateClosed
-        //state: stateOpen
 
         DFlow {
             id: sizeAndPosFlow
@@ -141,17 +189,8 @@ DPane {
             Row {
                 id: posRow
                 spacing: DStyle.defaultSpacing
-
-//                opacity: {
-//                    if (propertiesController.focusedComponent && propertiesController.focusedComponent.isRoot) {
-//                        return 0.0;
-//                    }
-
-//                    return 1.0;
-//                }
-
-//                Behavior on opacity { DFadeAnimation { } }
-//                visible: opacity > 0.0
+                Behavior on height { DAnimation { } }
+                clip: true
 
                 DText {
                     width: 24
@@ -161,8 +200,18 @@ DPane {
                 }
 
                 DSpinner {
+                    id: xSpinner
                     anchors.verticalCenter: parent.verticalCenter
                     value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.posX) : 0
+                    onValueIncreased: {
+                        propertiesController.requestCX(newValue);
+                    }
+                    onValueDecreased: {
+                        propertiesController.requestCX(newValue);
+                    }
+                    onValueEntered: {
+                        propertiesController.requestCX(newValue);
+                    }
                 }
 
                 DText {
@@ -173,8 +222,18 @@ DPane {
                 }
 
                 DSpinner {
+                    id: ySpinner
                     anchors.verticalCenter: parent.verticalCenter
                     value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.posY) : 0
+                    onValueIncreased: {
+                        propertiesController.requestCY(newValue);
+                    }
+                    onValueDecreased: {
+                        propertiesController.requestCY(newValue);
+                    }
+                    onValueEntered: {
+                        propertiesController.requestCY(newValue);
+                    }
                 }
             }
 
@@ -190,8 +249,19 @@ DPane {
                 }
 
                 DSpinner {
+                    id: widthSpinner
                     anchors.verticalCenter: parent.verticalCenter
                     value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.width) : 0
+                    minValue: 0
+                    onValueIncreased: {
+                        propertiesController.requestCWidth(newValue);
+                    }
+                    onValueDecreased: {
+                        propertiesController.requestCWidth(newValue);
+                    }
+                    onValueEntered: {
+                        propertiesController.requestCWidth(newValue);
+                    }
                 }
 
                 DText {
@@ -202,13 +272,24 @@ DPane {
                 }
 
                 DSpinner {
+                    id: heightSpinner
                     anchors.verticalCenter: parent.verticalCenter
                     value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.height) : 0
+                    minValue: 0
+                    onValueIncreased: {
+                        propertiesController.requestCHeight(newValue);
+                    }
+                    onValueDecreased: {
+                        propertiesController.requestCHeight(newValue);
+                    }
+                    onValueEntered: {
+                        propertiesController.requestCHeight(newValue);
+                    }
                 }
             }
         }
     }
-
+    // Anchors Section
     DSection {
         id: anchorsSection
         width: propertiesPaneRoot.contentWidth
@@ -389,7 +470,7 @@ DPane {
         }
 
     }
-
+    // Own Properties Section
     DSection {
         id: ownPropertiesSection
         width: propertiesPaneRoot.contentWidth
@@ -417,15 +498,17 @@ DPane {
             id: ownPropertiesContainer
             width: propertiesPaneRoot.contentWidth
             height: CONSTS.defaultPaneItemHeight * Math.min(CONSTS.defaultOwnPropertiesMax, ownPropertiesListView.count)
+            Behavior on height { DAnimation { } }
 
             DListView {
                 id: ownPropertiesListView
                 anchors.fill: parent
 
-//                model: ComponentOwnPropertiesFilter {
-//                    sourceModel: propertiesController.ownPropertiesModel
-//                }
-                model: propertiesController.ownPropertiesModel
+                model: ComponentOwnPropertiesFilter {
+                    filteredNames: propertiesController.filteredProperties
+                    sourceModel: propertiesController.ownPropertiesModel
+                }
+//                model: propertiesController.ownPropertiesModel
 
                 delegate: DPropertyItem {
                     id: opiDelegateRoot
@@ -445,6 +528,8 @@ DPane {
                     onFormulaEditClicked: {
                         console.log("ownPropertiesListView.delegate.onDeleteItemClicked - itemIndex: " + itemIndex);
 
+                        // Emit Edit Formula Launch Signal
+                        propertiesPaneRoot.editFormulaLaunch();
                         // ...
                     }
                 }
@@ -466,7 +551,7 @@ DPane {
             }
         }
     }
-
+    // Signals Section
     DSection {
         id: signalsSection
         width: propertiesPaneRoot.contentWidth
@@ -498,7 +583,7 @@ DPane {
             }
         }
     }
-
+    // Functions Section
     DSection {
         id: functionsSection
         width: propertiesPaneRoot.contentWidth
@@ -530,7 +615,7 @@ DPane {
             }
         }
     }
-
+    // States Section
     DSection {
         id: statesSection
         width: propertiesPaneRoot.contentWidth
@@ -564,7 +649,7 @@ DPane {
             }
         }
     }
-
+    // Transitions Section
     DSection {
         id: transitionsSection
         width: propertiesPaneRoot.contentWidth
@@ -598,13 +683,16 @@ DPane {
             }
         }
     }
-
+    // BAse Properties Section
     DSection {
         id: basePropertiesSection
         width: propertiesPaneRoot.contentWidth
         title: "Item"
 
         state: stateHidden
-        //state: stateOpen
+
+//        onStateChanged: {
+//            console.log("basePropertiesSection.onStateChanged - state: " + basePropertiesSection.state);
+//        }
     }
 }

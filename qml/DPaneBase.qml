@@ -28,8 +28,6 @@ DContainer {
     property QtObject parentPane: null
     property QtObject childPane: null
 
-    property QtObject transitionTarget: null
-
     property int lastShownX: creationX
     property int lastShownY: creationY
 
@@ -65,15 +63,15 @@ DContainer {
             return initialX - creationWidth - 32;
         }
 
-        return 32;
+        return initialX + 32;
     }
 
     property int creationY: {
         if (hideToSide === hideToTop) {
-            return 32;
+            return initialY + 32;
         }
 
-        return initialY - creationHeight * 0.5
+        return initialY - creationHeight * 0.5;
     }
 
     property int creationWidth: 320
@@ -195,6 +193,8 @@ DContainer {
 
     clipContent: true
 
+    state: stateCreate
+
     signal accepted()
     signal rejected()
 
@@ -254,9 +254,9 @@ DContainer {
     onPressed: {
         //console.log("DPaneBase.onPressed");
         // Check Set Drag Target
-        if (paneBaseRoot.parent.setDragTarget !== undefined) {
+        if (paneBaseRoot.parent.bringToFront !== undefined) {
             // Set Drag Target - ASSUMING Parent is MainGrabArea
-            paneBaseRoot.parent.setDragTarget(paneBaseRoot);
+            paneBaseRoot.parent.bringToFront(paneBaseRoot);
         }
     }
 
@@ -268,9 +268,9 @@ DContainer {
 
     onResizePressed: {
         // Check Set Drag Target
-        if (paneBaseRoot.parent.setDragTarget !== undefined) {
+        if (paneBaseRoot.parent.bringToFront !== undefined) {
             // Set Drag Target
-            paneBaseRoot.parent.setDragTarget(paneBaseRoot);
+            paneBaseRoot.parent.bringToFront(paneBaseRoot);
         }
     }
 
@@ -312,6 +312,11 @@ DContainer {
 
     // Show
     function show() {
+        // Check Parent Pane State
+        if (parentPane && parentPane.state !== stateShown) {
+            return;
+        }
+
         // Set State
         paneBaseRoot.state = stateShown;
     }
@@ -352,7 +357,7 @@ DContainer {
 
     // Bring To Front
     function bringToFront() {
-        if (paneBaseRoot.parent.bringToFront !== undefined) {
+        if (paneBaseRoot.parent && paneBaseRoot.parent.bringToFront !== undefined) {
             paneBaseRoot.parent.bringToFront(paneBaseRoot);
         }
     }
@@ -410,22 +415,18 @@ DContainer {
         onPressed: {
             //console.log("DPaneBase.topMouseArea.onPressed");
             // Check Set Drag Target
-            if (paneBaseRoot.parent.setDragTarget !== undefined) {
+            if (paneBaseRoot.parent.bringToFront !== undefined) {
                 // Set Drag Target - ASSUMING Parent is MainGrabArea
-                paneBaseRoot.parent.setDragTarget(paneBaseRoot);
+                paneBaseRoot.parent.bringToFront(paneBaseRoot);
             }
 
+            // Set Mouse Event Accepted
             mouse.accepted = false;
         }
 
         onReleased: {
             //console.log("DPaneBase.topMouseArea.onReleased");
-            // Check Clear Drag Target
-            if (paneBaseRoot.parent.clearDragTarget !== undefined) {
-                // Set Drag Target - ASSUMING Parent is MainGrabArea
-                paneBaseRoot.parent.clearDragTarget();
-            }
-
+            // Set Mouse Event Accepted
             mouse.accepted = false;
         }
     }

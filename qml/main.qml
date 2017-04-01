@@ -79,15 +79,6 @@ Item {
 
     // Close All Root Components
     function closeRootComponents() {
-//        // Get Root Components Count
-//        var rcCount = mainRoot.rootComponents.length;
-//        // Iterate Through Root Component
-//        for (var i=0; i<rcCount; i++) {
-//            // Get Root Component
-//            var rComponent = mainRoot.rootComponents[i];
-//            // Close Root Component
-//            rComponent.reset(true);
-//        }
     }
 
     // Keys Handling
@@ -127,8 +118,8 @@ Item {
                 // Set Open Recent Files On Show Finished
                 openRecentFilesOnShowFinished = false;
 
-                // Close Root Components
-                closeRootComponents();
+//                // Close Root Components
+//                closeRootComponents();
 
                 // Reset Project Pane
                 projectPane.reset(false);
@@ -292,8 +283,6 @@ Item {
         ProjectPane {
             id: projectPane
 
-            state: stateCreate
-
             onTransitionFinished: {
                 // Check New State
                 if (newState === stateShown) {
@@ -312,7 +301,10 @@ Item {
         PropertiesPane {
             id: propertiesPane
 
-            state: stateCreate
+            onEditFormulaLaunch: {
+                // Show Formula Editor
+                formulaEditor.show();
+            }
 
             onNewPropertyLaunch: {
                 // Show Property Editor
@@ -327,6 +319,18 @@ Item {
             onNewSignalLaunch: {
                 // Show Signal Editor
                 signalEditor.show();
+            }
+
+            onNewFunctionLaunch: {
+                // Show Function Editor
+
+                // ...
+            }
+
+            onEditFunctionLaunch: {
+                // Show Function Editor
+
+                // ...
             }
 
             onEditSignalLaunch: {
@@ -370,7 +374,6 @@ Item {
 
             // ...
 
-            state: stateCreate
         }
 
         // Signal Editor
@@ -386,8 +389,6 @@ Item {
             childPane: signalParameterEditor
 
             // ...
-
-            state: stateCreate
 
             onNewParameter: {
                 // Show Signal Parameter Editor
@@ -407,8 +408,6 @@ Item {
             creationY: initialY + 32
 
             parentPane: signalEditor
-
-            state: stateCreate
         }
 
         // Formula Editor
@@ -422,9 +421,6 @@ Item {
             creationY: initialY - formulaEditor.height * 0.5
 
             // ...
-
-            state: stateCreate
-            //state: stateShown
         }
 
         // State Editor
@@ -441,14 +437,13 @@ Item {
 
             // ...
 
-            state: stateCreate
-
             onNewPropertyChange: {
                 // Show Property Changes Editor
                 propertyChangesEditor.show();
             }
         }
 
+        // Property Changes Editor
         DPropertyChangesEditor {
             id: propertyChangesEditor
 
@@ -460,8 +455,6 @@ Item {
 
             parentPane: stateEditor
 
-            state: stateCreate
-
             // ...
 
         }
@@ -472,9 +465,6 @@ Item {
 
             initialX: propertiesPane.x
             initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
-
-
-            state: stateCreate
 
             // ...
 
@@ -491,8 +481,6 @@ Item {
             creationY: initialY - transitionEditor.height * 0.5
 
             childPane: transitionNodeEditor
-
-            state: stateCreate
 
             // ...
 
@@ -513,8 +501,6 @@ Item {
             creationY: initialY + 32
 
             parentPane: transitionEditor
-
-            state: stateCreate
 
             // ...
 

@@ -5,6 +5,7 @@ import enginecomponents 0.1
 
 import "DConstants.js" as CONSTS
 import "style"
+import "system"
 
 DRectangle {
     id: demoContainerRoot
@@ -13,23 +14,28 @@ DRectangle {
     height: 800
 
     clip: true
-    focus: true
 
     border.color: demoContainerRoot.focus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
 
-    Keys.onReleased: {
-        switch (event.key) {
-
-            case Qt.Key_F8:
-                settingsController.slowMotion = !settingsController.slowMotion;
-            break;
-
-            case Qt.Key_T:
-                settingsController.tracerVisible = !settingsController.tracerVisible;
-            break;
-
-            // ...
+    // Bring To Front
+    function bringToFront(item) {
+        // Check Item
+        if (item === null || item === undefined) {
+            return;
         }
+
+        // Get Item Position
+        var posX = item.x;
+        var posY = item.y;
+
+        // Set Item Parent To null To Remove From Children
+        item.parent = null;
+        // Set Item Parent To Bring To Front
+        item.parent = demoContainerRoot;
+
+        // Set Item Position
+        item.x = posX;
+        item.y = posY;
     }
 
     MouseArea {
@@ -45,10 +51,27 @@ DRectangle {
         height: 512
     }
 
-    DPropertyItem {
-        id: opiDelegateRoot
-        width: 300
-        anchors.centerIn: parent
+
+//    DPropertyItem {
+//        id: opiDelegateRoot
+//        width: 300
+//        anchors.centerIn: parent
+//    }
+
+    DContainer {
+        id: demoContainer
+        Component.onCompleted: {
+            x = (parent.width - width) * 0.5;
+            y = (parent.height - height) * 0.5;
+        }
+
+//        DText {
+//            anchors.left: parent.left
+//            anchors.leftMargin: 16
+//            anchors.top: parent.top
+//            anchors.topMargin: 16
+//            text: "Example"
+//        }
     }
 
     Flow {
@@ -62,6 +85,19 @@ DRectangle {
         layoutDirection: Qt.RightToLeft
 
         spacing: DStyle.defaultSpacing
+
+        DButton {
+            width: 196
+            text: formulaEditor.state === formulaEditor.stateCreate ? "Create Formula Editor" : "Reset Formula Editor"
+
+            onClicked: {
+                if (formulaEditor.state === formulaEditor.stateCreate) {
+                    formulaEditor.show();
+                } else {
+                    formulaEditor.reset(false);
+                }
+            }
+        }
 
         DButton {
             width: 128
@@ -158,21 +194,27 @@ DRectangle {
 
     }
 
+    // Formula Editor
+    DFormulaEditor {
+        id: formulaEditor
+
+//        initialX: parent.width - 32
+//        initialY: parent.height * 0.5
+
+//        creationX: initialX - formulaEditor.width - 32
+//        creationY: initialY - formulaEditor.height * 0.5
+
+        // ...
+    }
+
     // Property Editor
     DPropertyEditor {
         id: propertyEditor
-
-        //initialX: propertiesPane.x
-        //initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
-
-        state: stateCreate
     }
 
     // Signal Editor
     DSignalEditor {
         id: signalEditor
-
-        state: stateCreate
 
         childPane: signalParameterEditor
 
@@ -186,22 +228,18 @@ DRectangle {
     DSignalParameterEditor {
         id: signalParameterEditor
 
-        state: stateCreate
-
         parentPane: signalEditor
 
         initialX: signalEditor.x + signalEditor.width * 0.5
         initialY: signalEditor.y + signalEditor.height
 
-        creationX: initialX - signalParameterEditor.width * 0.5
-        creationY: initialY + 32
+//        creationX: initialX - signalParameterEditor.width * 0.5
+//        creationY: initialY + 32
     }
 
     // State Editor
     DStateEditor {
         id: stateEditor
-
-        state: stateCreate
 
         childPane: propertyChangesEditor
 
@@ -215,8 +253,6 @@ DRectangle {
     DPropertyChangesEditor {
         id: propertyChangesEditor
 
-        state: stateCreate
-
         parentPane: stateEditor
 
         initialX: stateEditor.x + stateEditor.width * 0.5
@@ -229,8 +265,6 @@ DRectangle {
     // Transition Editor
     DTransitionEditor {
         id: transitionEditor
-
-        state: stateCreate
 
         childPane: transitionNodeEditor
 
@@ -422,22 +456,25 @@ DRectangle {
         anchors.centerIn: parent
     }
 */
-//    DSourceContainer {
-//        id: sourceContainerDemo
-//        width: 600
-//        height: 500
-//        anchors.centerIn: parent
-//    }
-
-//    DActivityIndicator {
-//        width: 420
-//        height: 420
-//        anchors.centerIn: parent
-//        running: true
-//    }
-
-//    DColorTest {
-//        id: colorTest
-//    }
-
+/*
+    DSourceContainer {
+        id: sourceContainerDemo
+        width: 600
+        height: 500
+        anchors.centerIn: parent
+    }
+*/
+/*
+    DActivityIndicator {
+        width: 420
+        height: 420
+        anchors.centerIn: parent
+        running: true
+    }
+*/
+/*
+    DColorTest {
+        id: colorTest
+    }
+*/
 }

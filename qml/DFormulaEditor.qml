@@ -5,28 +5,36 @@ import "style"
 DPaneBase {
     id: formulaEditorRoot
 
-//    width: DStyle.formulaEdiorWidth
-//    height: DStyle.formulaEditorHeight
+    property string propertyName: "name"
 
-    title: "Formula" // Id
+    title: propertyName + " - Formula"
 
-    enablePosOverlay: false
-    enableSizeOverlay: false
+    hideToSide: hideToRight
+
+    creationWidth: DStyle.formulaEdiorWidth
+    creationHeight: DStyle.formulaEditorHeight
 
     minWidth: DStyle.formulaEdiorWidth
     minHeight: DStyle.formulaEditorHeight
 
-    enablePaneContent: true
+    enablePosOverlay: false
+    enableSizeOverlay: false
 
-    setFocusOnResize: false
+    //borderColor: formulaEditor.editorFocus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
 
-    topMouseAreaVisible: true
+    onTransitionStarted: {
+        if (newState === stateHidden) {
+            // Reset Focus
+            formulaEditor.setEditorFocus(false);
+        }
+    }
 
-    hideToSide: hideToRight
-
-    clipContent: true
-
-    //border.color: textInput.editor.focus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
+    onTransitionFinished: {
+        if (newState === stateShown) {
+            // Set Editor Focus
+            formulaEditor.setEditorFocus(true, true);
+        }
+    }
 
     DText {
         id: label
@@ -38,18 +46,36 @@ DPaneBase {
         opacity: formulaEditorRoot.state === formulaEditorRoot.stateShown ? 1.0 : 0.0
     }
 
-    DTextInput {
-        id: textInput
+    DSourceCodeEditor {
+        id: formulaEditor
         anchors.fill: parent
         anchors {
             leftMargin: DStyle.defaultMargin
             topMargin: label.height + DStyle.defaultMargin * 2
-            rightMargin: DStyle.defaultMargin
+            rightMargin: diskButton.width + DStyle.defaultMargin * 4
             bottomMargin: DStyle.defaultMargin
         }
 
-        fixTextSize: true
-        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-        editor.font.family: "Courier New"
+        onSourceEditorActivated: {
+            // Bring To Front
+            formulaEditorRoot.bringToFront();
+        }
+
+        onEscapeClicked: {
+            // Reject
+            formulaEditorRoot.rejected();
+        }
+    }
+
+    DDisc {
+        id: diskButton
+        anchors.right: parent.right
+        anchors.rightMargin: DStyle.defaultMargin * 2
+        anchors.verticalCenter: parent.verticalCenter
+
+        onClicked: {
+            // Emit Accepted Signal
+            formulaEditorRoot.accepted();
+        }
     }
 }

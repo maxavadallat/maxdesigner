@@ -8,19 +8,23 @@ import "DConstants.js" as CONSTS
 DPaneBase {
     id: propertyEditorRoot
 
-    hideToSide: hideToRight
+    property ComponentInfo componentInfo: null
+
+    property alias propertyName: nameEditor.text
+    property alias propertyType: typeOption.currentIndex
+    property alias propertyDefault: defaultEditor.text
 
     title: "New Property"
 
+    hideToSide: hideToRight
+
     creationWidth: 332
-    creationHeight: 118
+    creationHeight: 148
 
     minWidth: 332
-    minHeight: 118
+    minHeight: 148
 
     enableResize: false
-
-    property ComponentInfo componentInfo: null
 
     onTransitionStarted: {
         if (newState === stateHidden) {
@@ -106,15 +110,65 @@ DPaneBase {
                 id: typeOption
                 //width: propertyEditorRoot.width - 64
                 anchors.verticalCenter: parent.verticalCenter
+
                 model: [
-                    DPopupItemObject { text: "string" },
-                    DPopupItemObject { text: "int" },
-                    DPopupItemObject { text: "bool" },
-                    DPopupItemObject { text: "double" },
-                    DPopupItemObject { text: "var" },
-                    DPopupItemObject { text: "QtObject" }
+                    DPopupItemObject { text: CONSTS.propertyTypes[0] },
+                    DPopupItemObject { text: CONSTS.propertyTypes[1] },
+                    DPopupItemObject { text: CONSTS.propertyTypes[2] },
+                    DPopupItemObject { text: CONSTS.propertyTypes[3] },
+                    DPopupItemObject { text: CONSTS.propertyTypes[4] },
+                    DPopupItemObject { text: CONSTS.propertyTypes[5] },
+                    DPopupItemObject { text: CONSTS.propertyTypes[6] }
                 ]
 
+                onZChanged: {
+                    parent.z = typeOption.z;
+                }
+
+                onItemSelected: {
+                    // Set Focus
+                    nameEditor.setEditorFocus(true, true);
+                    // Switch Selected Index
+                    switch (itemIndex) {
+                        default:    defaultEditor.text = "";        break;
+                        case 1:     defaultEditor.text = "0";       break;
+                        case 2:     defaultEditor.text = "false";   break;
+                        case 3:     defaultEditor.text = "0.0";     break;
+                        case 5:     defaultEditor.text = "null";    break;
+                    }
+                }
+
+                onKeyEvent: {
+                    switch (event.key) {
+                        case Qt.Key_Escape:
+                            // Reset
+                            propertyEditorRoot.dismissPane(true);
+                        break;
+
+                        case Qt.Key_Tab:
+                            // Set Focus
+                            defaultEditor.setEditorFocus(true, true);
+                        break;
+                    }
+                }
+            }
+        }
+
+        Row {
+            spacing: DStyle.defaultSpacing
+
+            DText {
+                id: defaultLabel
+                width: 58
+                anchors.verticalCenter: parent.verticalCenter
+                horizontalAlignment: Text.AlignRight
+                text: "Default:"
+            }
+
+            DTextInput {
+                id: defaultEditor
+                width: typeOption.width
+                anchors.verticalCenter: parent.verticalCenter
                 onKeyEvent: {
                     switch (event.key) {
                         case Qt.Key_Escape:

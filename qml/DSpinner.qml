@@ -12,11 +12,12 @@ DControl {
 
     property double step: 1.0
 
-    property double minValue: -100.0
-    property double maxValue: 100.0
+    property double minValue: Number.MIN_VALUE
+    property double maxValue: Number.MAX_VALUE
 
     signal valueIncreased(var newValue)
     signal valueDecreased(var newValue)
+    signal valueEntered(var newValue)
     signal textUpdated(var newValue)
 
     Component.onCompleted: {
@@ -31,30 +32,30 @@ DControl {
         }
     }
 
+    // Increase Value
     function incValue() {
+        // Calculate New Value
         var newValue = Math.min(spinnerRoot.value + spinnerRoot.step, spinnerRoot.maxValue);
+        // Check New Value
         if (newValue !== value) {
             valueIncreased(newValue);
         }
     }
 
+    // Decrease Value
     function decValue() {
+        // Calculate New Value
         var newValue = Math.max(spinnerRoot.value - spinnerRoot.step, spinnerRoot.minValue);
+        // Check New Value
         if (newValue !== value) {
             valueDecreased(newValue);
         }
     }
 
-//    Rectangle {
-//        anchors.fill: parent
-//        color: "transparent"
-//        border.color: "orange"
-//    }
-
     DTextInput {
         id: textInput
 
-        width: parent.width - buttonsColumn.width
+        width: parent.width
         height: DStyle.spinnerHeight
 
         editor.inputMethodHints: Qt.ImhDigitsOnly
@@ -67,14 +68,29 @@ DControl {
         pixelSize: DStyle.fontSizeM
         showClearButton: false
 
+        onAccepted: {
+            // Calculate New Value
+            var newValue = Math.min(spinnerRoot.maxValue, Math.max(spinnerRoot.minValue, Number(textInput.text)));
+            // Check New Value
+            if (newValue !== value) {
+                // Emit Value Entered Signal
+                valueEntered(newValue);
+            }
+        }
+
         onTextChanged: {
             if (textInput.text === "-") {
                 return;
             }
 
+            // Calculate New Value
             var newValue = Math.min(spinnerRoot.maxValue, Math.max(spinnerRoot.minValue, Number(textInput.text)));
-            if (newValue !== value)
+
+            // Check New Value
+            if (newValue !== value) {
+                // Emit Text Updated Signal
                 textUpdated(newValue);
+            }
         }
 
         onKeyEvent: {
@@ -96,106 +112,100 @@ DControl {
                         textInput.text = "";
                     }
                 } break;
+
+                case Qt.Key_Escape: {
+                    textInput.text = String(spinnerRoot.value);
+                } break;
             }
         }
-    }
 
-    Column {
-        id: buttonsColumn
-        width: DStyle.spinnerButtonWidth
-
-        anchors.right: parent.right
-        //anchors.rightMargin: DStyle.defaultMargin
-        anchors.verticalCenter: parent.verticalCenter
-
-        DMouseArea {
+        Column {
+            id: buttonsColumn
             width: DStyle.spinnerButtonWidth
-            height: DStyle.spinnerButtonHeight
+
             anchors.right: parent.right
+            //anchors.rightMargin: DStyle.defaultMargin
+            anchors.verticalCenter: parent.verticalCenter
 
-            onClicked: {
-                // Set Focus To Text Input
-                textInput.setEditorFocus(true);
-                // Inc Value
-                spinnerRoot.incValue();
-            }
+            DMouseArea {
+                width: DStyle.spinnerButtonWidth
+                height: DStyle.spinnerButtonHeight
+                anchors.right: parent.right
 
-            onPressAndHold: {
-                // Set Focus To Text Input
-                textInput.setEditorFocus(true);
-                // Start Repeat Timer
-                incTimer.running = true;
-            }
-
-            onReleased: {
-                // Stop Repeat Timer
-                incTimer.running = false;
-            }
-
-//            Rectangle {
-//                anchors.fill: parent
-//                color: "transparent"
-//                border.color: "lime"
-//            }
-
-            DText {
-                anchors.centerIn: parent
-                text: "+"
-                color: parent.pressed ? DStyle.colorBorder : DStyle.colorFontDark
-            }
-
-            Timer {
-                id: incTimer
-                repeat: true
-                interval: DStyle.spinnerButtonTimer
-                onTriggered: {
+                onClicked: {
+                    // Set Focus To Text Input
+                    textInput.setEditorFocus(true);
+                    // Inc Value
                     spinnerRoot.incValue();
                 }
-            }
-        }
 
-        DMouseArea {
-            width: DStyle.spinnerButtonWidth
-            height: DStyle.spinnerButtonHeight
-            anchors.right: parent.right
+                onPressAndHold: {
+                    // Set Focus To Text Input
+                    textInput.setEditorFocus(true);
+                    // Start Repeat Timer
+                    incTimer.running = true;
+                }
 
-            onClicked: {
-                // Set Focus To Text Input
-                textInput.setEditorFocus(true);
-                // Dec Value
-                spinnerRoot.decValue();
-            }
+                onReleased: {
+                    // Stop Repeat Timer
+                    incTimer.running = false;
+                }
 
-            onPressAndHold: {
-                // Set Focus To Text Input
-                textInput.setEditorFocus(true);
-                // Start Repeat Timer
-                decTimer.running = true;
-            }
+                DText {
+                    anchors.centerIn: parent
+                    anchors.verticalCenterOffset: 2
+                    text: "+"
+                    color: parent.pressed ? DStyle.colorBorder : DStyle.colorFontDark
+                }
 
-            onReleased: {
-                // Stop Repeat Timer
-                decTimer.running = false;
-            }
-
-//            Rectangle {
-//                anchors.fill: parent
-//                color: "transparent"
-//                border.color: "lime"
-//            }
-
-            DText {
-                anchors.centerIn: parent
-                text: "-"
-                color: parent.pressed ? DStyle.colorBorder : DStyle.colorFontDark
+                Timer {
+                    id: incTimer
+                    repeat: true
+                    interval: DStyle.spinnerButtonTimer
+                    onTriggered: {
+                        spinnerRoot.incValue();
+                    }
+                }
             }
 
-            Timer {
-                id: decTimer
-                repeat: true
-                interval: DStyle.spinnerButtonTimer
-                onTriggered: {
+            DMouseArea {
+                width: DStyle.spinnerButtonWidth
+                height: DStyle.spinnerButtonHeight
+                anchors.right: parent.right
+
+                onClicked: {
+                    // Set Focus To Text Input
+                    textInput.setEditorFocus(true);
+                    // Dec Value
                     spinnerRoot.decValue();
+                }
+
+                onPressAndHold: {
+                    // Set Focus To Text Input
+                    textInput.setEditorFocus(true);
+                    // Start Repeat Timer
+                    decTimer.running = true;
+                }
+
+                onReleased: {
+                    // Stop Repeat Timer
+                    decTimer.running = false;
+                }
+
+                DText {
+                    anchors.centerIn: parent
+                    anchors.verticalCenterOffset: -3
+                    text: "-"
+                    color: parent.pressed ? DStyle.colorBorder : DStyle.colorFontDark
+                }
+
+                Timer {
+                    id: decTimer
+                    repeat: true
+                    interval: DStyle.spinnerButtonTimer
+                    onTriggered: {
+                        spinnerRoot.decValue();
+                    }
                 }
             }
         }

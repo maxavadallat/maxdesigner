@@ -53,3 +53,7 @@ var defaultOwnPropertiesMax                     = 7;
 
 // Default Swipe Area Width
 var defaultSwipeAreaWidth                       = 16;
+
+// Property Types
+var propertyTypes                               = ["string", "int", "bool", "double", "var", "object", "list"];
+

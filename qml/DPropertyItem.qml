@@ -35,8 +35,9 @@ Item {
         id: propertyItemFlipable
         anchors.fill: parent
         anchors.rightMargin: CONSTS.defaultSwipeAreaWidth
-        //handleDoubleClick: false
         enabled: !propertyItemRoot.markFordeletion
+
+        flipped: propertyItemRoot.propertyValue.length > 0 && propertyItemRoot.propertyValue[0] === "{"
 
         front: DPropertyItemValue {
             width: propertyItemFlipable.width
@@ -52,6 +53,8 @@ Item {
         back: DPropertyItemFormula {
             width: propertyItemFlipable.width
             height: propertyItemFlipable.height
+            propertyName: propertyItemRoot.propertyName
+            propertyFormula: propertyItemRoot.propertyValue
             onFormulaEditClicked: {
                 // Emit Formula Edit Clicked Signal
                 propertyItemRoot.formulaEditClicked(propertyItemRoot.itemIndex);
