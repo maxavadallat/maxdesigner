@@ -655,7 +655,7 @@ DContainer {
                 ScriptAction {
                     script: {
                         // Reset Cliping Content
-                        paneBaseRoot.clipContent = false;
+                        paneBaseRoot.clipContent = true;
                         // Emit Transition Finished Signal
                         paneBaseRoot.transitionFinished(stateShown);
                     }
@@ -761,7 +761,7 @@ DContainer {
                 ScriptAction {
                     script: {
                         // Reset Cliping Content
-                        paneBaseRoot.clipContent = false;
+                        paneBaseRoot.clipContent = true;
                         // Emit Transition Finished Signal
                         paneBaseRoot.transitionFinished(stateShown);
                     }
@@ -788,7 +788,7 @@ DContainer {
                         // Set Hide Button Text
                         hideButtonText.text = paneBaseRoot.title;
                         // Reset Cliping Content
-                        //paneBaseRoot.clipContent = true;
+                        paneBaseRoot.clipContent = true;
                         // Emit Transition Finished Signal
                         paneBaseRoot.transitionFinished(stateHidden);
                     }

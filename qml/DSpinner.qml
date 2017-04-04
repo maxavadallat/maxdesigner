@@ -97,25 +97,25 @@ DControl {
             //console.log("DSpinner.textInput.onKeyEvent - event.key: " + event.key);
             // Switch Key
             switch (event.key) {
-                case Qt.Key_Down: {
+                case Qt.Key_Down:
                     // Dec Value
                     spinnerRoot.decValue();
-                } break;
+                break;
 
-                case Qt.Key_Up: {
+                case Qt.Key_Up:
                     // Inc Value
                     spinnerRoot.incValue();
-                } break;
+                break;
 
-                case Qt.Key_Backspace: {
+                case Qt.Key_Backspace:
                     if (textInput.text === "NaN") {
                         textInput.text = "";
                     }
-                } break;
+                break;
 
-                case Qt.Key_Escape: {
+                case Qt.Key_Escape:
                     textInput.text = String(spinnerRoot.value);
-                } break;
+                break;
             }
         }
 

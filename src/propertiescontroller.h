@@ -7,13 +7,18 @@
 
 class ProjectModel;
 class ComponentInfo;
+class ComponentImportsModel;
 class ComponentOwnPropertiesModel;
 class ComponentPropertiesModel;
 class ComponentAnchorsModel;
 class ComponentSignalsModel;
+class ComponentSlotsModel;
 class ComponentStatesModel;
 class ComponentTransitionsModel;
+class ComponentTransition;
+class ComponentTransitionNode;
 class ComponentFunctionsModel;
+
 
 //==============================================================================
 // Properties Controller Class
@@ -37,9 +42,11 @@ class PropertiesController : public QObject
 
     Q_PROPERTY(QStringList filteredProperties READ filteredProperties WRITE setFilteredProperties NOTIFY filteredPropertiesChanged)
 
+    Q_PROPERTY(ComponentImportsModel* importsModel READ importsModel WRITE setImportsModel NOTIFY importsModelChanged)
     Q_PROPERTY(ComponentOwnPropertiesModel* ownPropertiesModel READ ownPropertiesModel NOTIFY ownPropertiesModelChanged)
     Q_PROPERTY(ComponentAnchorsModel* anchorsModel READ anchorsModel NOTIFY anchorsModelChanged)
     Q_PROPERTY(ComponentSignalsModel* signalsModel READ signalsModel NOTIFY signalsModelChanged)
+    Q_PROPERTY(ComponentSlotsModel* slotsModel READ slotsModel WRITE setSlotsModel NOTIFY slotsModelChanged)
     Q_PROPERTY(ComponentStatesModel* statesModel READ statesModel NOTIFY statesModelChanged)
     Q_PROPERTY(ComponentTransitionsModel* transitionsModel READ transitionsModel NOTIFY transitionsModelChanged)
     Q_PROPERTY(ComponentPropertiesModel* propertiesModel READ propertiesModel NOTIFY propertiesModelChanged)
@@ -99,12 +106,16 @@ public:
     // Get Filtered Properties
     QStringList filteredProperties();
 
+    // Get Imports Model
+    ComponentImportsModel* importsModel();
     // Get Anchors Model
     ComponentAnchorsModel* anchorsModel();
     // Get Own Properties Model
     ComponentOwnPropertiesModel* ownPropertiesModel();
     // Get Signals Model
     ComponentSignalsModel* signalsModel();
+    // Get Slots Model
+    ComponentSlotsModel* slotsModel();
     // Get States Model
     ComponentStatesModel* statesModel();
     // Get Transitins Model
@@ -113,6 +124,11 @@ public:
     ComponentPropertiesModel* propertiesModel();
     // Get Functions Model
     ComponentFunctionsModel* functionsModel();
+
+    // Add Import
+    Q_INVOKABLE void addComponentImport(const QString& aImport);
+    // Remove Import
+    Q_INVOKABLE void removeComponentImport(const int& aIndex);
 
     // Add Own Property
     Q_INVOKABLE void addOwnComponentProperty(const QString& aName, const int& aType, const QVariant& aDefaultValue = QVariant());
@@ -123,20 +139,73 @@ public:
     // Clear Property
     Q_INVOKABLE void clearComponentProperty(const QString& aName);
 
+    // Anchors
+
     // Add Signal
-    Q_INVOKABLE void addSignal(const QString& aSignalDef);
+    Q_INVOKABLE void addSignal(const QString& aName, const QStringList& aParameters = QStringList());
     // Remove Signal
-    Q_INVOKABLE void removeSignal(const QString& aSignalDef);
+    Q_INVOKABLE void removeSignal(const int& aindex);
+
+    // Add Slot
+    Q_INVOKABLE void addSlot(const QString& aName, const QString& aSource = "");
+    // Remove Slot
+    Q_INVOKABLE void removeSlot(const int& aIndex);
+
+    // Add Function
+    Q_INVOKABLE void addFunction(const QString& aName, const QStringList& aParameters = QStringList(), const QString& aSource = "");
+    // Remove Function
+    Q_INVOKABLE void removeFunction(const int& aIndex);
 
     // Add State
-    Q_INVOKABLE void addState(const QString& aName);
+    Q_INVOKABLE void addState(const QString& aName, const QString& aWhen = "");
     // Remove State
-    Q_INVOKABLE void removeState(const QString& aName);
+    Q_INVOKABLE void removeState(const int& aIndex);
+    // Add Property Change
+    Q_INVOKABLE void addPropertyChange(const QString& aStateName, const QString& aTarget, const QString& aProperty, const QString& aValue);
+
 
     // Add Transition
     Q_INVOKABLE void addTransition(const QString& aFrom, const QString& aTo);
     // Remove Transition
-    Q_INVOKABLE void removeTransition(const QString& aFrom, const QString& aTo);
+    Q_INVOKABLE void removeTransition(const int& aIndex);
+    // Remove Transition
+    Q_INVOKABLE void removeTransition(ComponentTransition* aTransition);
+
+    // Add Parallel Animation Node
+    Q_INVOKABLE void addParallelAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode);
+    // Remove Parallel Animation Node
+    Q_INVOKABLE void removeParallelAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode);
+    // Add Sequential Animation Node
+    Q_INVOKABLE void addSequentialAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode);
+    // Remove Sequential Animation Node
+    Q_INVOKABLE void removeSequentialAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode);
+    // Add Pause Animation Node
+    Q_INVOKABLE void addPauseAnimation(const QString& aDuration, ComponentTransition* aTransition, ComponentTransitionNode* aParentNode);
+    // Remove Pause Animation Node
+    Q_INVOKABLE void removePauseAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode);
+    // Add Property Animation Node
+    Q_INVOKABLE void addPropertyAnimation(const QString& aTarget,
+                                          const QString& aProperty,
+                                          const QString& aFrom,
+                                          const QString& aTo,
+                                          const QString& aDuration,
+                                          const QString& aEasing,
+                                          ComponentTransition* aTransition,
+                                          ComponentTransitionNode* aParentNode);
+    // Remove Property Animation Node
+    Q_INVOKABLE void removePropertyAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode);
+    // Add Property Action Node
+    Q_INVOKABLE void addPropertyAction(const QString& aTarget, const QString& aProperty, const QString& aValue, ComponentTransition* aTransition, ComponentTransitionNode* aParentNode);
+    // Remove Property Action Node
+    Q_INVOKABLE void removePropertyActionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode);
+    // Add Script Action Node
+    Q_INVOKABLE void addScriptAction(const QString& aScript, ComponentTransition* aTransition, ComponentTransitionNode* aParentNode);
+    // Remove Script Action Node
+    Q_INVOKABLE void removeScriptActionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode);
+    // Remove Transition Node
+    Q_INVOKABLE void removeTransitionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode);
+    // Move Transition Node
+    Q_INVOKABLE void moveTransitionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode, ComponentTransitionNode* aNewParentNode, const int& aIndex);
 
     // ...
 
@@ -166,14 +235,18 @@ signals:
     // Filtered Properties Changed Signal
     void filteredPropertiesChanged(const QStringList& aProperties);
 
+    // Imports Model Changed Signal
+    void importsModelChanged(ComponentImportsModel* aImportsModel);
     // Anchors Model Changed Signal
-    void anchorsModelChanged(ComponentAnchorsModel* aAncorsModel);
+    void anchorsModelChanged(ComponentAnchorsModel* aAnchorsModel);
     // Own Properties Model Changed Signal
     void ownPropertiesModelChanged(ComponentOwnPropertiesModel* aOwnPropertiesModel);
     // Properties Model Changed Signal
     void propertiesModelChanged(ComponentPropertiesModel* aPropertiesModel);
     // Singals Model Changed Signal
     void signalsModelChanged(ComponentSignalsModel* aSignalsModel);
+    // Slots Model Changed Signal
+    void slotsModelChanged(ComponentSlotsModel* aSlotsModel);
     // States Model Changed Signal
     void statesModelChanged(ComponentStatesModel* aStatesModel);
     // Transitions Model Changed Signal
@@ -192,6 +265,8 @@ private:
     // Set Filtered Properties
     void setFilteredProperties(const QStringList& aProperties);
 
+    // Set Imports Model
+    void setImportsModel(ComponentImportsModel* aImportsModel);
     // Set Anchors Model
     void setAnchorsModel(ComponentAnchorsModel* aAnchorsModel);
     // Set Own Properties Model
@@ -200,6 +275,8 @@ private:
     void setPropertiesModel(ComponentPropertiesModel* aPropertiesModel);
     // Set Signals Model
     void setSignalsModel(ComponentSignalsModel* aSignalsModel);
+    // Set Slots Model
+    void setSlotsModel(ComponentSlotsModel* aSlotsModel);
     // Set States Model
     void setStatesModel(ComponentStatesModel* aStatesModel);
     // Set Transitions Model
@@ -217,20 +294,24 @@ private: // Data
     // Filtered Properties
     QStringList                     mFilteredProperties;
 
+    // Imports
+    ComponentImportsModel*          mComponentImports;
     // Anchors
     ComponentAnchorsModel*          mComponentAnchors;
     // Own Properties
     ComponentOwnPropertiesModel*    mComponentOwnProperties;
+    // Properties
+    ComponentPropertiesModel*       mComponentProperties;
     // Signals
     ComponentSignalsModel*          mComponentSignals;
+    // Slots
+    ComponentSlotsModel*            mComponentSlots;
+    // Functions
+    ComponentFunctionsModel*        mComponentFunctions;
     // States
     ComponentStatesModel*           mComponentStates;
     // Transitions
     ComponentTransitionsModel*      mComponentTransitions;
-    // Properties
-    ComponentPropertiesModel*       mComponentProperties;
-    // Functions
-    ComponentFunctionsModel*        mComponentFunctions;
 };
 
 #endif // PROPERTIESCONTROLLER_H

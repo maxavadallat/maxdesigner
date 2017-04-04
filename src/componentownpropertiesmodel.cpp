@@ -23,6 +23,14 @@ ComponentOwnPropertiesModel::ComponentOwnPropertiesModel(ComponentInfo* aCompone
 //==============================================================================
 void ComponentOwnPropertiesModel::init()
 {
+    // Check Current Component
+    if (mComponent) {
+        // Connect Signals
+        connect(mComponent, SIGNAL(ownPropertiesUpdated()), this, SLOT(propertiesUpdated()));
+        connect(mComponent, SIGNAL(ownPropertyAdded(int)), this, SLOT(propertyAdded(int)));
+        connect(mComponent, SIGNAL(ownPropertyRemoved(int)), this, SLOT(propertyRemoved(int)));
+    }
+
     // ...
 }
 
@@ -32,6 +40,50 @@ void ComponentOwnPropertiesModel::init()
 void ComponentOwnPropertiesModel::clear()
 {
     // ...
+}
+
+//==============================================================================
+// Own Property Added Slot
+//==============================================================================
+void ComponentOwnPropertiesModel::propertyAdded(const int& aIndex)
+{
+    // Begin Inser Rows
+    beginInsertRows(QModelIndex(), aIndex, aIndex);
+
+    // ...
+
+    // End Insert Rows
+    endInsertRows();
+}
+
+//==============================================================================
+// Own Property Removed Slot
+//==============================================================================
+void ComponentOwnPropertiesModel::propertyRemoved(const int& aIndex)
+{
+    // Begin Remove Rows
+    beginRemoveRows(QModelIndex(), aIndex, aIndex);
+
+    // ...
+
+    // End Remove Rows
+    endRemoveRows();
+}
+
+//==============================================================================
+// Properties Updated Slot
+//==============================================================================
+void ComponentOwnPropertiesModel::propertiesUpdated()
+{
+    //qDebug() << "ComponentOwnPropertiesModel::propertiesUpdated";
+
+    // Begin Reset Model
+    beginResetModel();
+
+    // ...
+
+    // End Reset Model
+    endResetModel();
 }
 
 //==============================================================================
@@ -49,12 +101,29 @@ void ComponentOwnPropertiesModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
+        // Check Current Component
+        if (mComponent) {
+            // Disconnect Signals
+            disconnect(mComponent, SIGNAL(ownPropertiesUpdated()), this, SLOT(propertiesUpdated()));
+            disconnect(mComponent, SIGNAL(ownPropertyAdded(int)), this, SLOT(propertyAdded(int)));
+            disconnect(mComponent, SIGNAL(ownPropertyRemoved(int)), this, SLOT(propertyRemoved(int)));
+        }
+
         // Begin Reset Model
         beginResetModel();
         // Set Current Component
         mComponent = aComponent;
         // End Reset Model
         endResetModel();
+
+        // Check Current Component
+        if (mComponent) {
+            // Connect Signals
+            connect(mComponent, SIGNAL(ownPropertiesUpdated()), this, SLOT(propertiesUpdated()));
+            connect(mComponent, SIGNAL(ownPropertyAdded(int)), this, SLOT(propertyAdded(int)));
+            connect(mComponent, SIGNAL(ownPropertyRemoved(int)), this, SLOT(propertyRemoved(int)));
+        }
+
         // Emit Current Component Changed Signal
         emit currentComponentChanged(mComponent);
     }

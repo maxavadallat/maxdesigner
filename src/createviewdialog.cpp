@@ -78,6 +78,8 @@ int CreateViewDialog::viewHeight()
 void CreateViewDialog::reset()
 {
     ui->viewNameEdit->clear();
+    ui->viewNameEdit->setFocus();
+
     ui->widthEdit->clear();
     ui->heightEdit->clear();
 

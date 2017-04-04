@@ -150,7 +150,7 @@ DPane {
             id: objectNameTitle
             //width: propertiesPaneRoot.contentWidth
             anchors.verticalCenter: parent.verticalCenter
-            text: "Object Name:"
+            text: "objectName:"
         }
 
         DTextInput {
@@ -508,12 +508,13 @@ DPane {
                     filteredNames: propertiesController.filteredProperties
                     sourceModel: propertiesController.ownPropertiesModel
                 }
-//                model: propertiesController.ownPropertiesModel
 
                 delegate: DPropertyItem {
                     id: opiDelegateRoot
                     width: ownPropertiesListView.width
                     namesColumnWidth: propertiesPaneRoot.namesColumnWidth
+
+                    itemIndex: index
 
                     propertyName: pName
                     propertyType: pType
@@ -521,6 +522,10 @@ DPane {
 
                     onItemActionClicked: {
                         console.log("ownPropertiesListView.delegate.onDeleteItemClicked - itemIndex: " + itemIndex);
+                        //console.log("sourceIndex: " + ownPropertiesListView.opfilter.getSourceIndex(itemIndex));
+
+                        // Remove Component Property
+                        propertiesController.removeComponentProperty(propertyName);
 
                         // ...
                     }

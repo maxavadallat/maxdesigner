@@ -3,9 +3,11 @@
 #include "propertiescontroller.h"
 #include "projectmodel.h"
 #include "componentinfo.h"
+#include "componentimportsmodel.h"
 #include "componentownpropertiesmodel.h"
 #include "componentpropertiesmodel.h"
 #include "componentsignalsmodel.h"
+#include "componentslotsmodel.h"
 #include "componentanchorsmodel.h"
 #include "componentstatesmodel.h"
 #include "componenttransitionsmodel.h"
@@ -19,13 +21,15 @@ PropertiesController::PropertiesController(ProjectModel* aProjectModel, QObject*
     : QObject(aParent)
     , mProject(aProjectModel)
     , mFocusedComponent(NULL)
+    , mComponentImports(NULL)
     , mComponentAnchors(NULL)
     , mComponentOwnProperties(NULL)
+    , mComponentProperties(NULL)
     , mComponentSignals(NULL)
+    , mComponentSlots(NULL)
+    , mComponentFunctions(NULL)
     , mComponentStates(NULL)
     , mComponentTransitions(NULL)
-    , mComponentProperties(NULL)
-    , mComponentFunctions(NULL)
 {
     qDebug() << "PropertiesController created.";
     // Init
@@ -48,6 +52,15 @@ void PropertiesController::init()
 //==============================================================================
 void PropertiesController::clear()
 {
+    // Check Component Imports Model
+    if (mComponentImports) {
+        // Delete Component Imports Model
+        delete mComponentImports;
+        mComponentImports = NULL;
+        // Set Component Imports Model
+        setImportsModel(NULL);
+    }
+
     // Check Component Anchors Model
     if (mComponentAnchors) {
         // Delete Component Anchors Model
@@ -73,6 +86,15 @@ void PropertiesController::clear()
         mComponentSignals = NULL;
         // Set Component Signals Model
         setSignalsModel(NULL);
+    }
+
+    // Check Component Slots Model
+    if (mComponentSlots) {
+        // Delete Compoennt Slots Model
+        delete mComponentSlots;
+        mComponentSlots = NULL;
+        // Set Component Slots Model
+        setSlotsModel(mComponentSlots);
     }
 
     // Check Component States Model
@@ -132,6 +154,20 @@ void PropertiesController::setFilteredProperties(const QStringList& aProperties)
 }
 
 //==============================================================================
+// Set Imports Model
+//==============================================================================
+void PropertiesController::setImportsModel(ComponentImportsModel* aImportsModel)
+{
+    // Check Component Imports Model
+    if (mComponentImports != aImportsModel) {
+        // Set Component Imports Model
+        mComponentImports = aImportsModel;
+        // Emit Component Imports Model Changed Signal
+        emit importsModelChanged(mComponentImports);
+    }
+}
+
+//==============================================================================
 // Set Anchors Model
 //==============================================================================
 void PropertiesController::setAnchorsModel(ComponentAnchorsModel* aAnchorsModel)
@@ -184,6 +220,20 @@ void PropertiesController::setSignalsModel(ComponentSignalsModel* aSignalsModel)
         mComponentSignals = aSignalsModel;
         // Emit Component Signals Model Changed Signal
         emit signalsModelChanged(mComponentSignals);
+    }
+}
+
+//==============================================================================
+// Set Slots Model
+//==============================================================================
+void PropertiesController::setSlotsModel(ComponentSlotsModel* aSlotsModel)
+{
+    // Check Component Slots Model
+    if (mComponentSlots != aSlotsModel) {
+        // Set Component Slots Model
+        mComponentSlots = aSlotsModel;
+        // Emit Component Slots Model Changed Signal
+        emit slotsModelChanged(mComponentSlots);
     }
 }
 
@@ -279,15 +329,26 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
         // Emit Focused Component Changed Signal
         emit focusedComponentChanged(mFocusedComponent);
 
+        // Check Imports Model
+        if (mComponentImports) {
+            // Set Current Component
+            mComponentImports->setCurrentComponent(aComponent);
+        } else {
+            // Create New Imports Model
+            ComponentImportsModel* newImportsModel = new ComponentImportsModel(mFocusedComponent);
+            // Set Component Imports Model
+            setImportsModel(newImportsModel);
+        }
+
         // Check Own Properties Model
         if (mComponentOwnProperties) {
             // Set Current Component
             mComponentOwnProperties->setCurrentComponent(aComponent);
         } else {
             // Create New Component Own Properties Model
-            ComponentOwnPropertiesModel* newOwnProperties = new ComponentOwnPropertiesModel(mFocusedComponent);
+            ComponentOwnPropertiesModel* newOwnPropertiesModel = new ComponentOwnPropertiesModel(mFocusedComponent);
             // Set Component Own Properties Model
-            setOwnPropertiesModel(newOwnProperties);
+            setOwnPropertiesModel(newOwnPropertiesModel);
         }
 
         // Check Anchors Model
@@ -302,6 +363,14 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
         if (mComponentSignals) {
             // Set Current Component
             mComponentSignals->setCurrentComponent(aComponent);
+        } else {
+
+        }
+
+        // Check Slots Model
+        if (mComponentSlots) {
+            // Set Current Component
+            mComponentSlots->setCurrentComponent(aComponent);
         } else {
 
         }
@@ -491,6 +560,14 @@ QStringList PropertiesController::filteredProperties()
 }
 
 //==============================================================================
+// Get Imports Model
+//==============================================================================
+ComponentImportsModel* PropertiesController::importsModel()
+{
+    return mComponentImports;
+}
+
+//==============================================================================
 // Get Anchors Model
 //==============================================================================
 ComponentAnchorsModel* PropertiesController::anchorsModel()
@@ -512,6 +589,14 @@ ComponentOwnPropertiesModel* PropertiesController::ownPropertiesModel()
 ComponentSignalsModel* PropertiesController::signalsModel()
 {
     return mComponentSignals;
+}
+
+//==============================================================================
+// Get Slots Model
+//==============================================================================
+ComponentSlotsModel* PropertiesController::slotsModel()
+{
+    return mComponentSlots;
 }
 
 //==============================================================================
@@ -547,6 +632,30 @@ ComponentFunctionsModel* PropertiesController::functionsModel()
 }
 
 //==============================================================================
+// Add Import
+//==============================================================================
+void PropertiesController::addComponentImport(const QString& aImport)
+{
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Add Import
+        mFocusedComponent->addImport(aImport);
+    }
+}
+
+//==============================================================================
+// Remove Import
+//==============================================================================
+void PropertiesController::removeComponentImport(const int& aIndex)
+{
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Remove Import
+        mFocusedComponent->removeImport(aIndex);
+    }
+}
+
+//==============================================================================
 // Add Own Property
 //==============================================================================
 void PropertiesController::addOwnComponentProperty(const QString& aName, const int& aType, const QVariant& aDefaultValue)
@@ -566,7 +675,7 @@ void PropertiesController::removeComponentProperty(const QString& aName)
     // Check Focused Component
     if (mFocusedComponent) {
         // Remove Property
-        mFocusedComponent->removeProperty(aName);
+        mFocusedComponent->removeComponentProperty(aName);
     }
 }
 
@@ -590,63 +699,115 @@ void PropertiesController::clearComponentProperty(const QString& aName)
     // Check Focused Component
     if (mFocusedComponent) {
         // Remove Property
-        mFocusedComponent->removeProperty(aName);
+        mFocusedComponent->removeComponentProperty(aName);
     }
 }
 
 //==============================================================================
 // Add Signal
 //==============================================================================
-void PropertiesController::addSignal(const QString& aSignalDef)
+void PropertiesController::addSignal(const QString& aName, const QStringList& aParameters)
 {
-    Q_UNUSED(aSignalDef);
-
     // Check Focused Component
     if (mFocusedComponent) {
-
-        // ...
+        // Add Signal
+        mFocusedComponent->addSignal(aName, aParameters);
     }
 }
 
 //==============================================================================
 // Remove Signal
 //==============================================================================
-void PropertiesController::removeSignal(const QString& aSignalDef)
+void PropertiesController::removeSignal(const int& aIndex)
 {
-    Q_UNUSED(aSignalDef);
-
     // Check Focused Component
     if (mFocusedComponent) {
+        // Remove Signal
+        mFocusedComponent->removeSignal(aIndex);
+    }
+}
 
-        // ...
+//==============================================================================
+// Add Slot
+//==============================================================================
+void PropertiesController::addSlot(const QString& aName, const QString& aSource)
+{
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Add Slot
+        mFocusedComponent->addSlot(aName, aSource);
+    }
+}
+
+//==============================================================================
+// Remove Slot
+//==============================================================================
+void PropertiesController::removeSlot(const int& aIndex)
+{
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Remove Slot
+        mFocusedComponent->removeSlot(aIndex);
+    }
+}
+
+//==============================================================================
+// Add Function
+//==============================================================================
+void PropertiesController::addFunction(const QString& aName, const QStringList& aParameters, const QString& aSource)
+{
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Add Function
+        mFocusedComponent->addFunction(aName, aParameters, aSource);
+    }
+}
+
+//==============================================================================
+// Remove Function
+//==============================================================================
+void PropertiesController::removeFunction(const int& aIndex)
+{
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Remove Function
+        mFocusedComponent->removeFunction(aIndex);
     }
 }
 
 //==============================================================================
 // Add State
 //==============================================================================
-void PropertiesController::addState(const QString& aName)
+void PropertiesController::addState(const QString& aName, const QString& aWhen)
 {
-    Q_UNUSED(aName);
-
     // Check Focused Component
     if (mFocusedComponent) {
-
-        // ...
+        // Add State
+        mFocusedComponent->addState(aName, aWhen);
     }
 }
 
 //==============================================================================
 // Remove State
 //==============================================================================
-void PropertiesController::removeState(const QString& aName)
+void PropertiesController::removeState(const int& aIndex)
 {
-    Q_UNUSED(aName);
-
     // Check Focused Component
     if (mFocusedComponent) {
+        // Remove State
+        mFocusedComponent->removeState(aIndex);
+    }
+}
 
-        // ...
+//==============================================================================
+// Add Property Change
+//==============================================================================
+void PropertiesController::addPropertyChange(const QString& aStateName, const QString& aTarget, const QString& aProperty, const QString& aValue)
+{
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Add Property Change
+        mFocusedComponent->addPropertyChange(aStateName, aTarget, aProperty, aValue);
     }
 }
 
@@ -655,12 +816,8 @@ void PropertiesController::removeState(const QString& aName)
 //==============================================================================
 void PropertiesController::addTransition(const QString& aFrom, const QString& aTo)
 {
-    Q_UNUSED(aFrom);
-    Q_UNUSED(aTo);
-
-    // Check Focused Component
-    if (mFocusedComponent) {
-
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
         // ...
     }
 }
@@ -668,19 +825,185 @@ void PropertiesController::addTransition(const QString& aFrom, const QString& aT
 //==============================================================================
 // Remove Transition
 //==============================================================================
-void PropertiesController::removeTransition(const QString& aFrom, const QString& aTo)
+void PropertiesController::removeTransition(const int& aIndex)
 {
-    Q_UNUSED(aFrom);
-    Q_UNUSED(aTo);
-
-    // Check Focused Component
-    if (mFocusedComponent) {
-
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
         // ...
     }
 }
 
-// ...
+//==============================================================================
+// Remove Transition
+//==============================================================================
+void PropertiesController::removeTransition(ComponentTransition* aTransition)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // ...
+    }
+}
+
+//==============================================================================
+// Add Parallel Animation Node
+//==============================================================================
+void PropertiesController::addParallelAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // ...
+    }
+}
+
+//==============================================================================
+// Remove Parallel Animation Node
+//==============================================================================
+void PropertiesController::removeParallelAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // ...
+    }
+}
+
+//==============================================================================
+// Add Sequential Animation Node
+//==============================================================================
+void PropertiesController::addSequentialAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // ...
+    }
+}
+
+//==============================================================================
+// Remove Sequential Animation Node
+//==============================================================================
+void PropertiesController::removeSequentialAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // ...
+    }
+}
+
+//==============================================================================
+// Add Pause Animation Node
+//==============================================================================
+void PropertiesController::addPauseAnimation(const QString& aDuration, ComponentTransition* aTransition, ComponentTransitionNode* aParentNode)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // ...
+    }
+}
+
+//==============================================================================
+// Remove Pause Animation Node
+//==============================================================================
+void PropertiesController::removePauseAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // ...
+    }
+}
+
+//==============================================================================
+// Add Property Animation Node
+//==============================================================================
+void PropertiesController::addPropertyAnimation(const QString& aTarget,
+                                                const QString& aProperty,
+                                                const QString& aFrom,
+                                                const QString& aTo,
+                                                const QString& aDuration,
+                                                const QString& aEasing,
+                                                ComponentTransition* aTransition,
+                                                ComponentTransitionNode* aParentNode)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // ...
+    }
+}
+
+//==============================================================================
+// Remove Property Animation Node
+//==============================================================================
+void PropertiesController::removePropertyAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // ...
+    }
+}
+
+//==============================================================================
+// Add Property Action Node
+//==============================================================================
+void PropertiesController::addPropertyAction(const QString& aTarget, const QString& aProperty, const QString& aValue, ComponentTransition* aTransition, ComponentTransitionNode* aParentNode)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // ...
+    }
+}
+
+//==============================================================================
+// Remove Property Action Node
+//==============================================================================
+void PropertiesController::removePropertyActionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // ...
+    }
+}
+
+//==============================================================================
+// Add Script Action Node
+//==============================================================================
+void PropertiesController::addScriptAction(const QString& aScript, ComponentTransition* aTransition, ComponentTransitionNode* aParentNode)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // ...
+    }
+}
+
+//==============================================================================
+// Remove Script Action Node
+//==============================================================================
+void PropertiesController::removeScriptActionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // ...
+    }
+}
+
+//==============================================================================
+// Remove Transition Node
+//==============================================================================
+void PropertiesController::removeTransitionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // ...
+    }
+}
+
+//==============================================================================
+// Move Transition Node
+//==============================================================================
+void PropertiesController::moveTransitionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode, ComponentTransitionNode* aNewParentNode, const int& aIndex)
+{
+    // Check Component Transitions Model
+    if (mComponentTransitions) {
+        // ...
+    }
+}
 
 //==============================================================================
 // Destructor

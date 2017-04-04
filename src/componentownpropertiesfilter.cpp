@@ -72,6 +72,14 @@ void ComponentOwnPropertiesFilter::setFilteredNames(const QStringList& aFiltered
 }
 
 //==============================================================================
+// Get Source Index
+//==============================================================================
+int ComponentOwnPropertiesFilter::getSourceIndex(const int& aIndex)
+{
+    return mapToSource(index(aIndex, 0)).row();
+}
+
+//==============================================================================
 // Filter Accepts Row
 //==============================================================================
 bool ComponentOwnPropertiesFilter::filterAcceptsRow(int sourceRow, const QModelIndex& aParentIndex) const

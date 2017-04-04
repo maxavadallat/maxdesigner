@@ -1,12 +1,14 @@
 #include <QDebug>
 
-#include "componentfunctionsmodel.h"
+#include "componentslotsmodel.h"
 #include "componentinfo.h"
+#include "propertiescontroller.h"
+#include "constants.h"
 
 //==============================================================================
 // Constructor
 //==============================================================================
-ComponentFunctionsModel::ComponentFunctionsModel(ComponentInfo* aComponent, QObject* aParent)
+ComponentSlotsModel::ComponentSlotsModel(ComponentInfo* aComponent, QObject* aParent)
     : QAbstractListModel(aParent)
     , mComponent(aComponent)
 {
@@ -17,10 +19,10 @@ ComponentFunctionsModel::ComponentFunctionsModel(ComponentInfo* aComponent, QObj
 //==============================================================================
 // Init
 //==============================================================================
-void ComponentFunctionsModel::init()
+void ComponentSlotsModel::init()
 {
-    // Load Compoennt Functions
-    loadComponentFunctions();
+    // Load Compoennt Slots
+    loadComponentSlots();
 
     // ...
 }
@@ -28,15 +30,15 @@ void ComponentFunctionsModel::init()
 //==============================================================================
 // Clear
 //==============================================================================
-void ComponentFunctionsModel::clear()
+void ComponentSlotsModel::clear()
 {
     // Begin Reset Model
     beginResetModel();
 
-    // Iterate Through Functions
-    while (mFunctions.count() > 0) {
+    // Iterate Through Slots
+    while (mSlots.count() > 0) {
         // Delete Last
-        delete mFunctions.takeLast();
+        delete mSlots.takeLast();
     }
 
     // End Reset Model
@@ -44,9 +46,9 @@ void ComponentFunctionsModel::clear()
 }
 
 //==============================================================================
-// Load Component Functions
+// Load Component Slots
 //==============================================================================
-void ComponentFunctionsModel::loadComponentFunctions()
+void ComponentSlotsModel::loadComponentSlots()
 {
     // Clear
     clear();
@@ -55,9 +57,9 @@ void ComponentFunctionsModel::loadComponentFunctions()
 }
 
 //==============================================================================
-// Save Component Functions
+// Save Component Slots
 //==============================================================================
-void ComponentFunctionsModel::saveComponentFunctions()
+void ComponentSlotsModel::saveComponentSlots()
 {
     // ...
 }
@@ -65,7 +67,7 @@ void ComponentFunctionsModel::saveComponentFunctions()
 //==============================================================================
 // Get Current Component
 //==============================================================================
-ComponentInfo* ComponentFunctionsModel::currentComponent()
+ComponentInfo* ComponentSlotsModel::currentComponent()
 {
     return mComponent;
 }
@@ -73,7 +75,7 @@ ComponentInfo* ComponentFunctionsModel::currentComponent()
 //==============================================================================
 // Set Current Component
 //==============================================================================
-void ComponentFunctionsModel::setCurrentComponent(ComponentInfo* aComponent)
+void ComponentSlotsModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
@@ -82,23 +84,23 @@ void ComponentFunctionsModel::setCurrentComponent(ComponentInfo* aComponent)
         // Emit Current Component Changed Signal
         emit currentComponentChanged(mComponent);
 
-        // Load Component Functions
-        loadComponentFunctions();
+        // Load Component Slots
+        loadComponentSlots();
     }
 }
 
 //==============================================================================
 // Row Count
 //==============================================================================
-int ComponentFunctionsModel::rowCount(const QModelIndex& ) const
+int ComponentSlotsModel::rowCount(const QModelIndex& ) const
 {
-    return mFunctions.count();
+    return mSlots.count();
 }
 
 //==============================================================================
 // Data
 //==============================================================================
-QVariant ComponentFunctionsModel::data(const QModelIndex& index, int role) const
+QVariant ComponentSlotsModel::data(const QModelIndex& index, int role) const
 {
     // Get Row
     int fmRow = index.row();
@@ -108,9 +110,8 @@ QVariant ComponentFunctionsModel::data(const QModelIndex& index, int role) const
         // Switch Role
         switch (role) {
             default:
-            case FMRNameRole:   return mFunctions[fmRow]->functionName();
-            case FMRParamsRole: return mFunctions[fmRow]->functionParameters();
-            case FMRSoureRole:  return mFunctions[fmRow]->functionSource();
+            case SMRNameRole:   return mSlots[fmRow]->slotName();
+            case SMRSoureRole:  return mSlots[fmRow]->slotSource();
         }
     }
 
@@ -120,14 +121,13 @@ QVariant ComponentFunctionsModel::data(const QModelIndex& index, int role) const
 //==============================================================================
 // Get Role Names
 //==============================================================================
-QHash<int, QByteArray> ComponentFunctionsModel::roleNames() const
+QHash<int, QByteArray> ComponentSlotsModel::roleNames() const
 {
     // Init Role Names
     QHash<int, QByteArray> rNames;
 
-    rNames[FMRNameRole]     = "fName";
-    rNames[FMRParamsRole]   = "fParams";
-    rNames[FMRSoureRole]    = "fSource";
+    rNames[SMRNameRole]     = "slotName";
+    rNames[SMRSoureRole]    = "slotSource";
 
     return rNames;
 }
@@ -135,7 +135,7 @@ QHash<int, QByteArray> ComponentFunctionsModel::roleNames() const
 //==============================================================================
 // Destructor
 //==============================================================================
-ComponentFunctionsModel::~ComponentFunctionsModel()
+ComponentSlotsModel::~ComponentSlotsModel()
 {
     // Clear
     clear();
@@ -162,126 +162,62 @@ ComponentFunctionsModel::~ComponentFunctionsModel()
 //==============================================================================
 // Constructor
 //==============================================================================
-ComponentFunction::ComponentFunction(QObject* aParent)
+ComponentSlot::ComponentSlot(QObject* aParent)
     : QObject(aParent)
     , mName("")
     , mSource("")
 {
-    // ...
+
 }
 
 //==============================================================================
-// Get Function Name
+// Get Slot Name
 //==============================================================================
-QString ComponentFunction::functionName()
+QString ComponentSlot::slotName()
 {
     return mName;
 }
 
 //==============================================================================
-// Set Function Name
+// Set Slot Name
 //==============================================================================
-void ComponentFunction::setFunctionName(const QString& aFunctionName)
+void ComponentSlot::setSlotName(const QString& aSlotName)
 {
-    // Check Function Name
-    if (mName != aFunctionName) {
+    // Check Slot Name
+    if (mName != aSlotName) {
         // Set Name
-        mName = aFunctionName;
-        // Emit Function Name Changed Signal
-        emit functionNameChanged(mName);
+        mName = aSlotName;
+        // Emit Slot Name Changed Signal
+        emit slotNameChanged(mName);
     }
 }
 
 //==============================================================================
-// Get Function Parameters
+// Get Slot Source
 //==============================================================================
-QStringList ComponentFunction::functionParameters()
-{
-    return mParameters;
-}
-
-//==============================================================================
-// Set Function Parameters
-//==============================================================================
-void ComponentFunction::setFunctionParameters(const QStringList& aParameters)
-{
-    // Check Parameters
-    if (mParameters != aParameters) {
-        // Set Parameters
-        mParameters = aParameters;
-        // Emit Parameters Changed Signal
-        emit functionParametersChanged(mParameters);
-    }
-}
-
-//==============================================================================
-// Get Function Source
-//==============================================================================
-QString ComponentFunction::functionSource()
+QString ComponentSlot::slotSource()
 {
     return mSource;
 }
 
 //==============================================================================
-// Set Function Source
+// Set Slot Source
 //==============================================================================
-void ComponentFunction::setFunctionSource(const QString& aSource)
+void ComponentSlot::setSlotSource(const QString& aSource)
 {
     // Check Source
     if (mSource != aSource) {
         // Set Source
         mSource = aSource;
         // Emit Source Changed Signal
-        emit functionSourceChanged(mSource);
-    }
-}
-
-//==============================================================================
-// Insert Parameter
-//==============================================================================
-void ComponentFunction::insertParameter(const int& aIndex, const QString& aParameter)
-{
-    // Check Index
-    if (aIndex >= 0 && aIndex < mParameters.count()) {
-        // Insert
-        mParameters.insert(aIndex, aParameter);
-        // Emit Parameters Changed
-        emit functionParametersChanged(mParameters);
-    } else {
-        // Append
-        appendParameter(aParameter);
-    }
-}
-
-//==============================================================================
-// Append Parameter
-//==============================================================================
-void ComponentFunction::appendParameter(const QString& aParameter)
-{
-    // Append Parameter
-    mParameters << aParameter;
-    // Emit Parameters Changed
-    emit functionParametersChanged(mParameters);
-}
-
-//==============================================================================
-// Remove Parameter
-//==============================================================================
-void ComponentFunction::removeParameter(const int& aIndex)
-{
-    // Check Index
-    if (aIndex >= 0 && aIndex < mParameters.count()) {
-        // Remove Parameter
-        mParameters.removeAt(aIndex);
-        // Emit Parameters Changed
-        emit functionParametersChanged(mParameters);
+        emit slotSourceChanged(mSource);
     }
 }
 
 //==============================================================================
 // Export To JSON Object
 //==============================================================================
-QJsonObject ComponentFunction::toJSONObject()
+QJsonObject ComponentSlot::toJSONObject()
 {
     // Init New JSON Object
     QJsonObject newJSONObject;
@@ -294,7 +230,7 @@ QJsonObject ComponentFunction::toJSONObject()
 //==============================================================================
 // Destructor
 //==============================================================================
-ComponentFunction::~ComponentFunction()
+ComponentSlot::~ComponentSlot()
 {
     // ...
 }

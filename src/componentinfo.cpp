@@ -84,7 +84,7 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mBase(mProject ? mProject->getComponentByName(mBaseName) : NULL)
     , mParent(NULL)
 {
-    qDebug() << "ComponentInfo created.";
+    qDebug() << "ComponentInfo " <<  mName << " created.";
 
     // Init
     init();
@@ -137,7 +137,7 @@ void ComponentInfo::init()
 //==============================================================================
 void ComponentInfo::clear()
 {
-    qDebug() << "ComponentInfo::clear";
+    //qDebug() << "ComponentInfo::clear";
     // Clear ID Map
     clearIDMap();
     // Clear Children
@@ -614,14 +614,6 @@ QStringList ComponentInfo::componentProperties()
 }
 
 //==============================================================================
-// Get Dynamic Properties
-//==============================================================================
-QList<QByteArray> ComponentInfo::dynamicProperties()
-{
-    return dynamicPropertyNames();
-}
-
-//==============================================================================
 // Set Dirty State
 //==============================================================================
 void ComponentInfo::setDirty(const bool& aDirty)
@@ -729,10 +721,28 @@ QJsonObject ComponentInfo::toJSONObject()
         ciObject[JSON_KEY_COMPONENT_PARENT] = mParent->componentName();
     }
 
+    // Imports
+    if (!mImports.isEmpty()) {
+        // Set Signals
+        ciObject[JSON_KEY_COMPONENT_IMPORTS] = mImports;
+    }
+
     // Check Signals
     if (!mSignals.isEmpty()) {
         // Set Signals
         ciObject[JSON_KEY_COMPONENT_SIGNALS] = mSignals;
+    }
+
+    // Check Slots
+    if (!mSlots.isEmpty()) {
+        // Set Signals
+        ciObject[JSON_KEY_COMPONENT_SLOTS] = mSlots;
+    }
+
+    // Functions
+    if (!mFunctions.isEmpty()) {
+        // Set Signals
+        ciObject[JSON_KEY_COMPONENT_FUNCTIONS] = mFunctions;
     }
 
     // Check States
@@ -807,9 +817,14 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
     mBase = mProject ? mProject->getComponentByName(mBaseName) : NULL;
     // Set Parent Component
     mParent = mProject ? mProject->getComponentByName(aObject[JSON_KEY_COMPONENT_PARENT].toString()) : NULL;
-
+    // Set Imports
+    mImports = aObject[JSON_KEY_COMPONENT_IMPORTS].toArray();
     // Set Signals
     mSignals = aObject[JSON_KEY_COMPONENT_SIGNALS].toArray();
+    // Set Slots
+    mSlots = aObject[JSON_KEY_COMPONENT_SLOTS].toArray();
+    // Set Functions
+    mFunctions = aObject[JSON_KEY_COMPONENT_FUNCTIONS].toArray();
     // States
     mStates = aObject[JSON_KEY_COMPONENT_STATES].toArray();
     // Transitions
@@ -876,6 +891,133 @@ void ComponentInfo::requestClose()
 }
 
 //==============================================================================
+// Generate Live Code for Designer
+//==============================================================================
+QString ComponentInfo::generateLiveCode()
+{
+    qDebug() << "ComponentInfo::generateLiveCode - name: " << mName;
+
+    // Init Live Code
+    QString liveCode = "";
+
+    // Add Imports
+
+    // Get Imports Count
+    int iCount = mImports.count();
+    // Iterate Through Imports
+    for (int i=0; i<iCount; i++) {
+        // Append Imports
+        liveCode += QString("import %1\n").arg(mImports[i].toString());
+    }
+
+    // Add New Line
+    liveCode += "\n";
+
+    // Add Type
+    liveCode += mName + " {\n";
+
+    // Add ID ==================================================================
+
+    // Get Component ID
+    QString cID = componentProperty(JSON_KEY_COMPONENT_PROPERTY_ID).toString();
+
+    // Check ID
+    if (cID.isEmpty() && mIsRoot) {
+        // Set ID
+        cID = "root";
+    }
+
+    // Add ID
+    liveCode += QString("%1id: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cID);
+
+    // Add Object Name =========================================================
+
+    // Get Object Name
+    QString objectName = componentProperty(JSON_KEY_COMPONENT_PROPERTY_OBJECT_NAME).toString();
+
+    // Check Object Name
+    if (!objectName.isEmpty()) {
+        // Add Object Name
+        liveCode += QString("%1objectName: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(objectName);
+    }
+
+    // Add Pos =================================================================
+
+    // Get Pos X
+    QString cpX = posX();
+    // Check Pos X
+    if (cpX != "0") {
+        // Add Pos X
+        liveCode += QString("%1x: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cpX);
+    }
+
+    // Get Pos Y
+    QString cpY = posY();
+    // Check Pos Y
+    if (cpY != "0") {
+        // Add Pos Y
+        liveCode += QString("%1y: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cpY);
+    }
+
+    // Get Pos Z
+    QString cpZ = posZ();
+    // Check Pos Z
+    if (cpZ != "0") {
+        // Add Pos Z
+        liveCode += QString("%1z: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cpZ);
+    }
+
+    // Add Size ================================================================
+
+    // Get Width
+    QString cWidth = width();
+    // Check Width
+    if (cWidth != "0") {
+        // Add Width
+        liveCode += QString("%1width: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cWidth);
+    }
+
+    // Get Height
+    QString cHeight = height();
+    // Check Height
+    if (cHeight != "0") {
+        // Add Height
+        liveCode += QString("%1height: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cHeight);
+    }
+
+    // Add Anchors =============================================================
+
+    // Add Own Properties ======================================================
+
+    // Add Inherited Properties ================================================
+
+    // Add Signals =============================================================
+
+    // Add Slots ===============================================================
+
+    // Add Hooks for Property Getters Setters !!! ==============================
+
+
+
+
+    // Add Functions ===========================================================
+
+    // Add Children ============================================================
+
+    // Add States ==============================================================
+
+    // Add Transitions =========================================================
+
+    liveCode += "}\n";
+
+    // ...
+
+    qDebug() << "ComponentInfo::generateLiveCode - liveCode: " << liveCode;
+
+    return liveCode;
+}
+
+//==============================================================================
 // Get Property
 //==============================================================================
 QVariant ComponentInfo::componentProperty(const QString& aName)
@@ -888,6 +1030,16 @@ QVariant ComponentInfo::componentProperty(const QString& aName)
     // Check Property Keys
     if (mProperties.keys().indexOf(aName) >= 0) {
         return mProperties[aName].toVariant();
+    }
+
+    // Check Base Component
+    if (mBase) {
+        // Check If Has Property
+        QString baseProperty = mBase->componentProperty(aName).toString();
+        // Check Base Property
+        if (!baseProperty.isNull()) {
+            return baseProperty;
+        }
     }
 
     qWarning() << "ComponentInfo::componentProperty - aName: " << aName << " - NO PROPERTY!";
@@ -913,6 +1065,15 @@ void ComponentInfo::addComponentOwnProperty(const QString& aName, const EPropert
         case EPropertyType::EPTQtObjectList:    mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_LIST).arg(aDefault.toString()); break;
         break;
     }
+
+    // Set Dirty
+    setDirty(true);
+
+    // Emit Own Property Added Signal
+    emit ownPropertyAdded(mOwnProperties.keys().indexOf(aName));
+
+    // Emit Own Properties Updated
+    //emit ownPropertiesUpdated();
 }
 
 //==============================================================================
@@ -949,6 +1110,12 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
         // Set Own Property
         mOwnProperties[aName] = QString("%1:%2").arg(tPrefix).arg(aValue.toString());
 
+        // Emit Own Property Added Signal
+        emit ownPropertyAdded(mOwnProperties.keys().indexOf(aName));
+
+        // Emit Own Properties Updated
+        //emit ownPropertiesUpdated();
+
     } else {
         qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - BASE";
 
@@ -964,7 +1131,7 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
 //==============================================================================
 // Remove Property
 //==============================================================================
-void ComponentInfo::removeProperty(const QString& aName)
+void ComponentInfo::removeComponentProperty(const QString& aName)
 {
     qDebug() << "ComponentInfo::removeProperty - aName: " << aName;
 
@@ -974,18 +1141,35 @@ void ComponentInfo::removeProperty(const QString& aName)
     int opIndex = opKeys.indexOf(aName);
     // Check Own Property Index
     if (opIndex >= 0) {
+        // Remove Value
+        mOwnProperties.remove(aName);
+        // Emit Own Property Removed Signal
+        emit ownPropertyRemoved(opIndex);
+
         // Check If Prototype
         if (mProtoType) {
-            // Remove Value
-            mOwnProperties.remove(aName);
+            // Set Dirty
+            setDirty(true);
         }
-    } else {
-        // Remove Value
-        mProperties.remove((aName));
     }
+}
 
-    // Set Dirty
-    setDirty(true);
+//==============================================================================
+// Clear Component Property
+//==============================================================================
+void ComponentInfo::clearComponentProperty(const QString& aName)
+{
+    // Get Keys
+    QStringList pKeys = mProperties.keys();
+    // Get Property Index
+    int pIndex = pKeys.indexOf(aName);
+    // Check Own Property Index
+    if (pIndex >= 0) {
+        // Remove Value
+        mProperties.remove(aName);
+        // Emit Own Properties Updated
+        emit ownPropertiesUpdated();
+    }
 }
 
 //==============================================================================
@@ -1009,6 +1193,251 @@ bool ComponentInfo::hasProperty(const QString& aName)
     }
 
     return false;
+}
+
+//==============================================================================
+// Add Import
+//==============================================================================
+void ComponentInfo::addImport(const QString& aImport)
+{
+    // Get Imports Count
+    int iCount = mImports.count();
+    // Iterate Through Imports
+    for (int i=0; i<iCount; i++) {
+        // Get String Value
+        QString jsonValueString = mImports[i].toString();
+        // Check JS String Value
+        if (jsonValueString == aImport) {
+            // No Need To Add
+            return;
+        }
+    }
+
+    // Append Import
+    mImports << QJsonValue(aImport);
+    // Set Dirty
+    setDirty(true);
+    // Emit Import Added Signal
+    emit importAdded(mImports.count() - 1);
+}
+
+//==============================================================================
+// Remove Import
+//==============================================================================
+void ComponentInfo::removeImport(const QString& aImport)
+{
+    // Get Imports Count
+    int iCount = mImports.count();
+    // Iterate Through Imports
+    for (int i=0; i<iCount; i++) {
+        // Get String Value
+        QString jsonValueString = mImports[i].toString();
+        // Check JS String Value
+        if (jsonValueString == aImport) {
+            // Remove Import
+            mImports.removeAt(i);
+            // Set Dirty
+            setDirty(true);
+            // Emit Import Removed Signal
+            emit importRemoved(i);
+
+            return;
+        }
+    }
+}
+
+//==============================================================================
+// Remove Import
+//==============================================================================
+void ComponentInfo::removeImport(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < mImports.count()) {
+        // Remove Import
+        mImports.removeAt(aIndex);
+        // Set Dirty
+        setDirty(true);
+        // Emit Import Removed Signal
+        emit importRemoved(aIndex);
+    }
+}
+
+//==============================================================================
+// Add Signal
+//==============================================================================
+void ComponentInfo::addSignal(const QString& aName, const QStringList& aParameters)
+{
+    // Get Signals Count
+    int sCount = mSignals.count();
+    // Iterate Through Signals
+    for (int i=0; i<sCount; i++) {
+        // Get String Value
+        QString jsonValueString = mSignals[i].toString();
+        // Check JS String Value
+        if (jsonValueString == aName) {
+            return;
+        }
+    }
+
+    // Init New Signal JSON Object
+    QJsonObject newSignal;
+
+    // Set Signal Name
+    newSignal[JSON_KEY_COMPONENT_SIGNAL_NAME] = aName;
+    // Set Parameters
+    newSignal[JSON_KEY_COMPONENT_SIGNAL_PARAMETERS] = aParameters.join(':');
+
+    // Append Signal
+    mSignals << newSignal;
+    // Set Dirty
+    setDirty(true);
+    // Emit Signal Added
+    emit signalAdded(mSignals.count() - 1);
+}
+
+//==============================================================================
+// Remove Signal
+//==============================================================================
+void ComponentInfo::removeSignal(const QString& aName)
+{
+    // Get Signals Count
+    int sCount = mSignals.count();
+    // Iterate Through Signals
+    for (int i=0; i<sCount; i++) {
+        // Get String Value
+        QString jsonValueString = mSignals[i].toString();
+        // Check JS String Value
+        if (jsonValueString == aName) {
+            // Remove Signal
+            mSignals.removeAt(i);
+            // Set Dirty
+            setDirty(true);
+            // Emit  Removed Signal
+            emit signalRemoved(i);
+
+            return;
+        }
+    }
+}
+
+//==============================================================================
+// Remove Signal
+//==============================================================================
+void ComponentInfo::removeSignal(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < mSignals.count()) {
+        // Remove Signal
+        mSignals.removeAt(aIndex);
+        // Set Dirty
+        setDirty(true);
+        // Emit Signal Removed Signal
+        emit signalRemoved(aIndex);
+    }
+}
+
+//==============================================================================
+// Add Slot
+//==============================================================================
+void ComponentInfo::addSlot(const QString& aName, const QString& aSource)
+{
+
+}
+
+//==============================================================================
+// Remove Slot
+//==============================================================================
+void ComponentInfo::removeSlot(const QString& aName)
+{
+
+}
+
+//==============================================================================
+// Remove Slot
+//==============================================================================
+void ComponentInfo::removeSlot(const int& aIndex)
+{
+
+}
+
+//==============================================================================
+// Add Function
+//==============================================================================
+void ComponentInfo::addFunction(const QString& aName, const QStringList& aParameters, const QString& aSource)
+{
+
+}
+
+//==============================================================================
+// Remove Function
+//==============================================================================
+void ComponentInfo::removeFunction(const QString& aName)
+{
+
+}
+
+//==============================================================================
+// Remove Function
+//==============================================================================
+void ComponentInfo::removeFunction(const int& aIndex)
+{
+
+}
+
+//==============================================================================
+// Add State
+//==============================================================================
+void ComponentInfo::addState(const QString& aName, const QString& aWhen)
+{
+
+}
+
+//==============================================================================
+// Remove State
+//==============================================================================
+void ComponentInfo::removeState(const QString& aName)
+{
+
+}
+
+//==============================================================================
+// Remove State
+//==============================================================================
+void ComponentInfo::removeState(const int& aIndex)
+{
+
+}
+
+//==============================================================================
+// Add Property Change
+//==============================================================================
+void ComponentInfo::addPropertyChange(const QString& aStateName, const QString& aTarget, const QString& aProperty, const QVariant& aValue)
+{
+
+}
+
+//==============================================================================
+// Remove Property Change
+//==============================================================================
+void ComponentInfo::removePropertyChange(const QString& aStateName, const int& aIndex)
+{
+
+}
+
+//==============================================================================
+// Add Transition
+//==============================================================================
+void ComponentInfo::addTransition(const QString& aStateFrom, const QString& aStateTo)
+{
+
+}
+
+//==============================================================================
+// Remove Transition
+//==============================================================================
+void ComponentInfo::removeTransition(const int& aIndex)
+{
+
 }
 
 //==============================================================================
@@ -1063,7 +1492,7 @@ ComponentInfo::~ComponentInfo()
     // Clear
     clear();
 
-    qDebug() << "ComponentInfo deleted.";
+    qDebug() << "ComponentInfo " << mName << " deleted.";
 }
 
 

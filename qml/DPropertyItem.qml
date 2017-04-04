@@ -13,7 +13,7 @@ Item {
     property string propertyType: "type"
     property string propertyValue: "value"
 
-    property int itemIndex: 0
+    property int itemIndex: -1
 
     property bool markFordeletion: swipeGesture.swipeOn
 
@@ -67,12 +67,11 @@ Item {
         id: swipeGesture
         anchors.fill: parent
         enabled: propertyItemRoot.enableSwipe
+
         onActionButtonClicked: {
-            // Check If Marked For Deletion
-            if (propertyItemRoot.markFordeletion) {
-                // Emit Item Action Clicked Signal
-                propertyItemRoot.itemActionClicked(propertyItemRoot.itemIndex);
-            }
+            //console.log("DPropertyItem.swipeGesture.onActionButtonClicked");
+            // Emit Item Action Clicked Signal
+            propertyItemRoot.itemActionClicked(propertyItemRoot.itemIndex);
         }
     }
 }

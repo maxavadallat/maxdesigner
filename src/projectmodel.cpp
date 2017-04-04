@@ -248,6 +248,13 @@ bool ProjectModel::initProject(const QString& aName, const QString& aDir)
             return false;
         }
 
+        // Create Live Temp Dir
+        if (!tempDir.mkdir(DEFAULR_PROJECT_LIVE_TEMP_DIR_NAME)) {
+            qWarning() << "ProjectModel::initProject - livetemp: " << DEFAULR_PROJECT_LIVE_TEMP_DIR_NAME << " - ERROR CREATING PATH!!";
+
+            return false;
+        }
+
         // ...
 
         return true;
@@ -651,6 +658,13 @@ void ProjectModel::setQmlDir(const QString& aQMLDir)
         mProperties[JSON_KEY_PROJECT_QML_DIR] = aQMLDir;
         // Emit QML Dir Changed Signal
         emit qmlDirChanged(mProperties[JSON_KEY_PROJECT_QML_DIR].toString());
+
+        // Check Previous Links
+
+        // Check QML Dir
+
+        // Create Link To QML Dir
+
         // Set Dirty Properties
         setDirty(true);
     }

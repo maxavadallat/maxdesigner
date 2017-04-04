@@ -75,7 +75,16 @@ QString CreateComponentDialog::componentCategory()
 //==============================================================================
 QString CreateComponentDialog::componentBaseName()
 {
-    return ui->baseTypeTab->currentIndex() == 0 ? ui->baseTypeComboBox->currentText() : ui->componentTypeComboBox->currentText();
+    QVariant cBase = "";
+
+    // Check Base Type Tab
+    if (ui->baseTypeTab->currentIndex() == 0) {
+        cBase = ui->baseTypeComboBox->itemData(ui->baseTypeComboBox->currentIndex());
+    } else {
+        cBase = ui->componentTypeComboBox->itemData(ui->componentTypeComboBox->currentIndex());
+    }
+
+    return cBase.toString();
 }
 
 //==============================================================================
@@ -117,6 +126,7 @@ void CreateComponentDialog::setBuiltInVisibility(const bool& aVisible)
 void CreateComponentDialog::reset()
 {
     ui->componentNameEdit->clear();
+    ui->componentNameEdit->setFocus();
     ui->baseTypeTab->setCurrentIndex(0);
     ui->baseTypeComboBox->setCurrentIndex(-1);
     ui->baseTypeComboBox->setCurrentText("");

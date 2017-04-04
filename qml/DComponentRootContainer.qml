@@ -192,6 +192,13 @@ DPaneBase {
             }
         }
 
+        // On Component Property Changed
+        onComponentPropertyChanged: {
+            console.log("DComponentRootContainer.componentInfoConnection.onComponentPropertyChanged - aName: " + aName + " - aValue: " + aValue);
+
+            // ...
+        }
+
         // ...
     }
 
@@ -393,6 +400,15 @@ DPaneBase {
                 ctx.stroke();
             }
         }
+    }
+
+    DText {
+        anchors.centerIn: parent
+        color: "white"
+        visible: settingsController.componentNamesVisible
+        opacity: 0.05
+        font.pixelSize: 64
+        text: componentInfo ? componentInfo.componentName : ""
     }
 
     // ...

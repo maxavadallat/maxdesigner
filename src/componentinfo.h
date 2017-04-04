@@ -15,10 +15,12 @@ class ViewsModel;
 class MainWindow;
 class QMLParser;
 
+class ComponentImportsModel;
 class ComponentAnchorsModel;
 class ComponentPropertiesModel;
 class ComponentOwnPropertiesModel;
 class ComponentSignalsModel;
+class ComponentSlotsModel;
 class ComponentStatesModel;
 class ComponentTransitionsModel;
 class ComponentFunctionsModel;
@@ -63,12 +65,13 @@ class ComponentInfo : public QObject
     Q_PROPERTY(QString width READ width NOTIFY widthChanged)
     Q_PROPERTY(QString height READ height NOTIFY heightChanged)
 
-    // Dynamic Properties
-    Q_PROPERTY(QList<QByteArray> dynamicProperties READ dynamicProperties NOTIFY dynamicPropertiesChanged)
-
     // Anchors
 
     // Signals
+
+    // Slots
+
+    // Functions
 
     // States
 
@@ -160,19 +163,47 @@ public:
     // Get Height
     QString height();
 
-    // Signals
+    // Set Left Anchor
+    void setAnchorLeft(const QString& aLeft);
+    // Set Left Anchor Margin
+    void setAnchorLeftMargin(const int& aMargin);
 
-    // Anchors
+    // Set Right Anchor
+    void setAnchorRight(const QString& aRight);
+    // Set Right Anchor Margin
+    void setAnchorRightMargin(const int& aMargin);
 
-    // States
+    // Set Top Anchor
+    void setAnchorTop(const QString& aTop);
+    // Set Top Anchor Margin
+    void setAnchorTopMargin(const int& aMargin);
 
-    // Transitions
+    // Set Bottom Anchor
+    void setAnchorBottom(const QString& aBottom);
+    // Set Bottom Anchor Margin
+    void setAnchorBottomMargin(const int& aMargin);
+
+    // Set Fill Anchor
+    void setAnchorFill(const QString& aFill);
+    // Set Anchor Margins
+    void setAnchorMargins(const int& aMargin);
+
+    // Set Center In Anchor
+    void setAnchorCenterIn(const QString& aCenterIn);
+
+    // Set Horizontal Center Anchor
+    void setAnchorHorizontalCenter(const QString& aHorizontalCenter);
+    // Set Horizontal Center Anchor Offset
+    void setAnchorHorizontalCenterOffset(const QString& aHorizontalCenterOffset);
+
+    // Set Vertical Center Anchor
+    void setAnchorVerticalCenter(const QString& aVerticalCenter);
+    // Set Vertical Center Anchor Offset
+    void setAnchorVerticalCenterOffset(const QString& aVerticalCenterOffset);
+
 
     // Get Properties
     QStringList componentProperties();
-
-    // Get Dynamic Properties
-    QList<QByteArray> dynamicProperties();
 
     // Get Component Hierarchy
     QStringList hierarchy();
@@ -184,54 +215,77 @@ public:
     // Set Component Property
     void setComponentProperty(const QString& aName, const QVariant& aValue);
     // Remove Own Property
-    void removeProperty(const QString& aName);
+    void removeComponentProperty(const QString& aName);
+    // Clear Component Property
+    void clearComponentProperty(const QString& aName);
 
     // Check If Has Property
     Q_INVOKABLE bool hasProperty(const QString& aName);
 
-//    // Add Signal
-//    void addSignal(const QString& aName, const QStringList& aParameters = QStringList());
-//    // Remove Signal
-//    void removeSignal(const QString& aName);
+    // Add Import
+    void addImport(const QString& aImport);
+    // Remove Import
+    void removeImport(const QString& aImport);
+    // Remove Import
+    void removeImport(const int& aIndex);
 
+    // Add Signal
+    void addSignal(const QString& aName, const QStringList& aParameters = QStringList());
+    // Remove Signal
+    void removeSignal(const QString& aName);
+    // Remove Signal
+    void removeSignal(const int& aIndex);
 
-//    // Add State
-//    void addState(const QString& aName);
-//    // Remove State
-//    void removeState(const QString& aName);
+    // Add Slot
+    void addSlot(const QString& aName, const QString& aSource = "");
+    // Remove Slot
+    void removeSlot(const QString& aName);
+    // Remove Slot
+    void removeSlot(const int& aIndex);
 
-//    // Add Property Change
-//    void addPropertyChange(const QString& aStateName, const QString& aTarget, const QString& aProperty, const QVariant& aValue, const int& aIndex = -1);
-//    // Remove Property Change
-//    void removePropertyChange(const int& aIndex);
+    // Add Function
+    void addFunction(const QString& aName, const QStringList& aParameters = QStringList(), const QString& aSource = "");
+    // Remove Function
+    void removeFunction(const QString& aName);
+    // Remove Function
+    void removeFunction(const int& aIndex);
 
-//    // Add Transition
-//    void addTransition(const QString& aStateFrom, const QString& aStateTo);
+    // Add State
+    void addState(const QString& aName, const QString& aWhen = "");
+    // Remove State
+    void removeState(const QString& aName);
+    // Remove State
+    void removeState(const int& aIndex);
+
+    // Add Property Change
+    void addPropertyChange(const QString& aStateName, const QString& aTarget, const QString& aProperty, const QVariant& aValue);
+    // Remove Property Change
+    void removePropertyChange(const QString& aStateName, const int& aIndex);
+
+    // Add Transition
+    void addTransition(const QString& aStateFrom, const QString& aStateTo);
+    // Remove Transition
+    void removeTransition(const int& aIndex);
 //    // Remove Transition
 //    void removeTransition(const QString& aStateFrom, const QString& aStateTo);
 
+//    // Add Parallel Animation
+//    void addPrallelAnimation(const QString& aStateFrom, const QString& aStateTo);
+//    // Add Sequential Animation
+//    void addSequentialAnimation(const QString& aStateFrom, const QString& aStateTo);
 //    // Add Property Action
 //    void addPropertyAction(const QString& aStateFrom, const QString& aStateTo, const QString& aTarget, const QString& aProperty, const QVariant& aValue, const int& aIndex = -1);
-//    // Remove Property Action
-//    void removePropertyAction(const int& aIndex);
-
 //    // Add Property Animation
 //    void addPropertyAnimation(const QString& aStateFrom, const QString& aStateTo, const QString& aTarget, const QString& aProperty, const QVariant& aFrom, const QVariant& aTo, const int& aIndex = -1);
-//    // Remove Property Animation
-//    void removePropertyAnimation(const int& aIndex);
-
 //    // Add Pause Animation
 //    void addPauseAnimation(const QString& aStateFrom, const QString& aStateTo, const int& aDuration);
-//    // Remove Pause Animation
-//    void removePauseAnimation(const int& aIndex);
+//    // Add Sctipt Action
+//    void addScriptAction(const QString& aStateFrom, const QString& aStateTo, const QString& aScript);
 
-//    // Add Script Action
-
-//    // Remove Script Action
-
-//    // Add Function
-
-//    // Remove Function
+//    // Remove Transition Node
+//    void removeTransitionNode(const QString& aStateFrom, const QString& aStateTo, const int& aIndex);
+//    // Mode Transition Node
+//    void moveTransitionNode(const QString& aStateFrom, const QString& aStateTo, const int& aFrom, const int& aTo);
 
     // Add Child
     Q_INVOKABLE void addChild(ComponentInfo* aChild);
@@ -243,6 +297,9 @@ public:
 
     // Request Close
     Q_INVOKABLE void requestClose();
+
+    // Generate Live Code
+    QString generateLiveCode();
 
     // Destructor
     ~ComponentInfo();
@@ -285,23 +342,107 @@ signals:
     // Height Changed Signal
     void heightChanged(const QString& aHeight);
 
-    // Signals
+    // Imports
+
+    // Import Added Signal
+    void importAdded(const int& aIndex);
+    // Import Removed Signal
+    void importRemoved(const int& aIndex);
 
     // Anchors
 
+    // Left Anchor Changed Signal
+    void anchorLeftChanged(const QString& aLeft);
+    // Left Anchor Margin Changed Signal
+    void anchorLeftMarginChanged(const QString& aMargin);
+
+    // Right Anchor Changed Signal
+    void anchorRightChanged(const QString& aRight);
+    // Right Anchor Margin Changed Signal
+    void anchorRightMarginChanged(const QString& aMargin);
+
+    // Top Anchor Changed Signal
+    void anchorTopChanged(const QString& aTop);
+    // Top Anchor Margin Changed Signal
+    void anchorTopMarginChanged(const QString& aMargin);
+
+    // Bottom Anchor Changed Signal
+    void anchorBottomChanged(const QString& aBottom);
+    // Bottom Anchor Margin Changed Signal
+    void anchorBottomMarginChanged(const QString& aMargin);
+
+    // Fill Anchor Changed Signal
+    void anchorFillChanged(const QString& aFill);
+    // Fill Anchor Margin Changed Signal
+    void anchorFillMarginChanged(const QString& aMargin);
+
+    // Center Anchor Changed Signal
+    void anchorCenterInChanged(const QString& aCenterIn);
+
+    // Horizontal Center Anchor Changed Signal
+    void anchorHorizontalCenterChanged(const QString& aLeft);
+    // Vertical Center Anchor Changed Signal
+    void anchorVerticalCenterChanged(const QString& aLeft);
+
+    // Horizontal Center Anchor Offset Changed Signal
+    void anchorHorizontalCenterOffsetChanged(const QString& aOffset);
+    // Vertical Center Anchor Offset Changed Signal
+    void anchorVerticalCenterOfsetChanged(const QString& aOffset);
+
+    // Component Property Changed Signal
+    void componentPropertyChanged(const QString& aName, const QVariant& aValue);
+
+    // Own Property Added Signal
+    void ownPropertyAdded(const int& aIndex);
+    // Own Property Removed Signal
+    void ownPropertyRemoved(const int& aIndex);
+
+    // Own Properties Updated Signal
+    void ownPropertiesUpdated();
+
+    // Signals
+
+    // Component Signal Added Signal
+    void signalAdded(const int& aIndex);
+    // Component Signal Removed Signal
+    void signalRemoved(const int& aIndex);
+
+    // Slots
+
+    // Component Slot Added Signal
+    void slotAdded(const int& aIndex);
+    // Component Slot Removed Signal
+    void slotRemoved(const int& aIndex);
+
+    // Functions
+
+    // Component Function Added Signal
+    void functionAdded(const int& aIndex);
+    // Component Function Removed Signal
+    void functionRemoved(const int& aIndex);
+
     // States
+
+    // State Added
+    void stateAdded(const int& aIndex);
+    // State Removed
+    void stateRemoved(const int& aIndex);
 
     // Transitions
 
+    // Transition Added
+    void transitionAdded(const int& aIndex);
+    // Transition Removed
+    void transitionRemoved(const int& aIndex);
+
+
     // Dynamic Properties Changed
     void dynamicPropertiesChanged();
-
     // Request Close Container Signal
     void requestContainerClose();
 
     // ...
 
-//public:
 protected:
     friend class ProjectModel;
     friend class BaseComponentsModel;
@@ -443,12 +584,16 @@ protected: // Data
     QJsonObject             mProperties;
     // Signals
     QJsonArray              mSignals;
+    // Slots
+    QJsonArray              mSlots;
     // States
     QJsonArray              mStates;
     // Transitions
     QJsonArray              mTransitions;
     // Functions
     QJsonArray              mFunctions;
+    // Imports
+    QJsonArray              mImports;
 };
 
 #endif // COMPONENTINFO_H

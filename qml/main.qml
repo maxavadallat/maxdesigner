@@ -372,6 +372,11 @@ Item {
             creationX: initialX - propertyEditor.width - 32
             creationY: initialY - propertyEditor.height * 0.5
 
+            onAccepted: {
+                // Add Own Property
+                propertiesController.addOwnComponentProperty(propertyName, propertyType, propertyDefault);
+            }
+
             // ...
 
         }

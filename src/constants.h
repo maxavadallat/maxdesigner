@@ -28,6 +28,8 @@
 // File Sort Filter Proxy
 #define DEFAULT_MAIN_QML_COMPONENTS_FILE_SORT_FILTER        "FileSortFilterProxy"
 
+// Component Import Model
+#define DEFAULT_MAIN_QML_COMPONENTS_IMPORTS_MODEL           "ComponentImportsModel"
 // Component Own Properties Model
 #define DEFAULT_MAIN_QML_COMPONENTS_OWN_PROPERTIES_MODEL    "ComponentOwnPropertiesModel"
 // Component Properties Model
@@ -36,6 +38,8 @@
 #define DEFAULT_MAIN_QML_COMPONENTS_ANCHORS_MODEL           "ComponentAnchorsModel"
 // Component Signals Model
 #define DEFAULT_MAIN_QML_COMPONENTS_SIGNALS_MODEL           "ComponentSignalsModel"
+// Component Slots Model
+#define DEFAULT_MAIN_QML_COMPONENTS_SLOTS_MODEL             "ComponentSlotsModel"
 // Component States Model
 #define DEFAULT_MAIN_QML_COMPONENTS_STATES_MODEL            "ComponentStatesModel"
 // Component Transitions Model
@@ -83,6 +87,9 @@
 // File Name Mask
 #define DEFAULT_FILE_NAME_MASK                              "."
 
+// Default Source Indent
+#define DEFAULT_SOURCE_INDENT                               "    "
+
 // Default Recent Open Projects List
 #define DEFAULT_RECENTPROJECTLIST_FILE_NAME                 ".designerrecent.list"
 // Max Recent Project File
@@ -105,6 +112,7 @@
 #define DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME             "basecomponents"
 #define DEFAULT_PROJECT_COMPONENTS_DIR_NAME                 "components"
 #define DEFAULT_PROJECT_VIEWS_DIR_NAME                      "views"
+#define DEFAULR_PROJECT_LIVE_TEMP_DIR_NAME                  "livetemp"
 
 // JSON Keys for Project Info
 #define JSON_KEY_PROJECT_NAME                               "projectName"
@@ -153,6 +161,8 @@
 #define JSON_KEY_COMPONENT_CHILDREN                         "componentChildren"
 #define JSON_KEY_COMPONENT_ANCHORS                          "componentAnchors"
 #define JSON_KEY_COMPONENT_SIGNALS                          "componentSignals"
+#define JSON_KEY_COMPONENT_SLOTS                            "componentSlots"
+#define JSON_KEY_COMPONENT_FUNCTIONS                        "componentFunctions"
 #define JSON_KEY_COMPONENT_STATES                           "componentStates"
 #define JSON_KEY_COMPONENT_TRANSITIONS                      "componentTransitions"
 #define JSON_KEY_COMPONENT_SOURCE                           "componentSource"

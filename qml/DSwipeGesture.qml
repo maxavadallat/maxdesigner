@@ -76,6 +76,8 @@ Item {
         property real lastTime: 0
         property int velocity: 0
 
+        preventStealing: !swipeGestureRoot.swipeOn
+
         drag.target: actionButtonContainer
         drag.axis: Drag.XAxis
         drag.minimumX: swipeMinX
@@ -154,6 +156,10 @@ Item {
             easingAnimation.start();
         }
 
+        MouseArea {
+            anchors.fill: parent
+        }
+
         DButton {
             id: actionButton
             anchors.right: parent.right
@@ -163,6 +169,7 @@ Item {
             highlightColor: actionButtonHiglightColor
             text: actionButtonText
             onClicked: {
+                //console.log("DSwipeGesture.actionButton.onClicked");
                 swipeGestureRoot.actionButtonClicked();
             }
         }

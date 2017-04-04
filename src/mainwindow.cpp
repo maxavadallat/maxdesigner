@@ -35,11 +35,13 @@
 
 #include "componentcategorymodel.h"
 
+#include "componentimportsmodel.h"
 #include "componentanchorsmodel.h"
 #include "componentownpropertiesmodel.h"
 #include "componentownpropertiesfilter.h"
 #include "componentpropertiesmodel.h"
 #include "componentsignalsmodel.h"
+#include "componentslotsmodel.h"
 #include "componentstatesmodel.h"
 #include "componenttransitionsmodel.h"
 #include "componentfunctionsmodel.h"
@@ -193,10 +195,14 @@ void MainWindow::init()
     // Register Own Properties Filter
     qmlRegisterType<ComponentOwnPropertiesFilter>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_OWN_COMPONENTS_FILTER);
 
+    // Register Component Imports Model
+    qmlRegisterUncreatableType<ComponentImportsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_IMPORTS_MODEL, "");
     // Register Component Own Properties Model
     qmlRegisterUncreatableType<ComponentOwnPropertiesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_OWN_PROPERTIES_MODEL, "");
     // Register Component Signals Model
     qmlRegisterUncreatableType<ComponentSignalsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_SIGNALS_MODEL, "");
+    // Register Component Slots Model
+    qmlRegisterUncreatableType<ComponentSlotsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_SLOTS_MODEL, "");
     // Register Component States Model
     qmlRegisterUncreatableType<ComponentStatesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_STATES_MODEL, "");
     // Register Component Transitionss Model
@@ -419,6 +425,8 @@ void MainWindow::openProject(const QString& aFilePath)
         ui->actionCreateComponent->setEnabled(true);
         // Set Enable Create View Menu Item
         ui->actionCreateView->setEnabled(true);
+        // Set Component Names Visible Menu Item
+        ui->actionShowComponentNames->setEnabled(true);
 
         // ...
 
@@ -940,6 +948,8 @@ void MainWindow::createNewProject()
         ui->actionCreateComponent->setEnabled(true);
         // Set Enable Create View Menu Item
         ui->actionCreateView->setEnabled(true);
+        // Set Component Names Visible Menu Item
+        ui->actionShowComponentNames->setEnabled(true);
 
         // Check Project Tree Model
         if (mProjectTreeModel) {
@@ -1076,10 +1086,12 @@ void MainWindow::updateProject()
         return;
     }
 
-    // Set Main QML File
-    mProjectModel->setMainQMLFile(mProjectPropertiesDiaog->mainQMLFile());
+    qDebug() << "MainWindow::updateProject";
+
     // Set QML Dir
     mProjectModel->setQmlDir(mProjectPropertiesDiaog->qmlDir());
+    // Set Main QML File
+    mProjectModel->setMainQMLFile(mProjectPropertiesDiaog->mainQMLFile());
 
     // Get QML Dir Path
     QString qmlDir = mProjectModel->qmlDir();
@@ -1186,6 +1198,7 @@ void MainWindow::closeProject()
     ui->actionDefineBaseComponent->setEnabled(false);
     ui->actionCreateComponent->setEnabled(false);
     ui->actionCreateView->setEnabled(false);
+    ui->actionShowComponentNames->setEnabled(false);
     ui->actionCloseComponent->setEnabled(false);
     ui->actionCloseAllComponents->setEnabled(false);
     ui->actionEditComponent->setEnabled(false);

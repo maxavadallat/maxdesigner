@@ -26,6 +26,9 @@ public:
     // Set Filtered Names
     void setFilteredNames(const QStringList& aFilteredNames);
 
+    // Get Source Index
+    Q_INVOKABLE int getSourceIndex(const int& aIndex);
+
     // Destructor
     ~ComponentOwnPropertiesFilter();
 

@@ -1,19 +1,17 @@
-#ifndef COMPONENTOWNPROPERTIESMODEL_H
-#define COMPONENTOWNPROPERTIESMODEL_H
+#ifndef COMPONENTIMPORTSMODEL_H
+#define COMPONENTIMPORTSMODEL_H
 
 #include <QObject>
 #include <QAbstractListModel>
-#include <QList>
-#include <QJsonArray>
-#include <QJsonObject>
+#include <QStringList>
 
 class ComponentInfo;
 class PropertiesController;
 
 //==============================================================================
-// Component Own Properties Model
+// Component Imports Model Class
 //==============================================================================
-class ComponentOwnPropertiesModel : public QAbstractListModel
+class ComponentImportsModel : public QAbstractListModel
 {
     Q_OBJECT
 
@@ -26,7 +24,7 @@ public:
     void setCurrentComponent(ComponentInfo* aComponent);
 
     // Destructor
-    ~ComponentOwnPropertiesModel();
+    ~ComponentImportsModel();
 
 signals:
     // Current Component Changed Signal
@@ -42,35 +40,30 @@ public: // from QAbstractListModel
 
 protected:
     friend class PropertiesController;
-
     // Constructor
-    explicit ComponentOwnPropertiesModel(ComponentInfo* aComponent, QObject* aParent = NULL);
+    explicit ComponentImportsModel(ComponentInfo* aComponent, QObject* aParent = NULL);
 
     // Init
     void init();
     // Clear
     void clear();
 
-protected slots:
-    // Own Property Added Slot
-    void propertyAdded(const int& aIndex);
-    // Own Property Removed Slot
-    void propertyRemoved(const int& aIndex);
-
-    // Properties Updated Slot
-    void propertiesUpdated();
+    // Load Component Imports
+    void loadComponentImports();
+    // Save Component Imports
+    void saveComponentImports();
 
 public:
     // Item Field Roles
-    enum OPMRoles {
-        PropertyNameRole = Qt::UserRole + 1,
-        PropertyTypeRole,
-        PropertyValueRole
+    enum IMRoles {
+        IMRNameRole = Qt::UserRole + 1
     };
 
 protected: // Data
     // Current Component
-    ComponentInfo*  mComponent;
+    ComponentInfo*      mComponent;
+    // Imports
+    QStringList         mImports;
 };
 
-#endif // COMPONENTOWNPROPERTIESMODEL_H
+#endif // COMPONENTIMPORTSMODEL_H
