@@ -11,6 +11,7 @@ class ComponentInfo;
 class BaseComponentsModel;
 class ComponentsModel;
 class ViewsModel;
+class PropertiesController;
 
 //==============================================================================
 // Project Model
@@ -31,6 +32,8 @@ class ProjectModel : public QObject
     Q_PROPERTY(QString viewsDir READ viewsDir NOTIFY viewsDirChanged)
     Q_PROPERTY(QStringList importPaths READ importPaths NOTIFY importPathsChanged)
     Q_PROPERTY(QStringList pluginPaths READ pluginPaths NOTIFY pluginPathsChanged)
+
+    Q_PROPERTY(PropertiesController* propertiesController READ propertiesController WRITE setPropertiesController NOTIFY propertiesControllerChanged)
 
     Q_PROPERTY(BaseComponentsModel* baseComponentsModel READ baseComponentsModel NOTIFY baseComponentsModelChanged)
     Q_PROPERTY(ComponentsModel* componentsModel READ componentsModel NOTIFY componentsModelChanged)
@@ -138,6 +141,9 @@ public:
     // Set Plugin Paths
     void setPluginPaths(const QStringList& aPluginPaths);
 
+    // Get Properties Controller
+    PropertiesController* propertiesController();
+
     // Get Base Component Model
     BaseComponentsModel* baseComponentsModel();
     // Get Components Model
@@ -190,6 +196,9 @@ signals:
     // Plugin Path Removed Signal
     void pluginPathRemoved(const QString& aPluginPath);
 
+    // Properties Controller Changed Signal
+    void propertiesControllerChanged(PropertiesController* aController);
+
     // Base Components Model Changed Signal
     void baseComponentsModelChanged(BaseComponentsModel* aBaseComponents);
     // Components Model Changed Signal
@@ -213,7 +222,8 @@ signals:
     // Project Properties Dirty State changed Signal
     void dirtyChanged(const bool& aDirty);
 
-private:
+protected:
+    friend class MainWindow;
     // Init
     void init();
 
@@ -237,6 +247,9 @@ private:
     // Create Views Model
     void createViewsModel();
 
+    // Set Properties Controller
+    void setPropertiesController(PropertiesController* aController);
+
     // Set Base Components Model
     void setBaseComponentsModel(BaseComponentsModel* aBaseComponents);
     // Set Components Model
@@ -257,6 +270,8 @@ private: // Data
     QJsonObject             mProperties;
     // Dirty Properties
     bool                    mDirty;
+    // Properties Controller
+    PropertiesController*   mPropertiesController;
     // Base Components
     BaseComponentsModel*    mBaseComponents;
     // Components

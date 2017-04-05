@@ -26,6 +26,7 @@ DContainer {
     Keys.onReleased: {
         switch (event.key) {
             case Qt.Key_Backspace:
+            case Qt.Key_Delete:
 
                 // ...
 
@@ -73,5 +74,14 @@ DContainer {
         anchors.fill: parent
         asynchronous: true
         active: false
+    }
+
+    DText {
+        anchors.centerIn: parent
+        color: "white"
+        visible: settingsController.componentNamesVisible
+        opacity: 0.05
+        font.pixelSize: 64
+        text: componentInfo ? componentInfo.componentName : ""
     }
 }

@@ -9,6 +9,7 @@
 #include <QString>
 
 class ProjectModel;
+class PropertiesController;
 class BaseComponentsModel;
 class ComponentsModel;
 class ViewsModel;
@@ -48,6 +49,8 @@ class ComponentInfo : public QObject
     Q_PROPERTY(bool focused READ focused WRITE setFocused NOTIFY focusedChanged)
     // Is Root
     Q_PROPERTY(bool isRoot READ isRoot WRITE setIsRoot NOTIFY isRootChanged)
+    // Built In
+    Q_PROPERTY(bool builtIn READ builtIn WRITE setBuiltIn NOTIFY builtInChanged)
 
     // Info Path
     Q_PROPERTY(QString infoPath READ infoPath NOTIFY infoPathChanged)
@@ -64,18 +67,6 @@ class ComponentInfo : public QObject
     // Size
     Q_PROPERTY(QString width READ width NOTIFY widthChanged)
     Q_PROPERTY(QString height READ height NOTIFY heightChanged)
-
-    // Anchors
-
-    // Signals
-
-    // Slots
-
-    // Functions
-
-    // States
-
-    // Transitions
 
 public:
     // Property Type
@@ -138,6 +129,11 @@ public:
     bool isRoot();
     // Set Is Root
     void setIsRoot(const bool& aRoot);
+
+    // Built In
+    bool builtIn();
+    // Set Built In
+    void setBuiltIn(const bool& aBuiltIn);
 
     // Get QML Source Path
     QString sourcePath();
@@ -203,10 +199,14 @@ public:
 
 
     // Get Properties
-    QStringList componentProperties();
+    Q_INVOKABLE QStringList componentProperties();
 
     // Get Component Hierarchy
-    QStringList hierarchy();
+    Q_INVOKABLE QStringList hierarchy();
+
+    // Get Child Component ID List
+    Q_INVOKABLE QStringList idList();
+
 
     // Get Component Property
     QVariant componentProperty(const QString& aName);
@@ -262,31 +262,6 @@ public:
     // Remove Property Change
     void removePropertyChange(const QString& aStateName, const int& aIndex);
 
-    // Add Transition
-    void addTransition(const QString& aStateFrom, const QString& aStateTo);
-    // Remove Transition
-    void removeTransition(const int& aIndex);
-//    // Remove Transition
-//    void removeTransition(const QString& aStateFrom, const QString& aStateTo);
-
-//    // Add Parallel Animation
-//    void addPrallelAnimation(const QString& aStateFrom, const QString& aStateTo);
-//    // Add Sequential Animation
-//    void addSequentialAnimation(const QString& aStateFrom, const QString& aStateTo);
-//    // Add Property Action
-//    void addPropertyAction(const QString& aStateFrom, const QString& aStateTo, const QString& aTarget, const QString& aProperty, const QVariant& aValue, const int& aIndex = -1);
-//    // Add Property Animation
-//    void addPropertyAnimation(const QString& aStateFrom, const QString& aStateTo, const QString& aTarget, const QString& aProperty, const QVariant& aFrom, const QVariant& aTo, const int& aIndex = -1);
-//    // Add Pause Animation
-//    void addPauseAnimation(const QString& aStateFrom, const QString& aStateTo, const int& aDuration);
-//    // Add Sctipt Action
-//    void addScriptAction(const QString& aStateFrom, const QString& aStateTo, const QString& aScript);
-
-//    // Remove Transition Node
-//    void removeTransitionNode(const QString& aStateFrom, const QString& aStateTo, const int& aIndex);
-//    // Mode Transition Node
-//    void moveTransitionNode(const QString& aStateFrom, const QString& aStateTo, const int& aFrom, const int& aTo);
-
     // Add Child
     Q_INVOKABLE void addChild(ComponentInfo* aChild);
     // Remove Child
@@ -323,6 +298,8 @@ signals:
     void focusedChanged(const bool& aFocused);
     // Is Root changed Signal
     void isRootChanged(const bool& aRoot);
+    // Built In Changed Signal
+    void builtInChanged(const bool& aBuiltIn);
     // Source Path Changed Signal
     void sourcePathChanged(const QString& aPath);
 
@@ -427,6 +404,8 @@ signals:
     void stateAdded(const int& aIndex);
     // State Removed
     void stateRemoved(const int& aIndex);
+    // State Updated
+    void stateUpdated(const int& aIndex);
 
     // Transitions
 
@@ -507,14 +486,6 @@ protected:
     // Set Height
     void setHeight(const QString& aHeight);
 
-    // Signals
-
-    // Anchors
-
-    // States
-
-    // Transitions
-
     // Set Dirty State
     void setDirty(const bool& aDirty);
 
@@ -580,6 +551,8 @@ protected: // Data
 
     // Own Properties
     QJsonObject             mOwnProperties;
+    // Anchors
+    QJsonObject             mAnchors;
     // Properties
     QJsonObject             mProperties;
     // Signals

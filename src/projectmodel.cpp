@@ -20,6 +20,7 @@ ProjectModel::ProjectModel(QObject* parent)
     : QObject(parent)
     , mName("")
     , mDirty(false)
+    , mPropertiesController(NULL)
     , mBaseComponents(NULL)
     , mComponents(NULL)
     , mViews(NULL)
@@ -138,6 +139,20 @@ void ProjectModel::createViewsModel()
 //        newModel->setViewsDir(viewsDir());
         // Set Views Model
         setViewsModel(newModel);
+    }
+}
+
+//==============================================================================
+// Set Properties Controller
+//==============================================================================
+void ProjectModel::setPropertiesController(PropertiesController* aController)
+{
+    // Check Properties Controller
+    if (mPropertiesController != aController) {
+        // Set Properties Contorller
+        mPropertiesController = aController;
+        // Emit Properties Controller Changed Signal
+        emit propertiesControllerChanged(mPropertiesController);
     }
 }
 
@@ -979,6 +994,14 @@ void ProjectModel::setPluginPaths(const QStringList& aPluginPaths)
     mProperties[JSON_KEY_PROJECT_PLUGIN_PATHS] = QJsonArray::fromStringList(aPluginPaths);
     // Set Dirty Properties
     setDirty(true);
+}
+
+//==============================================================================
+// Get Properties Controller
+//==============================================================================
+PropertiesController* ProjectModel::propertiesController()
+{
+    return mPropertiesController;
 }
 
 //==============================================================================

@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include <QDebug>
 
+#include "propertiescontroller.h"
 #include "designerapplication.h"
 #include "mainwindow.h"
 #include "componentinfo.h"
@@ -418,6 +419,30 @@ void ComponentInfo::setIsRoot(const bool& aRoot)
 }
 
 //==============================================================================
+// Built In
+//==============================================================================
+bool ComponentInfo::builtIn()
+{
+    return mBuiltIn;
+}
+
+//==============================================================================
+// Set Built In
+//==============================================================================
+void ComponentInfo::setBuiltIn(const bool& aBuiltIn)
+{
+    // Check Built In
+    if (mBuiltIn != aBuiltIn) {
+        // Set Built In
+        mBuiltIn = aBuiltIn;
+        // Emit Built In Changed Signal
+        emit builtInChanged(mBuiltIn);
+        // Set Dirty
+        setDirty(true);
+    }
+}
+
+//==============================================================================
 // Get Component Info Path
 //==============================================================================
 QString ComponentInfo::infoPath()
@@ -670,9 +695,17 @@ QStringList ComponentInfo::hierarchy()
     QStringList cth = mBase ? mBase->hierarchy() : QStringList();
 
     // Append Component Type Name
-    cth << mType;
+    cth << mName;
 
     return cth;
+}
+
+//==============================================================================
+// Get Child Component ID List
+//==============================================================================
+QStringList ComponentInfo::idList()
+{
+    return mIDMap.keys();
 }
 
 //==============================================================================
@@ -700,8 +733,16 @@ QJsonObject ComponentInfo::toJSONObject()
     ciObject[JSON_KEY_COMPONENT_CATEGORY] = QJsonValue(mCategory);
     // Set Component Base Name
     ciObject[JSON_KEY_COMPONENT_BASE] = QJsonValue(mBaseName);
+    // Set Built In
+    ciObject[JSON_KEY_COMPONENT_BUILTIN] = QJsonValue(mBuiltIn);
 
     // ...
+
+    // Check Anchors
+    if (!mAnchors.isEmpty()) {
+        // Set Anchors
+        ciObject[JSON_KEY_COMPONENT_ANCHORS] = mAnchors;
+    }
 
     // Check Own Properties
     if (!mOwnProperties.isEmpty()) {
@@ -804,15 +845,20 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
     setComponentCategory(aObject[JSON_KEY_COMPONENT_CATEGORY].toString());
     // Set Component Base Name
     setComponentBase(aObject[JSON_KEY_COMPONENT_BASE].toString());
+    // Set Built In
+    setBuiltIn(aObject[JSON_KEY_COMPONENT_BUILTIN].toBool());
 
     // ...
 
+    // Set Anchors
+    mAnchors = aObject[JSON_KEY_COMPONENT_ANCHORS].toObject();
     // Set Own Properties
     mOwnProperties = aObject[JSON_KEY_COMPONENT_OWN_PROPERTIES].toObject();
     // Set Properties
     mProperties = aObject[JSON_KEY_COMPONENT_PROPERTIES].toObject();
 
     // Base Components Might Not Be Ready !!!!
+
     // Set Base Component
     mBase = mProject ? mProject->getComponentByName(mBaseName) : NULL;
     // Set Parent Component
@@ -900,7 +946,7 @@ QString ComponentInfo::generateLiveCode()
     // Init Live Code
     QString liveCode = "";
 
-    // Add Imports
+    // Add Imports =============================================================
 
     // Get Imports Count
     int iCount = mImports.count();
@@ -987,26 +1033,238 @@ QString ComponentInfo::generateLiveCode()
 
     // Add Anchors =============================================================
 
+    // Check Anchors
+    if (!mAnchors.isEmpty()) {
+        // Get Anchors Fill Target
+        QString afTarget = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_FILL).toString();
+        // Get Anchors Center In Target
+        QString acTarget = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_CENTERIN).toString();
+        // Get Horizontal Center Anchor Target
+        QString ahcTarget = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER).toString();
+        // Get Vertical Center Anchor Target
+        QString avcTarget = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER).toString();
+
+        // Init Horizontal Center Used Flag
+        bool hCenter = false;
+        // Init Vertical Center Used Flag
+        bool vCenter = false;
+
+        // Check Fill Target
+        if (!afTarget.isEmpty()) {
+            // Add Fill Target
+            liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_FILL).arg(afTarget);
+        // Check Center In Target
+        } else if (!acTarget.isEmpty()) {
+            // Add Center In Target
+            liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_CENTERIN).arg(acTarget);
+            // Set Horizontal & Vertical Center Used Flag
+            hCenter = true;
+            vCenter = true;
+        } else {
+            // Check Horizontal Center Target
+            if (!ahcTarget.isEmpty()) {
+                // Add Horizontal Center Target
+                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER).arg(ahcTarget);
+                // Set Horizontal Center Used Flag
+                hCenter = true;
+            } else {
+                // Get Left Anchor Target
+                QString alTarget = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFT).toString();
+                // Get Right Anchor Target
+                QString arTarget = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHT).toString();
+
+                // Check Left Anchor Target
+                if (!alTarget.isEmpty()) {
+                    // Add Left Anchor Target
+                    liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFT).arg(alTarget);
+                }
+
+                // Check Right Anchor Target
+                if (!arTarget.isEmpty()) {
+                    // Add Right Anchor Target
+                    liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHT).arg(arTarget);
+                }
+            }
+
+            // Check Vertical Center Target
+            if (!avcTarget.isEmpty()) {
+                // Add Vertical Center Target
+                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER).arg(avcTarget);
+                // Set Vertical Center Used Flag
+                vCenter = true;
+            } else {
+                // Get Top Anchor Target
+                QString atTarget = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOP).toString();
+                // Get Bottom Anchor Target
+                QString abTarget = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOM).toString();
+
+                // Check Top Anchor Target
+                if (!atTarget.isEmpty()) {
+                    // Add Top Anchor Target
+                    liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOP).arg(atTarget);
+                }
+
+                // Check Bottom Anchor Target
+                if (!abTarget.isEmpty()) {
+                    // Add Bottom Anchor Target
+                    liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOM).arg(abTarget);
+                }
+            }
+        }
+
+        // Check Center In and Horizontal Center Target
+        if (!acTarget.isEmpty() || !ahcTarget.isEmpty()) {
+            // Get Horizontal Center Offset
+            QString hcOffset = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER_OFFS).toString();
+            // Check Horizontal Center Offset
+            if (!hcOffset.isEmpty()) {
+                // Add Horiontal Center Offset
+                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER_OFFS).arg(hcOffset);
+                // Set Horizontal Center Used Flag
+                hCenter = true;
+            }
+        }
+
+        // Check Center In and Vertical Center Target
+        if (!acTarget.isEmpty() || !avcTarget.isEmpty()) {
+            // Get Vertical Center Offset
+            QString vcOffset = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER_OFFS).toString();
+            // Check Vertical Center Offset
+            if (!vcOffset.isEmpty()) {
+                // Add Horiontal Center Offset
+                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER_OFFS).arg(vcOffset);
+                // Set Vertical Center Used Flag
+                vCenter = true;
+            }
+        }
+
+        // Init Single Margin Used Flag
+        bool sMargin = false;
+
+        // Check If Hoizontal CenTer Is used
+        if (!hCenter) {
+            // Get Left Anchor Margin
+            QString alMargin = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFTMARGIN).toString();
+            // Get Right Anchor Margin
+            QString arMargin = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHTMARGIN).toString();
+
+            // Check Left Margin
+            if (!alMargin.isEmpty()) {
+                // Add Left Margin
+                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFTMARGIN).arg(alMargin);
+                // Set Single Margin Used
+                sMargin = true;
+            }
+
+            // Check Right Margin
+            if (!arMargin.isEmpty()) {
+                // Add Right Margin
+                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHTMARGIN).arg(arMargin);
+                // Set Single Margin Used
+                sMargin = true;
+            }
+        }
+
+        // Check If Vertical Center Used
+        if (!vCenter) {
+            // Get Top Anchor Margin
+            QString atMargin = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOPMARGIN).toString();
+            // Get Bottom Anchor Margin
+            QString abMargin = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOMMARGIN).toString();
+
+            // Check Top Margin
+            if (!atMargin.isEmpty()) {
+                // Add Top Margin
+                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOPMARGIN).arg(atMargin);
+                // Set Single Margin Used
+                sMargin = true;
+            }
+
+            // Check Bottom Margin
+            if (!abMargin.isEmpty()) {
+                // Add Bottom Margin
+                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOMMARGIN).arg(abMargin);
+                // Set Single Margin Used
+                sMargin = true;
+            }
+        }
+
+        // Check Single Margin Used &  Center Flags
+        if (!sMargin && !hCenter && !vCenter) {
+            // Get Anchor Margins
+            QString aMargins = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_MARGINS).toString();
+            // Check Margins
+            if (!aMargins.isEmpty()) {
+                // Add Bottom Margin
+                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_MARGINS).arg(aMargins);
+            }
+        }
+    }
+
     // Add Own Properties ======================================================
+
+    // Add New Line
+    liveCode += "\n";
+
+    // Get Own Properties Keys
+    QStringList opKeys = mOwnProperties.keys();
+
+    // Get Own Properties Count
+    int opCount = opKeys.count();
+
+    // Get Filtered Property Keys
+    QStringList fpKeys = mProject->propertiesController() ? mProject->propertiesController()->filteredProperties() : QStringList();
+
+    // Iterate Through Own Properties
+    for (int j=0; j<opCount; j++) {
+        // Check Filtered Properties
+        if (fpKeys.indexOf(opKeys[j]) == -1) {
+            // Get Property Type And Value
+            QStringList typeAndValue = mOwnProperties[opKeys[j]].toString().split(":");
+            // Append Live Code
+            liveCode += QString("%1property %2 %3: %4\n").arg(DEFAULT_SOURCE_INDENT).arg(typeAndValue[0]).arg(opKeys[j]).arg(typeAndValue[1]);
+        }
+    }
 
     // Add Inherited Properties ================================================
 
+    // Add New Line
+    liveCode += "\n";
+
     // Add Signals =============================================================
+
+    // Add New Line
+    liveCode += "\n";
 
     // Add Slots ===============================================================
 
-    // Add Hooks for Property Getters Setters !!! ==============================
+    // Add New Line
+    liveCode += "\n";
 
+    // Add Hooks for Property Getters And Setters !!! ==============================
 
-
+    // Add New Line
+    liveCode += "\n";
 
     // Add Functions ===========================================================
 
+    // Add New Line
+    liveCode += "\n";
+
     // Add Children ============================================================
+
+    // Add New Line
+    liveCode += "\n";
 
     // Add States ==============================================================
 
+    // Add New Line
+    liveCode += "\n";
+
     // Add Transitions =========================================================
+
+    // Add New Line
+    liveCode += "\n";
 
     liveCode += "}\n";
 
@@ -1272,7 +1530,7 @@ void ComponentInfo::addSignal(const QString& aName, const QStringList& aParamete
     // Iterate Through Signals
     for (int i=0; i<sCount; i++) {
         // Get String Value
-        QString jsonValueString = mSignals[i].toString();
+        QString jsonValueString = mSignals[i].toObject()[JSON_KEY_COMPONENT_SIGNAL_NAME].toString();
         // Check JS String Value
         if (jsonValueString == aName) {
             return;
@@ -1305,7 +1563,7 @@ void ComponentInfo::removeSignal(const QString& aName)
     // Iterate Through Signals
     for (int i=0; i<sCount; i++) {
         // Get String Value
-        QString jsonValueString = mSignals[i].toString();
+        QString jsonValueString = mSignals[i].toObject()[JSON_KEY_COMPONENT_SIGNAL_NAME].toString();
         // Check JS String Value
         if (jsonValueString == aName) {
             // Remove Signal
@@ -1341,7 +1599,32 @@ void ComponentInfo::removeSignal(const int& aIndex)
 //==============================================================================
 void ComponentInfo::addSlot(const QString& aName, const QString& aSource)
 {
+    // Get Slots Count
+    int sCount = mSlots.count();
+    // Iterate Through Slots
+    for (int i=0; i<sCount; i++) {
+        // Get String Value
+        QString jsonValueString = mSlots[i].toObject()[JSON_KEY_COMPONENT_SLOT_NAME].toString();
+        // Check JS String Value
+        if (jsonValueString == aName) {
+            return;
+        }
+    }
 
+    // Init New Slot JSON Object
+    QJsonObject newSlot;
+
+    // Set Slot Name
+    newSlot[JSON_KEY_COMPONENT_SLOT_NAME] = aName;
+    // Set Parameters
+    newSlot[JSON_KEY_COMPONENT_SLOT_SOURCE] = aSource;
+
+    // Append Slot
+    mSlots << newSlot;
+    // Set Dirty
+    setDirty(true);
+    // Emit Slot Added
+    emit slotAdded(mSlots.count() - 1);
 }
 
 //==============================================================================
@@ -1349,7 +1632,24 @@ void ComponentInfo::addSlot(const QString& aName, const QString& aSource)
 //==============================================================================
 void ComponentInfo::removeSlot(const QString& aName)
 {
+    // Get Slots Count
+    int sCount = mSlots.count();
+    // Iterate Through Slots
+    for (int i=0; i<sCount; i++) {
+        // Get String Value
+        QString jsonValueString = mSlots[i].toObject()[JSON_KEY_COMPONENT_SLOT_NAME].toString();
+        // Check JS String Value
+        if (jsonValueString == aName) {
+            // Remove Slot
+            mSlots.removeAt(i);
+            // Set Dirty
+            setDirty(true);
+            // Emit Slot Removed Signal
+            emit slotRemoved(i);
 
+            return;
+        }
+    }
 }
 
 //==============================================================================
@@ -1357,7 +1657,15 @@ void ComponentInfo::removeSlot(const QString& aName)
 //==============================================================================
 void ComponentInfo::removeSlot(const int& aIndex)
 {
-
+    // Check Index
+    if (aIndex >= 0 && aIndex < mSlots.count()) {
+        // Remove Slot
+        mSlots.removeAt(aIndex);
+        // Set Dirty
+        setDirty(true);
+        // Emit Slot Removed Signal
+        emit slotRemoved(aIndex);
+    }
 }
 
 //==============================================================================
@@ -1365,7 +1673,34 @@ void ComponentInfo::removeSlot(const int& aIndex)
 //==============================================================================
 void ComponentInfo::addFunction(const QString& aName, const QStringList& aParameters, const QString& aSource)
 {
+    // Get Functions Count
+    int fCount = mFunctions.count();
+    // iterate Through Functions
+    for (int i=0; i<fCount; i++) {
+        // Get JSON Object
+        QJsonObject componentFunction = mFunctions[i].toObject();
+        // Check Function Name
+        if (componentFunction[JSON_KEY_COMPONENT_FUNCTION_NAME].toString() == aName) {
+            return;
+        }
+    }
 
+    // Init New Function JSON Object
+    QJsonObject newFunctionObject;
+
+    // Set Name
+    newFunctionObject[JSON_KEY_COMPONENT_FUNCTION_NAME] = aName;
+    // Set Parameters
+    newFunctionObject[JSON_KEY_COMPONENT_FUNCTION_PARAMETERS] = aParameters.join(':');
+    // Set Source
+    newFunctionObject[JSON_KEY_COMPONENT_FUNCTION_SOURCE] = aSource;
+
+    // Add Function
+    mFunctions << newFunctionObject;
+    // Set Dirty
+    setDirty(true);
+    // Emit Function Added Signal
+    emit functionAdded(mFunctions.count() - 1);
 }
 
 //==============================================================================
@@ -1373,7 +1708,24 @@ void ComponentInfo::addFunction(const QString& aName, const QStringList& aParame
 //==============================================================================
 void ComponentInfo::removeFunction(const QString& aName)
 {
+    // Get Functions Count
+    int fCount = mFunctions.count();
+    // iterate Through Functions
+    for (int i=0; i<fCount; i++) {
+        // Get JSON Object
+        QJsonObject componentFunction = mFunctions[i].toObject();
+        // Check Function Name
+        if (componentFunction[JSON_KEY_COMPONENT_FUNCTION_NAME].toString() == aName) {
+            // Remove Function
+            mFunctions.removeAt(i);
+            // Set Dirty
+            setDirty(true);
+            // Emit Function Removed Signal
+            emit functionRemoved(i);
 
+            return;
+        }
+    }
 }
 
 //==============================================================================
@@ -1381,7 +1733,15 @@ void ComponentInfo::removeFunction(const QString& aName)
 //==============================================================================
 void ComponentInfo::removeFunction(const int& aIndex)
 {
-
+    // Check Index
+    if (aIndex >=0 && aIndex < mFunctions.count()) {
+        // Remove Function
+        mFunctions.removeAt(aIndex);
+        // Set Dirty
+        setDirty(true);
+        // Emit Function Removed Signal
+        emit functionRemoved(aIndex);
+    }
 }
 
 //==============================================================================
@@ -1389,7 +1749,35 @@ void ComponentInfo::removeFunction(const int& aIndex)
 //==============================================================================
 void ComponentInfo::addState(const QString& aName, const QString& aWhen)
 {
+    // Get States Count
+    int sCount = mStates.count();
+    // Iterate Througn States
+    for (int i=0; i<sCount; i++) {
+        // Get State JSON Object
+        QJsonObject stateObject = mStates[i].toObject();
+        // Check State Name
+        if (stateObject[JSON_KEY_COMPONENT_STATE_NAME].toString() == aName) {
+            // Skip
+            return;
+        }
+    }
 
+    // Init New State Object
+    QJsonObject newStateObject;
+
+    // Set Name
+    newStateObject[JSON_KEY_COMPONENT_STATE_NAME] = aName;
+    // Set When Trigger
+    newStateObject[JSON_KEY_COMPONENT_STATE_WHEN] = aWhen;
+
+    // Add Property Changes Later
+
+    // Add State
+    mStates << newStateObject;
+    // Set Dirty
+    setDirty(true);
+    // Emit State Added Signal
+    emit stateAdded(mStates.count() - 1);
 }
 
 //==============================================================================
@@ -1397,7 +1785,24 @@ void ComponentInfo::addState(const QString& aName, const QString& aWhen)
 //==============================================================================
 void ComponentInfo::removeState(const QString& aName)
 {
+    // Get States Count
+    int sCount = mStates.count();
+    // Iterate Througn States
+    for (int i=0; i<sCount; i++) {
+        // Get State JSON Object
+        QJsonObject stateObject = mStates[i].toObject();
+        // Check State Name
+        if (stateObject[JSON_KEY_COMPONENT_STATE_NAME].toString() == aName) {
+            // Remove State
+            mStates.removeAt(i);
+            // Set Dirty
+            setDirty(true);
+            // Emit State Removed Signal
+            emit stateRemoved(i);
 
+            return;
+        }
+    }
 }
 
 //==============================================================================
@@ -1405,7 +1810,15 @@ void ComponentInfo::removeState(const QString& aName)
 //==============================================================================
 void ComponentInfo::removeState(const int& aIndex)
 {
-
+    // Check Index
+    if (aIndex >= 0 && aIndex < mStates.count()) {
+        // Remove State
+        mStates.removeAt(aIndex);
+        // Set Dirty
+        setDirty(true);
+        // Emit State Removed Signal
+        emit stateRemoved(aIndex);
+    }
 }
 
 //==============================================================================
@@ -1413,7 +1826,44 @@ void ComponentInfo::removeState(const int& aIndex)
 //==============================================================================
 void ComponentInfo::addPropertyChange(const QString& aStateName, const QString& aTarget, const QString& aProperty, const QVariant& aValue)
 {
+    // Get States Count
+    int sCount = mStates.count();
+    // Iterate Througn States
+    for (int i=0; i<sCount; i++) {
+        // Get State JSON Object
+        QJsonObject stateObject = mStates[i].toObject();
+        // Check State Name
+        if (stateObject[JSON_KEY_COMPONENT_STATE_NAME].toString() == aStateName) {
+            // Init New Property Change JSON Object
+            QJsonObject newPropertyChangeObject;
 
+            // Set Target
+            newPropertyChangeObject[JSON_KEY_COMPONENT_PROPERTY_CHANGE_TARGET] = aTarget;
+            // Set Property
+            newPropertyChangeObject[JSON_KEY_COMPONENT_PROPERTY_CHANGE_PROPERTY] = aProperty;
+            // Set Value
+            newPropertyChangeObject[JSON_KEY_COMPONENT_PROPERTY_CHANGE_VALUE] = aValue.toString();
+
+            // Init Property Changes Array
+            QJsonArray propertyChangesArray = stateObject[JSON_KEY_COMPONENT_STATE_PROPERTY_CHANGES].toArray();
+
+            // Add Property Change
+            propertyChangesArray << newPropertyChangeObject;
+            // Set Dirty
+            setDirty(true);
+
+            // Set Property Changes Array
+            stateObject[JSON_KEY_COMPONENT_STATE_PROPERTY_CHANGES] = propertyChangesArray;
+
+            // Set State Object
+            mStates[i] = stateObject;
+
+            // Emit Property Change Added
+            emit stateUpdated(i);
+
+            return;
+        }
+    }
 }
 
 //==============================================================================
@@ -1421,23 +1871,40 @@ void ComponentInfo::addPropertyChange(const QString& aStateName, const QString& 
 //==============================================================================
 void ComponentInfo::removePropertyChange(const QString& aStateName, const int& aIndex)
 {
+    // Get States Count
+    int sCount = mStates.count();
+    // Iterate Througn States
+    for (int i=0; i<sCount; i++) {
+        // Get State JSON Object
+        QJsonObject stateObject = mStates[i].toObject();
+        // Check State Name
+        if (stateObject[JSON_KEY_COMPONENT_STATE_NAME].toString() == aStateName) {
+            // Init Property Changes Array
+            QJsonArray propertyChangesArray = stateObject[JSON_KEY_COMPONENT_STATE_PROPERTY_CHANGES].toArray();
 
-}
+            // Check Index
+            if (aIndex >= 0 && aIndex < propertyChangesArray.count()) {
+                // Remove Property Change
+                propertyChangesArray.removeAt(aIndex);
+                // Set Dirty
+                setDirty(true);
 
-//==============================================================================
-// Add Transition
-//==============================================================================
-void ComponentInfo::addTransition(const QString& aStateFrom, const QString& aStateTo)
-{
+                // Check Count
+                if (propertyChangesArray.count() == 0) {
+                    // Remove Property Changes Array
+                    stateObject.remove(JSON_KEY_COMPONENT_STATE_PROPERTY_CHANGES);
+                } else {
+                    // Set Property Changes
+                    stateObject[JSON_KEY_COMPONENT_STATE_PROPERTY_CHANGES] = propertyChangesArray;
+                }
 
-}
+                // Set State Object
+                mStates[i] = stateObject;
+            }
 
-//==============================================================================
-// Remove Transition
-//==============================================================================
-void ComponentInfo::removeTransition(const int& aIndex)
-{
-
+            return;
+        }
+    }
 }
 
 //==============================================================================

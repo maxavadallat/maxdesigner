@@ -442,6 +442,9 @@ void MainWindow::openProject(const QString& aFilePath)
             mOpenFiles->setProjectModel(mProjectModel);
         }
 
+        // Set Properties Controller
+        mProjectModel->setPropertiesController(mPropertiesController);
+
         // Emit Current Project Changed Signal
         emit currentProjectChanged(mProjectModel);
 
@@ -1087,6 +1090,9 @@ void MainWindow::updateProject()
     }
 
     qDebug() << "MainWindow::updateProject";
+
+    // Set Properties Controller
+    mProjectModel->setPropertiesController(mPropertiesController);
 
     // Set QML Dir
     mProjectModel->setQmlDir(mProjectPropertiesDiaog->qmlDir());

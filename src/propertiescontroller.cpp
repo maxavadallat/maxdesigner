@@ -42,7 +42,7 @@ PropertiesController::PropertiesController(ProjectModel* aProjectModel, QObject*
 void PropertiesController::init()
 {
     // Set Filtered Properties
-    setFilteredProperties(QString("id,objectName,width,height,x,y,states,transitions,children").split(","));
+    setFilteredProperties(QString("id,objectName,x,y,z,width,height,states,transitions,children").split(","));
 
     // ...
 }
@@ -356,7 +356,10 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
             // Set Current Component
             mComponentAnchors->setCurrentComponent(aComponent);
         } else {
-
+            // Create New Component Anchors Model
+            ComponentAnchorsModel* newComponentAnchorsModel = new ComponentAnchorsModel(mFocusedComponent);
+            // Set Component Anchors Model
+            setAnchorsModel(newComponentAnchorsModel);
         }
 
         // Check Signals Model
@@ -818,7 +821,8 @@ void PropertiesController::addTransition(const QString& aFrom, const QString& aT
 {
     // Check Component Transitions Model
     if (mComponentTransitions) {
-        // ...
+        // Add Transition
+        mComponentTransitions->addTransition(aFrom, aTo);
     }
 }
 
@@ -829,7 +833,8 @@ void PropertiesController::removeTransition(const int& aIndex)
 {
     // Check Component Transitions Model
     if (mComponentTransitions) {
-        // ...
+        // Remove Transitions
+        mComponentTransitions->removeTransition(aIndex);
     }
 }
 
@@ -840,7 +845,8 @@ void PropertiesController::removeTransition(ComponentTransition* aTransition)
 {
     // Check Component Transitions Model
     if (mComponentTransitions) {
-        // ...
+        // Remove Transition
+        mComponentTransitions->removeTransition(aTransition);
     }
 }
 
@@ -851,18 +857,8 @@ void PropertiesController::addParallelAnimation(ComponentTransition* aTransition
 {
     // Check Component Transitions Model
     if (mComponentTransitions) {
-        // ...
-    }
-}
-
-//==============================================================================
-// Remove Parallel Animation Node
-//==============================================================================
-void PropertiesController::removeParallelAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode)
-{
-    // Check Component Transitions Model
-    if (mComponentTransitions) {
-        // ...
+        // Add Parallel Animation
+        mComponentTransitions->addParallelAnimation(aTransition, aParentNode);
     }
 }
 
@@ -873,18 +869,8 @@ void PropertiesController::addSequentialAnimation(ComponentTransition* aTransiti
 {
     // Check Component Transitions Model
     if (mComponentTransitions) {
-        // ...
-    }
-}
-
-//==============================================================================
-// Remove Sequential Animation Node
-//==============================================================================
-void PropertiesController::removeSequentialAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode)
-{
-    // Check Component Transitions Model
-    if (mComponentTransitions) {
-        // ...
+        // Add Sequential Animatino
+        mComponentTransitions->addSequentialAnimation(aTransition, aParentNode);
     }
 }
 
@@ -895,18 +881,8 @@ void PropertiesController::addPauseAnimation(const QString& aDuration, Component
 {
     // Check Component Transitions Model
     if (mComponentTransitions) {
-        // ...
-    }
-}
-
-//==============================================================================
-// Remove Pause Animation Node
-//==============================================================================
-void PropertiesController::removePauseAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode)
-{
-    // Check Component Transitions Model
-    if (mComponentTransitions) {
-        // ...
+        // Add Pause Animation
+        mComponentTransitions->addPauseAnimation(aDuration, aTransition, aParentNode);
     }
 }
 
@@ -924,18 +900,8 @@ void PropertiesController::addPropertyAnimation(const QString& aTarget,
 {
     // Check Component Transitions Model
     if (mComponentTransitions) {
-        // ...
-    }
-}
-
-//==============================================================================
-// Remove Property Animation Node
-//==============================================================================
-void PropertiesController::removePropertyAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode)
-{
-    // Check Component Transitions Model
-    if (mComponentTransitions) {
-        // ...
+        // Add Property Animation
+        mComponentTransitions->addPropertyAnimation(aTarget, aProperty, aFrom, aTo, aDuration, aEasing, aTransition, aParentNode);
     }
 }
 
@@ -946,18 +912,8 @@ void PropertiesController::addPropertyAction(const QString& aTarget, const QStri
 {
     // Check Component Transitions Model
     if (mComponentTransitions) {
-        // ...
-    }
-}
-
-//==============================================================================
-// Remove Property Action Node
-//==============================================================================
-void PropertiesController::removePropertyActionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode)
-{
-    // Check Component Transitions Model
-    if (mComponentTransitions) {
-        // ...
+        // Add Property Action
+        mComponentTransitions->addPropertyAction(aTarget, aProperty, aValue, aTransition, aParentNode);
     }
 }
 
@@ -968,40 +924,35 @@ void PropertiesController::addScriptAction(const QString& aScript, ComponentTran
 {
     // Check Component Transitions Model
     if (mComponentTransitions) {
-        // ...
-    }
-}
-
-//==============================================================================
-// Remove Script Action Node
-//==============================================================================
-void PropertiesController::removeScriptActionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode)
-{
-    // Check Component Transitions Model
-    if (mComponentTransitions) {
-        // ...
+        // Add Script Action
+        mComponentTransitions->addScriptAction(aScript, aTransition, aParentNode);
     }
 }
 
 //==============================================================================
 // Remove Transition Node
 //==============================================================================
-void PropertiesController::removeTransitionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode)
+void PropertiesController::removeTransitionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode, ComponentTransitionNode* aParentNode)
 {
     // Check Component Transitions Model
     if (mComponentTransitions) {
-        // ...
+        // Remove Transition Node
+        mComponentTransitions->removeTransitionNode(aTransition, aNode, aParentNode);
     }
 }
 
 //==============================================================================
 // Move Transition Node
 //==============================================================================
-void PropertiesController::moveTransitionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode, ComponentTransitionNode* aNewParentNode, const int& aIndex)
+void PropertiesController::moveTransitionNode(ComponentTransition* aTransition,
+                                              ComponentTransitionNode* aNode,
+                                              ComponentTransitionNode* aTargetNode,
+                                              const int& aTargetIndex)
 {
     // Check Component Transitions Model
     if (mComponentTransitions) {
-        // ...
+        // Move Transition
+        mComponentTransitions->moveTransitionNode(aTransition, aNode, aTargetNode, aTargetIndex);
     }
 }
 

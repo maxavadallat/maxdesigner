@@ -2,21 +2,8 @@
 
 #include "componentanchorsmodel.h"
 #include "componentinfo.h"
+#include "propertiescontroller.h"
 #include "constants.h"
-
-//==============================================================================
-// From JSON Object
-//==============================================================================
-ComponentAnchorsModel* ComponentAnchorsModel::fromJSONObject(ComponentInfo* aComponent, const QJsonObject& aObject)
-{
-    // Init New Anchors Model
-    ComponentAnchorsModel* newAnchorsModel = new ComponentAnchorsModel(aComponent);
-
-    // Load Component Anchors
-    newAnchorsModel->loadComponentAnchors(aObject);
-
-    return newAnchorsModel;
-}
 
 //==============================================================================
 // Constructor
@@ -25,6 +12,8 @@ ComponentAnchorsModel::ComponentAnchorsModel(ComponentInfo* aComponent, QObject*
     : QObject(aParent)
     , mComponent(aComponent)
 {
+    qDebug() << "ComponentAnchorsModel created.";
+
     // Init
     init();
 }
@@ -34,7 +23,6 @@ ComponentAnchorsModel::ComponentAnchorsModel(ComponentInfo* aComponent, QObject*
 //==============================================================================
 void ComponentAnchorsModel::init()
 {
-    // ...
 }
 
 //==============================================================================
@@ -45,25 +33,22 @@ void ComponentAnchorsModel::clear()
     // ...
 }
 
-//==============================================================================
-// Load Component Anchors
-//==============================================================================
-void ComponentAnchorsModel::loadComponentAnchors(const QJsonObject& aObject)
-{
-    if (aObject.isEmpty()) {
-        return;
-    }
+////==============================================================================
+//// Load Component Anchors
+////==============================================================================
+//void ComponentAnchorsModel::loadComponentAnchors()
+//{
 
-    // ...
-}
+//    // ...
+//}
 
-//==============================================================================
-// Save Component Anchors
-//==============================================================================
-void ComponentAnchorsModel::saveComponentAnchors()
-{
-    //
-}
+////==============================================================================
+//// Save Component Anchors
+////==============================================================================
+//void ComponentAnchorsModel::saveComponentAnchors()
+//{
+//    //
+//}
 
 //==============================================================================
 // Get Current Component
@@ -92,7 +77,12 @@ void ComponentAnchorsModel::setCurrentComponent(ComponentInfo* aComponent)
 //==============================================================================
 QString ComponentAnchorsModel::anchorsLeft()
 {
-    return mAnchorLeft;
+    // Check Current Component
+    if (mComponent) {
+        return mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFT].toString();
+    }
+
+    return "";
 }
 
 //==============================================================================
@@ -101,11 +91,13 @@ QString ComponentAnchorsModel::anchorsLeft()
 void ComponentAnchorsModel::setAnchorsLeft(const QString& aAnchorLeft)
 {
     // Check Anchors Left
-    if (mAnchorLeft != aAnchorLeft) {
+    if (mComponent && anchorsLeft() != aAnchorLeft) {
         // Set Anchors Left
-        mAnchorLeft = aAnchorLeft;
+        mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFT] = aAnchorLeft;
+        // Set Component Dirty
+        mComponent->setDirty(true);
         // Emit Anchors Left Changed Signal
-        emit anchorsLeftChanged(mAnchorLeft);
+        emit anchorsLeftChanged(aAnchorLeft);
     }
 }
 
@@ -114,7 +106,12 @@ void ComponentAnchorsModel::setAnchorsLeft(const QString& aAnchorLeft)
 //==============================================================================
 QString ComponentAnchorsModel::anchorsRight()
 {
-    return mAnchorRight;
+    // Check Current Component
+    if (mComponent) {
+        return mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHT].toString();
+    }
+
+    return "";
 }
 
 //==============================================================================
@@ -123,11 +120,13 @@ QString ComponentAnchorsModel::anchorsRight()
 void ComponentAnchorsModel::setAnchorsRight(const QString& aAnchorRight)
 {
     // Check Anchors Right
-    if (mAnchorRight != aAnchorRight) {
-        // Set Anchors Right
-        mAnchorRight = aAnchorRight;
+    if (mComponent &&  anchorsRight() != aAnchorRight) {
+        // Set Anchors Left
+        mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFT] = aAnchorRight;
+        // Set Component Dirty
+        mComponent->setDirty(true);
         // Emit Anchors Right Changed Signal
-        emit anchorsRightChanged(mAnchorRight);
+        emit anchorsRightChanged(aAnchorRight);
     }
 }
 
@@ -136,7 +135,12 @@ void ComponentAnchorsModel::setAnchorsRight(const QString& aAnchorRight)
 //==============================================================================
 QString ComponentAnchorsModel::anchorsTop()
 {
-    return mAnchorTop;
+    // Check Current Component
+    if (mComponent) {
+        return mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOP].toString();
+    }
+
+    return "";
 }
 
 //==============================================================================
@@ -145,11 +149,13 @@ QString ComponentAnchorsModel::anchorsTop()
 void ComponentAnchorsModel::setAnchorsTop(const QString& aAnchorTop)
 {
     // Check Anchors Top
-    if (mAnchorTop != aAnchorTop) {
+    if (mComponent && anchorsTop() != aAnchorTop) {
         // Set Anchors Top
-        mAnchorTop = aAnchorTop;
+        mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOP] = aAnchorTop;
+        // Set Component Dirty
+        mComponent->setDirty(true);
         // Emit Anchors Top Changed Signal
-        emit anchorsTopChanged(mAnchorTop);
+        emit anchorsTopChanged(aAnchorTop);
     }
 }
 
@@ -158,7 +164,12 @@ void ComponentAnchorsModel::setAnchorsTop(const QString& aAnchorTop)
 //==============================================================================
 QString ComponentAnchorsModel::anchorsBottom()
 {
-    return mAnchorBottom;
+    // Check Current Component
+    if (mComponent) {
+        return mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOM].toString();
+    }
+
+    return "";
 }
 
 //==============================================================================
@@ -167,11 +178,13 @@ QString ComponentAnchorsModel::anchorsBottom()
 void ComponentAnchorsModel::setAnchorsBottom(const QString& aAnchorBottom)
 {
     // Check Anchors Bottom
-    if (mAnchorBottom != aAnchorBottom) {
+    if (mComponent && anchorsBottom() != aAnchorBottom) {
         // Set Anchors Bottom
-        mAnchorBottom = aAnchorBottom;
+        mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOM] = aAnchorBottom;
+        // Set Component Dirty
+        mComponent->setDirty(true);
         // Emit Anchors Bottom Changed Signal
-        emit anchorsBottomChanged(mAnchorBottom);
+        emit anchorsBottomChanged(aAnchorBottom);
     }
 }
 
@@ -180,7 +193,12 @@ void ComponentAnchorsModel::setAnchorsBottom(const QString& aAnchorBottom)
 //==============================================================================
 QString ComponentAnchorsModel::anchorsFill()
 {
-    return mAnchorFill;
+    // Check Current Component
+    if (mComponent) {
+        return mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_FILL].toString();
+    }
+
+    return "";
 }
 
 //==============================================================================
@@ -189,11 +207,13 @@ QString ComponentAnchorsModel::anchorsFill()
 void ComponentAnchorsModel::setAnchorsFill(const QString& aAnchorFill)
 {
     // Check Anchors Fill
-    if (mAnchorFill != aAnchorFill) {
+    if (mComponent && anchorsFill() != aAnchorFill) {
         // Set Anchors Fill
-        mAnchorFill = aAnchorFill;
+        mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_FILL] = aAnchorFill;
+        // Set Component Dirty
+        mComponent->setDirty(true);
         // Emit Anchors Fill Changed Signal
-        emit anchorsFillChanged(mAnchorFill);
+        emit anchorsFillChanged(aAnchorFill);
     }
 }
 
@@ -202,7 +222,12 @@ void ComponentAnchorsModel::setAnchorsFill(const QString& aAnchorFill)
 //==============================================================================
 QString ComponentAnchorsModel::anchorsCenterIn()
 {
-    return mAnchorCenterIn;
+    // Check Current Component
+    if (mComponent) {
+        return mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_CENTERIN].toString();
+    }
+
+    return "";
 }
 
 //==============================================================================
@@ -211,11 +236,71 @@ QString ComponentAnchorsModel::anchorsCenterIn()
 void ComponentAnchorsModel::setAnchorsCenterIn(const QString& aAnchorCenterIn)
 {
     // Check Anchors CenterIn
-    if (mAnchorCenterIn != aAnchorCenterIn) {
+    if (mComponent && anchorsCenterIn() != aAnchorCenterIn) {
         // Set Anchors CenterIn
-        mAnchorCenterIn = aAnchorCenterIn;
+        mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_CENTERIN] = aAnchorCenterIn;
+        // Set Component Dirty
+        mComponent->setDirty(true);
         // Emit Anchors CenterIn Changed Signal
-        emit anchorsCenterInChanged(mAnchorCenterIn);
+        emit anchorsCenterInChanged(aAnchorCenterIn);
+    }
+}
+
+//==============================================================================
+// Horizontal Center Target
+//==============================================================================
+QString ComponentAnchorsModel::horizontalCenter()
+{
+    // Check Current Component
+    if (mComponent) {
+        return mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER].toString();
+    }
+
+    return "";
+}
+
+//==============================================================================
+// Set Horizontal Center Target
+//==============================================================================
+void ComponentAnchorsModel::setHorizontalCenter(const QString& aHorizontalCenter)
+{
+    // Check Anchors Horizontal Center
+    if (mComponent && horizontalCenter() != aHorizontalCenter) {
+        // Set Anchors Horizontal Center
+        mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER] = aHorizontalCenter;
+        // Set Component Dirty
+        mComponent->setDirty(true);
+        // Emit Anchors Horizontal Changed Signal
+        emit anchorsHorizontalCenterChanged(aHorizontalCenter);
+    }
+}
+
+//==============================================================================
+// Vertical Center Target
+//==============================================================================
+QString ComponentAnchorsModel::verticalCenter()
+{
+    // Check Current Component
+    if (mComponent) {
+        return mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER].toString();
+    }
+
+    return "";
+}
+
+//==============================================================================
+// Set Vertical Center Target
+//==============================================================================
+void ComponentAnchorsModel::setVerticalCenter(const QString& aVerticalCenter)
+{
+    // Check Anchors Vertical Center
+    if (mComponent && verticalCenter() != aVerticalCenter) {
+        // Set Anchors Vertical Center
+        mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER] = aVerticalCenter;
+        // Set Component Dirty
+        mComponent->setDirty(true);
+        // Emit Anchors Vertical Changed Signal
+        emit anchorsVerticalCenterChanged(aVerticalCenter);
     }
 }
 
@@ -224,7 +309,12 @@ void ComponentAnchorsModel::setAnchorsCenterIn(const QString& aAnchorCenterIn)
 //==============================================================================
 QString ComponentAnchorsModel::anchorsMargins()
 {
-    return mAnchorMargins;
+    // Check Current Component
+    if (mComponent) {
+        return mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_MARGINS].toString();
+    }
+
+    return "";
 }
 
 //==============================================================================
@@ -233,11 +323,13 @@ QString ComponentAnchorsModel::anchorsMargins()
 void ComponentAnchorsModel::setAnchorsMargins(const QString& aAnchorMargins)
 {
     // Check Anchors Margins
-    if (mAnchorMargins != aAnchorMargins) {
+    if (mComponent && anchorsMargins() != aAnchorMargins) {
         // Set Anchors Margins
-        mAnchorMargins = aAnchorMargins;
+        mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_MARGINS] = aAnchorMargins;
+        // Set Component Dirty
+        mComponent->setDirty(true);
         // Emit Anchors Margins Changed Signal
-        emit anchorsMarginsChanged(mAnchorMargins);
+        emit anchorsMarginsChanged(aAnchorMargins);
     }
 }
 
@@ -246,7 +338,12 @@ void ComponentAnchorsModel::setAnchorsMargins(const QString& aAnchorMargins)
 //==============================================================================
 QString ComponentAnchorsModel::anchorsLeftMargin()
 {
-    return mAnchorLeftMargin;
+    // Check Current Component
+    if (mComponent) {
+        return mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFTMARGIN].toString();
+    }
+
+    return "";
 }
 
 //==============================================================================
@@ -255,11 +352,13 @@ QString ComponentAnchorsModel::anchorsLeftMargin()
 void ComponentAnchorsModel::setAnchorsLeftMargin(const QString& aAnchorLeftMargin)
 {
     // Check Anchors LeftMargin
-    if (mAnchorLeftMargin != aAnchorLeftMargin) {
+    if (mComponent && anchorsLeftMargin() != aAnchorLeftMargin) {
         // Set Anchors LeftMargin
-        mAnchorLeftMargin = aAnchorLeftMargin;
+        mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFTMARGIN] = aAnchorLeftMargin;
+        // Set Component Dirty
+        mComponent->setDirty(true);
         // Emit Anchors LeftMargin Changed Signal
-        emit anchorsLeftMarginChanged(mAnchorLeftMargin);
+        emit anchorsLeftMarginChanged(aAnchorLeftMargin);
     }
 }
 
@@ -268,7 +367,12 @@ void ComponentAnchorsModel::setAnchorsLeftMargin(const QString& aAnchorLeftMargi
 //==============================================================================
 QString ComponentAnchorsModel::anchorsRightMargin()
 {
-    return mAnchorRightMargin;
+    // Check Current Component
+    if (mComponent) {
+        return mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHTMARGIN].toString();
+    }
+
+    return "";
 }
 
 //==============================================================================
@@ -277,11 +381,13 @@ QString ComponentAnchorsModel::anchorsRightMargin()
 void ComponentAnchorsModel::setAnchorsRightMargin(const QString& aAnchorRightMargin)
 {
     // Check Anchors RightMargin
-    if (mAnchorRightMargin != aAnchorRightMargin) {
+    if (mComponent && anchorsRightMargin() != aAnchorRightMargin) {
         // Set Anchors RightMargin
-        mAnchorRightMargin = aAnchorRightMargin;
+        mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHTMARGIN] = aAnchorRightMargin;
+        // Set Component Dirty
+        mComponent->setDirty(true);
         // Emit Anchors RightMargin Changed Signal
-        emit anchorsRightMarginChanged(mAnchorRightMargin);
+        emit anchorsRightMarginChanged(aAnchorRightMargin);
     }
 }
 
@@ -290,7 +396,12 @@ void ComponentAnchorsModel::setAnchorsRightMargin(const QString& aAnchorRightMar
 //==============================================================================
 QString ComponentAnchorsModel::anchorsTopMargin()
 {
-    return mAnchorTopMargin;
+    // Check Current Component
+    if (mComponent) {
+        return mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOPMARGIN].toString();
+    }
+
+    return "";
 }
 
 //==============================================================================
@@ -299,11 +410,13 @@ QString ComponentAnchorsModel::anchorsTopMargin()
 void ComponentAnchorsModel::setAnchorsTopMargin(const QString& aAnchorTopMargin)
 {
     // Check Anchors TopMargin
-    if (mAnchorTopMargin != aAnchorTopMargin) {
+    if (mComponent && anchorsTopMargin() != aAnchorTopMargin) {
         // Set Anchors TopMargin
-        mAnchorTopMargin = aAnchorTopMargin;
+        mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOPMARGIN] = aAnchorTopMargin;
+        // Set Component Dirty
+        mComponent->setDirty(true);
         // Emit Anchors TopMargin Changed Signal
-        emit anchorsTopMarginChanged(mAnchorTopMargin);
+        emit anchorsTopMarginChanged(aAnchorTopMargin);
     }
 }
 
@@ -312,7 +425,12 @@ void ComponentAnchorsModel::setAnchorsTopMargin(const QString& aAnchorTopMargin)
 //==============================================================================
 QString ComponentAnchorsModel::anchorsBottomMargin()
 {
-    return mAnchorBottomMargin;
+    // Check Current Component
+    if (mComponent) {
+        return mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOMMARGIN].toString();
+    }
+
+    return "";
 }
 
 //==============================================================================
@@ -321,11 +439,13 @@ QString ComponentAnchorsModel::anchorsBottomMargin()
 void ComponentAnchorsModel::setAnchorsBottomMargin(const QString& aAnchorBottomMargin)
 {
     // Check Anchors BottomMargin
-    if (mAnchorBottomMargin != aAnchorBottomMargin) {
+    if (mComponent && anchorsBottomMargin() != aAnchorBottomMargin) {
         // Set Anchors BottomMargin
-        mAnchorBottomMargin = aAnchorBottomMargin;
+        mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOMMARGIN] = aAnchorBottomMargin;
+        // Set Component Dirty
+        mComponent->setDirty(true);
         // Emit Anchors BottomMargin Changed Signal
-        emit anchorsBottomMarginChanged(mAnchorBottomMargin);
+        emit anchorsBottomMarginChanged(aAnchorBottomMargin);
     }
 }
 
@@ -334,7 +454,12 @@ void ComponentAnchorsModel::setAnchorsBottomMargin(const QString& aAnchorBottomM
 //==============================================================================
 QString ComponentAnchorsModel::anchorsHorizontalOffset()
 {
-    return mAnchorHorizontalOffset;
+    // Check Current Component
+    if (mComponent) {
+        return mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER_OFFS].toString();
+    }
+
+    return "";
 }
 
 //==============================================================================
@@ -342,12 +467,14 @@ QString ComponentAnchorsModel::anchorsHorizontalOffset()
 //==============================================================================
 void ComponentAnchorsModel::setAnchorsHorizontalOffset(const QString& aAnchorHorizontalOffset)
 {
-    // Check Anchors HorizontalOffset
-    if (mAnchorHorizontalOffset != aAnchorHorizontalOffset) {
-        // Set Anchors HorizontalOffset
-        mAnchorHorizontalOffset = aAnchorHorizontalOffset;
+    // Check Anchors Horizontal Offset
+    if (mComponent && anchorsHorizontalOffset() != aAnchorHorizontalOffset) {
+        // Set Anchors Horizontal Offset
+        mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER_OFFS] = aAnchorHorizontalOffset;
+        // Set Component Dirty
+        mComponent->setDirty(true);
         // Emit Anchors HorizontalOffset Changed Signal
-        emit anchorsHorizontalOffsetChanged(mAnchorHorizontalOffset);
+        emit anchorsHorizontalOffsetChanged(aAnchorHorizontalOffset);
     }
 }
 
@@ -356,7 +483,12 @@ void ComponentAnchorsModel::setAnchorsHorizontalOffset(const QString& aAnchorHor
 //==============================================================================
 QString ComponentAnchorsModel::anchorsVerticalOffset()
 {
-    return mAnchorVerticalOffset;
+    // Check Current Component
+    if (mComponent) {
+        return mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER_OFFS].toString();
+    }
+
+    return "";
 }
 
 //==============================================================================
@@ -364,26 +496,15 @@ QString ComponentAnchorsModel::anchorsVerticalOffset()
 //==============================================================================
 void ComponentAnchorsModel::setAnchorsVerticalOffset(const QString& aAnchorVerticalOffset)
 {
-    // Check Anchors VerticalOffset
-    if (mAnchorVerticalOffset != aAnchorVerticalOffset) {
-        // Set Anchors VerticalOffset
-        mAnchorVerticalOffset = aAnchorVerticalOffset;
-        // Emit Anchors VerticalOffset Changed Signal
-        emit anchorsVerticalOffsetChanged(mAnchorVerticalOffset);
+    // Check Anchors Vertical Offset
+    if (mComponent && anchorsVerticalOffset() != aAnchorVerticalOffset) {
+        // Set Anchors Vertical Offset
+        mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER_OFFS] = aAnchorVerticalOffset;
+        // Set Component Dirty
+        mComponent->setDirty(true);
+        // Emit Anchors Vertical Offset Changed Signal
+        emit anchorsVerticalOffsetChanged(aAnchorVerticalOffset);
     }
-}
-
-//==============================================================================
-// To JSON Object
-//==============================================================================
-QJsonObject ComponentAnchorsModel::toJSONObject()
-{
-    // Init New JSON Object
-    QJsonObject newObject;
-
-    // ...
-
-    return newObject;
 }
 
 //==============================================================================
@@ -395,4 +516,6 @@ ComponentAnchorsModel::~ComponentAnchorsModel()
     clear();
 
     // ...
+
+    qDebug() << "ComponentAnchorsModel deleted.";
 }

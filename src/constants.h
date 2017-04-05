@@ -171,6 +171,13 @@
 #define JSON_KEY_COMPONENT_SIGNAL_NAME                      "componentSignalName"
 #define JSON_KEY_COMPONENT_SIGNAL_PARAMETERS                "componentSignalParameters"
 
+#define JSON_KEY_COMPONENT_SLOT_NAME                        "componentSlotName"
+#define JSON_KEY_COMPONENT_SLOT_SOURCE                      "componentSlotSource"
+
+#define JSON_KEY_COMPONENT_FUNCTION_NAME                    "componentFunctionName"
+#define JSON_KEY_COMPONENT_FUNCTION_PARAMETERS              "componentFunctionParameters"
+#define JSON_KEY_COMPONENT_FUNCTION_SOURCE                  "componentFunctionSource"
+
 #define JSON_KEY_COMPONENT_STATE_NAME                       "componentStateName"
 #define JSON_KEY_COMPONENT_STATE_WHEN                       "componentStateWhen"
 #define JSON_KEY_COMPONENT_STATE_PROPERTY_CHANGES           "componentStatePropertyChanges"
@@ -182,7 +189,7 @@
 #define JSON_KEY_COMPONENT_TRANSITION_FROM                  "componentTransitionFrom"
 #define JSON_KEY_COMPONENT_TRANSITION_TO                    "componentTransitionTo"
 
-#define JSON_KEY_COMPONENT_TRANSITION_ROOT                  "componentTransitionRoot"
+#define JSON_KEY_COMPONENT_TRANSITION_NODES                 "componentTransitionNodes"
 
 #define JSON_KEY_COMPONENT_TRANSITION_NODE_TYPE             "componentTransitionNodeType"
 #define JSON_KEY_COMPONENT_TRANSITION_NODE_CHILDREN         "componentTransitionNodeChildren"
@@ -224,6 +231,7 @@
 
 #define JSON_KEY_COMPONENT_PROPERTY_ANCHORS_FILL            "anchors.fill"
 #define JSON_KEY_COMPONENT_PROPERTY_ANCHORS_CENTERIN        "anchors.centerIn"
+
 #define JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFT            "anchors.left"
 #define JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHT           "anchors.right"
 #define JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOP             "anchors.top"

@@ -172,17 +172,11 @@ public:
     Q_INVOKABLE void removeTransition(ComponentTransition* aTransition);
 
     // Add Parallel Animation Node
-    Q_INVOKABLE void addParallelAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode);
-    // Remove Parallel Animation Node
-    Q_INVOKABLE void removeParallelAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode);
+    Q_INVOKABLE void addParallelAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode = NULL);
     // Add Sequential Animation Node
-    Q_INVOKABLE void addSequentialAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode);
-    // Remove Sequential Animation Node
-    Q_INVOKABLE void removeSequentialAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode);
+    Q_INVOKABLE void addSequentialAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode = NULL);
     // Add Pause Animation Node
-    Q_INVOKABLE void addPauseAnimation(const QString& aDuration, ComponentTransition* aTransition, ComponentTransitionNode* aParentNode);
-    // Remove Pause Animation Node
-    Q_INVOKABLE void removePauseAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode);
+    Q_INVOKABLE void addPauseAnimation(const QString& aDuration, ComponentTransition* aTransition, ComponentTransitionNode* aParentNode = NULL);
     // Add Property Animation Node
     Q_INVOKABLE void addPropertyAnimation(const QString& aTarget,
                                           const QString& aProperty,
@@ -191,21 +185,26 @@ public:
                                           const QString& aDuration,
                                           const QString& aEasing,
                                           ComponentTransition* aTransition,
-                                          ComponentTransitionNode* aParentNode);
-    // Remove Property Animation Node
-    Q_INVOKABLE void removePropertyAnimationNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode);
+                                          ComponentTransitionNode* aParentNode = NULL);
     // Add Property Action Node
-    Q_INVOKABLE void addPropertyAction(const QString& aTarget, const QString& aProperty, const QString& aValue, ComponentTransition* aTransition, ComponentTransitionNode* aParentNode);
-    // Remove Property Action Node
-    Q_INVOKABLE void removePropertyActionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode);
+    Q_INVOKABLE void addPropertyAction(const QString& aTarget,
+                                       const QString& aProperty,
+                                       const QString& aValue,
+                                       ComponentTransition* aTransition,
+                                       ComponentTransitionNode* aParentNode = NULL);
     // Add Script Action Node
-    Q_INVOKABLE void addScriptAction(const QString& aScript, ComponentTransition* aTransition, ComponentTransitionNode* aParentNode);
-    // Remove Script Action Node
-    Q_INVOKABLE void removeScriptActionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode);
+    Q_INVOKABLE void addScriptAction(const QString& aScript,
+                                     ComponentTransition* aTransition,
+                                     ComponentTransitionNode* aParentNode= NULL);
     // Remove Transition Node
-    Q_INVOKABLE void removeTransitionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode);
+    Q_INVOKABLE void removeTransitionNode(ComponentTransition* aTransition,
+                                          ComponentTransitionNode* aNode,
+                                          ComponentTransitionNode* aParentNode = NULL);
     // Move Transition Node
-    Q_INVOKABLE void moveTransitionNode(ComponentTransition* aTransition, ComponentTransitionNode* aNode, ComponentTransitionNode* aNewParentNode, const int& aIndex);
+    Q_INVOKABLE void moveTransitionNode(ComponentTransition* aTransition,
+                                        ComponentTransitionNode* aNode,
+                                        ComponentTransitionNode* aTargetNode,
+                                        const int& aTargetIndex);
 
     // ...
 

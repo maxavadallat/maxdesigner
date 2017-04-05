@@ -115,50 +115,160 @@ void ComponentTransitionsModel::removeTransition(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
+        // Begin Remove Rows
+        beginRemoveRows(QModelIndex(), aIndex, aIndex);
         // Delete Transition
         delete mTransitions.takeAt(aIndex);
+        // End Remove Rows
+        endRemoveRows();
     }
 }
 
 //==============================================================================
-// Add Sequential Animation Root Item
+// Remvoe Transitions
 //==============================================================================
-void ComponentTransitionsModel::addSequentialAnimationRoot(const int& aIndex)
+void ComponentTransitionsModel::removeTransition(ComponentTransition* aTransition)
 {
-    // Check Index
-    if (aIndex >= 0 && aIndex < rowCount()) {
-
+    // Check Transition
+    if (!aTransition) {
+        return;
     }
-}
 
-//==============================================================================
-// Add Parallel Animation Root Item
-//==============================================================================
-void ComponentTransitionsModel::addParallelAnimationRoot(const int& aIndex)
-{
-    // Check Index
-    if (aIndex >= 0 && aIndex < rowCount()) {
-
-    }
-}
-
-//==============================================================================
-// Remove Transtion Root Item
-//==============================================================================
-void ComponentTransitionsModel::removeTransitionRoot(const int& aIndex)
-{
-    // Get Transitions Count
-    int tCount = mTransitions.count();
-    // Check Index
-    if (aIndex >= 0 && aIndex < tCount) {
-        // Get Transition
-        ComponentTransition* transition = mTransitions[aIndex];
-        // Check Transition
-        if (transition) {
-            // Clear
-            transition->clear();
+    // Iterate Through Transitions
+    for (int i=0; mTransitions.count(); i++) {
+        // Check Transitions
+        if (mTransitions[i] == aTransition) {
+            // Begin Remove Rows
+            beginRemoveRows(QModelIndex(), i, i);
+            // Delete Transition
+            delete mTransitions.takeAt(i);
+            // End Remove Rows
+            endRemoveRows();
         }
     }
+}
+
+//==============================================================================
+// Add Parallel Animation Node
+//==============================================================================
+void ComponentTransitionsModel::addParallelAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode)
+{
+    // Check Transition
+    if (!aTransition) {
+        return;
+    }
+
+    // ...
+}
+
+//==============================================================================
+// Add Sequential Animation Node
+//==============================================================================
+void ComponentTransitionsModel::addSequentialAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode)
+{
+    // Check Transition
+    if (!aTransition) {
+        return;
+    }
+
+    // ...
+}
+
+//==============================================================================
+// Add Pause Animation Node
+//==============================================================================
+void ComponentTransitionsModel::addPauseAnimation(const QString& aDuration, ComponentTransition* aTransition, ComponentTransitionNode* aParentNode)
+{
+    // Check Transition
+    if (!aTransition) {
+        return;
+    }
+
+    // ...
+}
+
+//==============================================================================
+// Add Property Animation Node
+//==============================================================================
+void ComponentTransitionsModel::addPropertyAnimation(const QString& aTarget,
+                                                     const QString& aProperty,
+                                                     const QString& aFrom,
+                                                     const QString& aTo,
+                                                     const QString& aDuration,
+                                                     const QString& aEasing,
+                                                     ComponentTransition* aTransition,
+                                                     ComponentTransitionNode* aParentNode)
+{
+    // Check Transition
+    if (!aTransition) {
+        return;
+    }
+
+    // ...
+}
+
+//==============================================================================
+// Add Property Action Node
+//==============================================================================
+void ComponentTransitionsModel::addPropertyAction(const QString& aTarget,
+                                                  const QString& aProperty,
+                                                  const QString& aValue,
+                                                  ComponentTransition* aTransition,
+                                                  ComponentTransitionNode* aParentNode)
+{
+    // Check Transition
+    if (!aTransition) {
+        return;
+    }
+
+    // ...
+}
+
+//==============================================================================
+// Add Script Action Node
+//==============================================================================
+void ComponentTransitionsModel::addScriptAction(const QString& aScript,
+                                                ComponentTransition* aTransition,
+                                                ComponentTransitionNode* aParentNode)
+{
+    // Check Transition
+    if (!aTransition) {
+        return;
+    }
+
+    // ...
+}
+
+//==============================================================================
+// Remove Transition Node
+//==============================================================================
+void ComponentTransitionsModel::removeTransitionNode(ComponentTransition* aTransition,
+                                                     ComponentTransitionNode* aNode,
+                                                     ComponentTransitionNode* aParentNode)
+{
+    // Check Transition
+    if (!aTransition) {
+        return;
+    }
+
+    // ...
+}
+
+//==============================================================================
+// Move Transition Node
+//==============================================================================
+void ComponentTransitionsModel::moveTransitionNode(ComponentTransition* aTransition,
+                                                   ComponentTransitionNode* aNode,
+                                                   ComponentTransitionNode* aTargetNode,
+                                                   const int& aTargetIndex)
+{
+    // Check Transition
+    if (!aTransition) {
+        return;
+    }
+
+    // ...
+
 }
 
 //==============================================================================
@@ -330,10 +440,8 @@ ComponentTransition* ComponentTransition::fromJSONObject(ComponentTransitionsMod
     ComponentTransition* newTransition = new ComponentTransition(aObject[JSON_KEY_COMPONENT_TRANSITION_FROM].toString(),
                                                                  aObject[JSON_KEY_COMPONENT_TRANSITION_TO].toString());
 
-    // Get Transition Root Node
-    newTransition->mTransitionRoot = ComponentTransitionNode::fromJSONObject(aModel, aObject[JSON_KEY_COMPONENT_TRANSITION_ROOT].toObject());
-    // Set Current Node
-    newTransition->setCurrentNode(newTransition->mTransitionRoot);
+    // Read Transition Nodes
+    newTransition->readNodes(aObject[JSON_KEY_COMPONENT_TRANSITION_NODES].toArray());
 
     return newTransition;
 }
@@ -343,7 +451,6 @@ ComponentTransition* ComponentTransition::fromJSONObject(ComponentTransitionsMod
 //==============================================================================
 ComponentTransition::ComponentTransition(const QString& aFromState, const QString& aToState, QObject* aParent)
     : QObject(aParent)
-    , mTransitionRoot(NULL)
     , mCurrentNode(NULL)
     , mFromState(aFromState)
     , mToState(aToState)
@@ -418,6 +525,25 @@ void ComponentTransition::setCurrentNode(ComponentTransitionNode* aNode)
 }
 
 //==============================================================================
+// Get Node Count
+//==============================================================================
+int ComponentTransition::nodeCount()
+{
+    return mNodes.count();
+}
+
+//==============================================================================
+// Get Node By Index
+//==============================================================================
+ComponentTransitionNode* ComponentTransition::nodeByIndex(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < mNodes.count()) {
+        return mNodes[aIndex];
+    }
+}
+
+//==============================================================================
 // To JSON Object
 //==============================================================================
 QJsonObject ComponentTransition::toJSONObject()
@@ -431,6 +557,19 @@ QJsonObject ComponentTransition::toJSONObject()
 }
 
 //==============================================================================
+// Read Nodes
+//==============================================================================
+void ComponentTransition::readNodes(const QJsonArray& aNodes)
+{
+    // Check Nodes Array Count
+    if (!aNodes.isEmpty()) {
+
+        // ...
+
+    }
+}
+
+//==============================================================================
 // Clear
 //==============================================================================
 void ComponentTransition::clear()
@@ -438,11 +577,10 @@ void ComponentTransition::clear()
     // Set Current Node
     setCurrentNode(NULL);
 
-    // Check Transition Root Node
-    if (mTransitionRoot) {
-        // Delete Transition Root Node
-        delete mTransitionRoot;
-        mTransitionRoot = NULL;
+    // Iterate Through Nodes
+    while (mNodes.count() > 0) {
+        // Delete Last
+        delete mNodes.takeLast();
     }
 }
 

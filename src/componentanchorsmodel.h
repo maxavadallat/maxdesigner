@@ -6,6 +6,7 @@
 #include <QJsonObject>
 
 class ComponentInfo;
+class PropertiesController;
 
 //==============================================================================
 // Component Anchors Model
@@ -30,6 +31,10 @@ class ComponentAnchorsModel : public QObject
     Q_PROPERTY(QString anchorsFill READ anchorsFill WRITE setAnchorsFill NOTIFY anchorsFillChanged)
     // CenterIn Target
     Q_PROPERTY(QString anchorsCenterIn READ anchorsCenterIn WRITE setAnchorsCenterIn NOTIFY anchorsCenterInChanged)
+    // Horizontal Center Target
+    Q_PROPERTY(QString horizontalCenter READ horizontalCenter WRITE setHorizontalCenter NOTIFY anchorsHorizontalCenterChanged)
+    // Vertical Center Target
+    Q_PROPERTY(QString verticalCenter READ verticalCenter WRITE setVerticalCenter NOTIFY anchorsVerticalCenterChanged)
 
     // Margins
     Q_PROPERTY(QString anchorsMargins READ anchorsMargins WRITE setAnchorsMargins NOTIFY anchorsMarginsChanged)
@@ -49,12 +54,6 @@ class ComponentAnchorsModel : public QObject
     Q_PROPERTY(QString anchorsVerticalOffset READ anchorsVerticalOffset WRITE setAnchorsVerticalOffset NOTIFY anchorsVerticalOffsetChanged)
 
 public:
-    // From JSON Object
-    static ComponentAnchorsModel* fromJSONObject(ComponentInfo* aComponent, const QJsonObject& aObject);
-
-    // Constructor
-    explicit ComponentAnchorsModel(ComponentInfo* aComponent, QObject* aParent = NULL);
-
     // Get Current Component
     ComponentInfo* currentComponent();
     // Set Current Component
@@ -89,6 +88,16 @@ public:
     QString anchorsCenterIn();
     // Set CenterIn Target
     void setAnchorsCenterIn(const QString& aAnchorCenterIn);
+
+    // Horizontal Center Target
+    QString horizontalCenter();
+    // Set Horizontal Center Target
+    void setHorizontalCenter(const QString& aHorizontalCenter);
+
+    // Vertical Center Target
+    QString verticalCenter();
+    // Set Vertical Center Target
+    void setVerticalCenter(const QString& aVerticalCenter);
 
     // Margins
     QString anchorsMargins();
@@ -125,9 +134,6 @@ public:
     // Set Vertical Center Offset
     void setAnchorsVerticalOffset(const QString& aAnchorVerticalOffset);
 
-    // To JSON Object
-    QJsonObject toJSONObject();
-
     // Destructor
     ~ComponentAnchorsModel();
 
@@ -146,6 +152,10 @@ signals:
     void anchorsFillChanged(const QString& aAnchorFill);
     // CenterIn Target Changed Signal
     void anchorsCenterInChanged(const QString& aAnchorCenterIn);
+    // Horizontal Center Target Changed Signal
+    void anchorsHorizontalCenterChanged(const QString& aHorizontalCenter);
+    // Vertical Center Target Changed Signal
+    void anchorsVerticalCenterChanged(const QString& aVerticalCenter);
     // Margins Changed Signal
     void anchorsMarginsChanged(const QString& aAnchorMargins);
     // Left Margin Changed Signal
@@ -162,50 +172,18 @@ signals:
     void anchorsVerticalOffsetChanged(const QString& aAnchorVerticalOffset);
 
 protected:
+    friend class PropertiesController;
+    // Constructor
+    explicit ComponentAnchorsModel(ComponentInfo* aComponent, QObject* aParent = NULL);
+
     // Init
     void init();
     // Clear
     void clear();
 
-    // Load Component Anchors
-    void loadComponentAnchors(const QJsonObject& aObject);
-    // Save Component Anchors
-    void saveComponentAnchors();
-
 protected: // Data
     // Component
     ComponentInfo*      mComponent;
-
-    // Ancors Left Target
-    QString             mAnchorLeft;
-    // Ancors Right Target
-    QString             mAnchorRight;
-    // Ancors Top Target
-    QString             mAnchorTop;
-    // Ancors Bottom Target
-    QString             mAnchorBottom;
-
-    // Ancors Fill Target
-    QString             mAnchorFill;
-    // Ancors Center In Target
-    QString             mAnchorCenterIn;
-
-    // Anchor Margins
-    QString             mAnchorMargins;
-
-    // Ancors Left Margin
-    QString             mAnchorLeftMargin;
-    // Ancors Right Margin
-    QString             mAnchorRightMargin;
-    // Ancors Top Margin
-    QString             mAnchorTopMargin;
-    // Ancors Bottom Margin
-    QString             mAnchorBottomMargin;
-
-    // Ancors Horizontal Center Offset
-    QString             mAnchorHorizontalOffset;
-    // Ancors Vertical Center Offset
-    QString             mAnchorVerticalOffset;
 };
 
 #endif // COMPONENTANCHORSMODEL_H
