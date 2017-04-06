@@ -61,6 +61,7 @@ signals:
 
 protected:
     friend class ComponentInfo;
+    friend class PropertiesController;
 
     // Constructor
     explicit ComponentStatesModel(ComponentInfo* aComponent, QObject* aParent = NULL);

@@ -158,7 +158,10 @@ void ComponentTransitionsModel::addParallelAnimation(ComponentTransition* aTrans
         return;
     }
 
-    // ...
+    // Create New Parallel Animation
+    ComponentParallelAnimation* newParallelAnimation = new ComponentParallelAnimation();
+    // Append Node
+    aTransition->appendNode(newParallelAnimation, aParentNode);
 }
 
 //==============================================================================
@@ -171,7 +174,10 @@ void ComponentTransitionsModel::addSequentialAnimation(ComponentTransition* aTra
         return;
     }
 
-    // ...
+    // Create New Sequential Animation
+    ComponentSequentialAnimation* newSequentialAnimation = new ComponentSequentialAnimation();
+    // Append Node
+    aTransition->appendNode(newSequentialAnimation, aParentNode);
 }
 
 //==============================================================================
@@ -184,7 +190,12 @@ void ComponentTransitionsModel::addPauseAnimation(const QString& aDuration, Comp
         return;
     }
 
-    // ...
+    // Create New Pause Animation
+    ComponentPauseAnimation* newPauseAnimation = new ComponentPauseAnimation();
+    // Set Duration
+    newPauseAnimation->setDuration(aDuration);
+    // Append Node
+    aTransition->appendNode(newPauseAnimation, aParentNode);
 }
 
 //==============================================================================
@@ -204,7 +215,18 @@ void ComponentTransitionsModel::addPropertyAnimation(const QString& aTarget,
         return;
     }
 
-    // ...
+    // Create New Property Animation
+    ComponentPropertyAnimation* newPropertyAnimation = new ComponentPropertyAnimation();
+    // Set Up Property animation
+    newPropertyAnimation->setPropertyAnimationTarget(aTarget);
+    newPropertyAnimation->setPropertyAnimationProperty(aProperty);
+    newPropertyAnimation->setValueFrom(aFrom);
+    newPropertyAnimation->setValueTo(aTo);
+    newPropertyAnimation->setDuration(aDuration);
+    newPropertyAnimation->setEasingType(aEasing);
+
+    // Append Node
+    aTransition->appendNode(newPropertyAnimation, aParentNode);
 }
 
 //==============================================================================
@@ -221,7 +243,15 @@ void ComponentTransitionsModel::addPropertyAction(const QString& aTarget,
         return;
     }
 
-    // ...
+    // Create New Property Action
+    ComponentPropertyAction* newPropertyAction = new ComponentPropertyAction();
+    // Set Up Property Action
+    newPropertyAction->setPropertyActionTarget(aTarget);
+    newPropertyAction->setPropertyActionProperty(aProperty);
+    newPropertyAction->setPropertyActionValue(aValue);
+
+    // Append Node
+    aTransition->appendNode(newPropertyAction, aParentNode);
 }
 
 //==============================================================================
@@ -236,7 +266,26 @@ void ComponentTransitionsModel::addScriptAction(const QString& aScript,
         return;
     }
 
-    // ...
+    // Create New Script Action
+    ComponentScriptAction* newScriptAction = new ComponentScriptAction();
+    // Set Up New Script Action
+    newScriptAction->setScript(aScript);
+    // Append Node
+    aTransition->appendNode(newScriptAction, aParentNode);
+}
+
+// Remove Transition Node
+void ComponentTransitionsModel::removeTransitionNode(ComponentTransition* aTransition,
+                                                     const int& aIndex,
+                                                     ComponentTransitionNode* aParentNode)
+{
+    // Check Transition
+    if (!aTransition) {
+        return;
+    }
+
+    // Remove Node
+    aTransition->removeNode(aIndex, aParentNode);
 }
 
 //==============================================================================
@@ -251,7 +300,32 @@ void ComponentTransitionsModel::removeTransitionNode(ComponentTransition* aTrans
         return;
     }
 
-    // ...
+    // Check Parent Node
+    if (aParentNode) {
+        // Get Nodes Count
+        int nCount = aParentNode->mChildren.count();
+        // Iterate Through Nodes
+        for (int i=0; i<nCount; i++) {
+            // Check Child Node
+            if (aParentNode->mChildren[i] == aNode) {
+                // Delete Node
+                delete aParentNode->mChildren.takeAt(i);
+                return;
+            }
+        }
+    } else {
+        // Get Nodes Count
+        int nCount = aTransition->mNodes.count();
+        // Iterate Through Nodes
+        for (int i=0; i<nCount; i++) {
+            // Check Child Node
+            if (aTransition->mNodes[i] == aNode) {
+                // Delete Node
+                delete aTransition->mNodes.takeAt(i);
+                return;
+            }
+        }
+    }
 }
 
 //==============================================================================
@@ -541,6 +615,8 @@ ComponentTransitionNode* ComponentTransition::nodeByIndex(const int& aIndex)
     if (aIndex >= 0 && aIndex < mNodes.count()) {
         return mNodes[aIndex];
     }
+
+    return NULL;
 }
 
 //==============================================================================
@@ -566,6 +642,72 @@ void ComponentTransition::readNodes(const QJsonArray& aNodes)
 
         // ...
 
+    }
+}
+
+//==============================================================================
+// Append Node
+//==============================================================================
+void ComponentTransition::appendNode(ComponentTransitionNode* aNode, ComponentTransitionNode* aParentNode)
+{
+    // Check Node
+    if (!aNode) {
+        return;
+    }
+
+    // Check Parent Node
+    if (aParentNode) {
+        // Append Node
+        aParentNode->appendChild(aNode);
+    } else {
+        // Append Node
+        mNodes << aNode;
+    }
+}
+
+//==============================================================================
+// Insert Node
+//==============================================================================
+void ComponentTransition::insertNode(const int& aIndex, ComponentTransitionNode* aNode, ComponentTransitionNode* aParentNode)
+{
+    // Check Node
+    if (!aNode) {
+        return;
+    }
+
+    // Check Parent Node
+    if (aParentNode) {
+        // Insert Node
+        aParentNode->insertChild(aIndex, aNode);
+    } else {
+        // Check Index
+        if (aIndex >= 0 && aIndex < mNodes.count()) {
+            // Insert Node
+            mNodes.insert(aIndex, aNode);
+        } else {
+            // Append Node
+            mNodes << aNode;
+        }
+    }
+}
+
+//==============================================================================
+// Remove Node
+//==============================================================================
+void ComponentTransition::removeNode(const int& aIndex, ComponentTransitionNode* aParentNode)
+{
+    // Check Parent Node
+    if (aParentNode) {
+        // Remove Node
+        aParentNode->removeChild(aIndex);
+    } else {
+        // Check Index
+        if (aIndex >= 0 && aIndex < mNodes.count()) {
+            // Remove Node
+            delete mNodes.takeAt(aIndex);
+        } else {
+            qWarning() << "ComponentTransition::removeNode - aIndex: " << aIndex << " - INVALID INDEX!";
+        }
     }
 }
 
@@ -883,7 +1025,7 @@ ComponentPauseAnimation* ComponentPauseAnimation::fromJSONObject(const QJsonObje
     ComponentPauseAnimation* newPauseAnimation = new ComponentPauseAnimation();
 
     // Set Duration
-    newPauseAnimation->setDuration(aObject[JSON_KEY_COMPONENT_TRANSITION_PAUSE_DURATION].toInt());
+    newPauseAnimation->setDuration(aObject[JSON_KEY_COMPONENT_TRANSITION_PAUSE_DURATION].toString());
 
     return newPauseAnimation;
 }
@@ -893,7 +1035,7 @@ ComponentPauseAnimation* ComponentPauseAnimation::fromJSONObject(const QJsonObje
 //==============================================================================
 ComponentPauseAnimation::ComponentPauseAnimation(QObject* aParent)
     : ComponentTransitionNode(ETTPauseAnimation, aParent)
-    , mDuration(0)
+    , mDuration("0")
 {
     // ...
 }
@@ -901,7 +1043,7 @@ ComponentPauseAnimation::ComponentPauseAnimation(QObject* aParent)
 //==============================================================================
 // Get Duration
 //==============================================================================
-int ComponentPauseAnimation::duration()
+QString ComponentPauseAnimation::duration()
 {
     return mDuration;
 }
@@ -909,7 +1051,7 @@ int ComponentPauseAnimation::duration()
 //==============================================================================
 // Set Duration
 //==============================================================================
-void ComponentPauseAnimation::setDuration(const int& aDuration)
+void ComponentPauseAnimation::setDuration(const QString& aDuration)
 {
     // Check Duration
     if (mDuration != aDuration) {

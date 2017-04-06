@@ -367,7 +367,10 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
             // Set Current Component
             mComponentSignals->setCurrentComponent(aComponent);
         } else {
-
+            // Create New Component Signals Model
+            ComponentSignalsModel* newComponentSignalsModel = new ComponentSignalsModel(mFocusedComponent);
+            // Set Component Signals Model
+            setSignalsModel(newComponentSignalsModel);
         }
 
         // Check Slots Model
@@ -375,31 +378,10 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
             // Set Current Component
             mComponentSlots->setCurrentComponent(aComponent);
         } else {
-
-        }
-
-        // Check Component States
-        if (mComponentStates) {
-            // Set Current Component
-            mComponentStates->setCurrentComponent(aComponent);
-        } else {
-
-        }
-
-        // Check Transitions Model
-        if (mComponentTransitions) {
-            // Set Current Component
-            mComponentTransitions->setCurrentComponent(aComponent);
-        } else {
-
-        }
-
-        // Check Properties Model
-        if (mComponentProperties) {
-            // Set Current Component
-            mComponentProperties->setCurrentComponent(aComponent);
-        } else {
-
+            // Create New Component Slots Model
+            ComponentSlotsModel* newComponentSlotsModel = new ComponentSlotsModel(mFocusedComponent);
+            // Set Component Slots Model
+            setSlotsModel(newComponentSlotsModel);
         }
 
         // Check Component Functions Model
@@ -407,7 +389,43 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
             // Set Current Component
             mComponentFunctions->setCurrentComponent(aComponent);
         } else {
+            // Create New Component Functions Model
+            ComponentFunctionsModel* newComponentFunctionsModel = new ComponentFunctionsModel(mFocusedComponent);
+            // Set Component Functions Model
+            setFunctionsModel(newComponentFunctionsModel);
+        }
 
+        // Check Component States
+        if (mComponentStates) {
+            // Set Current Component
+            mComponentStates->setCurrentComponent(aComponent);
+        } else {
+            // Create New Component States Model
+            ComponentStatesModel* newComponentStatesModel = new ComponentStatesModel(mFocusedComponent);
+            // Set Component States Model
+            setStatesModel(newComponentStatesModel);
+        }
+
+        // Check Transitions Model
+        if (mComponentTransitions) {
+            // Set Current Component
+            mComponentTransitions->setCurrentComponent(aComponent);
+        } else {
+            // Create New Component Trnsitions Model
+            ComponentTransitionsModel* newComponentTransitionsModel = new ComponentTransitionsModel(mFocusedComponent);
+            // Set Component Transitions Model
+            setTransitionsModel(newComponentTransitionsModel);
+        }
+
+        // Check Inherited Properties Model
+        if (mComponentProperties) {
+            // Set Current Component
+            mComponentProperties->setCurrentComponent(aComponent);
+        } else {
+            // Create New Compoennt Inherited Properties Model
+            ComponentPropertiesModel* newComponentPropertiesModel = new ComponentPropertiesModel(mFocusedComponent);
+            // Set Component Inherited Properties Model
+            setPropertiesModel(newComponentPropertiesModel);
         }
 
         // ...

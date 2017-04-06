@@ -85,7 +85,7 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mBase(mProject ? mProject->getComponentByName(mBaseName) : NULL)
     , mParent(NULL)
 {
-    qDebug() << "ComponentInfo " <<  mName << " created.";
+    //qDebug() << "ComponentInfo " <<  mName << " created.";
 
     // Init
     init();
@@ -987,6 +987,9 @@ QString ComponentInfo::generateLiveCode()
         liveCode += QString("%1objectName: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(objectName);
     }
 
+    // Add New Line
+    liveCode += "\n";
+
     // Add Pos =================================================================
 
     // Get Pos X
@@ -1035,6 +1038,9 @@ QString ComponentInfo::generateLiveCode()
 
     // Check Anchors
     if (!mAnchors.isEmpty()) {
+        // Add New Line
+        liveCode += "\n";
+
         // Get Anchors Fill Target
         QString afTarget = mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_FILL).toString();
         // Get Anchors Center In Target
@@ -1203,72 +1209,228 @@ QString ComponentInfo::generateLiveCode()
 
     // Add Own Properties ======================================================
 
-    // Add New Line
-    liveCode += "\n";
+    // Init Own Property Value Hook List
+    QStringList opvHookList = QStringList();
+    // Init Inherited Properties Value Hook List
+    QStringList pvHookList = QStringList();
 
     // Get Own Properties Keys
     QStringList opKeys = mOwnProperties.keys();
-
     // Get Own Properties Count
     int opCount = opKeys.count();
 
-    // Get Filtered Property Keys
-    QStringList fpKeys = mProject->propertiesController() ? mProject->propertiesController()->filteredProperties() : QStringList();
+    // Check Own Prpoerties Key Count
+    if (opCount > 0) {
+        // Add New Line
+        liveCode += "\n";
 
-    // Iterate Through Own Properties
-    for (int j=0; j<opCount; j++) {
-        // Check Filtered Properties
-        if (fpKeys.indexOf(opKeys[j]) == -1) {
-            // Get Property Type And Value
-            QStringList typeAndValue = mOwnProperties[opKeys[j]].toString().split(":");
-            // Append Live Code
-            liveCode += QString("%1property %2 %3: %4\n").arg(DEFAULT_SOURCE_INDENT).arg(typeAndValue[0]).arg(opKeys[j]).arg(typeAndValue[1]);
+        // Get Filtered Property Keys
+        QStringList fpKeys = mProject->propertiesController() ? mProject->propertiesController()->filteredProperties() : QStringList();
+
+        // Iterate Through Own Properties
+        for (int j=0; j<opCount; j++) {
+            // Check Filtered Properties
+            if (fpKeys.indexOf(opKeys[j]) == -1) {
+                // Get Property Type And Value
+                QStringList typeAndValue = mOwnProperties[opKeys[j]].toString().split(":");
+                // Get Type
+                QString pType = typeAndValue[0];
+                // Get Value
+                QString pValue = typeAndValue[1];
+                // Check Type
+                if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING && pValue.isEmpty()) {
+                    // Set Value
+                    pValue = "\"\"";
+                }
+                // Append Live Code
+                liveCode += QString("%1property %2 %3: %4\n").arg(DEFAULT_SOURCE_INDENT).arg(pType).arg(opKeys[j]).arg(pValue);
+                // Add Value Setting Hook
+                opvHookList << QString("%1%1%1case %2: %3.%2 = value; break;\n").arg(DEFAULT_SOURCE_INDENT).arg(opKeys[j]).arg(cID);
+            }
         }
     }
 
     // Add Inherited Properties ================================================
 
-    // Add New Line
-    liveCode += "\n";
+    // Get Properties Keys
+    QStringList pKeys = mProperties.keys();
+    // Get Properties Count
+    int pCount = pKeys.count();
+
+    // Check Inherited Properties Keys Count
+    if (pCount > 0) {
+        // Add New Line
+        liveCode += "\n";
+
+        // Iterate Through Properties
+        for (int k=0; k<pCount; k++) {
+            // Get Value
+            QString pValue = mProperties.value(pKeys[k]).toString();
+            // Append Live Code
+            liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(pKeys[k]).arg(pValue);
+            // Add Value Setting Hook
+            pvHookList << QString("%1%1%1case %2: %3.%2 = value; break;\n").arg(DEFAULT_SOURCE_INDENT).arg(pKeys[k]).arg(cID);
+        }
+
+        // ...
+    }
 
     // Add Signals =============================================================
 
-    // Add New Line
-    liveCode += "\n";
+    // Check Signals
+    if (!mSignals.isEmpty()) {
+        // Add New Line
+        liveCode += "\n";
+
+        // Get Signals Count
+        int signalsCount = mSignals.count();
+
+        // Iterate Through Signals
+        for (int l=0; l<signalsCount; l++) {
+            // Get Signal Object
+            QJsonObject signalObject = mSignals[l].toObject();
+            // Get Name
+            QString signalName = signalObject.value(JSON_KEY_COMPONENT_SIGNAL_NAME).toString();
+            // Get Parameters
+            QString signalParams = signalObject.value(JSON_KEY_COMPONENT_SIGNAL_PARAMETERS).toString();
+            // Init Signal String
+            QString signalDef = QString("signal %1(").arg(signalName);
+
+            // Check Parameters
+            if (!signalParams.isEmpty()) {
+                // Get Parameter List
+                QStringList signalParamList = signalParams.split(",");
+                // Get Parameter List Count
+                int splCount = signalParamList.count();
+                // Iterate Through Signal Parameter List
+                for (int m=0; m<splCount; m++) {
+                    // Check Index
+                    if (m > 0) {
+                        // Add Separator
+                        signalDef += ", ";
+                    }
+
+                    // Add Parameter
+                    signalDef += QString("var %1").arg(signalParamList[m]);
+                }
+            }
+
+            // Add Final )
+            signalDef += ")\n";
+
+            // Append To Live Code
+            liveCode += QString("%1%2\n").arg(DEFAULT_SOURCE_INDENT).arg(signalDef);
+        }
+    }
 
     // Add Slots ===============================================================
 
-    // Add New Line
-    liveCode += "\n";
+    // Check Slots
+    if (!mSlots.isEmpty()) {
+        // Add New Line
+        liveCode += "\n";
+
+        // Get Slots Count
+        int slotsCount = mSlots.count();
+
+        // Iterate Through Signals
+        for (int n=0; n<slotsCount; n++) {
+            // Get Slot Object
+            QJsonObject slotObject = mSlots[n].toObject();
+            // Get Slot Name
+            QString slotName = slotObject.value(JSON_KEY_COMPONENT_SLOT_NAME).toString();
+            // Get Source
+            QString slotSource = slotObject.value(JSON_KEY_COMPONENT_SLOT_SOURCE).toString();
+            // Append To Live Code
+            liveCode += QString("%1%2: %3\n\n").arg(DEFAULT_SOURCE_INDENT).arg(slotName).arg(slotSource);
+        }
+    }
 
     // Add Hooks for Property Getters And Setters !!! ==============================
 
-    // Add New Line
-    liveCode += "\n";
+    // Get Own Property Value Hookss Count
+    int opvhCount = opvHookList.count();
+    // Get Inherited Properties Value Hook's Count
+    int pvhCount = pvHookList.count();
+
+    // Check Properties Count
+    if (opvhCount > 0 || pvhCount > 0) {
+        // Init Property Update Hook Function Code
+        QString propertyHooks = QString("%1function __setProperty(key, value) {\n").arg(DEFAULT_SOURCE_INDENT);
+        // Add Key Switch
+        propertyHooks += QString("%1%1switch (key) {\n").arg(DEFAULT_SOURCE_INDENT);
+        // Add Default Hook
+        propertyHooks += QString("%1%1%1default: console.log(\"__setProperty property:\" + key + \" IS NOT DEFINED!\"); break;\n").arg(DEFAULT_SOURCE_INDENT);
+
+        // Iterate Through Own Property Value Hooks
+        for (int i=0; i<opvhCount; i++) {
+            // Append Own Property Vlaue Hook
+            propertyHooks += opvHookList[i];
+        }
+
+        // Iterate Through Inherited Property Value Hooks
+        for (int j=0; j<pvhCount; j++) {
+            // Append Inherited Property Value Hook
+            propertyHooks += pvHookList[j];
+        }
+
+        // Add Switch Closing Bracket
+        propertyHooks += QString("%1%1}\n").arg(DEFAULT_SOURCE_INDENT);
+        // Add Final Bracket
+        propertyHooks += QString("%1}\n").arg(DEFAULT_SOURCE_INDENT);
+
+        // Append Property Hooks To Live Code
+        liveCode += propertyHooks;
+
+        // Add New Line
+        liveCode += "\n";
+    }
 
     // Add Functions ===========================================================
 
-    // Add New Line
-    liveCode += "\n";
+    // Check Functions
+    if (!mFunctions.isEmpty()) {
+        // Add New Line
+        liveCode += "\n";
+
+        // ...
+    }
 
     // Add Children ============================================================
 
-    // Add New Line
-    liveCode += "\n";
+    // Check Children
+    if (mChildren.count() > 0) {
+        // Add New Line
+        liveCode += "\n";
+
+        // ...
+    }
 
     // Add States ==============================================================
 
-    // Add New Line
-    liveCode += "\n";
+    // Check States
+    if (!mStates.isEmpty()) {
+        // Add New Line
+        liveCode += "\n";
+
+        // ...
+    }
 
     // Add Transitions =========================================================
 
-    // Add New Line
-    liveCode += "\n";
+    // Check Transitions
+    if (!mTransitions.isEmpty()) {
+        // Add New Line
+        liveCode += "\n";
+
+        // ...
+    }
+
+    //==========================================================================
+
+    liveCode += QString("%1//...\n\n").arg(DEFAULT_SOURCE_INDENT);
 
     liveCode += "}\n";
-
-    // ...
 
     qDebug() << "ComponentInfo::generateLiveCode - liveCode: " << liveCode;
 
@@ -1543,7 +1705,7 @@ void ComponentInfo::addSignal(const QString& aName, const QStringList& aParamete
     // Set Signal Name
     newSignal[JSON_KEY_COMPONENT_SIGNAL_NAME] = aName;
     // Set Parameters
-    newSignal[JSON_KEY_COMPONENT_SIGNAL_PARAMETERS] = aParameters.join(':');
+    newSignal[JSON_KEY_COMPONENT_SIGNAL_PARAMETERS] = aParameters.join(',');
 
     // Append Signal
     mSignals << newSignal;

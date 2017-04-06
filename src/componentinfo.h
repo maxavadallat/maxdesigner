@@ -498,12 +498,14 @@ protected slots:
     void viewsDirChanged(const QString& aViewsDir);
 
 protected: // Data
+    friend class ComponentImportsModel;
     friend class ComponentAnchorsModel;
+    friend class ComponentOwnPropertiesModel;
+    friend class ComponentPropertiesModel;
     friend class ComponentSignalsModel;
+    friend class ComponentSlotsModel;
     friend class ComponentStatesModel;
     friend class ComponentTransitionsModel;
-    friend class ComponentPropertiesModel;
-    friend class ComponentOwnPropertiesModel;
     friend class ComponentFunctionsModel;
 
     // Project Model

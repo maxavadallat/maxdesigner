@@ -88,6 +88,12 @@ public:
     void addScriptAction(const QString& aScript,
                          ComponentTransition* aTransition,
                          ComponentTransitionNode* aParentNode= NULL);
+
+    // Remove Transition Node
+    void removeTransitionNode(ComponentTransition* aTransition,
+                              const int& aIndex,
+                              ComponentTransitionNode* aParentNode = NULL);
+
     // Remove Transition Node
     void removeTransitionNode(ComponentTransition* aTransition,
                               ComponentTransitionNode* aNode,
@@ -220,6 +226,13 @@ protected:
     // Clear
     void clear();
 
+    // Append Node
+    void appendNode(ComponentTransitionNode* aNode, ComponentTransitionNode* aParentNode = NULL);
+    // Insert Node
+    void insertNode(const int& aIndex, ComponentTransitionNode* aNode, ComponentTransitionNode* aParentNode = NULL);
+    // Remove Node
+    void removeNode(const int& aIndex, ComponentTransitionNode* aParentNode = NULL);
+
     // To JSON Object
     QJsonObject toJSONObject();
 
@@ -235,6 +248,8 @@ signals:
     void currentNodeChanged(ComponentTransitionNode* aNode);
 
 protected: // Data
+    friend class ComponentTransitionsModel;
+
     // Transition Nodes
     QList<ComponentTransitionNode*> mNodes;
     // Current Node
@@ -292,6 +307,9 @@ signals:
     void countChanged(const int& aCount);
 
 protected: // Data
+    friend class ComponentTransition;
+    friend class ComponentTransitionsModel;
+
     // Transition Type
     ETransitionType                     mType;
     // Children
@@ -359,7 +377,7 @@ class ComponentPauseAnimation : public ComponentTransitionNode
     Q_OBJECT
 
     // Duration
-    Q_PROPERTY(int duration READ duration WRITE setDuration NOTIFY durationChanged)
+    Q_PROPERTY(QString duration READ duration WRITE setDuration NOTIFY durationChanged)
 
 public:
     // From JSON Object
@@ -368,9 +386,9 @@ public:
     explicit ComponentPauseAnimation(QObject* aParent = NULL);
 
     // Get Duration
-    int duration();
+    QString duration();
     // Set Duration
-    void setDuration(const int& aDuration);
+    void setDuration(const QString& aDuration);
 
     // To JSON Object
     virtual QJsonObject toJSONObject();
@@ -380,11 +398,11 @@ public:
 
 signals:
     // Duration Changed Signal
-    void durationChanged(const int& aDuration);
+    void durationChanged(const QString& aDuration);
 
 protected: // Data
     // Duration
-    int     mDuration;
+    QString     mDuration;
 };
 
 

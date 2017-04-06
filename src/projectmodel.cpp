@@ -1046,7 +1046,7 @@ ComponentInfo* ProjectModel::getComponentByName(const QString& aName, const QStr
         return NULL;
     }
 
-    qDebug() << "ProjectModel::getComponentByName - aName: " << aName << " - aType: " << aType;
+    //qDebug() << "ProjectModel::getComponentByName - aName: " << aName << " - aType: " << aType;
 
     // Init Component Info
     ComponentInfo* cInfo = NULL;

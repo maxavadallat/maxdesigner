@@ -21,7 +21,8 @@ ComponentStatesModel::ComponentStatesModel(ComponentInfo* aComponent, QObject* a
 //==============================================================================
 void ComponentStatesModel::init()
 {
-    // ...
+    // Load Component States
+    loadComponentStates();
 }
 
 //==============================================================================
@@ -47,6 +48,13 @@ void ComponentStatesModel::clear()
 //==============================================================================
 void ComponentStatesModel::loadComponentStates()
 {
+    // Check Compoent Info
+    if (!mComponent) {
+        return;
+    }
+
+    qDebug() << "ComponentStatesModel::loadComponentStates - name: " << mComponent->mName;
+
     // Begin Reset Model
     beginResetModel();
 
