@@ -197,20 +197,37 @@ void MainWindow::init()
 
     // Register Component Imports Model
     qmlRegisterUncreatableType<ComponentImportsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_IMPORTS_MODEL, "");
+
     // Register Component Own Properties Model
     qmlRegisterUncreatableType<ComponentOwnPropertiesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_OWN_PROPERTIES_MODEL, "");
+
     // Register Component Signals Model
     qmlRegisterUncreatableType<ComponentSignalsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_SIGNALS_MODEL, "");
+    // Register Component Signal
+    qmlRegisterUncreatableType<ComponentSignal>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENT_SIGNAL, "");
+
     // Register Component Slots Model
     qmlRegisterUncreatableType<ComponentSlotsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_SLOTS_MODEL, "");
-    // Register Component States Model
-    qmlRegisterUncreatableType<ComponentStatesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_STATES_MODEL, "");
-    // Register Component Transitionss Model
-    qmlRegisterUncreatableType<ComponentTransitionsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_TRANSITIONS_MODEL, "");
-    // Register Component Properties Model
-    qmlRegisterUncreatableType<ComponentPropertiesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_PROPERTIES_MODEL, "");
+    // Register Component Slot
+    qmlRegisterUncreatableType<ComponentSlot>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENT_SLOT, "");
+
     // Register Component Functions Model
     qmlRegisterUncreatableType<ComponentFunctionsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_FUNCTIONS_MODEL, "");
+    // Register Component Function
+    qmlRegisterUncreatableType<ComponentFunction>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENT_FUNCTION, "");
+
+    // Register Component States Model
+    qmlRegisterUncreatableType<ComponentStatesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_STATES_MODEL, "");
+    // Register Component State
+    qmlRegisterUncreatableType<ComponentState>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENT_STATE, "");
+
+    // Register Component Transitions Model
+    qmlRegisterUncreatableType<ComponentTransitionsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_TRANSITIONS_MODEL, "");
+    // Register Component Transition
+    qmlRegisterUncreatableType<ComponentTransition>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENT_TRANSITION, "");
+
+    // Register Component Properties Model
+    qmlRegisterUncreatableType<ComponentPropertiesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_PROPERTIES_MODEL, "");
 
     // Get Engine
     QQmlEngine* engine = ui->mainQuickWidget->engine();

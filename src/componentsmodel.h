@@ -3,8 +3,7 @@
 
 #include <QObject>
 #include <QAbstractListModel>
-#include <QList>
-//#include <QJsonObject>
+#include <QMap>
 
 class ProjectModel;
 class ComponentInfo;
@@ -21,9 +20,9 @@ public:
     void setComponentsDir(const QString& aDirPath);
 
     // Add Component
-    void addComponent(ComponentInfo* aComponent);
-    // Remove Compoennt
-    void removeComponent(ComponentInfo* aComponent, const bool& aDelete = true);
+    bool addComponent(ComponentInfo* aComponent);
+    // Remove Component
+    bool removeComponent(const int& aIndex);
 
     // Get Component Index By Name
     int getComponentIndex(const QString& aName);
@@ -61,16 +60,16 @@ public: // from QAbstractListModel
 private: // Data
 
     // Item Field Roles
-    enum ItemRoles {
-        ComponentNameRole = Qt::UserRole + 1
+    enum ECItemRoles {
+        ECRName = Qt::UserRole + 1
     };
 
     // Project Model
-    ProjectModel*           mProjectModel;
-    // Component List
-    QList<ComponentInfo*>   mComponentList;
+    ProjectModel*                   mProjectModel;
+    // Components
+    QMap<QString, ComponentInfo*>   mComponents;
     // Components Dir
-    QString                 mComponentsDir;
+    QString                         mComponentsDir;
 };
 
 #endif // COMPONENTSLISTMODEL_H

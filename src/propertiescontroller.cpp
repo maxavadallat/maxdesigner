@@ -41,6 +41,12 @@ PropertiesController::PropertiesController(ProjectModel* aProjectModel, QObject*
 //==============================================================================
 void PropertiesController::init()
 {
+    // Check Project Model
+    if (mProject) {
+        // Set Properties Controller
+        mProject->setPropertiesController(this);
+    }
+
     // Set Filtered Properties
     setFilteredProperties(QString("id,objectName,x,y,z,width,height,states,transitions,children").split(","));
 
@@ -52,6 +58,15 @@ void PropertiesController::init()
 //==============================================================================
 void PropertiesController::clear()
 {
+    // Check Component Properties Model
+    if (mComponentProperties) {
+        // Delete Component Properties Model
+        delete mComponentProperties;
+        mComponentProperties = NULL;
+        // Set Component Properties Model
+        setPropertiesModel(NULL);
+    }
+
     // Check Component Imports Model
     if (mComponentImports) {
         // Delete Component Imports Model
@@ -113,15 +128,6 @@ void PropertiesController::clear()
         mComponentTransitions = NULL;
         // Set Component Transitions Model
         setTransitionsModel(NULL);
-    }
-
-    // Check Component Properties Model
-    if (mComponentProperties) {
-        // Delete Component Properties Model
-        delete mComponentProperties;
-        mComponentProperties = NULL;
-        // Set Component Properties Model
-        setPropertiesModel(NULL);
     }
 
     // Check Component Functions Model
@@ -321,7 +327,7 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
         // Check Previous Focused Component
 
 
-        qDebug() << "PropertiesController::setFocusedCompoenent - componentName: " << (aComponent ? aComponent->componentName() : "NULL");
+        qDebug() << "PropertiesController::setFocusedCompoenent - componentName: " << (aComponent ? aComponent->mName : "NULL");
 
         // Set Focused Component
         mFocusedComponent = aComponent;
@@ -346,7 +352,7 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
             mComponentOwnProperties->setCurrentComponent(aComponent);
         } else {
             // Create New Component Own Properties Model
-            ComponentOwnPropertiesModel* newOwnPropertiesModel = new ComponentOwnPropertiesModel(mFocusedComponent);
+            ComponentOwnPropertiesModel* newOwnPropertiesModel = new ComponentOwnPropertiesModel(mFocusedComponent, mProject);
             // Set Component Own Properties Model
             setOwnPropertiesModel(newOwnPropertiesModel);
         }
@@ -423,7 +429,7 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
             mComponentProperties->setCurrentComponent(aComponent);
         } else {
             // Create New Compoennt Inherited Properties Model
-            ComponentPropertiesModel* newComponentPropertiesModel = new ComponentPropertiesModel(mFocusedComponent);
+            ComponentPropertiesModel* newComponentPropertiesModel = new ComponentPropertiesModel(mFocusedComponent, mProject);
             // Set Component Inherited Properties Model
             setPropertiesModel(newComponentPropertiesModel);
         }
@@ -657,10 +663,10 @@ ComponentFunctionsModel* PropertiesController::functionsModel()
 //==============================================================================
 void PropertiesController::addComponentImport(const QString& aImport)
 {
-    // Check Focused Component
-    if (mFocusedComponent) {
+    // Check Component Imports Model
+    if (mComponentImports) {
         // Add Import
-        mFocusedComponent->addImport(aImport);
+        mComponentImports->addImport(aImport);
     }
 }
 
@@ -669,11 +675,48 @@ void PropertiesController::addComponentImport(const QString& aImport)
 //==============================================================================
 void PropertiesController::removeComponentImport(const int& aIndex)
 {
-    // Check Focused Component
-    if (mFocusedComponent) {
+    // Check Component Imports Model
+    if (mComponentImports) {
         // Remove Import
-        mFocusedComponent->removeImport(aIndex);
+        mComponentImports->removeImport(aIndex);
     }
+}
+
+//==============================================================================
+// Get Component Property
+//==============================================================================
+QVariant PropertiesController::componentProperty(const QString& aName)
+{
+    // Check Name
+    if (aName.isEmpty()) {
+        qWarning() << "PropertiesController::componentProperty - aName: IS EMPTY!";
+        return QVariant();
+    }
+
+    // Check Focused Component
+    if (!mFocusedComponent) {
+        qWarning() << "PropertiesController::componentProperty - mFocusedComponent: IS NULL!";
+
+        return QVariant();
+    }
+
+    return mFocusedComponent->componentProperty(aName);
+}
+
+//==============================================================================
+// Set Property
+//==============================================================================
+void PropertiesController::setComponentProperty(const QString& aName, const QVariant& aValue)
+{
+    // Check Name
+    if (aName.isEmpty()) {
+        qWarning() << "PropertiesController::setComponentProperty - aName: IS EMPTY!";
+        return;
+    }
+
+    qDebug() << "PropertiesController::setComponentProperty - aName: " << aName << " - aValue: " << aValue;
+
+    // ...
 }
 
 //==============================================================================
@@ -681,10 +724,10 @@ void PropertiesController::removeComponentImport(const int& aIndex)
 //==============================================================================
 void PropertiesController::addOwnComponentProperty(const QString& aName, const int& aType, const QVariant& aDefaultValue)
 {
-    // Check Focused Component
-    if (mFocusedComponent) {
-        // Add Own Property
-        mFocusedComponent->addComponentOwnProperty(aName, (ComponentInfo::EPropertyType)aType, aDefaultValue);
+    // Check Component Own Properties Model
+    if (mComponentOwnProperties) {
+        // Add Property
+        mComponentOwnProperties->addComponentProperty(aName, aType, aDefaultValue);
     }
 }
 
@@ -693,22 +736,10 @@ void PropertiesController::addOwnComponentProperty(const QString& aName, const i
 //==============================================================================
 void PropertiesController::removeComponentProperty(const QString& aName)
 {
-    // Check Focused Component
-    if (mFocusedComponent) {
-        // Remove Property
-        mFocusedComponent->removeComponentProperty(aName);
-    }
-}
-
-//==============================================================================
-// Set Property
-//==============================================================================
-void PropertiesController::setComponentProperty(const QString& aName, const QVariant& aValue)
-{
-    // Check Focused Component
-    if (mFocusedComponent) {
-        // Set Property
-        mFocusedComponent->setComponentProperty(aName, aValue);
+    // Check Component Own Properties Model
+    if (mComponentOwnProperties) {
+        // Remove Component Property
+        mComponentOwnProperties->removeComponentProperty(aName);
     }
 }
 
@@ -717,11 +748,32 @@ void PropertiesController::setComponentProperty(const QString& aName, const QVar
 //==============================================================================
 void PropertiesController::clearComponentProperty(const QString& aName)
 {
-    // Check Focused Component
-    if (mFocusedComponent) {
-        // Remove Property
-        mFocusedComponent->removeComponentProperty(aName);
+    // Check Name
+    if (aName.isEmpty()) {
+        qWarning() << "PropertiesController::clearComponentProperty - aName: IS EMPTY!";
+        return;
     }
+
+    // Check Focused Component
+    if (mFocusedComponent && !mFocusedComponent->hasProperty(aName)) {
+        // Has No Property
+        return;
+    }
+
+    // Check Compontn Own Properties Model
+    if (mComponentOwnProperties) {
+        // Clear Property
+
+
+    }
+
+    // Check Component Inherited Properties Model
+    if (mComponentProperties) {
+        // Clear Property
+
+    }
+
+    // ...
 }
 
 //==============================================================================
@@ -729,10 +781,10 @@ void PropertiesController::clearComponentProperty(const QString& aName)
 //==============================================================================
 void PropertiesController::addSignal(const QString& aName, const QStringList& aParameters)
 {
-    // Check Focused Component
-    if (mFocusedComponent) {
+    // Check Component Signals Model
+    if (mComponentSignals) {
         // Add Signal
-        mFocusedComponent->addSignal(aName, aParameters);
+        mComponentSignals->addSignal(aName, aParameters);
     }
 }
 
@@ -741,10 +793,10 @@ void PropertiesController::addSignal(const QString& aName, const QStringList& aP
 //==============================================================================
 void PropertiesController::removeSignal(const int& aIndex)
 {
-    // Check Focused Component
-    if (mFocusedComponent) {
+    // Check Component Signals Model
+    if (mComponentSignals) {
         // Remove Signal
-        mFocusedComponent->removeSignal(aIndex);
+        mComponentSignals->removeSignal(aIndex);
     }
 }
 
@@ -753,10 +805,10 @@ void PropertiesController::removeSignal(const int& aIndex)
 //==============================================================================
 void PropertiesController::addSlot(const QString& aName, const QString& aSource)
 {
-    // Check Focused Component
-    if (mFocusedComponent) {
+    // Check Component Slots Model
+    if (mComponentSlots) {
         // Add Slot
-        mFocusedComponent->addSlot(aName, aSource);
+        mComponentSlots->addSlot(aName, aSource);
     }
 }
 
@@ -765,10 +817,10 @@ void PropertiesController::addSlot(const QString& aName, const QString& aSource)
 //==============================================================================
 void PropertiesController::removeSlot(const int& aIndex)
 {
-    // Check Focused Component
-    if (mFocusedComponent) {
+    // Check Component Slots Model
+    if (mComponentSlots) {
         // Remove Slot
-        mFocusedComponent->removeSlot(aIndex);
+        mComponentSlots->removeSlot(aIndex);
     }
 }
 
@@ -777,10 +829,10 @@ void PropertiesController::removeSlot(const int& aIndex)
 //==============================================================================
 void PropertiesController::addFunction(const QString& aName, const QStringList& aParameters, const QString& aSource)
 {
-    // Check Focused Component
-    if (mFocusedComponent) {
+    // Check Compoennt Functions Model
+    if (mComponentFunctions) {
         // Add Function
-        mFocusedComponent->addFunction(aName, aParameters, aSource);
+        mComponentFunctions->addFunction(aName, aParameters, aSource);
     }
 }
 
@@ -789,10 +841,10 @@ void PropertiesController::addFunction(const QString& aName, const QStringList& 
 //==============================================================================
 void PropertiesController::removeFunction(const int& aIndex)
 {
-    // Check Focused Component
-    if (mFocusedComponent) {
+    // Check Compoennt Functions Model
+    if (mComponentFunctions) {
         // Remove Function
-        mFocusedComponent->removeFunction(aIndex);
+        mComponentFunctions->removeFunction(aIndex);
     }
 }
 
@@ -801,10 +853,10 @@ void PropertiesController::removeFunction(const int& aIndex)
 //==============================================================================
 void PropertiesController::addState(const QString& aName, const QString& aWhen)
 {
-    // Check Focused Component
-    if (mFocusedComponent) {
+    // Check Component States Model
+    if (mComponentStates) {
         // Add State
-        mFocusedComponent->addState(aName, aWhen);
+        mComponentStates->addState(aName, aWhen);
     }
 }
 
@@ -813,10 +865,10 @@ void PropertiesController::addState(const QString& aName, const QString& aWhen)
 //==============================================================================
 void PropertiesController::removeState(const int& aIndex)
 {
-    // Check Focused Component
-    if (mFocusedComponent) {
+    // Check Component States Model
+    if (mComponentStates) {
         // Remove State
-        mFocusedComponent->removeState(aIndex);
+        mComponentStates->removeState(aIndex);
     }
 }
 
@@ -825,10 +877,10 @@ void PropertiesController::removeState(const int& aIndex)
 //==============================================================================
 void PropertiesController::addPropertyChange(const QString& aStateName, const QString& aTarget, const QString& aProperty, const QString& aValue)
 {
-    // Check Focused Component
-    if (mFocusedComponent) {
+    // Check Component States Model
+    if (mComponentStates) {
         // Add Property Change
-        mFocusedComponent->addPropertyChange(aStateName, aTarget, aProperty, aValue);
+        mComponentStates->addPropertyChange(aStateName, aTarget, aProperty, aValue);
     }
 }
 

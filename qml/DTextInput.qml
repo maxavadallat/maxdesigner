@@ -19,6 +19,8 @@ DControl {
     property bool showClearButton: true
     property bool fixTextSize: false
 
+    property bool invalidValue: false
+
     clip: true
 
     signal keyEvent(var event)
@@ -46,6 +48,7 @@ DControl {
     DEditorBackground {
         anchors.fill: parent
         editorFocus: textInput.activeFocus
+        invalidValue: textInputRoot.invalidValue
     }
 
     TextInput {

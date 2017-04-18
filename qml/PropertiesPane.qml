@@ -97,24 +97,30 @@ DPane {
 
     state: stateCreate
 
+    signal newImportLaunch()
+    signal editImportsLaunch(var index)
+
     signal newPropertyLaunch()
-    signal editPropertyLaunch()
+    signal editPropertyLaunch(var index)
 
     signal newSignalLaunch()
-    signal editSignalLaunch()
+    signal editSignalLaunch(var index)
+
+    signal newSlotLaunch()
+    signal editSlotLaunch(var index)
 
     signal newFunctionLaunch()
-    signal editFunctionLaunch()
+    signal editFunctionLaunch(var index)
 
     signal editFormulaLaunch()
 
     signal newStateLaunch()
-    signal editStateLaunch()
-
-    signal stateSelectionLaunch()
+    signal editStateLaunch(var index)
 
     signal newTransitionLaunch()
-    signal editTransitionLaunch()
+    signal editTransitionLaunch(var index)
+
+    signal stateSelectionLaunch()
 
     // ID Row
     Row {
@@ -167,11 +173,53 @@ DPane {
             }
         }
     }
-
+    // Spacer
     Item {
-        id: spacer
         width: propertiesPaneRoot.contentWidth
         height: DStyle.defaultSpacing
+    }
+    // Imports Section
+    DSection {
+        id: importsSection
+        width: propertiesPaneRoot.contentWidth
+        title: "Imports"
+        state: stateClosed
+
+        minHeight: importsFlow.height + addImportButton.height + DStyle.defaultMargin
+
+        DFlow {
+            id: importsFlow
+            width: propertiesPaneRoot.contentWidth
+            spacing: DStyle.defaultSpacing
+
+            Repeater {
+                id: importsRepeater
+                model: propertiesController ? propertiesController.importsModel : undefined
+
+                delegate: DTag {
+                    tagTitle: importName
+                    onRemoveClicked: {
+                        // Remove Import
+                        propertiesController.importsModel.removeImport(index);
+                    }
+                }
+            }
+        }
+
+        Item {
+            width: propertiesPaneRoot.contentWidth
+            height: DStyle.defaultMargin
+        }
+
+        DButton {
+            id: addImportButton
+            width: propertiesPaneRoot.contentWidth
+            text: "Add Import"
+            onClicked: {
+                // Emit New Import Launch
+                propertiesPaneRoot.newImportLaunch();
+            }
+        }
     }
     // Size & Pos Section
     DSection {
@@ -239,7 +287,9 @@ DPane {
 
             Row {
                 id: sizeRow
+                Behavior on height { DAnimation { } }
                 spacing: DStyle.defaultSpacing
+                clip: true
 
                 DText {
                     width: 24
@@ -563,13 +613,34 @@ DPane {
         title: "Signals"
         minHeight: signalsContainer.height + addSignalButton.height
 
-        // Signals
+        // Signals Container
         Item {
             id: signalsContainer
             width: propertiesPaneRoot.contentWidth
-            height: 0
+            height: CONSTS.defaultPaneItemHeight * Math.min(CONSTS.defaultSignalsMax, signalsListView.count)
+            Behavior on height { DAnimation { } }
 
-            // ...
+            DListView {
+                id: signalsListView
+                anchors.fill: parent
+
+                model: propertiesController.signalsModel
+
+                delegate: DSignalItemDelegate {
+                    width: signalsListView.width
+                    itemIndex: index
+                    signalName: model.signalName + "(" + model.signalParameters + ")";
+
+                    onItemActionClicked: {
+                        propertiesController.signalsModel.removeSignal(itemIndex);
+                    }
+
+                    onItemDoubleClicked: {
+                        // Emit Edit Signal Launch Signal
+                        propertiesPaneRoot.editSignalLaunch(itemIndex);
+                    }
+                }
+            }
         }
 
         Item {
@@ -583,8 +654,41 @@ DPane {
             text: "Add Signal"
 
             onClicked: {
-                // Emit New Signal Launch
+                // Emit New Signal Launch Signal
                 propertiesPaneRoot.newSignalLaunch();
+            }
+        }
+    }
+    // Slots Section
+    DSection {
+        id: slotsSection
+
+        width: propertiesPaneRoot.contentWidth
+        title: "Slots"
+        minHeight: slotsContainer.height + addSlotButton.height
+
+        // Slots Container
+        Item {
+            id: slotsContainer
+            width: propertiesPaneRoot.contentWidth
+            height: 0
+
+            // ...
+        }
+
+        Item {
+            width: propertiesPaneRoot.contentWidth
+            height: DStyle.defaultMargin
+        }
+
+        DButton {
+            id: addSlotButton
+            width: propertiesPaneRoot.contentWidth
+            text: "Add Slot"
+
+            onClicked: {
+                // Emit New Slot Launch
+                propertiesPaneRoot.newSlotLaunch();
             }
         }
     }
@@ -688,16 +792,20 @@ DPane {
             }
         }
     }
-    // BAse Properties Section
-    DSection {
-        id: basePropertiesSection
-        width: propertiesPaneRoot.contentWidth
-        title: "Item"
+    // Base Properties Repeater
+    Repeater {
+        id: basePropertiesRepeater
+        model: propertiesController.propertiesModel
+        visible: false
 
-        state: stateHidden
+        delegate: DSection {
+            id: basePropertiesSection
+            width: propertiesPaneRoot.contentWidth
+            title: "Item"
 
-//        onStateChanged: {
-//            console.log("basePropertiesSection.onStateChanged - state: " + basePropertiesSection.state);
-//        }
+            state: stateHidden
+
+            // ...
+        }
     }
 }

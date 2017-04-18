@@ -38,41 +38,27 @@ DRectangle {
         item.y = posY;
     }
 
-    MouseArea {
-        anchors.fill: parent
-        onClicked: {
-            demoContainerRoot.focus = true;
-        }
-    }
 
-    DDisc {
+    Flow {
         anchors.centerIn: parent
-        width: 512
-        height: 512
-    }
+        spacing: DStyle.defaultSpacing
 
-
-//    DPropertyItem {
-//        id: opiDelegateRoot
-//        width: 300
-//        anchors.centerIn: parent
-//    }
-
-    DContainer {
-        id: demoContainer
-        Component.onCompleted: {
-            x = (parent.width - width) * 0.5;
-            y = (parent.height - height) * 0.5;
+        DTag {
+            tagTitle: "Whatever"
+            onRemoveClicked: {
+                destroy();
+            }
         }
 
-//        DText {
-//            anchors.left: parent.left
-//            anchors.leftMargin: 16
-//            anchors.top: parent.top
-//            anchors.topMargin: 16
-//            text: "Example"
-//        }
+        DTag {
+            tagTitle: "Test"
+            onRemoveClicked: {
+                destroy();
+            }
+        }
     }
+
+
 
     Flow {
         anchors.left: parent.left
@@ -190,7 +176,67 @@ DRectangle {
             }
         }
 
+        DButton {
+            width: 168
+            text: importEditor.state === importEditor.stateCreate ? "Add Imports" : "Close Imports"
+
+            onClicked: {
+                if (importEditor.state === importEditor.stateCreate) {
+                    importEditor.show();
+                } else {
+                    importEditor.reset(false);
+                }
+            }
+        }
+
+        DButton {
+            width: 168
+            text: slotEditor.state === slotEditor.stateCreate ? "Create Slot" : "Reset Slot"
+
+            onClicked: {
+                if (slotEditor.state === slotEditor.stateCreate) {
+                    slotEditor.show();
+                } else {
+                    slotEditor.reset(false);
+                }
+            }
+        }
+
+        DButton {
+            width: 168
+            text: functionEditor.state === functionEditor.stateCreate ? "Create Function" : "Reset Function"
+
+            onClicked: {
+                if (functionEditor.state === functionEditor.stateCreate) {
+                    functionEditor.show();
+                } else {
+                    functionEditor.reset(false);
+                }
+            }
+        }
+
         // ...
+
+    }
+
+//    DImportsEditor {
+//        id: importsEditor
+
+//        childPane: importEditor
+
+//        onNewImport: {
+//            // Show Import Editor
+//            childPane.show();
+//        }
+//    }
+
+    DImportEditor {
+        id: importEditor
+
+//        parentPane: importsEditor
+
+//        initialX: parentPane.x + parentPane.width * 0.5
+//        initialY: parentPane.y + parentPane.height
 
     }
 
@@ -235,6 +281,16 @@ DRectangle {
 
 //        creationX: initialX - signalParameterEditor.width * 0.5
 //        creationY: initialY + 32
+    }
+
+    DSlotEditor {
+        id: slotEditor
+
+    }
+
+    DFunctionEditor {
+        id: functionEditor
+
     }
 
     // State Editor
@@ -294,6 +350,109 @@ DRectangle {
         creationY: initialY + 32
     }
 
+/*
+//    MouseArea {
+//        id: demoArea1
+//        width: 400
+//        height: 400
+//        anchors.centerIn: parent
+
+//        drag.filterChildren: true
+
+//        propagateComposedEvents: true
+
+//        onPressed: {
+//            console.log("demoArea1.onPressed");
+
+//            DSystemModel.lastMousePressOwner = "demoArea1";
+
+//        }
+
+//        onReleased: {
+//            console.log("demoArea1.onReleased");
+
+//            // Check Last Mouse Press Owner
+//            if (DSystemModel.lastMousePressOwner === "demoArea1") {
+//                // Reset Last Mouse Press Owner
+//                DSystemModel.lastMousePressOwner = "";
+//            }
+//        }
+
+//        onClicked: {
+//            console.log("demoArea1.onClicked");
+//        }
+
+//        Rectangle {
+//            anchors.fill: parent
+//            color: "transparent"
+//            border.color: parent.pressed ? "red" : "purple"
+//        }
+
+//        MouseArea {
+//            id: demoArea2
+//            width: 300
+//            height: 300
+//            anchors.centerIn: parent
+
+//            //preventStealing: true
+
+//            onPressed: {
+//                console.log("demoArea2.onPressed");
+
+//                DSystemModel.lastMousePressOwner = "demoArea2";
+//            }
+
+//            onReleased: {
+//                console.log("demoArea2.onReleased");
+
+//                // Check Last Mouse Press Owner
+//                if (DSystemModel.lastMousePressOwner === "demoArea2") {
+//                    // Reset Last Mouse Press Owner
+//                    DSystemModel.lastMousePressOwner = "";
+//                }
+//            }
+
+//            onClicked: {
+//                console.log("demoArea2.onClicked");
+//            }
+
+//            Rectangle {
+//                anchors.fill: parent
+//                color: "transparent"
+//                border.color: parent.pressed ? "red" : "orange"
+//            }
+//        }
+//    }
+
+//    MouseArea {
+//        anchors.fill: parent
+//        onClicked: {
+//            demoContainerRoot.focus = true;
+//        }
+//    }
+
+//    DDisc {
+//        anchors.centerIn: parent
+//        width: 512
+//        height: 512
+//    }
+
+
+//    DPropertyItem {
+//        id: opiDelegateRoot
+//        width: 300
+//        anchors.centerIn: parent
+//    }
+
+
+//    DContainer {
+//        id: demoContainer
+//        Component.onCompleted: {
+//            x = (parent.width - width) * 0.5;
+//            y = (parent.height - height) * 0.5;
+//        }
+//    }
+*/
 /*
     Column {
         anchors.centerIn: parent

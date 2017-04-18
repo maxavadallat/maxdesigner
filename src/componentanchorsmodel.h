@@ -134,6 +134,13 @@ public:
     // Set Vertical Center Offset
     void setAnchorsVerticalOffset(const QString& aAnchorVerticalOffset);
 
+    // Clear Horizontal Anchors
+    void clearHorizontalAnchors();
+    // Clear Vertical Anchors
+    void clearVerticalAnchors();
+    // Clear All Anchors
+    void clearAllAnchors();
+
     // Destructor
     ~ComponentAnchorsModel();
 

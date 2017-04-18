@@ -76,7 +76,8 @@ Item {
                 switch (propertyItemValueRoot.propertyType) {
                     case CONSTS.propertyTypes[1]:
                     case CONSTS.propertyTypes[2]:
-                    case CONSTS.propertyTypes[3]:   return false;
+                    case CONSTS.propertyTypes[3]:
+                    case CONSTS.propertyTypes[4]:   return false;
                 }
 
                 return true;
@@ -91,10 +92,11 @@ Item {
             id: propertyValueSpinner
             width: propertyItemValueRoot.valueEditorWidth
             visible: {
-                // Check Property Type
-                if (propertyItemValueRoot.propertyType === CONSTS.propertyTypes[1] ||
-                    propertyItemValueRoot.propertyType === CONSTS.propertyTypes[3]    ) {
-                    return true;
+                // Switch Property Type
+                switch (propertyItemValueRoot.propertyType) {
+                    case CONSTS.propertyTypes[2]:
+                    case CONSTS.propertyTypes[3]:
+                    case CONSTS.propertyTypes[4]:   return true;
                 }
 
                 return false;
@@ -107,7 +109,7 @@ Item {
 
             visible: {
                 // Check Property Type
-                if (propertyItemValueRoot.propertyType === CONSTS.propertyTypes[2]) {
+                if (propertyItemValueRoot.propertyType === CONSTS.propertyTypes[1]) {
                     return true;
                 }
 

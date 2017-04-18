@@ -28,7 +28,7 @@ void ComponentSignalsModel::init()
 //==============================================================================
 // Clear
 //==============================================================================
-void ComponentSignalsModel::clear()
+void ComponentSignalsModel::clear(const bool& aEndReset)
 {
     // Begin Reset Model
     beginResetModel();
@@ -39,25 +39,31 @@ void ComponentSignalsModel::clear()
         delete mSignals.takeLast();
     }
 
-    // End Reset Model
-    endResetModel();
+    // Check End Reset
+    if (aEndReset) {
+        // End Reset Model
+        endResetModel();
+    }
 }
 
 //==============================================================================
 // Load Component Signals
 //==============================================================================
-void ComponentSignalsModel::loadComponentSignals(const QJsonArray& aArray)
+void ComponentSignalsModel::loadComponentSignals()
 {
     // Clear
     clear();
 
-    // Get Array Count
-    int csCount = aArray.count();
+    // Check Component
+    if (mComponent) {
+        // Get Signals Count
+        int sCount = mComponent->mSignals.count();
 
-    // Iterate Through Array
-    for (int i=0; i<csCount; i++) {
-        // Append Signal
-        appendSignal(ComponentSignal::fromJSONObject(aArray[i].toObject()));
+        // Iterate Through Signals
+        for (int i=0; i<sCount; i++) {
+            // Append Signal
+            appendSignal(ComponentSignal::fromJSONObject(mComponent->mSignals[i].toObject()));
+        }
     }
 }
 
@@ -70,6 +76,21 @@ void ComponentSignalsModel::saveComponentSignals()
     if (mComponent) {
         // Set Signals
         mComponent->mSignals = toJSONArray();
+    }
+}
+
+//==============================================================================
+// Clear Component Signals
+//==============================================================================
+void ComponentSignalsModel::clearComponentSignals()
+{
+    // Check Component
+    if (mComponent) {
+        // Iterate Through Signals
+        while (mComponent->mSignals.count() > 0) {
+            // Remove Last
+            mComponent->mSignals.removeLast();
+        }
     }
 }
 
@@ -88,13 +109,27 @@ void ComponentSignalsModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
+        // Save Previous Component Signals
+        saveComponentSignals();
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Component Changed Signal
         emit currentComponentChanged(mComponent);
+        // Load New Component Signals
+        loadComponentSignals();
+    }
+}
 
-        // Load Component Signals
 
+//==============================================================================
+// Add Signal
+//==============================================================================
+void ComponentSignalsModel::addSignal(const QString& aName, const QStringList& aParameters)
+{
+    // Check If Signal Valid
+    if (signalValid(aName)) {
+        // Append New Signal
+        appendSignal(new ComponentSignal(aName, aParameters));
     }
 }
 
@@ -104,23 +139,39 @@ void ComponentSignalsModel::setCurrentComponent(ComponentInfo* aComponent)
 void ComponentSignalsModel::appendSignal(ComponentSignal* aSignal)
 {
     // Check Signal
-    if (!aSignal) {
-        return;
+    if (aSignal) {
+        // Begin Insert Rows
+        beginInsertRows(QModelIndex(), rowCount(), rowCount());
+        // Append Signal
+        mSignals << aSignal;
+        // End Insert Rows
+        endInsertRows();
     }
+}
 
-    // Get Index
-    int sIndex = mSignals.indexOf(aSignal);
-    // Check Idnex
-    if (sIndex >= 0) {
-        return;
+//==============================================================================
+// Remove Signal
+//==============================================================================
+void ComponentSignalsModel::removeSignal(const QString& aName)
+{
+    // Get Signals Count
+    int sCount = mSignals.count();
+    // Iterate Through Signals
+    for (int i=0; i<sCount; i++) {
+        // Get Signal
+        ComponentSignal* cSignal = mSignals[i];
+        // Check Signal
+        if (cSignal && cSignal->mName == aName) {
+            // Begin Remove rows
+            beginRemoveRows(QModelIndex(), i, i);
+            // Remove Signal
+            delete mSignals.takeAt(i);
+            // End Remove Rows
+            endRemoveRows();
+
+            return;
+        }
     }
-
-    // Begin Insert Rows
-    beginInsertRows(QModelIndex(), rowCount(), rowCount());
-    // Append Signal
-    mSignals << aSignal;
-    // End Insert Rows
-    endInsertRows();
 }
 
 //==============================================================================
@@ -140,12 +191,94 @@ void ComponentSignalsModel::removeSignal(const int& aIndex)
 }
 
 //==============================================================================
+// Rename Signal
+//==============================================================================
+void ComponentSignalsModel::renameSignal(const int& aIndex, const QString& aName)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount() && signalValid(aName)) {
+        // Set Signal Name
+        mSignals[aIndex]->mName = aName;
+        // Emit Data Changed Signal
+        emit dataChanged(index(aIndex), index(aIndex));
+    }
+}
+
+//==============================================================================
+// Check If Signal Valid
+//==============================================================================
+bool ComponentSignalsModel::signalValid(const QString& aName)
+{
+    // Check Signal Name
+    if (!aName.isEmpty()) {
+        // Get Signals Count
+        int sCount = rowCount();
+        // Iterate Through Signals
+        for (int i=0; i<sCount; i++) {
+            // Check Signal Name
+            if (mSignals[i]->mName == aName) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+//==============================================================================
+// Create New Signal
+//==============================================================================
+ComponentSignal* ComponentSignalsModel::createNewSignal()
+{
+    return new ComponentSignal("");
+}
+
+//==============================================================================
+// Get/Select Signal
+//==============================================================================
+ComponentSignal* ComponentSignalsModel::selectSignal(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        return mSignals[aIndex];
+    }
+
+    return NULL;
+}
+
+//==============================================================================
+// Discard New Signal
+//==============================================================================
+void ComponentSignalsModel::discardNewSignal(ComponentSignal* aSignal)
+{
+    // Check Signal
+    if (aSignal) {
+        // Delete Signal
+        delete aSignal;
+    }
+}
+
+//==============================================================================
 // To JSON Array
 //==============================================================================
 QJsonArray ComponentSignalsModel::toJSONArray()
 {
     // Init New Array
     QJsonArray newArray;
+
+    // Get Signals Count
+    int sCount = mSignals.count();
+    // Iterate Through Signals
+    for (int i=0; i<sCount; i++) {
+        // Get Signal
+        ComponentSignal* cSignal = mSignals[i];
+        // Append To Array
+        newArray << cSignal->toJSONObject();
+    }
+
+    // ...
 
     return newArray;
 }
@@ -301,6 +434,47 @@ void ComponentSignal::setSignalParameters(const QStringList& aParameters)
 }
 
 //==============================================================================
+// Add Signal Parameter
+//==============================================================================
+void ComponentSignal::addSignalParameter(const QString& aParameter)
+{
+    // Check Parameters
+    if (mParameters.indexOf(aParameter) < 0) {
+        // Add Parameter
+        mParameters << aParameter;
+        // Emit Signal Parameters Changed Signal
+        emit signalParametersChanged(mParameters);
+    }
+}
+
+//==============================================================================
+// Remove Signal Parameter
+//==============================================================================
+void ComponentSignal::removeSignalParameter(const int& aIndex)
+{
+    // Check Parameters
+    if (aIndex >= 0 && aIndex < mParameters.count()) {
+        // Remove Parameter
+        mParameters.removeAt(aIndex);
+        // Emit Signal Parameters Changed Signal
+        emit signalParametersChanged(mParameters);
+    }
+}
+
+//==============================================================================
+// Check If Parameter Valid
+//==============================================================================
+bool ComponentSignal::parameterValid(const QString& aParameter)
+{
+    // Check Parameter
+    if (!aParameter.isEmpty()) {
+        return (mParameters.indexOf(aParameter) < 0);
+    }
+
+    return false;
+}
+
+//==============================================================================
 // To JSON Object
 //==============================================================================
 QJsonObject ComponentSignal::toJSONObject()
@@ -308,7 +482,10 @@ QJsonObject ComponentSignal::toJSONObject()
     // Init New JSON Object
     QJsonObject newObject;
 
-    // ...
+    // Set Signal Name
+    newObject[JSON_KEY_COMPONENT_SIGNAL_NAME] = mName;
+    // Set Parameters
+    newObject[JSON_KEY_COMPONENT_SIGNAL_PARAMETERS] = mParameters.join(',');
 
     return newObject;
 }

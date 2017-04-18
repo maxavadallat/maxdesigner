@@ -3,13 +3,16 @@
 #include "componentpropertiesmodel.h"
 #include "componentownpropertiesmodel.h"
 #include "componentinfo.h"
+#include "mainwindow.h"
+#include "projectmodel.h"
 
 //==============================================================================
 // Constructor
 //==============================================================================
-ComponentPropertiesModel::ComponentPropertiesModel(QObject* aParent)
+ComponentPropertiesModel::ComponentPropertiesModel(ComponentInfo* aComponent, ProjectModel* aProject, QObject* aParent)
     : QAbstractListModel(aParent)
-    , mComponent(NULL)
+    , mComponent(aComponent)
+    , mProject(aProject)
 {
     qDebug() << "ComponentPropertiesModel created.";
 
@@ -33,12 +36,15 @@ void ComponentPropertiesModel::init()
 //==============================================================================
 void ComponentPropertiesModel::clear()
 {
-    // Begin Reset Model
-    beginResetModel();
-    // Clear
-    mHierarchy.clear();
-    // End Reset Model
-    endResetModel();
+    // Chekc Hierarchy
+    if (mHierarchy.count() > 0) {
+        // Begin Reset Model
+        beginResetModel();
+        // Clear
+        mHierarchy.clear();
+        // End Reset Model
+        endResetModel();
+    }
 }
 
 //==============================================================================
@@ -49,7 +55,27 @@ void ComponentPropertiesModel::loadComponentProperties()
     // Clear
     clear();
 
+    // Check Component
+    if (!mComponent) {
+        return;
+    }
+
+    // Build Hierarchy
+    addComponentToHierarchy(mComponent->mBaseName);
+
     // ...
+
+}
+
+//==============================================================================
+// Add Component To Hierarchy
+//==============================================================================
+void ComponentPropertiesModel::addComponentToHierarchy(const QString& aBaseName)
+{
+    // Check Component Base Name
+    if (!aBaseName.isEmpty()) {
+
+    }
 }
 
 //==============================================================================
@@ -74,6 +100,50 @@ void ComponentPropertiesModel::setCurrentComponent(ComponentInfo* aComponent)
         // Load Component Properties
         loadComponentProperties();
     }
+}
+
+//==============================================================================
+// Set Component Own Property Value
+//==============================================================================
+bool ComponentPropertiesModel::setComponentProperty(const QString& aName, const QVariant& aValue)
+{
+    // Check Component
+    if (!mComponent) {
+        return false;
+    }
+
+    qDebug() << "ComponentPropertiesModel::setComponentProperty - aName: " << aName << " - aValue: " << aValue;
+
+    // ...
+
+    return false;
+}
+
+//==============================================================================
+// Clear Component Property
+//==============================================================================
+bool ComponentPropertiesModel::clearComponentProperty(const QString& aName)
+{
+    // Check Component
+    if (!mComponent) {
+        return false;
+    }
+
+    qDebug() << "ComponentPropertiesModel::clearComponentProperty - aName: " << aName;
+
+    // Check Property Keys
+    if (mComponent->mProperties.keys().indexOf(aName) >= 0) {
+
+        // Remove Key
+        mComponent->mProperties.remove(aName);
+
+
+        return true;
+    }
+
+    // ...
+
+    return false;
 }
 
 //==============================================================================

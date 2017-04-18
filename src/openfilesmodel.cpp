@@ -285,7 +285,7 @@ void OpenFilesModel::closeFocusedFile()
 //==============================================================================
 void OpenFilesModel::closeAllFiles()
 {
-    qDebug() << "OpenFilesModel::closeFocusedFile";
+    //qDebug() << "OpenFilesModel::closeAllFiles";
 
     // Begin Reset Model
     beginResetModel();

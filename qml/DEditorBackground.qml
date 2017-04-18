@@ -11,74 +11,29 @@ Item {
 
     property bool editorFocus: false
 
-//    property bool highLight: false
+    property bool invalidValue: false
 
-//    color: DStyle.colorEditorBG
-//    border.color: DStyle.colorBG
-//    color: "transparent"
+    property string borderColor: {
+
+        if (invalidValue) {
+            return "red";
+        }
+
+        if (editorFocus) {
+            return DStyle.colorBorder;
+        }
+
+        return DStyle.colorBorderNoFocus;
+    }
 
     property int radius: DStyle.defaultRadius
-
-//    smooth: true
-//    antialiasing: true
-/*
-    Rectangle {
-        id: shadowRectangle
-        anchors.fill: parent
-        anchors.margins: 1
-        color: DStyle.colorEditorBG
-        radius: parent.radius
-        visible: false
-//        smooth: true
-//        antialiasing: true
-    }
-
-    InnerShadow {
-        id: normalShadow
-        anchors.fill: parent
-        radius: 8.0
-        samples: 16
-        horizontalOffset: 3
-        verticalOffset: 3
-        color: DStyle.colorShadow
-        source: shadowRectangle
-        visible: !editorBGRoot.highLight
-//        smooth: true
-//        antialiasing: true
-    }
-*/
-
-//    Rectangle {
-//        id: highlightShadowRectangle
-//        anchors.fill: parent
-//        anchors.margins: 1
-//        color: DStyle.colorBorder
-//        radius: parent.radius
-//        visible: false
-////        smooth: true
-////        antialiasing: true
-//    }
-
-//    InnerShadow {
-//        id: highLightShadow
-//        anchors.fill: parent
-//        radius: 8.0
-//        samples: 16
-//        horizontalOffset: 3
-//        verticalOffset: 3
-//        color: DStyle.colorShadow
-//        source: highlightShadowRectangle
-//        visible: editorBGRoot.highLight
-////        smooth: true
-////        antialiasing: true
-//    }
 
     Rectangle {
         anchors.fill: parent
         color: "transparent"
-        border.color: editorBGRoot.editorFocus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
+        border.color: editorBGRoot.borderColor
         radius: editorBGRoot.radius
-        smooth: true
-        antialiasing: true
+        //smooth: true
+        //antialiasing: true
     }
 }

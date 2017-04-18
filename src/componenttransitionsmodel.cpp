@@ -337,7 +337,7 @@ void ComponentTransitionsModel::moveTransitionNode(ComponentTransition* aTransit
                                                    const int& aTargetIndex)
 {
     // Check Transition
-    if (!aTransition) {
+    if (!aTransition || !aNode) {
         return;
     }
 
@@ -525,6 +525,7 @@ ComponentTransition* ComponentTransition::fromJSONObject(ComponentTransitionsMod
 //==============================================================================
 ComponentTransition::ComponentTransition(const QString& aFromState, const QString& aToState, QObject* aParent)
     : QObject(aParent)
+    , mModel(NULL)
     , mCurrentNode(NULL)
     , mFromState(aFromState)
     , mToState(aToState)
@@ -627,7 +628,47 @@ QJsonObject ComponentTransition::toJSONObject()
     // Init New JSON Object
     QJsonObject newJSONObject;
 
-    // ...
+    // Check From State
+    if (!mFromState.isNull()) {
+        // Check If Empty
+        if (mFromState.isEmpty()) {
+            // Set From State
+            setFromState(QString("\"\""));
+        }
+
+        // Set From State
+        newJSONObject[JSON_KEY_COMPONENT_TRANSITION_FROM] = mFromState;
+    }
+
+    // Check To State
+    if (!mToState.isNull()) {
+        // Check If Empty
+        if (mToState.isEmpty()) {
+            // Set To State
+            setToState(QString("\"\""));
+        }
+
+        // Set To State
+        newJSONObject[JSON_KEY_COMPONENT_TRANSITION_TO] = mToState;
+    }
+
+    // Get Nodes Count
+    int nCount = mNodes.count();
+
+    // Check Nodes Count
+    if (nCount > 0) {
+        // Init New JSON Array
+        QJsonArray newNodesArray;
+
+        // Iterate Through Nodes
+        for (int i=0; i<nCount; i++) {
+            // Append Node
+            newNodesArray << mNodes[i]->toJSONObject();
+        }
+
+        // Set Nodes Array
+        newJSONObject[JSON_KEY_COMPONENT_TRANSITION_NODES] = newNodesArray;
+    }
 
     return newJSONObject;
 }

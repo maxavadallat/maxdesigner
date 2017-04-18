@@ -12,6 +12,8 @@ ComponentImportsModel::ComponentImportsModel(ComponentInfo* aComponent, QObject*
     : QAbstractListModel(aParent)
     , mComponent(aComponent)
 {
+    qDebug() << "ComponentImportsModel created.";
+
     // Init
     init();
 }
@@ -32,14 +34,7 @@ void ComponentImportsModel::init()
 //==============================================================================
 void ComponentImportsModel::clear()
 {
-    // Begin Reset Model
-    beginResetModel();
-
-    // Clear
-    mImports.clear();
-
-    // End Reset Model
-    endResetModel();
+    // ...
 }
 
 //==============================================================================
@@ -50,7 +45,13 @@ void ComponentImportsModel::loadComponentImports()
     // Clear
     clear();
 
+    // Begin Reset Model
+    beginResetModel();
+
     // ...
+
+    // End Reset Model
+    endResetModel();
 }
 
 //==============================================================================
@@ -76,14 +77,125 @@ void ComponentImportsModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
+        // Save Previous Component Imports
+        saveComponentImports();
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Component Changed Signal
         emit currentComponentChanged(mComponent);
-
-        // Load Component Imports
+        // Load New Component Imports
         loadComponentImports();
     }
+}
+
+//==============================================================================
+// Add Import
+//==============================================================================
+void ComponentImportsModel::addImport(const QString& aImport)
+{
+    // Check If Import Valid
+    if (!importValid(aImport)) {
+        return;
+    }
+
+    qDebug() << "ComponentImportsModel::addImport - aImport: " << aImport;
+
+    // Begin Insert Rows
+    beginInsertRows(QModelIndex(), rowCount(), rowCount());
+    // Append Import
+    mComponent->mImports << QJsonValue(aImport);
+    // End Insert Rows
+    endInsertRows();
+
+    // Set Dirty
+    mComponent->setDirty(true);
+
+    // Emit Import Added Signal
+    emit mComponent->importAdded(rowCount() - 1);
+}
+
+//==============================================================================
+// Remove Import
+//==============================================================================
+void ComponentImportsModel::removeImport(const QString& aImport)
+{
+    // Check Component
+    if (!mComponent) {
+        return;
+    }
+
+    // Get Imports Count
+    int iCount = mComponent->mImports.count();
+    // Iterate Through Imports
+    for (int i=0; i<iCount; i++) {
+        // Get String Value
+        QString jsonValueString = mComponent->mImports[i].toString();
+        // Check JS String Value
+        if (jsonValueString == aImport) {
+            // Begin Remove Rows
+            beginRemoveRows(QModelIndex(), i, i);
+            // Remove Import
+            mComponent->mImports.removeAt(i);
+            // End Remove Rows
+            endRemoveRows();
+            // Set Dirty
+            mComponent->setDirty(true);
+            // Emit Import Removed Signal
+            emit mComponent->importRemoved(i);
+
+            return;
+        }
+    }
+}
+
+//==============================================================================
+// Remove Import
+//==============================================================================
+void ComponentImportsModel::removeImport(const int& aIndex)
+{
+    // Check Index
+    if (mComponent && aIndex >= 0 && aIndex < mComponent->mImports.count()) {
+        // Begin Remove Rows
+        beginRemoveRows(QModelIndex(), aIndex, aIndex);
+        // Remove Import
+        mComponent->mImports.removeAt(aIndex);
+        // End Remove Rows
+        endRemoveRows();
+        // Set Dirty
+        mComponent->setDirty(true);
+        // Emit Import Removed Signal
+        emit mComponent->importRemoved(aIndex);
+    }
+}
+
+//==============================================================================
+// Check If Import Vali
+//==============================================================================
+bool ComponentImportsModel::importValid(const QString& aImport)
+{
+    // Check Component
+    if (!mComponent) {
+        return false;
+    }
+
+    // Check Import
+    if (!aImport.isEmpty()) {
+        // Get Imports Count
+        int iCount = rowCount();
+        // Iterate Through Imports
+        for (int i=0; i<iCount; i++) {
+            // Get String Value
+            QString jsonValueString = mComponent->mImports[i].toString();
+            // Check JS String Value
+            if (jsonValueString == aImport) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 //==============================================================================
@@ -91,7 +203,7 @@ void ComponentImportsModel::setCurrentComponent(ComponentInfo* aComponent)
 //==============================================================================
 int ComponentImportsModel::rowCount(const QModelIndex& ) const
 {
-    return mImports.count();
+    return mComponent ? mComponent->mImports.count() : 0;
 }
 
 //==============================================================================
@@ -103,11 +215,11 @@ QVariant ComponentImportsModel::data(const QModelIndex& index, int role) const
     int imRow = index.row();
 
     // Check Row
-    if (imRow >= 0 && imRow < rowCount()) {
+    if (mComponent && imRow >= 0 && imRow < rowCount()) {
         // Switch Role
         switch (role) {
             default:
-            case IMRNameRole:   return mImports[imRow];
+            case IMRNameRole:   return mComponent->mImports[imRow].toString();
         }
     }
 
@@ -136,4 +248,6 @@ ComponentImportsModel::~ComponentImportsModel()
     clear();
 
     // ...
+
+    qDebug() << "ComponentImportsModel deleted.";
 }

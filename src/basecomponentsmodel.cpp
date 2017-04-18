@@ -36,16 +36,24 @@ void BaseComponentsModel::init()
 //==============================================================================
 void BaseComponentsModel::clear()
 {
-    //qDebug() << "BaseComponentsModel::clear";
-
     // Begin Reset Model
     beginResetModel();
 
-    // Iterate Through Base Component List
-    while (mBaseComponentList.count() > 0) {
-        // Delete Last Item
-        delete mBaseComponentList.takeLast();
+    // Get Keys Count
+    int bckCount = rowCount();
+
+    qDebug() << "BaseComponentsModel::clear - count: " << bckCount;
+
+    // Iterate Thru Keys
+    for (int i=0; i<bckCount; i++) {
+        // Get Component Info
+        ComponentInfo* component = mBaseComponents[mBaseComponents.keys()[i]];
+        // Delete Component
+        delete component;
     }
+
+    // Clear
+    mBaseComponents.clear();
 
     // End Reset Model
     endResetModel();
@@ -65,13 +73,13 @@ void BaseComponentsModel::updateBaseComponents()
     int bcCount = rowCount();
     // Iterate Through Base Components
     for (int i=0; i<bcCount; i++) {
-        // Get Component Info
-        ComponentInfo* componentInfo = mBaseComponentList[i];
+        // Get Component
+        ComponentInfo* component = getComponentByIndex(i);
         // Check Base Name
-        if (componentInfo && !componentInfo->mBaseName.isEmpty() && !componentInfo->mBase) {
-            qDebug() << "BaseComponentsModel::updateBaseComponents - name: " << componentInfo->componentName();
+        if (component && !component->mBaseName.isEmpty() && !component->mBase) {
+            qDebug() << "BaseComponentsModel::updateBaseComponents - name: " << component->mName;
             // Set Base Component
-            componentInfo->mBase = mProjectModel->getComponentByName(componentInfo->mBaseName);
+            component->mBase = mProjectModel->getComponentByName(component->mBaseName);
         }
     }
 }
@@ -129,76 +137,73 @@ void BaseComponentsModel::setBaseComponentsDir(const QString& aDirPath)
 //==============================================================================
 // Add Base Component
 //==============================================================================
-void BaseComponentsModel::addBaseComponent(ComponentInfo* aComponent)
+bool BaseComponentsModel::addBaseComponent(ComponentInfo* aComponent)
 {
     // Check Component
     if (aComponent) {
-        //qDebug() << "BaseComponentsModel::addBaseComponent - name: " << aComponent->componentName();
+        // Get Component Name
+        QString cName = aComponent->mName;
 
-        // Get Base Components Count
-        int bcCount = mBaseComponentList.count();
-        // Get Index Of Component
-        int bcIndex = mBaseComponentList.indexOf(aComponent);
-        // Check Base Component Index
-        if (bcIndex < 0) {
-            // Begin Insert Rows
-            beginInsertRows(QModelIndex(), bcCount, bcCount);
-            // Append Base Component
-            mBaseComponentList << aComponent;
-            // End Insert Rows
-            endInsertRows();
+        // Check Base Component
+        ComponentInfo* component = mBaseComponents.value(cName);
+
+        // Check Component
+        if (component) {
+            qWarning() << "BaseComponentsModel::addBaseComponent - name: " << cName << " - ALREADY EXITS!";
+            return false;
         }
+
+        qDebug() << "BaseComponentsModel::addBaseComponent - name: " << cName;
+
+        // Add Base Component To Base Component Map
+        mBaseComponents[cName] = aComponent;
+        // Get New Key Index
+        int newIndex = mBaseComponents.keys().indexOf(cName);
+
+        // Begin Insert Rows
+        beginInsertRows(QModelIndex(), newIndex, newIndex);
+
+        // End Insert Rows
+        endInsertRows();
+
+        return true;
     }
+
+    return false;
 }
 
 //==============================================================================
-// Remove Base Compoennt
+// Remove Base Component
 //==============================================================================
-void BaseComponentsModel::removeBaseComponent(ComponentInfo* aComponent, const bool& aDelete)
+bool BaseComponentsModel::removeBaseComponent(const int& aIndex)
 {
-    // Check Component
-    if (aComponent) {
-        //qDebug() << "BaseComponentsModel::removeBaseComponent - name: " << aComponent->componentName();
-
-        // Get Base Components Count
-        int bcCount = mBaseComponentList.count();
-        // Get Index Of Component
-        int bcIndex = mBaseComponentList.indexOf(aComponent);
-        // Check Base Component Index
-        if (bcIndex >= 0 && bcIndex < bcCount) {
-            // Begin Remove Rows
-            beginRemoveRows(QModelIndex(), bcIndex, bcIndex);
-            // Check Deletion
-            if (aDelete) {
-                // Delete Item
-                delete mBaseComponentList.takeAt(bcIndex);
-            } else {
-                // Remove Item
-                mBaseComponentList.removeAt(bcIndex);
-            }
-            // End Remove Rows
-            endRemoveRows();
+    // Get Base Components Count
+    int bcCount = rowCount();
+    // Check Index
+    if (aIndex >= 0 && aIndex < bcCount) {
+        // Get Component
+        ComponentInfo* component = getComponentByIndex(aIndex);
+        // Get Info File
+        QFile ciFile(component->mInfoPath);
+        // Get Key
+        QString bcKey = mBaseComponents.keys()[aIndex];
+        // Begin Remove Rows
+        beginRemoveRows(QModelIndex(), aIndex, aIndex);
+        // Remove Key
+        mBaseComponents.remove(bcKey);
+        // Delete Component
+        delete component;
+        // Delete Component Info File
+        if (!ciFile.remove()) {
+            qWarning() << "BaseComponentsModel::removeBaseComponent - ERROR REMOVING FILE!";
         }
-    }
-}
+        // End Remove Rows
+        endRemoveRows();
 
-//==============================================================================
-// Set Base Component
-//==============================================================================
-void BaseComponentsModel::setBaseComponent(const int& aIndex, ComponentInfo* aComponent)
-{
-    // Check Component
-    if (aComponent) {
-        // Get Base Components Count
-        int bcCount = mBaseComponentList.count();
-        // Check Index
-        if (aIndex >= 0 && aIndex < bcCount) {
-            // Set Component Info
-            mBaseComponentList[aIndex] = aComponent;
-            // Emit Data Changed
-            emit dataChanged(index(aIndex), index(aIndex));
-        }
+        return true;
     }
+
+    return false;
 }
 
 //==============================================================================
@@ -206,19 +211,7 @@ void BaseComponentsModel::setBaseComponent(const int& aIndex, ComponentInfo* aCo
 //==============================================================================
 int BaseComponentsModel::getComponentIndex(const QString& aName)
 {
-    // Get Components Count
-    int cCount = mBaseComponentList.count();
-    // Iterate Through Components
-    for (int i=0; i<cCount; i++) {
-        // Get Component Info
-        ComponentInfo* component = mBaseComponentList[i];
-        // Check Component Name
-        if (component->componentName() == aName) {
-            return i;
-        }
-    }
-
-    return -1;
+    return mBaseComponents.keys().indexOf(aName);
 }
 
 //==============================================================================
@@ -226,27 +219,7 @@ int BaseComponentsModel::getComponentIndex(const QString& aName)
 //==============================================================================
 ComponentInfo* BaseComponentsModel::getComponent(const QString& aName)
 {
-    // Get Components Count
-    int cCount = mBaseComponentList.count();
-    // Iterate Through Components
-    for (int i=0; i<cCount; i++) {
-        // Get Component Info
-        ComponentInfo* component = mBaseComponentList[i];
-        // Get Component Name
-        QString componentName = component->componentName();
-
-        // Check Component Name
-        if (componentName.isEmpty()) {
-            qWarning() << "BaseComponentsModel::getComponent - COMPONENT NAME IS EMPTY!!!";
-        }
-
-        // Check Component Name
-        if (componentName == aName) {
-            return component;
-        }
-    }
-
-    return NULL;
+    return mBaseComponents.value(aName);
 }
 
 //==============================================================================
@@ -254,9 +227,8 @@ ComponentInfo* BaseComponentsModel::getComponent(const QString& aName)
 //==============================================================================
 ComponentInfo* BaseComponentsModel::getComponentByIndex(const int& aIndex)
 {
-    // Check Index
-    if (aIndex >= 0 && aIndex < mBaseComponentList.count()) {
-        return mBaseComponentList[aIndex];
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        return mBaseComponents[mBaseComponents.keys()[aIndex]];
     }
 
     return NULL;
@@ -267,7 +239,7 @@ ComponentInfo* BaseComponentsModel::getComponentByIndex(const int& aIndex)
 //==============================================================================
 int BaseComponentsModel::rowCount(const QModelIndex& ) const
 {
-    return mBaseComponentList.count();
+    return mBaseComponents.keys().count();
 }
 
 //==============================================================================
@@ -276,14 +248,18 @@ int BaseComponentsModel::rowCount(const QModelIndex& ) const
 QVariant BaseComponentsModel::data(const QModelIndex& index, int role) const
 {
     // Get Ro
-    int row = index.row();
+    int bcRow = index.row();
+
     // Check Row
-    if (row >= 0 && row < mBaseComponentList.count()) {
+    if (bcRow >= 0 && bcRow < rowCount()) {
+        // Get Component Info
+        ComponentInfo* component = mBaseComponents[mBaseComponents.keys()[bcRow]];
         // Switch Role
         switch (role) {
             case Qt::DisplayRole:
             case Qt::UserRole:
-            case ComponentNameRole: return mBaseComponentList[row]->componentName();
+            case EBCRName:        return component->mName;
+            case EBCRBuiltIn:     return component->mBuiltIn;
         }
     }
 
@@ -299,7 +275,8 @@ QHash<int,QByteArray> BaseComponentsModel::roleNames() const
     QHash<int,QByteArray> rNames;
 
     // Set Role Names
-    rNames[ComponentNameRole] = "componentName";
+    rNames[EBCRName]    = "cName";
+    rNames[EBCRBuiltIn] = "cBuiltIn";
 
     return rNames;
 }

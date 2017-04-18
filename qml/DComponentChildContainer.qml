@@ -4,6 +4,7 @@ import enginecomponents 0.1
 
 import "DConstants.js" as CONSTS
 import "style"
+import "system"
 
 DContainer {
     id: cccRoot
@@ -12,15 +13,37 @@ DContainer {
 
     property ComponentInfo componentInfo: null
 
+    property Connections componentInfoConnections: Connections {
+        target: componentInfo
+
+        // ...
+    }
+
+    property bool selected: false
+
     backgroundColor: Qt.hsla(Math.random(), 0.5, 0.4, 0.2)
-    borderColor: cccRoot.selected ? DStyle.colorBorderSelected : cccRoot.focus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
+
+    borderColor: {
+        if (cccRoot.selected) {
+            return DStyle.colorBorderSelected;
+        }
+
+        if (cccRoot.componentInfo === propertiesController.focusedComponent) {
+            return DStyle.colorBorder;
+        }
+
+        return DStyle.colorBorderNoFocus;
+    }
+
     radius: 0
 
     enablePosOverlay: true
     enableSizeOverlay: true
+    setFocusOnResize: true
 
-    Component.onCompleted: {
-
+    Component.onDestruction: {
+        // Reset Component Info
+        cccRoot.componentInfo = null;
     }
 
     Keys.onReleased: {
@@ -28,45 +51,48 @@ DContainer {
             case Qt.Key_Backspace:
             case Qt.Key_Delete:
 
-                // ...
-
-                // Destroy
-                cccRoot.destroy();
-
+                // Check Parent Container
+                if (cccRoot.parentContainer && cccRoot.parentContainer.removeChildComponent !== undefined) {
+                    // Remove Child Component
+                    cccRoot.parentContainer.removeChildComponent(cccRoot);
+                } else {
+                    // Destroy
+                    cccRoot.destroy();
+                }
             break;
         }
     }
 
-    MouseArea {
-        id: dragArea
-        anchors.fill: parent
+    onPressed: {
+        console.log("DComponentChildContainer.onPressed");
+        // Set Last Mouse Press Owner
+        DSystemModel.lastMousePressOwner = "cccRoot";
 
-        drag.target: cccRoot.grabbed ? cccRoot : undefined
+        // ...
+    }
 
-        cursorShape: cccRoot.grabbed ? Qt.ClosedHandCursor : Qt.PointingHandCursor
+    onReleased: {
+        console.log("DComponentChildContainer.onReleased");
 
-        onPressed: {
-            // Set Selected
+        // Check Last Mouse Press Owner
+        if (DSystemModel.lastMousePressOwner === "cccRoot") {
+            // Reset Last Mouse Press Owner
+            DSystemModel.lastMousePressOwner = "";
+            // Set Focus
             cccRoot.focus = true;
-            // Check Modifiers
-            if (mouse.modifiers === Qt.ShiftModifier) {
-                // Toggle Selected
-                cccRoot.selected = !cccRoot.selected;
-            } else {
-                // Set Grabbed
-                cccRoot.grabbed = true;
-            }
+        }
+    }
+
+    onFocusChanged: {
+        console.log("DComponentChildContainer.onFocusChanged - focus: " + focus);
+
+        // Check Focus
+        if (cccRoot.focus) {
+            // Set Focused Componrnt
+            propertiesController.focusedComponent = cccRoot.componentInfo;
         }
 
-        onReleased: {
-            // Reset Grabbed
-            cccRoot.grabbed = false;
-        }
-
-        onCanceled: {
-            // Reset Grabbed
-            cccRoot.grabbed = false;
-        }
+        // ...
     }
 
     Loader {
@@ -81,7 +107,7 @@ DContainer {
         color: "white"
         visible: settingsController.componentNamesVisible
         opacity: 0.05
-        font.pixelSize: 64
+        font.pixelSize: 48
         text: componentInfo ? componentInfo.componentName : ""
     }
 }

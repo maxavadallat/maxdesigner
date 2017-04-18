@@ -34,6 +34,9 @@ DContainer {
     property int lastShownWidth: creationWidth
     property int lastShownHeight: creationHeight
 
+    property alias titleBottom: titleTextLabel.bottom
+    property alias titleHeight: titleTextLabel.height
+
     property int initialX: {
         if (hideToSide === hideToRight) {
             return parentWidth;
@@ -110,6 +113,7 @@ DContainer {
     readonly property int animDuration: DStyle.animDuration * 2.5
 
     property alias paneContainer: contentContainer
+
     default property alias paneContainerChildren: contentContainer.children
 
     property alias enablePaneContent: contentContainer.enabled

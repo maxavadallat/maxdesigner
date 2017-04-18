@@ -9,7 +9,7 @@
 ComponentCategoryModel::ComponentCategoryModel(QObject* aParent)
     : QAbstractListModel(aParent)
 {
-    qDebug() << "ComponentCategoryModel created.";
+    //qDebug() << "ComponentCategoryModel created.";
     // Init
     init();
 }
@@ -86,5 +86,5 @@ ComponentCategoryModel::~ComponentCategoryModel()
     // Clear
     clear();
 
-    qDebug() << "ComponentCategoryModel deleted.";
+    //qDebug() << "ComponentCategoryModel deleted.";
 }

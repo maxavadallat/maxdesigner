@@ -7,8 +7,10 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
+class ProjectModel;
 class ComponentInfo;
 class ComponentOwnPropertiesModel;
+class PropertiesController;
 
 //==============================================================================
 // Component Properties Model
@@ -20,15 +22,15 @@ class ComponentPropertiesModel : public QAbstractListModel
     Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent WRITE setCurrentComponent NOTIFY currentComponentChanged)
 
 public:
-    // Constructor
-    explicit ComponentPropertiesModel(QObject* aParent = NULL);
-
     // Get Current Component
     ComponentInfo* currentComponent();
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
 
-    // Get Base Properties
+    // Set Component Own Property Value
+    bool setComponentProperty(const QString& aName, const QVariant& aValue);
+    // Clear Component Property
+    bool clearComponentProperty(const QString& aName);
 
     // Destructor
     ~ComponentPropertiesModel();
@@ -46,6 +48,10 @@ public: // from QAbstractListModel
     virtual QHash<int, QByteArray> roleNames() const;
 
 protected:
+    friend class PropertiesController;
+    // Constructor
+    explicit ComponentPropertiesModel(ComponentInfo* aComponent, ProjectModel* aProject, QObject* aParent = NULL);
+
     // Init
     void init();
     // Clear
@@ -53,8 +59,9 @@ protected:
 
     // Load Component Properties
     void loadComponentProperties();
-//    // Save Component Properties
-//    void saveComponentProperties();
+
+    // Add Component To Hierarchy
+    void addComponentToHierarchy(const QString& aBaseName);
 
 public:
     // Properties Model Roles
@@ -65,6 +72,8 @@ public:
 protected: // Data
     // Current Component
     ComponentInfo*          mComponent;
+    // Project Model
+    ProjectModel*           mProject;
     // Component Bases/Hierarchy
     QList<ComponentInfo*>   mHierarchy;
 };

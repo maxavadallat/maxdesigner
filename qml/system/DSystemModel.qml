@@ -5,7 +5,7 @@ import QtQuick 2.0
 QtObject {
     id: systemmModelRoot
 
-    property bool testValue: true
+    property string lastMousePressOwner: ""
 
     signal cancelMarkForDeletion()
 

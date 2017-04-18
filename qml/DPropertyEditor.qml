@@ -37,6 +37,7 @@ DPaneBase {
         if (newState === stateShown) {
             // Set Focus
             nameEditor.setEditorFocus(true, true);
+            propertyEditorRoot.clipContent = false;
         }
     }
 
@@ -118,7 +119,8 @@ DPaneBase {
                     DPopupItemObject { text: CONSTS.propertyTypes[3] },
                     DPopupItemObject { text: CONSTS.propertyTypes[4] },
                     DPopupItemObject { text: CONSTS.propertyTypes[5] },
-                    DPopupItemObject { text: CONSTS.propertyTypes[6] }
+                    DPopupItemObject { text: CONSTS.propertyTypes[6] },
+                    DPopupItemObject { text: CONSTS.propertyTypes[7] }
                 ]
 
                 onZChanged: {
@@ -126,15 +128,18 @@ DPaneBase {
                 }
 
                 onItemSelected: {
+                    //console.log("DPropertyEditor.typeOption.onItemSelected - currentIndex: " + typeOption.currentIndex);
                     // Set Focus
                     nameEditor.setEditorFocus(true, true);
                     // Switch Selected Index
                     switch (itemIndex) {
                         default:    defaultEditor.text = "";        break;
-                        case 1:     defaultEditor.text = "0";       break;
-                        case 2:     defaultEditor.text = "false";   break;
-                        case 3:     defaultEditor.text = "0.0";     break;
-                        case 5:     defaultEditor.text = "null";    break;
+                        case 1:     defaultEditor.text = "false";   break;
+                        case 2:     defaultEditor.text = "0";       break;
+                        case 3:
+                        case 4:     defaultEditor.text = "0.0";     break;
+                        case 5:
+                        case 6:     defaultEditor.text = "null";    break;
                     }
                 }
 

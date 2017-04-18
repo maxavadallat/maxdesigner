@@ -24,6 +24,28 @@ public:
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
 
+    // Append Slot
+    void appendSlot(ComponentSlot* aSlot);
+
+    // Add Slot
+    Q_INVOKABLE void addSlot(const QString& aName, const QString& aSource = "");
+    // Remove Slot
+    Q_INVOKABLE void removeSlot(const QString& aName);
+    // Remove Slot
+    Q_INVOKABLE void removeSlot(const int& aIndex);
+    // Rename Slot
+    Q_INVOKABLE void renameSlot(const int& aIndex, const QString& aName);
+    // Is Slot Valie
+    Q_INVOKABLE bool slotValid(const QString& aName);
+
+    // Update Source
+    void updateSlotSource(const QString& aName, const QString& aSource);
+    // Update Source
+    void updateSlotSource(const int& aIndex, const QString& aSource);
+
+    // To JSON Array
+    QJsonArray toJSONArray();
+
     // Destructor
     ~ComponentSlotsModel();
 
@@ -47,12 +69,14 @@ protected:
     // Init
     void init();
     // Clear
-    void clear();
+    void clear(const bool& aEndReset = true);
 
     // Load Component Slots
     void loadComponentSlots();
     // Save Component Slots
     void saveComponentSlots();
+    // Clear Component Slots
+    void clearComponentSlots();
 
 public:
     // Item Field Roles
@@ -87,8 +111,11 @@ class ComponentSlot : public QObject
     Q_PROPERTY(QString slotSource READ slotSource WRITE setSlotSource NOTIFY slotSourceChanged)
 
 public:
+    // From JSON Object
+    static ComponentSlot* fromJSONObject(const QJsonObject& aObject);
+
     // Constructor
-    explicit ComponentSlot(QObject* aParent = NULL);
+    explicit ComponentSlot(const QString& aName, const QString& aSource, QObject* aParent = NULL);
 
     // Get Slot Name
     QString slotName();
@@ -113,6 +140,8 @@ signals:
     void slotSourceChanged(const QString& aSource);
 
 protected:
+    friend class ComponentSlotsModel;
+
     // Name
     QString     mName;
     // Source

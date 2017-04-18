@@ -130,16 +130,22 @@ public:
     // Remove Import
     Q_INVOKABLE void removeComponentImport(const int& aIndex);
 
+    // Get Component Property
+    Q_INVOKABLE QVariant componentProperty(const QString& aName);
+    // Set Property
+    Q_INVOKABLE void setComponentProperty(const QString& aName, const QVariant& aValue);
+
     // Add Own Property
     Q_INVOKABLE void addOwnComponentProperty(const QString& aName, const int& aType, const QVariant& aDefaultValue = QVariant());
     // Remove Own Property
     Q_INVOKABLE void removeComponentProperty(const QString& aName);
-    // Set Property
-    Q_INVOKABLE void setComponentProperty(const QString& aName, const QVariant& aValue);
     // Clear Property
     Q_INVOKABLE void clearComponentProperty(const QString& aName);
 
     // Anchors
+
+    // ...
+
 
     // Add Signal
     Q_INVOKABLE void addSignal(const QString& aName, const QStringList& aParameters = QStringList());

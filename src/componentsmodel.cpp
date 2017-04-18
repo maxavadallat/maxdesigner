@@ -38,11 +38,21 @@ void ComponentsModel::clear()
     // Begin Reset Model
     beginResetModel();
 
-    // Iterate Through Components List
-    while (mComponentList.count() > 0) {
-        // Delete Item
-        delete mComponentList.takeLast();
+    // Get Keys Count
+    int bckCount = rowCount();
+
+    qDebug() << "ComponentsModel::clear - count: " << bckCount;
+
+    // Iterate Thru Keys
+    for (int i=0; i<bckCount; i++) {
+        // Get Component Info
+        ComponentInfo* component = mComponents[mComponents.keys()[i]];
+        // Delete Component
+        delete component;
     }
+
+    // Clear
+    mComponents.clear();
 
     // End Reset Model
     endResetModel();
@@ -92,17 +102,17 @@ void ComponentsModel::updateBaseComponents()
         return;
     }
 
-    // Get Components Count
-    int cCount = rowCount();
+    // Get Base Components Count
+    int bcCount = rowCount();
     // Iterate Through Base Components
-    for (int i=0; i<cCount; i++) {
-        // Get Component Info
-        ComponentInfo* componentInfo = mComponentList[i];
+    for (int i=0; i<bcCount; i++) {
+        // Get Component
+        ComponentInfo* component = getComponentByIndex(i);
         // Check Base Name
-        if (componentInfo && !componentInfo->mBaseName.isEmpty() && !componentInfo->mBase) {
-            qDebug() << "ComponentsModel::updateBaseComponents - name: " << componentInfo->componentName();
+        if (component && !component->mBaseName.isEmpty() && !component->mBase) {
+            qDebug() << "ComponentsModel::updateBaseComponents - name: " << component->mName;
             // Set Base Component
-            componentInfo->mBase = mProjectModel->getComponentByName(componentInfo->mBaseName);
+            component->mBase = mProjectModel->getComponentByName(component->mBaseName);
         }
     }
 }
@@ -126,53 +136,73 @@ void ComponentsModel::setComponentsDir(const QString& aDirPath)
 //==============================================================================
 // Add Component
 //==============================================================================
-void ComponentsModel::addComponent(ComponentInfo* aComponent)
+bool ComponentsModel::addComponent(ComponentInfo* aComponent)
 {
     // Check Component
     if (aComponent) {
-        // Get Components Count
-        int cCount = mComponentList.count();
-        // Get Index Of Component
-        int cIndex = mComponentList.indexOf(aComponent);
-        // Check Component Index
-        if (cIndex < 0) {
-            // Begin Insert Rows
-            beginInsertRows(QModelIndex(), cCount, cCount);
-            // Append Component
-            mComponentList << aComponent;
-            // End Insert Rows
-            endInsertRows();
+        // Get Component Name
+        QString cName = aComponent->mName;
+
+        // Check Base Component
+        ComponentInfo* component = mComponents.value(cName);
+
+        // Check Component
+        if (component) {
+            qWarning() << "ComponentsModel::addBaseComponent - name: " << cName << " - ALREADY EXITS!";
+            return false;
         }
+
+        qDebug() << "ComponentsModel::addBaseComponent - name: " << cName;
+
+        // Add Base Component To Base Component Map
+        mComponents[cName] = aComponent;
+        // Get New Key Index
+        int newIndex = mComponents.keys().indexOf(cName);
+
+        // Begin Insert Rows
+        beginInsertRows(QModelIndex(), newIndex, newIndex);
+
+        // End Insert Rows
+        endInsertRows();
+
+        return true;
     }
+
+    return false;
 }
 
 //==============================================================================
-// Remove Compoennt
+// Remove Component
 //==============================================================================
-void ComponentsModel::removeComponent(ComponentInfo* aComponent, const bool& aDelete)
+bool ComponentsModel::removeComponent(const int& aIndex)
 {
-    // Check Component
-    if (aComponent) {
-        // Get Components Count
-        int cCount = mComponentList.count();
-        // Get Index Of Component
-        int cIndex = mComponentList.indexOf(aComponent);
-        // Check Component Index
-        if (cIndex >= 0 && cIndex < cCount) {
-            // Begin Remove Rows
-            beginRemoveRows(QModelIndex(), cIndex, cIndex);
-            // Check Deletion
-            if (aDelete) {
-                // Delete Item
-                delete mComponentList.takeAt(cIndex);
-            } else {
-                // Remove Item
-                mComponentList.removeAt(cIndex);
-            }
-            // End Remove Rows
-            endRemoveRows();
+    // Get Base Components Count
+    int bcCount = rowCount();
+    // Check Index
+    if (aIndex >= 0 && aIndex < bcCount) {
+        // Get Component
+        ComponentInfo* component = getComponentByIndex(aIndex);
+        // Get Info File
+        QFile ciFile(component->mInfoPath);
+        // Get Key
+        QString bcKey = mComponents.keys()[aIndex];
+        // Begin Remove Rows
+        beginRemoveRows(QModelIndex(), aIndex, aIndex);
+        // Remove Key
+        mComponents.remove(bcKey);
+        // Delete Component
+        delete component;
+        // Delete Component Info File
+        if (!ciFile.remove()) {
+            qWarning() << "ComponentsModel::removeBaseComponent - ERROR REMOVING FILE!";
         }
+        // End Remove Rows
+        endRemoveRows();
+
+        return true;
     }
+
+    return false;
 }
 
 //==============================================================================
@@ -180,19 +210,7 @@ void ComponentsModel::removeComponent(ComponentInfo* aComponent, const bool& aDe
 //==============================================================================
 int ComponentsModel::getComponentIndex(const QString& aName)
 {
-    // Get Components Count
-    int cCount = mComponentList.count();
-    // Iterate Through Components
-    for (int i=0; i<cCount; i++) {
-        // Get Component Info
-        ComponentInfo* component = mComponentList[i];
-        // Check Component Name
-        if (component->componentName() == aName) {
-            return i;
-        }
-    }
-
-    return -1;
+    return mComponents.keys().indexOf(aName);
 }
 
 //==============================================================================
@@ -200,19 +218,7 @@ int ComponentsModel::getComponentIndex(const QString& aName)
 //==============================================================================
 ComponentInfo* ComponentsModel::getComponent(const QString& aName)
 {
-    // Get Components Count
-    int cCount = mComponentList.count();
-    // Iterate Through Components
-    for (int i=0; i<cCount; i++) {
-        // Get Component Info
-        ComponentInfo* component = mComponentList[i];
-        // Check Component Name
-        if (component->componentName() == aName) {
-            return component;
-        }
-    }
-
-    return NULL;
+    return mComponents.value(aName);
 }
 
 //==============================================================================
@@ -220,9 +226,8 @@ ComponentInfo* ComponentsModel::getComponent(const QString& aName)
 //==============================================================================
 ComponentInfo* ComponentsModel::getComponentByIndex(const int& aIndex)
 {
-    // Check Index
-    if (aIndex >= 0 && aIndex < mComponentList.count()) {
-        return mComponentList[aIndex];
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        return mComponents[mComponents.keys()[aIndex]];
     }
 
     return NULL;
@@ -233,7 +238,7 @@ ComponentInfo* ComponentsModel::getComponentByIndex(const int& aIndex)
 //==============================================================================
 int ComponentsModel::rowCount(const QModelIndex& ) const
 {
-    return mComponentList.count();
+    return mComponents.keys().count();
 }
 
 //==============================================================================
@@ -242,15 +247,17 @@ int ComponentsModel::rowCount(const QModelIndex& ) const
 QVariant ComponentsModel::data(const QModelIndex& index, int role) const
 {
     // Ger Row
-    int row = index.row();
+    int cRow = index.row();
 
     // Check Row
-    if (row >= 0 && row < mComponentList.count()) {
+    if (cRow >= 0 && cRow < rowCount()) {
+        // Get Component Info
+        ComponentInfo* component = mComponents[mComponents.keys()[cRow]];
         // Switch Role
         switch (role) {
             case Qt::DisplayRole:
             case Qt::UserRole:
-            case ComponentNameRole: return mComponentList[row]->componentName();
+            case ECRName: return component->mName;
         }
     }
 
@@ -266,7 +273,7 @@ QHash<int,QByteArray> ComponentsModel::roleNames() const
     QHash<int,QByteArray> rNames;
 
     // Set Role Names
-    rNames[ComponentNameRole] = "componentName";
+    rNames[ECRName] = "cName";
 
     return rNames;
 }

@@ -46,11 +46,13 @@ class ComponentInfo : public QObject
     // Prototype
     Q_PROPERTY(bool protoType READ protoType NOTIFY protoTypeChanged)
     // Focused
-    Q_PROPERTY(bool focused READ focused WRITE setFocused NOTIFY focusedChanged)
+    Q_PROPERTY(bool focused READ focused NOTIFY focusedChanged)
     // Is Root
-    Q_PROPERTY(bool isRoot READ isRoot WRITE setIsRoot NOTIFY isRootChanged)
+    Q_PROPERTY(bool isRoot READ isRoot NOTIFY isRootChanged)
     // Built In
-    Q_PROPERTY(bool builtIn READ builtIn WRITE setBuiltIn NOTIFY builtInChanged)
+    Q_PROPERTY(bool builtIn READ builtIn NOTIFY builtInChanged)
+    // Child Count
+    Q_PROPERTY(int childCount READ childCount NOTIFY childCountChanged)
 
     // Info Path
     Q_PROPERTY(QString infoPath READ infoPath NOTIFY infoPathChanged)
@@ -159,47 +161,8 @@ public:
     // Get Height
     QString height();
 
-    // Set Left Anchor
-    void setAnchorLeft(const QString& aLeft);
-    // Set Left Anchor Margin
-    void setAnchorLeftMargin(const int& aMargin);
-
-    // Set Right Anchor
-    void setAnchorRight(const QString& aRight);
-    // Set Right Anchor Margin
-    void setAnchorRightMargin(const int& aMargin);
-
-    // Set Top Anchor
-    void setAnchorTop(const QString& aTop);
-    // Set Top Anchor Margin
-    void setAnchorTopMargin(const int& aMargin);
-
-    // Set Bottom Anchor
-    void setAnchorBottom(const QString& aBottom);
-    // Set Bottom Anchor Margin
-    void setAnchorBottomMargin(const int& aMargin);
-
-    // Set Fill Anchor
-    void setAnchorFill(const QString& aFill);
-    // Set Anchor Margins
-    void setAnchorMargins(const int& aMargin);
-
-    // Set Center In Anchor
-    void setAnchorCenterIn(const QString& aCenterIn);
-
-    // Set Horizontal Center Anchor
-    void setAnchorHorizontalCenter(const QString& aHorizontalCenter);
-    // Set Horizontal Center Anchor Offset
-    void setAnchorHorizontalCenterOffset(const QString& aHorizontalCenterOffset);
-
-    // Set Vertical Center Anchor
-    void setAnchorVerticalCenter(const QString& aVerticalCenter);
-    // Set Vertical Center Anchor Offset
-    void setAnchorVerticalCenterOffset(const QString& aVerticalCenterOffset);
-
-
-    // Get Properties
-    Q_INVOKABLE QStringList componentProperties();
+    // Get Property Keys
+    Q_INVOKABLE QStringList componentPropertyKeys();
 
     // Get Component Hierarchy
     Q_INVOKABLE QStringList hierarchy();
@@ -207,65 +170,19 @@ public:
     // Get Child Component ID List
     Q_INVOKABLE QStringList idList();
 
-
     // Get Component Property
     QVariant componentProperty(const QString& aName);
-    // Add Own Property
-    void addComponentOwnProperty(const QString& aName, const EPropertyType& aType = EPropertyType::EPTString, const QVariant& aDefault = QVariant());
-    // Set Component Property
-    void setComponentProperty(const QString& aName, const QVariant& aValue);
-    // Remove Own Property
-    void removeComponentProperty(const QString& aName);
-    // Clear Component Property
-    void clearComponentProperty(const QString& aName);
 
     // Check If Has Property
     Q_INVOKABLE bool hasProperty(const QString& aName);
-
-    // Add Import
-    void addImport(const QString& aImport);
-    // Remove Import
-    void removeImport(const QString& aImport);
-    // Remove Import
-    void removeImport(const int& aIndex);
-
-    // Add Signal
-    void addSignal(const QString& aName, const QStringList& aParameters = QStringList());
-    // Remove Signal
-    void removeSignal(const QString& aName);
-    // Remove Signal
-    void removeSignal(const int& aIndex);
-
-    // Add Slot
-    void addSlot(const QString& aName, const QString& aSource = "");
-    // Remove Slot
-    void removeSlot(const QString& aName);
-    // Remove Slot
-    void removeSlot(const int& aIndex);
-
-    // Add Function
-    void addFunction(const QString& aName, const QStringList& aParameters = QStringList(), const QString& aSource = "");
-    // Remove Function
-    void removeFunction(const QString& aName);
-    // Remove Function
-    void removeFunction(const int& aIndex);
-
-    // Add State
-    void addState(const QString& aName, const QString& aWhen = "");
-    // Remove State
-    void removeState(const QString& aName);
-    // Remove State
-    void removeState(const int& aIndex);
-
-    // Add Property Change
-    void addPropertyChange(const QString& aStateName, const QString& aTarget, const QString& aProperty, const QVariant& aValue);
-    // Remove Property Change
-    void removePropertyChange(const QString& aStateName, const int& aIndex);
 
     // Add Child
     Q_INVOKABLE void addChild(ComponentInfo* aChild);
     // Remove Child
     Q_INVOKABLE void removeChild(ComponentInfo* aChild, const bool& aDelete = true);
+
+    // Get Child Count
+    int childCount();
 
     // Export To QML
     void exportToQML(const QString& aFilePath);
@@ -300,6 +217,8 @@ signals:
     void isRootChanged(const bool& aRoot);
     // Built In Changed Signal
     void builtInChanged(const bool& aBuiltIn);
+    // Child Count Changed Signal
+    void childCountChanged(const int& aCount);
     // Source Path Changed Signal
     void sourcePathChanged(const QString& aPath);
 
@@ -374,6 +293,9 @@ signals:
     // Own Property Removed Signal
     void ownPropertyRemoved(const int& aIndex);
 
+    // Property Updated Signal
+    void propertyUpdated(const QString& aKey);
+
     // Own Properties Updated Signal
     void ownPropertiesUpdated();
 
@@ -438,6 +360,7 @@ protected:
                            ProjectModel* aProject,
                            const QString& aBaseName = "",
                            const bool& aBuiltIn = false,
+                           const bool& aProtoType = true,
                            QObject* aParent = NULL);
 
     // Init
@@ -473,6 +396,9 @@ protected:
     void setComponentID(const QString& aID);
     // Set Object Name
     void setComponentObjectName(const QString& aObjectName);
+
+    // Set Component Property
+    void setComponentProperty(const QString& aName, const QVariant& aValue);
 
     // Set Pos X
     void setPosX(const QString& aPosX);
@@ -512,7 +438,7 @@ protected: // Data
     ProjectModel*           mProject;
 
     // ProtoType
-    bool                    mProtoType;
+    bool                    mIsProtoType;
     // Dirty
     bool                    mDirty;
     // Built In
@@ -544,6 +470,8 @@ protected: // Data
     ComponentInfo*          mBase;
     // Parent Component Info
     ComponentInfo*          mParent;
+    // Prototype Component
+    ComponentInfo*          mProtoType;
 
     // Children
     QList<ComponentInfo*>   mChildren;

@@ -12,10 +12,11 @@ DMouseArea {
 
     default property alias mainContainer: contentContainer.children
 
-    property bool selected: false
-
     property int minWidth: 0
     property int minHeight: 0
+
+    property int maxWidth: Number.MAX_VALUE
+    property int maxHeight: Number.MAX_VALUE
 
     property bool showBackground: true
     property bool enableSizeOverlay: true
@@ -150,6 +151,7 @@ DMouseArea {
 
     // THIS IS ONLY FOR THE drag.filterChildren to work
     MouseArea {
+        id: dragHelper
         anchors.fill: parent
     }
 
@@ -208,17 +210,18 @@ DMouseArea {
         onPositionChanged: {
             if (pressed) {
                 var deltaX = pressPosX - mouse.x;
+                var newWidth = parent.width + deltaX;
 
-                if (parent.width + deltaX > containerRoot.minWidth) {
+                if (newWidth > containerRoot.minWidth) {
                     parent.x = parent.x - deltaX;
-                    parent.width = parent.width + deltaX;
+                    parent.width = newWidth;
                 }
 
                 var deltaY = pressPosY - mouse.y;
-
-                if (parent.height + deltaY > containerRoot.minHeight) {
+                var newHeight = parent.height + deltaY;
+                if (newHeight > containerRoot.minHeight) {
                     parent.y = parent.y - deltaY;
-                    parent.height = parent.height + deltaY;
+                    parent.height = newHeight;
                 }
             }
         }
@@ -252,10 +255,10 @@ DMouseArea {
         onPositionChanged: {
             if (pressed) {
                 var deltaY = pressPosY - mouse.y;
-
-                if (parent.height + deltaY > containerRoot.minHeight) {
+                var newHeight = parent.height + deltaY;
+                if (newHeight > containerRoot.minHeight) {
                     parent.y = parent.y - deltaY;
-                    parent.height = parent.height + deltaY;
+                    parent.height = newHeight;
                 }
             }
         }
@@ -290,17 +293,17 @@ DMouseArea {
         onPositionChanged: {
             if (pressed) {
                 var deltaX = pressPosX - mouse.x;
-
-                if (parent.width - deltaX > containerRoot.minWidth) {
+                var newWidth = parent.width - deltaX;
+                if (newWidth > containerRoot.minWidth) {
                     //parent.x = parent.x - deltaX;
-                    parent.width = parent.width - deltaX;
+                    parent.width = newWidth;
                 }
 
                 var deltaY = pressPosY - mouse.y;
-
-                if (parent.height + deltaY > containerRoot.minHeight) {
+                var newHeight = parent.height + deltaY
+                if (newHeight > containerRoot.minHeight) {
                     parent.y = parent.y - deltaY;
-                    parent.height = parent.height + deltaY;
+                    parent.height = newHeight;
                 }
             }
         }
@@ -334,10 +337,10 @@ DMouseArea {
         onPositionChanged: {
             if (pressed) {
                 var deltaX = pressPosX - mouse.x;
-
-                if (parent.width + deltaX > containerRoot.minWidth) {
+                var newWidth = parent.width + deltaX;
+                if (newWidth > containerRoot.minWidth) {
                     parent.x = parent.x - deltaX;
-                    parent.width = parent.width + deltaX;
+                    parent.width = newWidth;
                 }
             }
         }
@@ -371,9 +374,9 @@ DMouseArea {
         onPositionChanged: {
             if (pressed) {
                 var deltaX = pressPosX - mouse.x;
-
-                if (parent.width - deltaX > containerRoot.minWidth) {
-                    parent.width = parent.width - deltaX;
+                var newWidth = parent.width - deltaX;
+                if (newWidth > containerRoot.minWidth) {
+                    parent.width = newWidth;
                 }
             }
         }
@@ -408,16 +411,16 @@ DMouseArea {
         onPositionChanged: {
             if (pressed) {
                 var deltaX = pressPosX - mouse.x;
-
-                if (parent.width + deltaX > containerRoot.minWidth) {
+                var newWidth = parent.width + deltaX;
+                if (newWidth > containerRoot.minWidth) {
                     parent.x = parent.x - deltaX;
-                    parent.width = parent.width + deltaX;
+                    parent.width = newWidth;
                 }
 
                 var deltaY = pressPosY - mouse.y;
-
-                if (parent.height - deltaY > containerRoot.minHeight) {
-                    parent.height = parent.height - deltaY;
+                var newHeight = parent.height - deltaY;
+                if (newHeight > containerRoot.minHeight) {
+                    parent.height = newHeight;
                 }
             }
         }
@@ -451,9 +454,9 @@ DMouseArea {
         onPositionChanged: {
             if (pressed) {
                 var deltaY = pressPosY - mouse.y;
-
-                if (parent.height - deltaY > containerRoot.minHeight) {
-                    parent.height = parent.height - deltaY;
+                var newHeight = parent.height - deltaY;
+                if (newHeight > containerRoot.minHeight) {
+                    parent.height = newHeight;
                 }
             }
         }
@@ -488,15 +491,15 @@ DMouseArea {
         onPositionChanged: {
             if (pressed) {
                 var deltaX = pressPosX - mouse.x;
-
-                if (parent.width - deltaX > containerRoot.minWidth) {
-                    parent.width = parent.width - deltaX;
+                var newWidth = parent.width - deltaX;
+                if (newWidth > containerRoot.minWidth) {
+                    parent.width = newWidth;
                 }
 
                 var deltaY = pressPosY - mouse.y;
-
-                if (parent.height - deltaY > containerRoot.minHeight) {
-                    parent.height = parent.height - deltaY;
+                var newHeight = parent.height - deltaY;
+                if (newHeight > containerRoot.minHeight) {
+                    parent.height = newHeight;
                 }
             }
         }

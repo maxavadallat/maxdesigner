@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QList>
+#include <QMap>
 #include <QAbstractListModel>
 
 class ProjectModel;
@@ -20,12 +21,9 @@ public:
     void setBaseComponentsDir(const QString& aDirPath);
 
     // Add Base Component
-    void addBaseComponent(ComponentInfo* aComponent);
-    // Remove Base Compoennt
-    void removeBaseComponent(ComponentInfo* aComponent, const bool& aDelete = true);
-
-    // Set Base Component
-    void setBaseComponent(const int& aIndex, ComponentInfo* aComponent);
+    bool addBaseComponent(ComponentInfo* aComponent);
+    // Remove Base Component
+    bool removeBaseComponent(const int& aIndex);
 
     // Get Component Index By Name
     int getComponentIndex(const QString& aName);
@@ -65,16 +63,17 @@ public: // from QAbstractListModel
 private: // Data
 
     // Item Field Roles
-    enum ItemRoles {
-        ComponentNameRole = Qt::UserRole + 1
+    enum EBCItemRoles {
+        EBCRName = Qt::UserRole + 1,
+        EBCRBuiltIn
     };
 
     // Project Model
-    ProjectModel*           mProjectModel;
-    // Base Component List
-    QList<ComponentInfo*>   mBaseComponentList;
+    ProjectModel*                   mProjectModel;
+    // Base Components
+    QMap<QString, ComponentInfo*>   mBaseComponents;
     // Base Components Dir
-    QString                 mBaseComponentsDir;
+    QString                         mBaseComponentsDir;
 };
 
 #endif // BASECOMPONENTSMODEL_H

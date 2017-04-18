@@ -64,14 +64,14 @@ public:
                                        const QString& aBaseName,
                                        const QString& aCategory,
                                        const bool& aBuiltIn,
-                                       const int& aWidth,
-                                       const int& aHeight);
+                                       const int& aWidth = -1,
+                                       const int& aHeight = -1);
     // Create Component
     ComponentInfo* createComponent(const QString& aName,
                                    const QString& aBaseName,
                                    const QString& aCategory,
-                                   const int& aWidth,
-                                   const int& aHeight);
+                                   const int& aWidth = -1,
+                                   const int& aHeight = -1);
     // Create View
     ComponentInfo* createView(const QString& aName,
                               const QString& aBaseName,
@@ -151,9 +151,6 @@ public:
     // Get Views Model
     ViewsModel* viewsModel();
 
-    // Get Current Component
-    ComponentInfo* currentComponent();
-
     // Get Component By Name
     Q_INVOKABLE ComponentInfo* getComponentByName(const QString& aName, const QString& aType = "");
     // Get Component By File Path
@@ -213,9 +210,6 @@ signals:
     // View Creaeted Signal
     void viewCreated(ComponentInfo* aComponent, const int& aWidth, const int& aHeight);
 
-    // Current Component Changed Signal
-    void currentComponentChanged(ComponentInfo* aComponent);
-
     // Project Loaded Signal
     void projectLoaded();
 
@@ -224,6 +218,7 @@ signals:
 
 protected:
     friend class MainWindow;
+    friend class PropertiesController;
     // Init
     void init();
 
@@ -236,9 +231,6 @@ protected:
 
     // Set Project Properties Dirty State
     void setDirty(const bool& aDirty);
-
-    // Set Current Component
-    void setCurrentComponent(ComponentInfo* aComponent);
 
     // Create Base Components Model
     void createBaseComponentsModel();
@@ -263,7 +255,6 @@ protected:
     void updateBaseComponents();
 
 private: // Data
-
     // Project File Name
     QString                 mName;
     // Project Properties
@@ -278,8 +269,6 @@ private: // Data
     ComponentsModel*        mComponents;
     // Views
     ViewsModel*             mViews;
-    // Current Compoennt
-    ComponentInfo*          mCurrentComponent;
 };
 
 #endif // PROJECTMODEL_H

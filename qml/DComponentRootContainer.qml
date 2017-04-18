@@ -4,6 +4,7 @@ import enginecomponents 0.1
 
 import "DConstants.js" as CONSTS
 import "style"
+import "system"
 
 DPaneBase {
     id: componentRootContainerRoot
@@ -56,15 +57,8 @@ DPaneBase {
     property Component newComponent: Component {
 
         DComponentChildContainer {
-            property alias title: titleLabel.text
             width: CONSTS.componentItemWidth
             height: CONSTS.componentItemHeight
-
-            DText {
-                id: titleLabel
-                anchors.centerIn: parent
-                text: componentInfo ? componentInfo.componentName : ""
-            }
         }
     }
 
@@ -223,7 +217,22 @@ DPaneBase {
     }
 
     onPressed: {
-        componentRootContainerRoot.focus = true;
+        //console.log("DComponentRootContainer.onPressed");
+        // Set Last Mouse Press Owner
+        DSystemModel.lastMousePressOwner = "crcRoot";
+
+        // ...
+    }
+
+    onReleased: {
+        //console.log("DComponentRootContainer.onReleased");
+        // Check Last Mouse Press Owner
+        if (DSystemModel.lastMousePressOwner === "crcRoot") {
+            // Reset Last Mouse Press Owner
+            DSystemModel.lastMousePressOwner = "";
+            // Set Focus
+            componentRootContainerRoot.focus = true;
+        }
     }
 
     onWidthChanged: {
@@ -272,6 +281,29 @@ DPaneBase {
         }
     }
 
+    // Remove Child Component
+    function removeChildComponent(childComponentObject) {
+        console.log("DComponentRootContainer.removeChildComponent - childComponentObject: " + childComponentObject);
+
+        // Set Focus
+        componentRootContainerRoot.focus = true;
+
+        // Check ComponentInfo
+        if (componentRootContainerRoot.componentInfo) {
+            // Remove Child
+            componentRootContainerRoot.componentInfo.removeChild(childComponentObject.componentInfo);
+        }
+
+        // Check Child Object
+        if (childComponentObject) {
+            // Reset Component Info
+            childComponentObject.componentInfo = null;
+            // Destroy Child Component Object
+            childComponentObject.destroy();
+        }
+
+    }
+
     DMouseArea {
         id: wheelArea
         anchors.fill: parent
@@ -304,6 +336,13 @@ DPaneBase {
     DNoContent {
         id: baseCanvas
         anchors.fill: parent
+        visible: {
+            if (componentRootContainerRoot.componentInfo && componentRootContainerRoot.componentInfo.childCount > 0) {
+                return false;
+            }
+
+            return true;
+        }
     }
 
     DropArea {
@@ -361,14 +400,19 @@ DPaneBase {
             // Create New Object
             var newObject = newComponent.createObject(paneContainer, { "x": drop.x - CONSTS.componentItemWidth / 2,
                                                                        "y": drop.y - CONSTS.componentItemHeight / 2,
-                                                                       "focus": true,
                                                                        "parentContainer": componentRootContainerRoot });
+            // Check New Object
+            if (newObject) {
+                // Set Cloned Component Info
+                newObject.componentInfo = drop.source.clone();
+                // Add Child
+                componentRootContainerRoot.componentInfo.addChild(newObject.componentInfo);
+                // Set Focus
+                newObject.focus = true;
 
-//            // Set Cloned Component Info
-//            newObject.componentInfo = drop.source.clone();
-//            // Add Child
-//            componentRootContainerRoot.componentInfo.addChild(newObject.componentInfo);
-
+            } else {
+                console.error("DComponentRootContainer.dropArea.onDropped - ERROR CREATING NEW OBJECT!");
+            }
 
             // ...
 
@@ -407,7 +451,7 @@ DPaneBase {
         color: "white"
         visible: settingsController.componentNamesVisible
         opacity: 0.05
-        font.pixelSize: 64
+        font.pixelSize: 48
         text: componentInfo ? componentInfo.componentName : ""
     }
 

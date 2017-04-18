@@ -38,14 +38,24 @@
 #define DEFAULT_MAIN_QML_COMPONENTS_ANCHORS_MODEL           "ComponentAnchorsModel"
 // Component Signals Model
 #define DEFAULT_MAIN_QML_COMPONENTS_SIGNALS_MODEL           "ComponentSignalsModel"
+// Component Signal
+#define DEFAULT_MAIN_QML_COMPONENT_SIGNAL                   "ComponentSignal"
 // Component Slots Model
 #define DEFAULT_MAIN_QML_COMPONENTS_SLOTS_MODEL             "ComponentSlotsModel"
-// Component States Model
-#define DEFAULT_MAIN_QML_COMPONENTS_STATES_MODEL            "ComponentStatesModel"
-// Component Transitions Model
-#define DEFAULT_MAIN_QML_COMPONENTS_TRANSITIONS_MODEL       "ComponentTransitionsModel"
+// Component Slot
+#define DEFAULT_MAIN_QML_COMPONENT_SLOT                     "ComponentSlot"
 // Component Functions Model
 #define DEFAULT_MAIN_QML_COMPONENTS_FUNCTIONS_MODEL         "ComponentFunctionsModel"
+// Component Function
+#define DEFAULT_MAIN_QML_COMPONENT_FUNCTION                 "ComponentFunction"
+// Component States Model
+#define DEFAULT_MAIN_QML_COMPONENTS_STATES_MODEL            "ComponentStatesModel"
+// Component State
+#define DEFAULT_MAIN_QML_COMPONENT_STATE                    "ComponentState"
+// Component Transitions Model
+#define DEFAULT_MAIN_QML_COMPONENTS_TRANSITIONS_MODEL       "ComponentTransitionsModel"
+// Component Transition
+#define DEFAULT_MAIN_QML_COMPONENT_TRANSITION               "ComponentTransition"
 
 
 // Own Properties Filter Proxy
@@ -138,6 +148,7 @@
 #define COMPONENT_CATEGORY_LAYOUT                           "Layout"
 #define COMPONENT_CATEGORY_CONTAINER                        "Container"
 #define COMPONENT_CATEGORY_DELEGATE                         "Delegate"
+#define COMPONENT_CATEGORY_ANIMATION                        "Animation"
 
 #define DEFAULT_COMPONENT_WIDTH                             320
 #define DEFAULT_COMPONENT_HEIGHT                            200
@@ -249,6 +260,7 @@
 #define JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER_OFFS    "anchors.horizontalCenterOffset"
 #define JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER_OFFS    "anchors.verticalCenterOffset"
 
+/*
 #define JSON_KEY_COMPONENT_PROPERTY_STATE                   "state"
 
 #define JSON_KEY_COMPONENT_PROPERTY_OPACITY                 "opacity"
@@ -265,7 +277,7 @@
 #define JSON_KEY_COMPONENT_PROPERTY_STATES                  "states"
 #define JSON_KEY_COMPONENT_PROPERTY_TRANSITIONS             "transitions"
 
-/*
+
 #define JSON_KEY_COMPONENT_PROPERTY_RADIUS                  "radius"
 #define JSON_KEY_COMPONENT_PROPERTY_SPACING                 "spacing"
 #define JSON_KEY_COMPONENT_PROPERTY_COLOR                   "color"

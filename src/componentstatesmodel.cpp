@@ -48,12 +48,15 @@ void ComponentStatesModel::clear()
 //==============================================================================
 void ComponentStatesModel::loadComponentStates()
 {
+    // Clear
+    clear();
+
     // Check Compoent Info
     if (!mComponent) {
         return;
     }
 
-    qDebug() << "ComponentStatesModel::loadComponentStates - name: " << mComponent->mName;
+    //qDebug() << "ComponentStatesModel::loadComponentStates - name: " << mComponent->mName;
 
     // Begin Reset Model
     beginResetModel();
@@ -69,7 +72,12 @@ void ComponentStatesModel::loadComponentStates()
 //==============================================================================
 void ComponentStatesModel::saveComponentStates()
 {
+    // Check Component
+    if (!mComponent) {
+        return;
+    }
 
+    // ...
 }
 
 //==============================================================================
@@ -99,11 +107,19 @@ void ComponentStatesModel::setCurrentComponent(ComponentInfo* aComponent)
 //==============================================================================
 // Add State
 //==============================================================================
-void ComponentStatesModel::addState(const QString& aStateName)
+void ComponentStatesModel::addState(const QString& aStateName, const QString& aWhen)
 {
     // Check Name
     if (!aStateName.isEmpty()) {
+        // Create New State
+        ComponentState* newState = new ComponentState(aStateName, aWhen);
 
+        // Begin Insert rows
+        beginInsertRows(QModelIndex(), rowCount() - 1, rowCount() -1);
+        // Append To States
+        mStates << newState;
+        // End Insert Rows
+        endInsertRows();
     }
 }
 
@@ -377,10 +393,10 @@ ComponentState* ComponentState::fromJSONObject(const QJsonObject& aObject)
 //==============================================================================
 // Constructor
 //==============================================================================
-ComponentState::ComponentState(const QString& aName, QObject* aParent)
+ComponentState::ComponentState(const QString& aName, const QString& aWhen, QObject* aParent)
     : QAbstractListModel(aParent)
     , mName(aName)
-    , mWhen("")
+    , mWhen(aWhen)
 {
     // ...
 }

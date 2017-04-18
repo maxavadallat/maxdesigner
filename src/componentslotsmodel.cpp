@@ -30,19 +30,25 @@ void ComponentSlotsModel::init()
 //==============================================================================
 // Clear
 //==============================================================================
-void ComponentSlotsModel::clear()
+void ComponentSlotsModel::clear(const bool& aEndReset)
 {
-    // Begin Reset Model
-    beginResetModel();
+    // Check Component
+    if (mComponent) {
+        // Begin Reset Model
+        beginResetModel();
 
-    // Iterate Through Slots
-    while (mSlots.count() > 0) {
-        // Delete Last
-        delete mSlots.takeLast();
+        // Iterate Through Slots
+        while (mSlots.count() > 0) {
+            // Delete Last
+            delete mSlots.takeLast();
+        }
+
+        // Check End Reset Model
+        if (aEndReset) {
+            // End Reset Model
+            endResetModel();
+        }
     }
-
-    // End Reset Model
-    endResetModel();
 }
 
 //==============================================================================
@@ -53,7 +59,16 @@ void ComponentSlotsModel::loadComponentSlots()
     // Clear
     clear();
 
-    // ...
+    // Check Component
+    if (mComponent) {
+        // Get Slots Count
+        int sCount = mComponent->mSlots.count();
+        // Iterate Through Component Slots
+        for (int i=0; i<sCount; i++) {
+            // Append Slot
+            appendSlot(ComponentSlot::fromJSONObject(mComponent->mSlots[i].toObject()));
+        }
+    }
 }
 
 //==============================================================================
@@ -61,7 +76,33 @@ void ComponentSlotsModel::loadComponentSlots()
 //==============================================================================
 void ComponentSlotsModel::saveComponentSlots()
 {
-    // ...
+    // Clear Compoennt SLots
+    clearComponentSlots();
+
+    // Check Component
+    if (mComponent) {
+        // Set Component Slots
+        mComponent->mSlots = toJSONArray();
+    }
+}
+
+//==============================================================================
+// Clear Component Slots
+//==============================================================================
+void ComponentSlotsModel::clearComponentSlots()
+{
+    // Check Compoennt
+    if (!mComponent) {
+        return;
+    }
+
+    qDebug() << "ComponentSlotsModel::clearComponentSlots - mName: " << mComponent->mName;
+
+    // Iterate Through Component Slots
+    while (mComponent->mSlots.count() > 0) {
+        // Remove Last
+        mComponent->mSlots.removeLast();
+    }
 }
 
 //==============================================================================
@@ -79,13 +120,159 @@ void ComponentSlotsModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
+        // Save Previous Component Slots
+        saveComponentSlots();
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Component Changed Signal
         emit currentComponentChanged(mComponent);
-
-        // Load Component Slots
+        // Load New Component Slots
         loadComponentSlots();
+    }
+}
+
+//==============================================================================
+// Append Slot
+//==============================================================================
+void ComponentSlotsModel::appendSlot(ComponentSlot* aSlot)
+{
+    // Check Slot
+    if (aSlot) {
+        // Begin Insert Rows
+        beginInsertRows(QModelIndex(), rowCount(), rowCount());
+        // Append Slot
+        mSlots << aSlot;
+        // End Insert Rows
+        endInsertRows();
+    }
+}
+
+//==============================================================================
+// Add Slot
+//==============================================================================
+void ComponentSlotsModel::addSlot(const QString& aName, const QString& aSource)
+{
+    // Check If Slot Valid
+    if (slotValid(aName)) {
+        appendSlot(new ComponentSlot(aName, aSource));
+    }
+}
+
+//==============================================================================
+// Remove Slot
+//==============================================================================
+void ComponentSlotsModel::removeSlot(const QString& aName)
+{
+    // Get Slots Count
+    int sCount = mSlots.count();
+
+    // Iterate Through Slots
+    for (int i=0; i<sCount; i++) {
+        // Get Slot
+        ComponentSlot* cSlot = mSlots[i];
+        // Check Slot Name
+        if (cSlot->mName == aName) {
+            // Begin Remove Rows
+            beginRemoveRows(QModelIndex(), i, i);
+            // Delete SLot
+            delete mSlots.takeAt(i);
+            // End Remove Rows
+            endRemoveRows();
+
+            return;
+        }
+    }
+}
+
+//==============================================================================
+// Remove Slot
+//==============================================================================
+void ComponentSlotsModel::removeSlot(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < mSlots.count()) {
+        // Begin Remove Rows
+        beginRemoveRows(QModelIndex(), aIndex, aIndex);
+        // Remove Slot
+        delete mSlots.takeAt(aIndex);
+        // End Remove Rows
+        endRemoveRows();
+    }
+}
+
+//==============================================================================
+// Rename Slot
+//==============================================================================
+void ComponentSlotsModel::renameSlot(const int& aIndex, const QString& aName)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount() && slotValid(aName)) {
+        // Set Slot Name
+        mSlots[aIndex]->mName = aName;
+        // Emit Data Changed Signal
+        emit dataChanged(index(aIndex), index(aIndex));
+    }
+}
+
+//==============================================================================
+// Is Slot Valie
+//==============================================================================
+bool ComponentSlotsModel::slotValid(const QString& aName)
+{
+    if (!aName.isEmpty()) {
+        // Get Slots Count
+        int sCount = rowCount();
+
+        // Iterate Through Slots
+        for (int i=0; i<sCount; i++) {
+            // Check Slot Name
+            if (mSlots[i]->mName == aName) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+//==============================================================================
+// Update Source
+//==============================================================================
+void ComponentSlotsModel::updateSlotSource(const QString& aName, const QString& aSource)
+{
+    // Get Slots Count
+    int sCount = mSlots.count();
+
+    // Iterate Through Slots
+    for (int i=0; i<sCount; i++) {
+        // Get Slot
+        ComponentSlot* cSlot = mSlots[i];
+        // Check Slot Name
+        if (cSlot->mName == aName) {
+            // Set Slot Source
+            cSlot->mSource = aSource;
+
+            // Emit Data Changed Signal
+            emit dataChanged(index(i), index(i));
+
+            return;
+        }
+    }
+}
+
+//==============================================================================
+// Update Source
+//==============================================================================
+void ComponentSlotsModel::updateSlotSource(const int& aIndex, const QString& aSource)
+{
+    // Check Index
+    if (aIndex >- 0 && aIndex < mSlots.count()) {
+        // Set Source
+        mSlots[aIndex]->mSource = aSource;
+        // Emit Data Changed Signal
+        emit dataChanged(index(aIndex), index(aIndex));
     }
 }
 
@@ -94,7 +281,7 @@ void ComponentSlotsModel::setCurrentComponent(ComponentInfo* aComponent)
 //==============================================================================
 int ComponentSlotsModel::rowCount(const QModelIndex& ) const
 {
-    return mSlots.count();
+    return mComponent ? mComponent->mSlots.count() : 0;
 }
 
 //==============================================================================
@@ -106,7 +293,7 @@ QVariant ComponentSlotsModel::data(const QModelIndex& index, int role) const
     int fmRow = index.row();
 
     // Check Row
-    if (fmRow >= 0 && fmRow < rowCount()) {
+    if (mComponent && fmRow >= 0 && fmRow < rowCount()) {
         // Switch Role
         switch (role) {
             default:
@@ -130,6 +317,25 @@ QHash<int, QByteArray> ComponentSlotsModel::roleNames() const
     rNames[SMRSoureRole]    = "slotSource";
 
     return rNames;
+}
+
+//==============================================================================
+// To JSON Array
+//==============================================================================
+QJsonArray ComponentSlotsModel::toJSONArray()
+{
+    // Init New Array
+    QJsonArray newArray;
+
+    // Get Slots Count
+    int sCount = mSlots.count();
+    // Iterate Through Signals
+    for (int i=0; i<sCount; i++) {
+        // Append To Array
+        newArray << mSlots[i]->toJSONObject();
+    }
+
+    return newArray;
 }
 
 //==============================================================================
@@ -158,16 +364,26 @@ ComponentSlotsModel::~ComponentSlotsModel()
 
 
 
+//==============================================================================
+// From JSON Object
+//==============================================================================
+ComponentSlot* ComponentSlot::fromJSONObject(const QJsonObject& aObject)
+{
+    ComponentSlot* newSlot = new ComponentSlot(aObject[JSON_KEY_COMPONENT_SLOT_NAME].toString(),
+                                               aObject[JSON_KEY_COMPONENT_SLOT_SOURCE].toString());
+
+    return newSlot;
+}
 
 //==============================================================================
 // Constructor
 //==============================================================================
-ComponentSlot::ComponentSlot(QObject* aParent)
+ComponentSlot::ComponentSlot(const QString& aName, const QString& aSource, QObject* aParent)
     : QObject(aParent)
-    , mName("")
-    , mSource("")
+    , mName(aName)
+    , mSource(aSource)
 {
-
+    // ...
 }
 
 //==============================================================================

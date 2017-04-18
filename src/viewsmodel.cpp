@@ -38,11 +38,21 @@ void ViewsModel::clear()
     // Begin Reset Model
     beginResetModel();
 
-    // Iterate Through Views List
-    while (mViewsList.count() > 0) {
-        // Delete Item
-        delete mViewsList.takeLast();
+    // Get Keys Count
+    int bckCount = rowCount();
+
+    qDebug() << "ViewsModel::clear - count: " << bckCount;
+
+    // Iterate Thru Keys
+    for (int i=0; i<bckCount; i++) {
+        // Get Component Info
+        ComponentInfo* component = mViews[mViews.keys()[i]];
+        // Delete Component
+        delete component;
     }
+
+    // Clear
+    mViews.clear();
 
     // End Reset Model
     endResetModel();
@@ -92,17 +102,17 @@ void ViewsModel::updateBaseComponents()
         return;
     }
 
-    // Get View Components Count
-    int vcCount = rowCount();
+    // Get Base Components Count
+    int bcCount = rowCount();
     // Iterate Through Base Components
-    for (int i=0; i<vcCount; i++) {
-        // Get Component Info
-        ComponentInfo* componentInfo = mViewsList[i];
+    for (int i=0; i<bcCount; i++) {
+        // Get Component
+        ComponentInfo* component = getViewByIndex(i);
         // Check Base Name
-        if (componentInfo && !componentInfo->mBaseName.isEmpty() && !componentInfo->mBase) {
-            qDebug() << "ViewsModel::updateBaseComponents - name: " << componentInfo->componentName();
+        if (component && !component->mBaseName.isEmpty() && !component->mBase) {
+            qDebug() << "ViewsModel::updateBaseComponents - name: " << component->mName;
             // Set Base Component
-            componentInfo->mBase = mProjectModel->getComponentByName(componentInfo->mBaseName);
+            component->mBase = mProjectModel->getComponentByName(component->mBaseName);
         }
     }
 }
@@ -126,53 +136,73 @@ void ViewsModel::setViewsDir(const QString& aDirPath)
 //==============================================================================
 // Add View
 //==============================================================================
-void ViewsModel::addView(ComponentInfo* aView)
+bool ViewsModel::addView(ComponentInfo* aView)
 {
     // Check Component
     if (aView) {
-        // Get Views Count
-        int vCount = mViewsList.count();
-        // Get Index Of View
-        int vIndex = mViewsList.indexOf(aView);
-        // Check View Index
-        if (vIndex < 0) {
-            // Begin Insert Rows
-            beginInsertRows(QModelIndex(), vCount, vCount);
-            // Append Component
-            mViewsList << aView;
-            // End Insert Rows
-            endInsertRows();
+        // Get Component Name
+        QString cName = aView->mName;
+
+        // Check Base Component
+        ComponentInfo* component = mViews.value(cName);
+
+        // Check Component
+        if (component) {
+            qWarning() << "ViewsModel::addBaseComponent - name: " << cName << " - ALREADY EXITS!";
+            return false;
         }
+
+        qDebug() << "ViewsModel::addBaseComponent - name: " << cName;
+
+        // Add Base Component To Base Component Map
+        mViews[cName] = aView;
+        // Get New Key Index
+        int newIndex = mViews.keys().indexOf(cName);
+
+        // Begin Insert Rows
+        beginInsertRows(QModelIndex(), newIndex, newIndex);
+
+        // End Insert Rows
+        endInsertRows();
+
+        return true;
     }
+
+    return false;
 }
 
 //==============================================================================
 // Remove View
 //==============================================================================
-void ViewsModel::removeView(ComponentInfo* aView, const bool& aDelete)
+bool ViewsModel::removeView(const int& aIndex)
 {
-    // Check Component
-    if (aView) {
-        // Get Views Count
-        int vCount = mViewsList.count();
-        // Get Index Of Component
-        int vIndex = mViewsList.indexOf(aView);
-        // Check View Index
-        if (vIndex >= 0 && vIndex < vCount) {
-            // Begin Remove Rows
-            beginRemoveRows(QModelIndex(), vIndex, vIndex);
-            // Check Deletion
-            if (aDelete) {
-                // Delete Item
-                delete mViewsList.takeAt(vIndex);
-            } else {
-                // Remove Item
-                mViewsList.removeAt(vIndex);
-            }
-            // End Remove Rows
-            endRemoveRows();
+    // Get Base Components Count
+    int bcCount = rowCount();
+    // Check Index
+    if (aIndex >= 0 && aIndex < bcCount) {
+        // Get Component
+        ComponentInfo* component = getViewByIndex(aIndex);
+        // Get Info File
+        QFile ciFile(component->mInfoPath);
+        // Get Key
+        QString bcKey = mViews.keys()[aIndex];
+        // Begin Remove Rows
+        beginRemoveRows(QModelIndex(), aIndex, aIndex);
+        // Remove Key
+        mViews.remove(bcKey);
+        // Delete Component
+        delete component;
+        // Delete Component Info File
+        if (!ciFile.remove()) {
+            qWarning() << "ViewsModel::removeBaseComponent - ERROR REMOVING FILE!";
         }
+        // End Remove Rows
+        endRemoveRows();
+
+        return true;
     }
+
+    return false;
 }
 
 //==============================================================================
@@ -180,19 +210,7 @@ void ViewsModel::removeView(ComponentInfo* aView, const bool& aDelete)
 //==============================================================================
 int ViewsModel::getViewIndex(const QString& aName)
 {
-    // Get Viewss Count
-    int cCount = mViewsList.count();
-    // Iterate Through Viewss
-    for (int i=0; i<cCount; i++) {
-        // Get Views Info
-        ComponentInfo* component = mViewsList[i];
-        // Check Views Name
-        if (component->componentName() == aName) {
-            return i;
-        }
-    }
-
-    return -1;
+    return mViews.keys().indexOf(aName);
 }
 
 //==============================================================================
@@ -200,19 +218,7 @@ int ViewsModel::getViewIndex(const QString& aName)
 //==============================================================================
 ComponentInfo* ViewsModel::getView(const QString& aName)
 {
-    // Get Viewss Count
-    int cCount = mViewsList.count();
-    // Iterate Through Viewss
-    for (int i=0; i<cCount; i++) {
-        // Get Views Info
-        ComponentInfo* component = mViewsList[i];
-        // Check Views Name
-        if (component->componentName() == aName) {
-            return component;
-        }
-    }
-
-    return NULL;
+    return mViews.value(aName);
 }
 
 //==============================================================================
@@ -220,9 +226,8 @@ ComponentInfo* ViewsModel::getView(const QString& aName)
 //==============================================================================
 ComponentInfo* ViewsModel::getViewByIndex(const int& aIndex)
 {
-    // Check Index
-    if (aIndex >= 0 && aIndex < mViewsList.count()) {
-        return mViewsList[aIndex];
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        return mViews[mViews.keys()[aIndex]];
     }
 
     return NULL;
@@ -233,7 +238,7 @@ ComponentInfo* ViewsModel::getViewByIndex(const int& aIndex)
 //==============================================================================
 int ViewsModel::rowCount(const QModelIndex& ) const
 {
-    return mViewsList.count();
+    return mViews.keys().count();
 }
 
 //==============================================================================
@@ -241,15 +246,17 @@ int ViewsModel::rowCount(const QModelIndex& ) const
 //==============================================================================
 QVariant ViewsModel::data(const QModelIndex& index, int role) const
 {
-    // Get Ro
-    int row = index.row();
+    // Get Row Index
+    int vRow = index.row();
     // Check Row
-    if (row >= 0 && row < mViewsList.count()) {
+    if (vRow >= 0 && vRow < rowCount()) {
+        // Get Component Info
+        ComponentInfo* component = mViews[mViews.keys()[vRow]];
         // Switch Role
         switch (role) {
             case Qt::DisplayRole:
             case Qt::UserRole:
-            case ViewNameRole:  return mViewsList[row]->componentName();
+            case EVRName:  return component->mName;
         }
     }
 
@@ -265,7 +272,7 @@ QHash<int,QByteArray> ViewsModel::roleNames() const
     QHash<int,QByteArray> rNames;
 
     // Set Role Names
-    rNames[ViewNameRole] = "viewName";
+    rNames[EVRName] = "vName";
 
     return rNames;
 }

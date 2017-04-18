@@ -29,12 +29,30 @@ public:
     void setCurrentComponent(ComponentInfo* aComponent);
 
     // Append Signal
-    void appendSignal(ComponentSignal* aSignal);
+    Q_INVOKABLE void appendSignal(ComponentSignal* aSignal);
+
+    // Add Signal
+    Q_INVOKABLE void addSignal(const QString& aName, const QStringList& aParameters = QStringList());
     // Remove Signal
-    void removeSignal(const int& aIndex);
+    Q_INVOKABLE void removeSignal(const QString& aName);
+    // Remove Signal
+    Q_INVOKABLE void removeSignal(const int& aIndex);
+    // Rename Signal
+    Q_INVOKABLE void renameSignal(const int& aIndex, const QString& aName);
+    // Check If Signal Valid
+    Q_INVOKABLE bool signalValid(const QString& aName);
+
+    // Create New Signal
+    Q_INVOKABLE ComponentSignal* createNewSignal();
+    // Get/Select Signal
+    Q_INVOKABLE ComponentSignal* selectSignal(const int& aIndex);
+
+    // Discard New Signal
+    Q_INVOKABLE void discardNewSignal(ComponentSignal* aSignal);
 
     // To JSON Array
     QJsonArray toJSONArray();
+
     // Destructor
     ~ComponentSignalsModel();
 
@@ -46,12 +64,14 @@ protected:
     // Init
     void init();
     // Clear
-    void clear();
+    void clear(const bool& aEndReset = true);
 
     // Load Component Signals
-    void loadComponentSignals(const QJsonArray& aArray);
+    void loadComponentSignals();
     // Save Component Signals
     void saveComponentSignals();
+    // Clear Component Signals
+    void clearComponentSignals();
 
 public: // from QAbstractListModel
     // Row Count
@@ -79,6 +99,7 @@ protected: // Data
 
 
 
+
 //==============================================================================
 // Component Signal Class
 //==============================================================================
@@ -95,7 +116,7 @@ public:
     // From JSON Object
     static ComponentSignal* fromJSONObject(const QJsonObject& aOvject);
     // Constructor
-    explicit ComponentSignal(const QString& aName, const QStringList& aParameters, QObject* aParent = NULL);
+    explicit ComponentSignal(const QString& aName, const QStringList& aParameters = QStringList(), QObject* aParent = NULL);
 
     // Get Signal Name
     QString signalName();
@@ -106,6 +127,13 @@ public:
     QStringList signalParameters();
     // Set Signal Parameters
     void setSignalParameters(const QStringList& aParameters);
+
+    // Add Signal Parameter
+    Q_INVOKABLE void addSignalParameter(const QString& aParameter);
+    // Remove Signal Parameter
+    Q_INVOKABLE void removeSignalParameter(const int& aIndex);
+    // Check If Parameter Valid
+    Q_INVOKABLE bool parameterValid(const QString& aParameter);
 
     // To JSON Object
     QJsonObject toJSONObject();
@@ -126,6 +154,8 @@ protected:
     void clear();
 
 protected: // Data
+    friend class ComponentSignalsModel;
+
     // Signal Name
     QString         mName;
     // Parameters

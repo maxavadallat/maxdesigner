@@ -2,6 +2,7 @@
 
 #include "componentfunctionsmodel.h"
 #include "componentinfo.h"
+#include "constants.h"
 
 //==============================================================================
 // Constructor
@@ -10,6 +11,8 @@ ComponentFunctionsModel::ComponentFunctionsModel(ComponentInfo* aComponent, QObj
     : QAbstractListModel(aParent)
     , mComponent(aComponent)
 {
+    qDebug() << "ComponentFunctionsModel created.";
+
     // Init
     init();
 }
@@ -51,7 +54,16 @@ void ComponentFunctionsModel::loadComponentFunctions()
     // Clear
     clear();
 
-    // ...
+    // Check Component
+    if (mComponent) {
+        // Get Functions Count
+        int fCount = mComponent->mFunctions.count();
+        // Iterate Through Component Function
+        for (int i=0; i<fCount; i++) {
+            // Append Function
+            appendFunction(ComponentFunction::fromJSONObject(mComponent->mFunctions[i].toObject()));
+        }
+    }
 }
 
 //==============================================================================
@@ -59,7 +71,23 @@ void ComponentFunctionsModel::loadComponentFunctions()
 //==============================================================================
 void ComponentFunctionsModel::saveComponentFunctions()
 {
-    // ...
+    // Check Compoennt
+    if (mComponent) {
+        // Set Functions
+        mComponent->mFunctions = toJSONArray();
+    }
+}
+
+//==============================================================================
+// Clear Component Functions
+//==============================================================================
+void ComponentFunctionsModel::clearComponentFunctions()
+{
+    // Iterate Through Functions
+    while (mComponent && mComponent->mFunctions.count() > 0) {
+        // Remove Last
+        mComponent->mFunctions.removeLast();
+    }
 }
 
 //==============================================================================
@@ -77,14 +105,143 @@ void ComponentFunctionsModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
+        // Save Previous Component Functions
+        saveComponentFunctions();
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Component Changed Signal
         emit currentComponentChanged(mComponent);
-
         // Load Component Functions
         loadComponentFunctions();
     }
+}
+
+//==============================================================================
+// Append Function
+//==============================================================================
+void ComponentFunctionsModel::appendFunction(ComponentFunction* aFunction)
+{
+    // Check Function
+    if (aFunction) {
+        // Begin Insert Rows
+        beginInsertRows(QModelIndex(), rowCount(), rowCount());
+        // Append Function
+        mFunctions << aFunction;
+        // End Insert Rows
+        endInsertRows();
+    }
+}
+
+//==============================================================================
+// Add Function
+//==============================================================================
+void ComponentFunctionsModel::addFunction(const QString& aName, const QStringList& aParameters, const QString& aSource)
+{
+    // Check Function
+    if (functionValid(aName)) {
+        // Append Function
+        appendFunction(new ComponentFunction(aName, aSource, aParameters));
+    }
+}
+
+//==============================================================================
+// Remove Function
+//==============================================================================
+void ComponentFunctionsModel::removeFunction(const QString& aName)
+{
+    // Get Functions Count
+    int fCount = mFunctions.count();
+
+    // Iterate Through Functions
+    for (int i=0; i<fCount; i++) {
+        // Get Function
+        ComponentFunction* cFunction = mFunctions[i];
+        // Check Function Name
+        if (cFunction->mName == aName) {
+            // Begin Remove Rows
+            beginRemoveRows(QModelIndex(), i, i);
+            // Delete Function
+            delete mFunctions.takeAt(i);
+            // End Remove Rows
+            endRemoveRows();
+
+            return;
+        }
+    }
+}
+
+//==============================================================================
+// Remove Function
+//==============================================================================
+void ComponentFunctionsModel::removeFunction(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < mFunctions.count()) {
+        // Begin Remove Rows
+        beginRemoveRows(QModelIndex(), aIndex, aIndex);
+        // Delete Function
+        delete mFunctions.takeAt(aIndex);
+        // End Remove Rows
+        endRemoveRows();
+    }
+}
+
+//==============================================================================
+// Rename Function
+//==============================================================================
+void ComponentFunctionsModel::renameFunction(const int& aIndex, const QString& aName)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount() && functionValid(aName)) {
+        // Set Function Name
+        mFunctions[aIndex]->mName = aName;
+        // Emit Data Changed Signal
+        emit dataChanged(index(aIndex), index(aIndex));
+    }
+}
+
+//==============================================================================
+// Check If Function Valid
+//==============================================================================
+bool ComponentFunctionsModel::functionValid(const QString& aName)
+{
+    // Check Function Name
+    if (!aName.isEmpty()) {
+        // Get Functions Count
+        int fCount = mFunctions.count();
+        // Iterate Through Functions
+        for (int i=0; i<fCount; i++) {
+            // Check Function Name
+            if (mFunctions[i]->mName == aName) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+//==============================================================================
+// To JSON Array
+//==============================================================================
+QJsonArray ComponentFunctionsModel::toJSONArray()
+{
+    // Init New JSON Array
+    QJsonArray newArray;
+
+    // Get Functions Count
+    int fCount = mFunctions.count();
+    // Iterate Through Functions
+    for (int i=0; i<fCount; i++) {
+        // Get Function
+        ComponentFunction* cFunction = mFunctions[i];
+        // Append Functions
+        newArray << cFunction->toJSONObject();
+    }
+
+    return newArray;
 }
 
 //==============================================================================
@@ -141,6 +298,8 @@ ComponentFunctionsModel::~ComponentFunctionsModel()
     clear();
 
     // ...
+
+    qDebug() << "ComponentFunctionsModel deleted.";
 }
 
 
@@ -157,15 +316,26 @@ ComponentFunctionsModel::~ComponentFunctionsModel()
 
 
 
+//==============================================================================
+// From JSON Object
+//==============================================================================
+ComponentFunction* ComponentFunction::fromJSONObject(const QJsonObject& aObject)
+{
+    ComponentFunction* newFunction = new ComponentFunction(aObject[JSON_KEY_COMPONENT_FUNCTION_NAME].toString(),
+                                                           aObject[JSON_KEY_COMPONENT_FUNCTION_SOURCE].toString(),
+                                                           aObject[JSON_KEY_COMPONENT_FUNCTION_PARAMETERS].toString().split(","));
 
+    return newFunction;
+}
 
 //==============================================================================
 // Constructor
 //==============================================================================
-ComponentFunction::ComponentFunction(QObject* aParent)
+ComponentFunction::ComponentFunction(const QString& aName, const QString& aSource, const QStringList& aParameters, QObject* aParent)
     : QObject(aParent)
-    , mName("")
-    , mSource("")
+    , mName(aName)
+    , mParameters(aParameters)
+    , mSource(aSource)
 {
     // ...
 }
@@ -286,7 +456,10 @@ QJsonObject ComponentFunction::toJSONObject()
     // Init New JSON Object
     QJsonObject newJSONObject;
 
-    // ...
+    // Set UP JSON Object
+    newJSONObject[JSON_KEY_COMPONENT_FUNCTION_NAME] = mName;
+    newJSONObject[JSON_KEY_COMPONENT_FUNCTION_PARAMETERS] = mParameters.join(',');
+    newJSONObject[JSON_KEY_COMPONENT_FUNCTION_SOURCE] = mSource;
 
     return newJSONObject;
 }
@@ -296,5 +469,8 @@ QJsonObject ComponentFunction::toJSONObject()
 //==============================================================================
 ComponentFunction::~ComponentFunction()
 {
+    // Clear Parameters
+    mParameters.clear();
+
     // ...
 }

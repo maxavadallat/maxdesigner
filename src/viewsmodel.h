@@ -2,7 +2,7 @@
 #define VIEWSLISTMODEL_H
 
 #include <QObject>
-#include <QList>
+#include <QMap>
 #include <QAbstractListModel>
 
 class ProjectModel;
@@ -20,9 +20,9 @@ public:
     void setViewsDir(const QString& aDirPath);
 
     // Add View
-    void addView(ComponentInfo* aView);
+    bool addView(ComponentInfo* aView);
     // Remove View
-    void removeView(ComponentInfo* aView, const bool& aDelete = true);
+    bool removeView(const int& aIndex);
 
     // Get View Index By Name
     int getViewIndex(const QString& aName);
@@ -60,16 +60,16 @@ public: // from QAbstractListModel
 private: // Data
 
     // Item Field Roles
-    enum ItemRoles {
-        ViewNameRole = Qt::UserRole + 1
+    enum EVItemRoles {
+        EVRName = Qt::UserRole + 1
     };
 
     // Project Model
-    ProjectModel*           mProjectModel;
-    // View List
-    QList<ComponentInfo*>   mViewsList;
+    ProjectModel*                   mProjectModel;
+    // Components
+    QMap<QString, ComponentInfo*>   mViews;
     // Views Dir
-    QString                 mViewsDir;
+    QString                         mViewsDir;
 };
 
 #endif // VIEWSLISTMODEL_H

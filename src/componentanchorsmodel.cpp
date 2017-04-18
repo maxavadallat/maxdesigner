@@ -508,6 +508,45 @@ void ComponentAnchorsModel::setAnchorsVerticalOffset(const QString& aAnchorVerti
 }
 
 //==============================================================================
+// Clear Horizontal Anchors
+//==============================================================================
+void ComponentAnchorsModel::clearHorizontalAnchors()
+{
+    // Check Component
+    if (!mComponent) {
+        return;
+    }
+
+    // ...
+}
+
+//==============================================================================
+// Clear Vertical Anchors
+//==============================================================================
+void ComponentAnchorsModel::clearVerticalAnchors()
+{
+    // Check Component
+    if (!mComponent) {
+        return;
+    }
+
+    // ...
+}
+
+//==============================================================================
+// Clear All Anchors
+//==============================================================================
+void ComponentAnchorsModel::clearAllAnchors()
+{
+    // Check Component
+    if (!mComponent) {
+        return;
+    }
+
+    // ...
+}
+
+//==============================================================================
 // Destructor
 //==============================================================================
 ComponentAnchorsModel::~ComponentAnchorsModel()

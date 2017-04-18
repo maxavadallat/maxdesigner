@@ -50,10 +50,14 @@ var defaultNamesColumnWidth                     = 96;
 
 // Default Own Properties Max
 var defaultOwnPropertiesMax                     = 7;
+// Default Signals Max
+var defaultSignalsMax                           = 7;
+// Default Slots Max
+var defaultSlotsMax                             = 7;
 
 // Default Swipe Area Width
 var defaultSwipeAreaWidth                       = 16;
 
 // Property Types
-var propertyTypes                               = ["string", "int", "bool", "double", "var", "object", "list"];
+var propertyTypes                               = ["string", "bool", "int", "double", "real", "var", "object", "list"];
 

@@ -26,6 +26,33 @@ public:
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
 
+    // Append Function
+    void appendFunction(ComponentFunction* aFunction);
+
+    // Add Function
+    Q_INVOKABLE void addFunction(const QString& aName, const QStringList& aParameters = QStringList(), const QString& aSource = "");
+    // Remove Function
+    Q_INVOKABLE void removeFunction(const QString& aName);
+    // Remove Function
+    Q_INVOKABLE void removeFunction(const int& aIndex);
+    // Rename Function
+    Q_INVOKABLE void renameFunction(const int& aIndex, const QString& aName);
+    // Check If Function Valid
+    Q_INVOKABLE bool functionValid(const QString& aName);
+
+    // Add Parameter
+    void addParameter(const int& aIndex, const QString& aParameter);
+    // Remove Parameter
+    void removeParameter(const int& aIndex, const QString& aParameter);
+    // Remove Parameter
+    void removeParameter(const int& aIndex, const int& aParameterIndex);
+
+    // Set Source
+    void setSource(const int& aIndex, const QString& aSource);
+
+    // To JSON Array
+    QJsonArray toJSONArray();
+
     // Destructor
     ~ComponentFunctionsModel();
 
@@ -55,6 +82,8 @@ protected:
     void loadComponentFunctions();
     // Save Component Functions
     void saveComponentFunctions();
+    // Clear Component Functions
+    void clearComponentFunctions();
 
 public:
     // Item Field Roles
@@ -90,8 +119,11 @@ class ComponentFunction : public QObject
     Q_PROPERTY(QString functionSource READ functionSource WRITE setFunctionSource NOTIFY functionSourceChanged)
 
 public:
+    // From JSON Object
+    static ComponentFunction* fromJSONObject(const QJsonObject& aObject);
+
     // Constructor
-    explicit ComponentFunction(QObject* aParent = NULL);
+    explicit ComponentFunction(const QString& aName, const QString& aSource, const QStringList& aParameters = QStringList(), QObject* aParent = NULL);
 
     // Get Function Name
     QString functionName();
@@ -130,6 +162,7 @@ signals:
     void functionSourceChanged(const QString& aSource);
 
 protected:
+    friend class ComponentFunctionsModel;
     // Name
     QString     mName;
     // Parameters

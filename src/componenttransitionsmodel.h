@@ -250,6 +250,8 @@ signals:
 protected: // Data
     friend class ComponentTransitionsModel;
 
+    // Transitions Model
+    ComponentTransitionsModel*      mModel;
     // Transition Nodes
     QList<ComponentTransitionNode*> mNodes;
     // Current Node
@@ -310,11 +312,15 @@ protected: // Data
     friend class ComponentTransition;
     friend class ComponentTransitionsModel;
 
+    // Transitions Model
+    ComponentTransitionsModel*          mModel;
     // Transition Type
     ETransitionType                     mType;
     // Children
     QList<ComponentTransitionNode*>     mChildren;
 };
+
+
 
 
 

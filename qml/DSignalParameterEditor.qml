@@ -20,27 +20,46 @@ DPaneBase {
     enableResize: false
     enableHideButton: false
 
-    property ComponentInfo componentInfo: null
-
-//    signal accepted()
-//    signal rejected()
+    property ComponentSignal componentSignal: null
+    property string signalParameter: ""
 
     state: stateCreate
 
-//    onAccepted: {
-//        // Reset
-//        signalParameterEditorRoot.reset(false);
-//    }
+    onSignalParameterChanged: {
+        // Check Name Editor Text
+        if (parameterEditor.text !== signalParameterEditorRoot.signalParameter) {
+            // Set Name Editor Text
+            parameterEditor.text = signalParameterEditorRoot.signalParameter;
+        }
+    }
 
-//    onRejected: {
-//        // Reset
-//        signalParameterEditorRoot.reset(false);
-//    }
+    onTransitionStarted: {
+        if (newState === stateShown) {
+
+        }
+    }
 
     onTransitionFinished: {
         if (newState === stateShown) {
-            nameEditor.setEditorFocus(true, true);
+            parameterEditor.setEditorFocus(true, true);
         }
+    }
+
+    // Check If Parameter Valid
+    function parameterValid() {
+        if (signalParameterEditorRoot.componentSignal !== null) {
+            return signalParameterEditorRoot.componentSignal.parameterValid(parameterEditor.text);
+        }
+
+        return false;
+    }
+
+    // Reset Signal Parameter Editor
+    function resetSignalParameterEditor() {
+        // Reset Signal Parameter Text
+        parameterEditor.text = "";
+        // Reset Invalid Value
+        parameterEditor.invalidValue = false;
     }
 
     DDisc {
@@ -49,18 +68,22 @@ DPaneBase {
         anchors.verticalCenter: parent.verticalCenter
 
         onClicked: {
-            // Emit Accepted Signal
-            signalParameterEditorRoot.accepted();
-
-            // ...
+            // Check If Parameter Valid
+            if (parameterValid()) {
+                // Set Signal Parameter
+                signalParameterEditorRoot.signalParameter = parameterEditor.text;
+                // Emit Accepted Signal
+                signalParameterEditorRoot.accepted();
+            } else {
+                // Set Invalid Value
+                parameterEditor.invalidValue = true;
+            }
         }
     }
 
     Row {
         anchors.left: parent.left
         anchors.leftMargin: DStyle.defaultMargin
-//        anchors.top: parent.top
-//        anchors.topMargin: titleLabel.height + DStyle.defaultMargin * 2
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: 10
         spacing: DStyle.defaultSpacing
@@ -74,7 +97,7 @@ DPaneBase {
         }
 
         DTextInput {
-            id: nameEditor
+            id: parameterEditor
             width: 120
             onKeyEvent: {
                 switch (event.key) {
@@ -87,6 +110,24 @@ DPaneBase {
                         // ...
                     break;
                 }
+            }
+
+            onAccepted: {
+                // Check If Parameter Valid
+                if (parameterValid()) {
+                    // Set Signal Parameter
+                    signalParameterEditorRoot.signalParameter = parameterEditor.text;
+                    // Emit Accepted Signal
+                    signalParameterEditorRoot.accepted();
+                } else {
+                    // Set Invalid Value
+                    parameterEditor.invalidValue = true;
+                }
+            }
+
+            onTextChanged: {
+                // Reset Invalid Value
+                parameterEditor.invalidValue = false;
             }
         }
     }

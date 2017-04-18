@@ -3,57 +3,51 @@ import QtQuick 2.0
 import "style"
 
 DPaneBase {
-    id: formulaEditorRoot
+    id: slotEditorRoot
 
-    property string propertyName: "property"
+    property string slotName: "slot"
+    property string slotSource: ""
 
-    title: propertyName + ":"
+    title: "Slot"
 
     hideToSide: hideToRight
 
-    creationWidth: 358
-    creationHeight: 118
+    creationWidth: 500
+    creationHeight: 320
 
-    minWidth: 358
-    minHeight: 118
+    minWidth: 500
+    minHeight: 320
 
     enablePosOverlay: false
     enableSizeOverlay: false
 
-    //borderColor: formulaEditor.editorFocus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
-
-    onTransitionStarted: {
-        if (newState === stateHidden) {
-            // Reset Focus
-            formulaEditor.setEditorFocus(false);
-        }
-    }
-
     onTransitionFinished: {
         if (newState === stateShown) {
-            // Set Editor Focus
-            formulaEditor.setEditorFocus(true, true);
+            // Set EDitor Focus
+            slotSourceEditor.setEditorFocus(true, false);
         }
     }
 
+    // ...
+
     DSourceCodeEditor {
-        id: formulaEditor
+        id: slotSourceEditor
         anchors.fill: parent
         anchors {
             leftMargin: DStyle.defaultMargin
-            topMargin: formulaEditorRoot.titleHeight + DStyle.defaultMargin * 2
+            topMargin: slotEditorRoot.titleHeight + DStyle.defaultMargin * 2
             rightMargin: diskButton.width + DStyle.defaultMargin * 4
             bottomMargin: DStyle.defaultMargin
         }
 
         onSourceEditorActivated: {
             // Bring To Front
-            formulaEditorRoot.bringToFront();
+            slotEditorRoot.bringToFront();
         }
 
         onEscapeClicked: {
             // Reject
-            formulaEditorRoot.rejected();
+            slotEditorRoot.rejected();
         }
     }
 
@@ -65,7 +59,7 @@ DPaneBase {
 
         onClicked: {
             // Emit Accepted Signal
-            formulaEditorRoot.accepted();
+            slotEditorRoot.accepted();
         }
     }
 }

@@ -79,7 +79,6 @@ QtObject {
     readonly property int defaultRadius:                    4
     // Default Margin
     readonly property int defaultMargin:                    8
-
     // Default Spacing
     readonly property int defaultSpacing:                   4
 
@@ -163,11 +162,6 @@ QtObject {
     readonly property int posIndicatorWidth:                sizeIndicatorWidth
     // Default Position Indicator Height
     readonly property int posIndicatorHeight:               sizeIndicatorHeight
-
-    // Default Formule Editor Width
-    readonly property int formulaEdiorWidth:                358
-    // Default Formule Editor Height
-    readonly property int formulaEditorHeight:              118
 
     // Default Activity Indicator Width
     readonly property int activityIndicatorWidth:           56

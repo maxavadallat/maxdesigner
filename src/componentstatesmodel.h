@@ -27,7 +27,7 @@ public:
     void setCurrentComponent(ComponentInfo* aComponent);
 
     // Add State
-    void addState(const QString& aStateName);
+    void addState(const QString& aStateName, const QString& aWhen = "");
     // Set State Name
     void setStateName(const int& aIndex, const QString& aStateName);
     // Clear State
@@ -122,7 +122,7 @@ public:
     static ComponentState* fromJSONObject(const QJsonObject& aObject);
 
     // Constructor
-    explicit ComponentState(const QString& aName, QObject* aParent = NULL);
+    explicit ComponentState(const QString& aName, const QString& aWhen = "", QObject* aParent = NULL);
 
     // Get State Name
     QString stateName();
@@ -187,6 +187,7 @@ public:
     };
 
 protected: // Data
+    friend class ComponentStatesModel;
     // State Name
     QString                         mName;
     // When Trigger
@@ -249,6 +250,7 @@ signals:
     void propertyChangeValueChanged(const QString& aValue);
 
 protected: // Data
+    friend class ComponentStatesModel;
     // Target
     QString         mTarget;
     // Property

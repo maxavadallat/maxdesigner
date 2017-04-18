@@ -11,7 +11,8 @@ Item {
     width: CONSTS.componentItemWidth
     height: CONSTS.componentItemHeight
 
-    property alias title: componentTitleLabel.text
+    property string title: "Component"
+    property bool builtIn: false
 
     property QtObject componentInfo: null
 
@@ -142,7 +143,7 @@ Item {
             anchors.centerIn: parent
             font.pixelSize: DStyle.fontSizeS
             horizontalAlignment: Text.AlignHCenter
-            text: "ComponentItem"
+            text: componentItemRoot.title
         }
 
         DActivityIndicator {

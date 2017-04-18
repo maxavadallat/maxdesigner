@@ -9,6 +9,7 @@
 
 class ComponentInfo;
 class PropertiesController;
+class ProjectModel;
 
 //==============================================================================
 // Component Own Properties Model
@@ -24,6 +25,15 @@ public:
     ComponentInfo* currentComponent();
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
+
+    // Add Own Property
+    void addComponentProperty(const QString& aName, const int& aType = 0, const QVariant& aDefault = QVariant());
+    // Remove Own Property
+    void removeComponentProperty(const QString& aName);
+    // Set Component Own Property Value
+    bool setComponentProperty(const QString& aName, const QVariant& aValue);
+    // Clear Component Property
+    bool clearComponentProperty(const QString& aName);
 
     // Destructor
     ~ComponentOwnPropertiesModel();
@@ -44,33 +54,46 @@ protected:
     friend class PropertiesController;
 
     // Constructor
-    explicit ComponentOwnPropertiesModel(ComponentInfo* aComponent, QObject* aParent = NULL);
+    explicit ComponentOwnPropertiesModel(ComponentInfo* aComponent, ProjectModel* aProject, QObject* aParent = NULL);
 
     // Init
     void init();
     // Clear
-    void clear();
+    void clear(const bool& aEndReset = true);
+
+    // Load Component Properties
+    void loadComponentProperties();
+
+    // Generate Merged Keys
+    void generateMergedKeys();
 
 protected slots:
-    // Own Property Added Slot
-    void propertyAdded(const int& aIndex);
-    // Own Property Removed Slot
-    void propertyRemoved(const int& aIndex);
-
-    // Properties Updated Slot
-    void propertiesUpdated();
+//    // Own Property Added Slot
+//    void propertyAdded(const int& aIndex);
+//    // Own Property Updated
+//    void propertyUpdated(const int& aIndex);
+//    // Own Property Removed Slot
+//    void propertyRemoved(const int& aIndex);
+//    // Properties Updated Slot
+//    void propertiesUpdated();
 
 public:
     // Item Field Roles
     enum OPMRoles {
         PropertyNameRole = Qt::UserRole + 1,
         PropertyTypeRole,
-        PropertyValueRole
+        PropertyValueRole,
+        PropertyIsFormula,
+        PropertyIsProto
     };
 
 protected: // Data
     // Current Component
     ComponentInfo*  mComponent;
+    // Project Model
+    ProjectModel*   mProject;
+    // Property Keys
+    QStringList     mKeys;
 };
 
 #endif // COMPONENTOWNPROPERTIESMODEL_H

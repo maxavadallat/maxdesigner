@@ -23,6 +23,15 @@ public:
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
 
+    // Add Import
+    Q_INVOKABLE void addImport(const QString& aImport);
+    // Remove Import
+    Q_INVOKABLE void removeImport(const QString& aImport);
+    // Remove Import
+    Q_INVOKABLE void removeImport(const int& aIndex);
+    // Check If Import Valid
+    Q_INVOKABLE bool importValid(const QString& aImport);
+
     // Destructor
     ~ComponentImportsModel();
 
@@ -62,8 +71,6 @@ public:
 protected: // Data
     // Current Component
     ComponentInfo*      mComponent;
-    // Imports
-    QStringList         mImports;
 };
 
 #endif // COMPONENTIMPORTSMODEL_H

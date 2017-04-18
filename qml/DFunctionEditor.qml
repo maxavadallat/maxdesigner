@@ -3,57 +3,52 @@ import QtQuick 2.0
 import "style"
 
 DPaneBase {
-    id: formulaEditorRoot
+    id: functionEditorRoot
 
-    property string propertyName: "property"
+    property string functionName: "function"
+    property var functionParameters: []
+    property string functionSource: ""
 
-    title: propertyName + ":"
+    title: "Function"
 
     hideToSide: hideToRight
 
-    creationWidth: 358
-    creationHeight: 118
+    creationWidth: 500
+    creationHeight: 360
 
-    minWidth: 358
-    minHeight: 118
+    minWidth: 500
+    minHeight: 360
 
     enablePosOverlay: false
     enableSizeOverlay: false
 
-    //borderColor: formulaEditor.editorFocus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
-
-    onTransitionStarted: {
-        if (newState === stateHidden) {
-            // Reset Focus
-            formulaEditor.setEditorFocus(false);
-        }
-    }
-
     onTransitionFinished: {
         if (newState === stateShown) {
-            // Set Editor Focus
-            formulaEditor.setEditorFocus(true, true);
+            // Set EDitor Focus
+            funtionSourceEditor.setEditorFocus(true, false);
         }
     }
 
+    // ...
+
     DSourceCodeEditor {
-        id: formulaEditor
+        id: funtionSourceEditor
         anchors.fill: parent
         anchors {
             leftMargin: DStyle.defaultMargin
-            topMargin: formulaEditorRoot.titleHeight + DStyle.defaultMargin * 2
+            topMargin: functionEditorRoot.titleHeight + DStyle.defaultMargin * 2
             rightMargin: diskButton.width + DStyle.defaultMargin * 4
             bottomMargin: DStyle.defaultMargin
         }
 
         onSourceEditorActivated: {
             // Bring To Front
-            formulaEditorRoot.bringToFront();
+            functionEditorRoot.bringToFront();
         }
 
         onEscapeClicked: {
             // Reject
-            formulaEditorRoot.rejected();
+            functionEditorRoot.rejected();
         }
     }
 
@@ -65,7 +60,7 @@ DPaneBase {
 
         onClicked: {
             // Emit Accepted Signal
-            formulaEditorRoot.accepted();
+            functionEditorRoot.accepted();
         }
     }
 }

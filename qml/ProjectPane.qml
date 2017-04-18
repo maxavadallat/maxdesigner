@@ -71,7 +71,6 @@ DPane {
         id: baseComponentsSection
         width: projectPaneRoot.contentWidth
         title: "Base Components"
-        //state: stateClosed
         minHeight: baseComponentsRepeater.count > 0 ? baseComponentsFlow.height : 200
 
         DFlow {
@@ -83,9 +82,11 @@ DPane {
             Repeater {
                 id: baseComponentsRepeater
                 model: mainController.currentProject ? mainController.currentProject.baseComponentsModel : undefined
+
                 delegate: DComponentItem {
                     id: baseComponentItemDelegateRoot
-                    title: componentName
+                    title: cName
+                    builtIn: cBuiltIn
                     componentInfo: mainController.currentProject.baseComponentsModel.getComponentByIndex(index);
                     onGrabbedChanged: {
                         // Bring Section To Top
@@ -115,7 +116,6 @@ DPane {
         id: ownComponentsSection
         width: projectPaneRoot.contentWidth
         title: "Components"
-        //state: stateOpen
         minHeight: componentsRepeater.count > 0 ? componentsFlow.height : 200
 
         DFlow {
@@ -127,9 +127,10 @@ DPane {
             Repeater {
                 id: componentsRepeater
                 model: mainController.currentProject ? mainController.currentProject.componentsModel : undefined
+
                 delegate: DComponentItem {
                     id: componentItemDelegateRoot
-                    title: componentName
+                    title: cName
                     componentInfo: mainController.currentProject.componentsModel.getComponentByIndex(index);
                     onGrabbedChanged: {
                         // Bring Section To Top
@@ -159,7 +160,6 @@ DPane {
         id: viewsSection
         width: projectPaneRoot.contentWidth
         title: "Views"
-        //state: stateClosed
         minHeight: viewsRepeater.count > 0 ? viewsFlow.height : 200
 
         DFlow {
@@ -171,9 +171,10 @@ DPane {
             Repeater {
                 id: viewsRepeater
                 model: mainController.currentProject ? mainController.currentProject.viewsModel : undefined
+
                 delegate: DComponentItem {
                     id: viewItemDelegateRoot
-                    title: viewName
+                    title: vName
                     componentInfo: mainController.currentProject.viewsModel.getViewByIndex(index);
                     onGrabbedChanged: {
                         // Bring Section To Top

@@ -24,7 +24,6 @@ ProjectModel::ProjectModel(QObject* parent)
     , mBaseComponents(NULL)
     , mComponents(NULL)
     , mViews(NULL)
-    , mCurrentComponent(NULL)
 {
     qDebug() << "ProjectModel created.";
 
@@ -77,20 +76,6 @@ void ProjectModel::setDirty(const bool& aDirty)
         mDirty = aDirty;
         // Emit Properties Dirty State Changed Signal
         emit dirtyChanged(mDirty);
-    }
-}
-
-//==============================================================================
-// Set Current Component
-//==============================================================================
-void ProjectModel::setCurrentComponent(ComponentInfo* aComponent)
-{
-    // Check Current Compoennt
-    if (mCurrentComponent != aComponent) {
-        // Set Current Component
-        mCurrentComponent = aComponent;
-        // Emit Current Component Changed Signal
-        emit currentComponentChanged(mCurrentComponent);
     }
 }
 
@@ -473,9 +458,17 @@ ComponentInfo* ProjectModel::createBaseComponent(const QString& aName,
                                                  const int& aWidth,
                                                  const int& aHeight)
 {
-    // Check Current Compoennt
-    if (mCurrentComponent) {
-        // ...
+    // Check Base Components
+    if (!mBaseComponents) {
+        return NULL;
+    }
+
+    // Get Component Info
+    ComponentInfo* cInfo = mBaseComponents->getComponent(aName);
+    // Check Component Info
+    if (cInfo) {
+        qDebug() << "ProjectModel::createBaseComponent - aName: " << aName << " - COMPONENT ALREADY EXISTS!";
+        return cInfo;
     }
 
     qDebug() << "ProjectModel::createBaseComponent - aName: " << aName << " - aBaseName: " << aBaseName << " - aCategory: " << aCategory;
@@ -496,9 +489,6 @@ ComponentInfo* ProjectModel::createBaseComponent(const QString& aName,
     // Add To Base Components
     mBaseComponents->addBaseComponent(newComponent);
 
-    // Set Current Component
-    setCurrentComponent(newComponent);
-
     // Emit Base Compoennt Created Signal
     emit baseComponentCreated(newComponent, aWidth, aHeight);
 
@@ -510,9 +500,17 @@ ComponentInfo* ProjectModel::createBaseComponent(const QString& aName,
 //==============================================================================
 ComponentInfo* ProjectModel::createComponent(const QString& aName, const QString& aBaseName, const QString& aCategory, const int& aWidth, const int& aHeight)
 {
-    // Check Current Compoennt
-    if (mCurrentComponent) {
-        // ...
+    // Check Components
+    if (!mComponents) {
+        return NULL;
+    }
+
+    // Get Component Info
+    ComponentInfo* cInfo = mComponents->getComponent(aName);
+    // Check Component Info
+    if (cInfo) {
+        qDebug() << "ProjectModel::createComponent - aName: " << aName << " - COMPONENT ALREADY EXISTS!";
+        return cInfo;
     }
 
     qDebug() << "ProjectModel::createComponent - aName: " << aName << " - aBaseName: " << aBaseName << " - aCategory: " << aCategory;
@@ -533,9 +531,6 @@ ComponentInfo* ProjectModel::createComponent(const QString& aName, const QString
     // Add To Components
     mComponents->addComponent(newComponent);
 
-    // Set Current Component
-    setCurrentComponent(newComponent);
-
     // Emit Component Created Signal
     emit componentCreated(newComponent, aWidth, aHeight);
 
@@ -547,9 +542,17 @@ ComponentInfo* ProjectModel::createComponent(const QString& aName, const QString
 //==============================================================================
 ComponentInfo* ProjectModel::createView(const QString& aName, const QString& aBaseName, const int& aWidth, const int& aHeight)
 {
-    // Check Current Compoennt
-    if (mCurrentComponent) {
-        // ...
+    // Check Views Model
+    if (!mViews) {
+        return NULL;
+    }
+
+    // Get Component Info
+    ComponentInfo* cInfo = mViews->getView(aName);
+    // Check Component Info
+    if (cInfo) {
+        qDebug() << "ProjectModel::createView - aName: " << aName << " - VIEW ALREADY EXISTS!";
+        return cInfo;
     }
 
     qDebug() << "ProjectModel::createView - aName: " << aName << " - aBaseName: " << aBaseName;
@@ -566,9 +569,6 @@ ComponentInfo* ProjectModel::createView(const QString& aName, const QString& aBa
 
     // Add To Views
     mViews->addView(newComponent);
-
-    // Set Current Component
-    setCurrentComponent(newComponent);
 
     // Emit View Created Signal
     emit viewCreated(newComponent, aWidth, aHeight);
@@ -1026,14 +1026,6 @@ ComponentsModel* ProjectModel::componentsModel()
 ViewsModel* ProjectModel::viewsModel()
 {
     return mViews;
-}
-
-//==============================================================================
-// Get Current Component
-//==============================================================================
-ComponentInfo* ProjectModel::currentComponent()
-{
-    return mCurrentComponent;
 }
 
 //==============================================================================

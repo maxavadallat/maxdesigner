@@ -4,6 +4,7 @@ import enginecomponents 0.1
 
 import "DConstants.js" as CONSTS
 import "style"
+import "system"
 
 Item {
     id: mainRoot
@@ -301,9 +302,24 @@ Item {
         PropertiesPane {
             id: propertiesPane
 
-            onEditFormulaLaunch: {
-                // Show Formula Editor
-                formulaEditor.show();
+            onNewImportLaunch: {
+                // Check Imports Model
+                if (propertiesController.importsModel !== null) {
+                    // Set New Import
+                    importEditor.newImport = true;
+                    // Show Imports Editor
+                    importEditor.show();
+                }
+            }
+
+            onEditImportsLaunch: {
+                // Check Imports Model
+                if (propertiesController.importsModel !== null) {
+                    // Set New Import
+                    importEditor.newImport = false;
+                    // Show Imports Editor
+                    importEditor.show();
+                }
             }
 
             onNewPropertyLaunch: {
@@ -316,26 +332,53 @@ Item {
                 propertyEditor.show();
             }
 
+            onEditFormulaLaunch: {
+                // Show Formula Editor
+                formulaEditor.show();
+            }
+
             onNewSignalLaunch: {
-                // Show Signal Editor
-                signalEditor.show();
+                // Check Signals Model
+                if (propertiesController.signalsModel !== null) {
+                    // Set New Signal
+                    signalEditor.newSignal = true;
+                    // Set Component Signal
+                    signalEditor.componentSignal = propertiesController.signalsModel.createNewSignal();
+                    // Show Signal Editor
+                    signalEditor.show();
+                }
+            }
+
+            onEditSignalLaunch: {
+                // Check Signals Model
+                if (propertiesController.signalsModel !== null) {
+                    // Reset New Signal
+                    signalEditor.newSignal = false;
+                    // Set Component Signal
+                    signalEditor.componentSignal = propertiesController.signalsModel.selectSignal(index);
+                    // Show Signal Editor
+                    signalEditor.show();
+                }
+            }
+
+            onNewSlotLaunch: {
+                // Show Slot Editor
+                slotEditor.show();
+            }
+
+            onEditSlotLaunch: {
+                // Show Slot Editor
+                slotEditor.show();
             }
 
             onNewFunctionLaunch: {
                 // Show Function Editor
-
-                // ...
+                functionEditor.show();
             }
 
             onEditFunctionLaunch: {
                 // Show Function Editor
-
-                // ...
-            }
-
-            onEditSignalLaunch: {
-                // Show Signal Editor
-                signalEditor.show();
+                functionEditor.show();
             }
 
             onNewStateLaunch: {
@@ -362,6 +405,46 @@ Item {
 
         }
 
+//        // Imports Editor
+//        DImportsEditor {
+//            id: importsEditor
+
+//            initialX: propertiesPane.x
+//            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+
+//            creationX: initialX - importsEditor.width - 32
+//            creationY: initialY - importsEditor.height * 0.5
+
+//            childPane: importEditor
+
+//            onNewImport: {
+//                importEditor.show();
+//            }
+
+//            onAccepted: {
+
+//            }
+//        }
+
+        // Import Editor
+        DImportEditor {
+            id: importEditor
+
+            initialX: propertiesPane.x
+            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+
+            creationX: initialX - importEditor.width - 32
+            creationY: initialY - importEditor.height * 0.5
+
+            onAccepted: {
+                // Check Imports Model
+                if (propertiesController.importsModel !== null) {
+                    // Add Import
+                    propertiesController.importsModel.addImport(importEditor.importName);
+                }
+            }
+        }
+
         // Property Editor
         DPropertyEditor {
             id: propertyEditor
@@ -373,12 +456,15 @@ Item {
             creationY: initialY - propertyEditor.height * 0.5
 
             onAccepted: {
-                // Add Own Property
-                propertiesController.addOwnComponentProperty(propertyName, propertyType, propertyDefault);
+                // Check Own Properties Model
+                if (propertiesController.ownPropertiesModel !== null) {
+                    // Add Own Property
+                    //propertiesController.ownPropertiesModel
+                }
+
+//                // Add Own Property
+//                propertiesController.addOwnComponentProperty(propertyName, propertyType, propertyDefault);
             }
-
-            // ...
-
         }
 
         // Signal Editor
@@ -393,13 +479,36 @@ Item {
 
             childPane: signalParameterEditor
 
-            // ...
-
             onNewParameter: {
                 // Show Signal Parameter Editor
                 signalParameterEditor.show();
             }
 
+            onAccepted: {
+                // Check New Signal
+                if (signalEditor.newSignal) {
+                    // Append Signal
+                    propertiesController.signalsModel.appendSignal(signalEditor.componentSignal);
+                    // Reset Component Signal
+                    signalEditor.componentSignal = null;
+                    // Reset New Signal
+                    signalEditor.newSignal = false;
+                }
+
+                // ...
+            }
+
+            onRejected: {
+                // Check New Signal
+                if (signalEditor.newSignal) {
+                    // Discard Signal
+                    propertiesController.signalsModel.discardNewSignal(signalEditor.componentSignal);
+                    // Reset Component Signal
+                    signalEditor.componentSignal = null;
+                    // Reset New Signal
+                    signalEditor.newSignal = false;
+                }
+            }
         }
 
         // Signal Parameter Editor
@@ -413,6 +522,25 @@ Item {
             creationY: initialY + 32
 
             parentPane: signalEditor
+
+            onAccepted: {
+
+            }
+        }
+
+        // Slot Editor
+        DSlotEditor {
+            id: slotEditor
+
+            initialX: propertiesPane.x
+            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+
+            creationX: initialX - slotEditor.width - 32
+            creationY: initialY - slotEditor.height * 0.5
+
+            onAccepted: {
+
+            }
         }
 
         // Formula Editor
@@ -426,6 +554,21 @@ Item {
             creationY: initialY - formulaEditor.height * 0.5
 
             // ...
+        }
+
+        // Function Editor
+        DFunctionEditor {
+            id: functionEditor
+
+            initialX: propertiesPane.x
+            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+
+            creationX: initialX - functionEditor.width - 32
+            creationY: initialY - functionEditor.height * 0.5
+
+            onAccepted: {
+
+            }
         }
 
         // State Editor
