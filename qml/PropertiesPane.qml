@@ -51,10 +51,12 @@ DPane {
 
             } else {
                 // Close All Sections
+                importsSection.close();
                 sizeAndPosSection.close();
                 anchorsSection.close();
                 ownPropertiesSection.close();
                 signalsSection.close();
+                slotsSection.close();
                 statesSection.close();
                 transitionsSection.close();
             }
@@ -623,21 +625,27 @@ DPane {
             DListView {
                 id: signalsListView
                 anchors.fill: parent
+                currentIndex: -1
 
                 model: propertiesController.signalsModel
 
                 delegate: DSignalItemDelegate {
                     width: signalsListView.width
                     itemIndex: index
-                    signalName: model.signalName + "(" + model.signalParameters + ")";
+                    signalName: model.signalName + "(" + signalParameters + ")";
+                    itemCurrent: index === signalsListView.currentIndex
 
-                    onItemActionClicked: {
-                        propertiesController.signalsModel.removeSignal(itemIndex);
+                    onItemClicked: {
+                        signalsListView.currentIndex = itemIndex;
                     }
 
                     onItemDoubleClicked: {
                         // Emit Edit Signal Launch Signal
                         propertiesPaneRoot.editSignalLaunch(itemIndex);
+                    }
+
+                    onItemActionClicked: {
+                        propertiesController.signalsModel.removeSignal(itemIndex);
                     }
                 }
             }

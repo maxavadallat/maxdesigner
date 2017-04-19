@@ -28,29 +28,29 @@ public:
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
 
-    // Append Signal
-    Q_INVOKABLE void appendSignal(ComponentSignal* aSignal);
-
     // Add Signal
     Q_INVOKABLE void addSignal(const QString& aName, const QStringList& aParameters = QStringList());
-    // Remove Signal
-    Q_INVOKABLE void removeSignal(const QString& aName);
     // Remove Signal
     Q_INVOKABLE void removeSignal(const int& aIndex);
     // Rename Signal
     Q_INVOKABLE void renameSignal(const int& aIndex, const QString& aName);
+
     // Check If Signal Valid
     Q_INVOKABLE bool signalValid(const QString& aName);
 
-    // Create New Signal
+    // Create New Signal To Add
     Q_INVOKABLE ComponentSignal* createNewSignal();
-    // Get/Select Signal
+    // Get/Select Signal For Editing
     Q_INVOKABLE ComponentSignal* selectSignal(const int& aIndex);
 
+    // Append Signal To Signal List
+    Q_INVOKABLE void appendSignal(ComponentSignal* aSignal);
     // Discard New Signal
     Q_INVOKABLE void discardNewSignal(ComponentSignal* aSignal);
+    // Update Selected Signal
+    Q_INVOKABLE void updateSelectedSignal(const bool& aDoneEdit = true);
 
-    // To JSON Array
+    // Exports Model To JSON Array
     QJsonArray toJSONArray();
 
     // Destructor
@@ -61,10 +61,14 @@ signals:
     void currentComponentChanged(ComponentInfo* aComponent);
 
 protected:
+    friend class ComponentSignal;
     // Init
     void init();
     // Clear
-    void clear(const bool& aEndReset = true);
+    void clear();
+
+    // Set Dirty
+    void setDirty(const bool& aDirty);
 
     // Load Component Signals
     void loadComponentSignals();
@@ -93,7 +97,15 @@ protected: // Data
     ComponentInfo*          mComponent;
     // Signals
     QList<ComponentSignal*> mSignals;
+    // New Signal
+    bool                    mNewSignal;
+    // Dirty
+    bool                    mDirty;
+    // Selected Index
+    int                     mSelectedIndex;
 };
+
+
 
 
 
@@ -114,9 +126,7 @@ class ComponentSignal : public QObject
 
 public:
     // From JSON Object
-    static ComponentSignal* fromJSONObject(const QJsonObject& aOvject);
-    // Constructor
-    explicit ComponentSignal(const QString& aName, const QStringList& aParameters = QStringList(), QObject* aParent = NULL);
+    static ComponentSignal* fromJSONObject(ComponentSignalsModel* aModel, const QJsonObject& aObject);
 
     // Get Signal Name
     QString signalName();
@@ -132,8 +142,10 @@ public:
     Q_INVOKABLE void addSignalParameter(const QString& aParameter);
     // Remove Signal Parameter
     Q_INVOKABLE void removeSignalParameter(const int& aIndex);
+    // Update Signal Parameter
+    Q_INVOKABLE void updateSignalParameter(const int& aIndex, const QString& aParameter);
     // Check If Parameter Valid
-    Q_INVOKABLE bool parameterValid(const QString& aParameter);
+    Q_INVOKABLE bool parameterValid(const QString& aParameter, const bool& aNewParameter = true);
 
     // To JSON Object
     QJsonObject toJSONObject();
@@ -148,18 +160,25 @@ signals:
     void signalParametersChanged(const QStringList& aParameters);
 
 protected:
+    friend class ComponentSignalsModel;
+
+    // Constructor
+    explicit ComponentSignal(ComponentSignalsModel* aModel, const QString& aName, const QStringList& aParameters = QStringList(), QObject* aParent = NULL);
+
     // Init
     void init();
     // Clear
     void clear();
 
 protected: // Data
-    friend class ComponentSignalsModel;
-
+    // Signals Model
+    ComponentSignalsModel*  mModel;
     // Signal Name
-    QString         mName;
+    QString                 mName;
     // Parameters
-    QStringList     mParameters;
+    QStringList             mParameters;
+    // New Parameter
+    bool                    mNewParameter;
 };
 
 #endif // COMPONENTSIGNALSMODEL_H

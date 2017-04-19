@@ -17,8 +17,18 @@ Item {
 
     property bool enableSwipe: true
 
-    signal itemActionClicked(var itemIndex)
+    property bool itemCurrent: false
+
+    signal itemClicked(var itemIndex)
     signal itemDoubleClicked(var itemIndex)
+    signal itemActionClicked(var itemIndex)
+
+    DRectangle {
+        anchors.fill: parent
+        color: signalItemDelegateRoot.itemCurrent ? DStyle.colorSelectedHighLight : "transparent"
+        border.color: "transparent"
+        opacity: 0.2
+    }
 
     DText {
         id: signalText
@@ -35,6 +45,11 @@ Item {
     DMouseArea {
         id: signalItemMouseArea
         anchors.fill: parent
+
+        onClicked: {
+            signalItemDelegateRoot.itemClicked(signalItemDelegateRoot.itemIndex);
+        }
+
         onDoubleClicked: {
             signalItemDelegateRoot.itemDoubleClicked(signalItemDelegateRoot.itemIndex);
         }

@@ -22,6 +22,7 @@ DPaneBase {
 
     property ComponentSignal componentSignal: null
     property string signalParameter: ""
+    property bool newParameter: false
 
     state: stateCreate
 
@@ -30,12 +31,6 @@ DPaneBase {
         if (parameterEditor.text !== signalParameterEditorRoot.signalParameter) {
             // Set Name Editor Text
             parameterEditor.text = signalParameterEditorRoot.signalParameter;
-        }
-    }
-
-    onTransitionStarted: {
-        if (newState === stateShown) {
-
         }
     }
 

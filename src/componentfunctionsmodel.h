@@ -26,29 +26,28 @@ public:
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
 
-    // Append Function
-    void appendFunction(ComponentFunction* aFunction);
-
     // Add Function
     Q_INVOKABLE void addFunction(const QString& aName, const QStringList& aParameters = QStringList(), const QString& aSource = "");
-    // Remove Function
-    Q_INVOKABLE void removeFunction(const QString& aName);
+
     // Remove Function
     Q_INVOKABLE void removeFunction(const int& aIndex);
     // Rename Function
     Q_INVOKABLE void renameFunction(const int& aIndex, const QString& aName);
+
     // Check If Function Valid
     Q_INVOKABLE bool functionValid(const QString& aName);
 
-    // Add Parameter
-    void addParameter(const int& aIndex, const QString& aParameter);
-    // Remove Parameter
-    void removeParameter(const int& aIndex, const QString& aParameter);
-    // Remove Parameter
-    void removeParameter(const int& aIndex, const int& aParameterIndex);
+    // Create New Function
+    Q_INVOKABLE ComponentFunction* createNewFunction();
+    // Select Function
+    Q_INVOKABLE ComponentFunction* selectFunction(const int& aIndex);
 
-    // Set Source
-    void setSource(const int& aIndex, const QString& aSource);
+    // Append Function
+    Q_INVOKABLE void appendFunction(ComponentFunction* aFunction);
+    // Discard New Function
+    Q_INVOKABLE void discardNewFunction(ComponentFunction* aFunction);
+    // Update Selected Function
+    Q_INVOKABLE void updateSelectedFunction(const bool& aDoneEdit = true);
 
     // To JSON Array
     QJsonArray toJSONArray();
@@ -70,6 +69,8 @@ public: // from QAbstractListModel
 
 protected:
     friend class PropertiesController;
+    friend class ComponentFunction;
+
     // Constructor
     explicit ComponentFunctionsModel(ComponentInfo* aComponent, QObject* aParent = NULL);
 
@@ -77,6 +78,9 @@ protected:
     void init();
     // Clear
     void clear();
+
+    // Set Dirty
+    void setDirty(const bool& aDirty);
 
     // Load Component Functions
     void loadComponentFunctions();
@@ -98,6 +102,12 @@ protected: // Data
     ComponentInfo*              mComponent;
     // Function List
     QList<ComponentFunction*>   mFunctions;
+    // New Function
+    bool                        mNewFunction;
+    // Dirty
+    bool                        mDirty;
+    // Selected Function Index
+    int                         mSelectedIndex;
 };
 
 
@@ -120,10 +130,7 @@ class ComponentFunction : public QObject
 
 public:
     // From JSON Object
-    static ComponentFunction* fromJSONObject(const QJsonObject& aObject);
-
-    // Constructor
-    explicit ComponentFunction(const QString& aName, const QString& aSource, const QStringList& aParameters = QStringList(), QObject* aParent = NULL);
+    static ComponentFunction* fromJSONObject(ComponentFunctionsModel* aModel, const QJsonObject& aObject);
 
     // Get Function Name
     QString functionName();
@@ -141,11 +148,13 @@ public:
     void setFunctionSource(const QString& aSource);
 
     // Insert Parameter
-    void insertParameter(const int& aIndex, const QString& aParameter);
+    Q_INVOKABLE void insertFunctionParameter(const int& aIndex, const QString& aParameter);
     // Append Parameter
-    void appendParameter(const QString& aParameter);
+    Q_INVOKABLE void appendFunctionParameter(const QString& aParameter);
     // Remove Parameter
-    void removeParameter(const int& aIndex);
+    Q_INVOKABLE void removeFunctionParameter(const int& aIndex);
+    // Check If Parameter Valid
+    Q_INVOKABLE bool parameterValid(const QString& aParameter, const bool& aNewParameter = true);
 
     // Export To JSON Object
     QJsonObject toJSONObject();
@@ -163,16 +172,23 @@ signals:
 
 protected:
     friend class ComponentFunctionsModel;
+    // Constructor
+    explicit ComponentFunction(ComponentFunctionsModel* aModel,
+                               const QString& aName,
+                               const QString& aSource,
+                               const QStringList& aParameters = QStringList(),
+                               QObject* aParent = NULL);
+
+protected:
+    // Compoennt Functions Model
+    ComponentFunctionsModel*    mModel;
     // Name
-    QString     mName;
+    QString                     mName;
     // Parameters
-    QStringList mParameters;
+    QStringList                 mParameters;
     // Source
-    QString     mSource;
+    QString                     mSource;
 };
-
-
-
 
 
 #endif // COMPONENTFUNCTIONSMODEL_H

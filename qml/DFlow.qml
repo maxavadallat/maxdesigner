@@ -35,9 +35,9 @@ Item {
     //        }
     //    }
 
-    //    populate: Transition {
-    //        DAnimation { properties: "x, y" }
-    //    }
+        populate: Transition {
+            DAnimation { properties: "height" }
+        }
 
         move: Transition {
             DAnimation { properties: "x, y" }

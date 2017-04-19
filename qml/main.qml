@@ -275,6 +275,7 @@ Item {
         }
     }
 
+    // Main Grab Area
     MainGrabArea {
         id: mainGrabArea
 
@@ -405,36 +406,12 @@ Item {
 
         }
 
-//        // Imports Editor
-//        DImportsEditor {
-//            id: importsEditor
-
-//            initialX: propertiesPane.x
-//            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
-
-//            creationX: initialX - importsEditor.width - 32
-//            creationY: initialY - importsEditor.height * 0.5
-
-//            childPane: importEditor
-
-//            onNewImport: {
-//                importEditor.show();
-//            }
-
-//            onAccepted: {
-
-//            }
-//        }
-
         // Import Editor
         DImportEditor {
             id: importEditor
 
             initialX: propertiesPane.x
             initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
-
-            creationX: initialX - importEditor.width - 32
-            creationY: initialY - importEditor.height * 0.5
 
             onAccepted: {
                 // Check Imports Model
@@ -451,9 +428,6 @@ Item {
 
             initialX: propertiesPane.x
             initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
-
-            creationX: initialX - propertyEditor.width - 32
-            creationY: initialY - propertyEditor.height * 0.5
 
             onAccepted: {
                 // Check Own Properties Model
@@ -474,12 +448,22 @@ Item {
             initialX: propertiesPane.x
             initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
 
-            creationX: initialX - signalEditor.width - 32
-            creationY: initialY - signalEditor.height * 0.5
-
             childPane: signalParameterEditor
 
             onNewParameter: {
+                // Set New Parameter
+                signalParameterEditor.newParameter = true;
+                // Set Component Signal
+                signalParameterEditor.componentSignal = signalEditor.componentSignal;
+                // Show Signal Parameter Editor
+                signalParameterEditor.show();
+            }
+
+            onEditParameter: {
+                // Set New Parameter
+                signalParameterEditor.newParameter = false;
+                // Set Component Signal
+                signalParameterEditor.componentSignal = signalEditor.componentSignal;
                 // Show Signal Parameter Editor
                 signalParameterEditor.show();
             }
@@ -487,15 +471,18 @@ Item {
             onAccepted: {
                 // Check New Signal
                 if (signalEditor.newSignal) {
-                    // Append Signal
+                    // Append Component Signal
                     propertiesController.signalsModel.appendSignal(signalEditor.componentSignal);
                     // Reset Component Signal
                     signalEditor.componentSignal = null;
                     // Reset New Signal
                     signalEditor.newSignal = false;
-                }
+                } else {
+                    // Update Component Signal
+                    propertiesController.signalsModel.updateSelectedSignal();
 
-                // ...
+                    // ...
+                }
             }
 
             onRejected: {
@@ -507,6 +494,8 @@ Item {
                     signalEditor.componentSignal = null;
                     // Reset New Signal
                     signalEditor.newSignal = false;
+                } else {
+                    // ...
                 }
             }
         }
@@ -524,7 +513,16 @@ Item {
             parentPane: signalEditor
 
             onAccepted: {
-
+                // Check New Parameter
+                if (signalParameterEditor.newParameter) {
+                    // Add Signal Parameter
+                    signalEditor.componentSignal.addSignalParameter(signalParameterEditor.signalParameter);
+                    // Reset New Parameter
+                    signalParameterEditor.newParameter = false;
+                } else {
+                    // Set Parameter
+                    //signalEditor.componentSignal.
+                }
             }
         }
 
@@ -534,9 +532,6 @@ Item {
 
             initialX: propertiesPane.x
             initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
-
-            creationX: initialX - slotEditor.width - 32
-            creationY: initialY - slotEditor.height * 0.5
 
             onAccepted: {
 
@@ -550,8 +545,6 @@ Item {
             initialX: propertiesPane.x
             initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
 
-            creationX: initialX - formulaEditor.width - 32
-            creationY: initialY - formulaEditor.height * 0.5
 
             // ...
         }
@@ -577,9 +570,6 @@ Item {
 
             initialX: propertiesPane.x
             initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
-
-            creationX: initialX - stateEditor.width - 32
-            creationY: initialY - stateEditor.height * 0.5
 
             childPane: propertyChangesEditor
 
@@ -624,9 +614,6 @@ Item {
 
             initialX: propertiesPane.x
             initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
-
-            creationX: initialX - transitionEditor.width - 32
-            creationY: initialY - transitionEditor.height * 0.5
 
             childPane: transitionNodeEditor
 

@@ -10,6 +10,9 @@
 ComponentFunctionsModel::ComponentFunctionsModel(ComponentInfo* aComponent, QObject* aParent)
     : QAbstractListModel(aParent)
     , mComponent(aComponent)
+    , mNewFunction(false)
+    , mDirty(false)
+    , mSelectedIndex(-1)
 {
     qDebug() << "ComponentFunctionsModel created.";
 
@@ -47,6 +50,18 @@ void ComponentFunctionsModel::clear()
 }
 
 //==============================================================================
+// Set Dirty
+//==============================================================================
+void ComponentFunctionsModel::setDirty(const bool& aDirty)
+{
+    // Check If Dirty
+    if (mDirty != aDirty) {
+        // Set Dirty
+        mDirty = aDirty;
+    }
+}
+
+//==============================================================================
 // Load Component Functions
 //==============================================================================
 void ComponentFunctionsModel::loadComponentFunctions()
@@ -56,14 +71,18 @@ void ComponentFunctionsModel::loadComponentFunctions()
 
     // Check Component
     if (mComponent) {
+        qDebug() << "ComponentFunctionsModel::loadComponentFunctions";
         // Get Functions Count
         int fCount = mComponent->mFunctions.count();
         // Iterate Through Component Function
         for (int i=0; i<fCount; i++) {
             // Append Function
-            appendFunction(ComponentFunction::fromJSONObject(mComponent->mFunctions[i].toObject()));
+            appendFunction(ComponentFunction::fromJSONObject(this, mComponent->mFunctions[i].toObject()));
         }
     }
+
+    // Set Dirty
+    setDirty(false);
 }
 
 //==============================================================================
@@ -72,9 +91,14 @@ void ComponentFunctionsModel::loadComponentFunctions()
 void ComponentFunctionsModel::saveComponentFunctions()
 {
     // Check Compoennt
-    if (mComponent) {
+    if (mComponent && mDirty) {
+        qDebug() << "ComponentFunctionsModel::saveComponentFunctions";
         // Set Functions
         mComponent->mFunctions = toJSONArray();
+        // Set Component Dirty
+        mComponent->setDirty(true);
+        // Set Dirty
+        setDirty(false);
     }
 }
 
@@ -83,10 +107,17 @@ void ComponentFunctionsModel::saveComponentFunctions()
 //==============================================================================
 void ComponentFunctionsModel::clearComponentFunctions()
 {
-    // Iterate Through Functions
-    while (mComponent && mComponent->mFunctions.count() > 0) {
-        // Remove Last
-        mComponent->mFunctions.removeLast();
+    // Check Component
+    if (mComponent) {
+        qDebug() << "ComponentFunctionsModel::clearComponentFunctions";
+        // Iterate Through Functions
+        while (mComponent->mFunctions.count() > 0) {
+            // Remove Last
+            mComponent->mFunctions.removeLast();
+        }
+
+        // Set Component Dirty
+        mComponent->setDirty(true);
     }
 }
 
@@ -117,56 +148,15 @@ void ComponentFunctionsModel::setCurrentComponent(ComponentInfo* aComponent)
 }
 
 //==============================================================================
-// Append Function
-//==============================================================================
-void ComponentFunctionsModel::appendFunction(ComponentFunction* aFunction)
-{
-    // Check Function
-    if (aFunction) {
-        // Begin Insert Rows
-        beginInsertRows(QModelIndex(), rowCount(), rowCount());
-        // Append Function
-        mFunctions << aFunction;
-        // End Insert Rows
-        endInsertRows();
-    }
-}
-
-//==============================================================================
 // Add Function
 //==============================================================================
 void ComponentFunctionsModel::addFunction(const QString& aName, const QStringList& aParameters, const QString& aSource)
 {
     // Check Function
     if (functionValid(aName)) {
+        qDebug() << "ComponentFunctionsModel::addFunction - aName: " << aName;
         // Append Function
-        appendFunction(new ComponentFunction(aName, aSource, aParameters));
-    }
-}
-
-//==============================================================================
-// Remove Function
-//==============================================================================
-void ComponentFunctionsModel::removeFunction(const QString& aName)
-{
-    // Get Functions Count
-    int fCount = mFunctions.count();
-
-    // Iterate Through Functions
-    for (int i=0; i<fCount; i++) {
-        // Get Function
-        ComponentFunction* cFunction = mFunctions[i];
-        // Check Function Name
-        if (cFunction->mName == aName) {
-            // Begin Remove Rows
-            beginRemoveRows(QModelIndex(), i, i);
-            // Delete Function
-            delete mFunctions.takeAt(i);
-            // End Remove Rows
-            endRemoveRows();
-
-            return;
-        }
+        appendFunction(new ComponentFunction(this, aName, aSource, aParameters));
     }
 }
 
@@ -176,13 +166,16 @@ void ComponentFunctionsModel::removeFunction(const QString& aName)
 void ComponentFunctionsModel::removeFunction(const int& aIndex)
 {
     // Check Index
-    if (aIndex >= 0 && aIndex < mFunctions.count()) {
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        qDebug() << "ComponentFunctionsModel::removeFunction - aIndex: " << aIndex;
         // Begin Remove Rows
         beginRemoveRows(QModelIndex(), aIndex, aIndex);
         // Delete Function
         delete mFunctions.takeAt(aIndex);
         // End Remove Rows
         endRemoveRows();
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -193,10 +186,13 @@ void ComponentFunctionsModel::renameFunction(const int& aIndex, const QString& a
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount() && functionValid(aName)) {
+        qDebug() << "ComponentFunctionsModel::renameFunction - aIndex: " << aIndex;
         // Set Function Name
         mFunctions[aIndex]->mName = aName;
         // Emit Data Changed Signal
         emit dataChanged(index(aIndex), index(aIndex));
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -207,20 +203,114 @@ bool ComponentFunctionsModel::functionValid(const QString& aName)
 {
     // Check Function Name
     if (!aName.isEmpty()) {
-        // Get Functions Count
-        int fCount = mFunctions.count();
-        // Iterate Through Functions
-        for (int i=0; i<fCount; i++) {
-            // Check Function Name
-            if (mFunctions[i]->mName == aName) {
-                return false;
+        // Check If New Funtion
+        if (mNewFunction) {
+            // Get Functions Count
+            int fCount = mFunctions.count();
+            // Iterate Through Functions
+            for (int i=0; i<fCount; i++) {
+                // Check Function Name
+                if (mFunctions[i]->mName == aName) {
+                    return false;
+                }
             }
+        } else {
+            // ...
         }
 
         return true;
     }
 
     return false;
+}
+
+//==============================================================================
+// Create New Function
+//==============================================================================
+ComponentFunction* ComponentFunctionsModel::createNewFunction()
+{
+    qDebug() << "ComponentFunctionsModel::createNewFunction";
+
+    // Set New Function
+    mNewFunction = true;
+
+    // Create New Empty Function
+    return new ComponentFunction(this, "", "");
+}
+
+//==============================================================================
+// Select Function
+//==============================================================================
+ComponentFunction* ComponentFunctionsModel::selectFunction(const int& aIndex)
+{
+    // Check index
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        qDebug() << "ComponentFunctionsModel::selectFunction - aIndex: " << aIndex;
+        // Set New Function
+        mNewFunction = false;
+        // Set Selected Function Index
+        mSelectedIndex = aIndex;
+
+        return mFunctions[aIndex];
+    }
+
+    return NULL;
+}
+
+//==============================================================================
+// Append Function
+//==============================================================================
+void ComponentFunctionsModel::appendFunction(ComponentFunction* aFunction)
+{
+    // Check Function
+    if (aFunction) {
+        qDebug() << "ComponentFunctionsModel::appendFunction - mName: " << aFunction->mName;
+        // Begin Insert Rows
+        beginInsertRows(QModelIndex(), rowCount(), rowCount());
+        // Append Function
+        mFunctions << aFunction;
+        // End Insert Rows
+        endInsertRows();
+        // Set Dirty
+        setDirty(true);
+    }
+}
+
+//==============================================================================
+// Discard New Function
+//==============================================================================
+void ComponentFunctionsModel::discardNewFunction(ComponentFunction* aFunction)
+{
+    // Check Signal
+    if (aFunction) {
+        qDebug() << "ComponentFunctionsModel::discardNewFunction";
+        // Reset New Function
+        mNewFunction = false;
+        // Delete New Function
+        delete aFunction;
+    }
+}
+
+//==============================================================================
+// Update Selected Function
+//==============================================================================
+void ComponentFunctionsModel::updateSelectedFunction(const bool& aDoneEdit)
+{
+    // Check Selected Index
+    if (mSelectedIndex != -1) {
+        qDebug() << "ComponentFunctionsModel::updateSelectedSignal - mSelectedIndex: " << mSelectedIndex;
+
+        // ...
+
+        // Emit Data Changed Signal
+        emit dataChanged(index(mSelectedIndex), index(mSelectedIndex));
+
+        // Check If Done Editing
+        if (aDoneEdit) {
+            // Reset Selected index
+            mSelectedIndex = -1;
+        }
+    }
 }
 
 //==============================================================================
@@ -319,11 +409,12 @@ ComponentFunctionsModel::~ComponentFunctionsModel()
 //==============================================================================
 // From JSON Object
 //==============================================================================
-ComponentFunction* ComponentFunction::fromJSONObject(const QJsonObject& aObject)
+ComponentFunction* ComponentFunction::fromJSONObject(ComponentFunctionsModel* aModel, const QJsonObject& aObject)
 {
-    ComponentFunction* newFunction = new ComponentFunction(aObject[JSON_KEY_COMPONENT_FUNCTION_NAME].toString(),
+    ComponentFunction* newFunction = new ComponentFunction(aModel,
+                                                           aObject[JSON_KEY_COMPONENT_FUNCTION_NAME].toString(),
                                                            aObject[JSON_KEY_COMPONENT_FUNCTION_SOURCE].toString(),
-                                                           aObject[JSON_KEY_COMPONENT_FUNCTION_PARAMETERS].toString().split(","));
+                                                           aObject[JSON_KEY_COMPONENT_FUNCTION_PARAMETERS].toString().split(",", QString::SkipEmptyParts));
 
     return newFunction;
 }
@@ -331,8 +422,13 @@ ComponentFunction* ComponentFunction::fromJSONObject(const QJsonObject& aObject)
 //==============================================================================
 // Constructor
 //==============================================================================
-ComponentFunction::ComponentFunction(const QString& aName, const QString& aSource, const QStringList& aParameters, QObject* aParent)
+ComponentFunction::ComponentFunction(ComponentFunctionsModel* aModel,
+                                     const QString& aName,
+                                     const QString& aSource,
+                                     const QStringList& aParameters,
+                                     QObject* aParent)
     : QObject(aParent)
+    , mModel(aModel)
     , mName(aName)
     , mParameters(aParameters)
     , mSource(aSource)
@@ -355,10 +451,15 @@ void ComponentFunction::setFunctionName(const QString& aFunctionName)
 {
     // Check Function Name
     if (mName != aFunctionName) {
+        qDebug() << "ComponentFunction::setFunctionName - aFunctionName: " << aFunctionName;
         // Set Name
         mName = aFunctionName;
         // Emit Function Name Changed Signal
         emit functionNameChanged(mName);
+        // Set Model Dirty
+        mModel->setDirty(true);
+        // Update Selected Function
+        mModel->updateSelectedFunction(false);
     }
 }
 
@@ -377,10 +478,15 @@ void ComponentFunction::setFunctionParameters(const QStringList& aParameters)
 {
     // Check Parameters
     if (mParameters != aParameters) {
+        qDebug() << "ComponentFunction::setFunctionParameters - aParameters: " << aParameters;
         // Set Parameters
         mParameters = aParameters;
         // Emit Parameters Changed Signal
         emit functionParametersChanged(mParameters);
+        // Set Model Dirty
+        mModel->setDirty(true);
+        // Update Selected Function
+        mModel->updateSelectedFunction(false);
     }
 }
 
@@ -399,53 +505,94 @@ void ComponentFunction::setFunctionSource(const QString& aSource)
 {
     // Check Source
     if (mSource != aSource) {
+        qDebug() << "ComponentFunction::setFunctionSource - aSource: " << aSource;
         // Set Source
         mSource = aSource;
         // Emit Source Changed Signal
         emit functionSourceChanged(mSource);
+        // Set Model Dirty
+        mModel->setDirty(true);
+        // Update Selected Function
+        mModel->updateSelectedFunction(false);
     }
 }
 
 //==============================================================================
 // Insert Parameter
 //==============================================================================
-void ComponentFunction::insertParameter(const int& aIndex, const QString& aParameter)
+void ComponentFunction::insertFunctionParameter(const int& aIndex, const QString& aParameter)
 {
     // Check Index
-    if (aIndex >= 0 && aIndex < mParameters.count()) {
+    if (aIndex >= 0 && aIndex < mParameters.count() && mParameters.indexOf(aParameter) < 0) {
+        qDebug() << "ComponentFunction::insertFunctionParameter - aParameter: " << aParameter << " - aIndex: " << aIndex;
         // Insert
         mParameters.insert(aIndex, aParameter);
         // Emit Parameters Changed
         emit functionParametersChanged(mParameters);
+        // Set Model Dirty
+        mModel->setDirty(true);
+        // Update Selected Function
+        mModel->updateSelectedFunction(false);
     } else {
         // Append
-        appendParameter(aParameter);
+        appendFunctionParameter(aParameter);
     }
 }
 
 //==============================================================================
 // Append Parameter
 //==============================================================================
-void ComponentFunction::appendParameter(const QString& aParameter)
+void ComponentFunction::appendFunctionParameter(const QString& aParameter)
 {
-    // Append Parameter
-    mParameters << aParameter;
-    // Emit Parameters Changed
-    emit functionParametersChanged(mParameters);
+    // Check Parameter
+    if (mParameters.indexOf(aParameter) < 0) {
+        qDebug() << "ComponentFunction::appendFunctionParameter - aParameter: " << aParameter;
+        // Append Parameter
+        mParameters << aParameter;
+        // Emit Parameters Changed
+        emit functionParametersChanged(mParameters);
+        // Set Model Dirty
+        mModel->setDirty(true);
+        // Update Selected Function
+        mModel->updateSelectedFunction(false);
+    }
 }
 
 //==============================================================================
 // Remove Parameter
 //==============================================================================
-void ComponentFunction::removeParameter(const int& aIndex)
+void ComponentFunction::removeFunctionParameter(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < mParameters.count()) {
+        qDebug() << "ComponentFunction::removeFunctionParameter - aIndex: " << aIndex;
         // Remove Parameter
         mParameters.removeAt(aIndex);
         // Emit Parameters Changed
         emit functionParametersChanged(mParameters);
+        // Set Model Dirty
+        mModel->setDirty(true);
+        // Update Selected Function
+        mModel->updateSelectedFunction(false);
     }
+}
+
+//==============================================================================
+// Check If Parameter Valid
+//==============================================================================
+bool ComponentFunction::parameterValid(const QString& aParameter, const bool& aNewParameter)
+{
+    // Check Parameter
+    if (!aParameter.isEmpty()) {
+        // Check New Parameter
+        if (aNewParameter) {
+            return (mParameters.indexOf(aParameter) < 0);
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 //==============================================================================
@@ -458,7 +605,10 @@ QJsonObject ComponentFunction::toJSONObject()
 
     // Set UP JSON Object
     newJSONObject[JSON_KEY_COMPONENT_FUNCTION_NAME] = mName;
-    newJSONObject[JSON_KEY_COMPONENT_FUNCTION_PARAMETERS] = mParameters.join(',');
+    // Check Parameters
+    if (mParameters.count() > 0) {
+        newJSONObject[JSON_KEY_COMPONENT_FUNCTION_PARAMETERS] = mParameters.join(',');
+    }
     newJSONObject[JSON_KEY_COMPONENT_FUNCTION_SOURCE] = mSource;
 
     return newJSONObject;

@@ -7,32 +7,46 @@ import "style"
 DPaneBase {
     id: signalEditorRoot
 
-    title: "Signal"
+    title: "Signal" + (componentSignal ? " - " + componentSignal.signalName : "")
 
     hideToSide: hideToRight
 
     creationWidth: 332
-    creationHeight: 118 + parameterFLow.height
+    creationHeight: 118 + parameterFLow.height + DStyle.defaultMargin
 
     minWidth: 332
-    minHeight: 118 + parameterFLow.height
+    minHeight: 118 + parameterFLow.height + DStyle.defaultMargin
 
     enableResize: false
+
+    property bool newSignal: false
 
     property ComponentSignal componentSignal: null
     property ComponentSignalsModel signalsModel: propertiesController.signalsModel
 
-    property bool newSignal: true
-
     property Connections parameterEditorConnections: Connections {
         target: childPane
 
-        onAccepted: {
-            // Append Parameter
+        onRejected: {
+            // Reset Edit Parameter Index
+            editParameterIndex = -1;
+        }
 
-            // ...
+        onAccepted: {
+            // Check Edit Parameter Index
+            if (editParameterIndex !== -1) {
+                // Update Parameter
+                signalEditorRoot.componentSignal.updateSignalParameter(editParameterIndex, childPane.signalParameter);
+                // Reset Edit Parameter Index
+                editParameterIndex = -1;
+            } else {
+                // Append Parameter
+                signalEditorRoot.componentSignal.addSignalParameter(childPane.signalParameter);
+            }
         }
     }
+
+    property int editParameterIndex: -1
 
     state: stateCreate
 
@@ -47,14 +61,21 @@ DPaneBase {
     }
 
     onTransitionFinished: {
-        if (newState === stateShown) {
-            // Set Editor Focus
-            nameEditor.setEditorFocus(true, true);
-        }
+        switch (newState) {
+            case stateShown:
+                // Set Name Editor Focus
+                nameEditor.setEditorFocus(true, true);
+            break;
 
-        if (newState === stateHidden) {
-            // Reset Focus
-            nameEditor.setEditorFocus(false);
+            case stateHidden:
+                // Reset Name Editor Focus
+                nameEditor.setEditorFocus(false);
+            break;
+
+            case stateCreate:
+                // Reset Component Signal
+                signalEditorRoot.componentSignal = null;
+            break;
         }
     }
 
@@ -86,7 +107,7 @@ DPaneBase {
     // Reset Signal Editor
     function resetSignalEditor() {
         // Reset Name Text
-        nameEditor.text = "";
+        nameEditor.text = signalEditorRoot.componentSignal !== null ? signalEditorRoot.componentSignal.signalName : "";
         // Reset Invalid Value
         nameEditor.invalidValue = false;
     }
@@ -100,7 +121,8 @@ DPaneBase {
         onClicked: {
             // Check If Signal Valid
             if (signalEditorRoot.signalValid()) {
-                // ...
+                // Set Signal Name
+                signalEditorRoot.componentSignal.signalName = nameEditor.text;
                 // Emit Accepted Signal
                 signalEditorRoot.accepted();
             } else {
@@ -145,7 +167,10 @@ DPaneBase {
             onAccepted: {
                 // Check If Signal Name Valid
                 if (signalEditorRoot.signalValid()) {
-                    // ...
+                    // Set Signal Name
+                    signalEditorRoot.componentSignal.signalName = nameEditor.text;
+                    // Emit Accepted Signal
+                    signalEditorRoot.accepted();
                 } else {
                     // Set Invalid Value
                     nameEditor.invalidValue = true;
@@ -161,7 +186,7 @@ DPaneBase {
 
     DFlow {
         id: parameterFLow
-
+        width: nameRow.width
         anchors.left: parent.left
         anchors.leftMargin: DStyle.defaultMargin
         anchors.top: nameRow.bottom
@@ -174,12 +199,18 @@ DPaneBase {
 
             delegate: DTag {
                 tagTitle: signalEditorRoot.componentSignal.signalParameters[index]
+
                 onRemoveClicked: {
                     // Remove Signal Parameter
                     signalEditorRoot.componentSignal.removeSignalParameter(index);
                 }
 
                 onDoubleClicked: {
+                    // Set Edit Parameter Index
+                    signalEditorRoot.editParameterIndex = index;
+                    // Set Child Pane Signal Parameter
+                    signalEditorRoot.childPane.signalParameter = signalEditorRoot.componentSignal.signalParameters[index];
+                    // Emit Edit Parameter Signal
                     signalEditorRoot.editParameter();
                 }
             }
@@ -195,6 +226,9 @@ DPaneBase {
         text: "Add Parameter"
 
         onClicked: {
+            // Set Child Pane Signal Parameter
+            signalEditorRoot.childPane.signalParameter = "";
+            // Emit New Signal Parameter Signal
             signalEditorRoot.newParameter();
         }
     }

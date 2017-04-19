@@ -24,24 +24,32 @@ public:
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
 
-    // Append Slot
-    void appendSlot(ComponentSlot* aSlot);
-
     // Add Slot
     Q_INVOKABLE void addSlot(const QString& aName, const QString& aSource = "");
-    // Remove Slot
-    Q_INVOKABLE void removeSlot(const QString& aName);
     // Remove Slot
     Q_INVOKABLE void removeSlot(const int& aIndex);
     // Rename Slot
     Q_INVOKABLE void renameSlot(const int& aIndex, const QString& aName);
+
     // Is Slot Valie
     Q_INVOKABLE bool slotValid(const QString& aName);
 
-    // Update Source
-    void updateSlotSource(const QString& aName, const QString& aSource);
-    // Update Source
-    void updateSlotSource(const int& aIndex, const QString& aSource);
+    // Create New Slot To Add
+    Q_INVOKABLE ComponentSlot* createNewSlot();
+    // Get/Select Slot For Editing
+    Q_INVOKABLE ComponentSlot* selectSlot(const int& aIndex);
+
+    // Append Slot
+    Q_INVOKABLE void appendSlot(ComponentSlot* aSlot);
+    // Discard New Slot
+    Q_INVOKABLE void discardNewSlot(ComponentSlot* aSlot);
+    // Update Selected Slot
+    Q_INVOKABLE void updateSelectedSlot(const bool& aDoneEdit = true);
+
+//    // Update Source
+//    void updateSlotSource(const QString& aName, const QString& aSource);
+//    // Update Source
+//    void updateSlotSource(const int& aIndex, const QString& aSource);
 
     // To JSON Array
     QJsonArray toJSONArray();
@@ -63,13 +71,18 @@ public: // from QAbstractListModel
 
 protected:
     friend class PropertiesController;
+    friend class ComponentSlot;
+
     // Constructor
     explicit ComponentSlotsModel(ComponentInfo* aComponent, QObject* aParent = NULL);
 
     // Init
     void init();
     // Clear
-    void clear(const bool& aEndReset = true);
+    void clear();
+
+    // Set Dirty
+    void setDirty(const bool& aDirty);
 
     // Load Component Slots
     void loadComponentSlots();
@@ -87,9 +100,15 @@ public:
 
 protected: // Data
     // Current Component
-    ComponentInfo*              mComponent;
+    ComponentInfo*          mComponent;
     // Slots
-    QList<ComponentSlot*>       mSlots;
+    QList<ComponentSlot*>   mSlots;
+    // New Slot
+    bool                    mNewSlot;
+    // Dirty
+    bool                    mDirty;
+    // Selected Index
+    int                     mSelectedIndex;
 };
 
 
@@ -112,10 +131,7 @@ class ComponentSlot : public QObject
 
 public:
     // From JSON Object
-    static ComponentSlot* fromJSONObject(const QJsonObject& aObject);
-
-    // Constructor
-    explicit ComponentSlot(const QString& aName, const QString& aSource, QObject* aParent = NULL);
+    static ComponentSlot* fromJSONObject(ComponentSlotsModel* aModel, const QJsonObject& aObject);
 
     // Get Slot Name
     QString slotName();
@@ -141,17 +157,17 @@ signals:
 
 protected:
     friend class ComponentSlotsModel;
+    // Constructor
+    explicit ComponentSlot(ComponentSlotsModel* aModel, const QString& aName, const QString& aSource, QObject* aParent = NULL);
 
+protected:
+    // Slots Model
+    ComponentSlotsModel*    mModel;
     // Name
-    QString     mName;
+    QString                 mName;
     // Source
-    QString     mSource;
+    QString                 mSource;
 };
-
-
-
-
-
 
 
 #endif // COMPONENTSLOTSMODEL_H
