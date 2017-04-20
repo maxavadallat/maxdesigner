@@ -42,7 +42,7 @@ DPaneBase {
         anchors {
             leftMargin: DStyle.defaultMargin
             topMargin: formulaEditorRoot.titleHeight + DStyle.defaultMargin * 2
-            rightMargin: diskButton.width + DStyle.defaultMargin * 4
+            rightMargin: discButton.width + DStyle.defaultMargin * 4
             bottomMargin: DStyle.defaultMargin
         }
 
@@ -58,7 +58,7 @@ DPaneBase {
     }
 
     DDisc {
-        id: diskButton
+        id: discButton
         anchors.right: parent.right
         anchors.rightMargin: DStyle.defaultMargin * 2
         anchors.verticalCenter: parent.verticalCenter

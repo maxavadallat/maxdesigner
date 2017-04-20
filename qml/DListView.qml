@@ -10,7 +10,6 @@ DControl {
     property alias delegate: listView.delegate
     property alias count: listView.count
     property alias currentIndex: listView.currentIndex
-
     property int itemHeight: CONSTS.defaultPaneItemHeight
 
     clip: true
@@ -18,7 +17,7 @@ DControl {
     ListView {
         id: listView
         anchors.fill: parent
-        highlightFollowsCurrentItem: true
+        //highlightFollowsCurrentItem: true
 
         add: Transition {
             ParallelAnimation {

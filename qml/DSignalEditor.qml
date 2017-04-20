@@ -7,22 +7,10 @@ import "style"
 DPaneBase {
     id: signalEditorRoot
 
-    title: "Signal" + (componentSignal ? " - " + componentSignal.signalName : "")
-
-    hideToSide: hideToRight
-
-    creationWidth: 332
-    creationHeight: 118 + parameterFLow.height + DStyle.defaultMargin
-
-    minWidth: 332
-    minHeight: 118 + parameterFLow.height + DStyle.defaultMargin
-
-    enableResize: false
-
-    property bool newSignal: false
-
     property ComponentSignal componentSignal: null
     property ComponentSignalsModel signalsModel: propertiesController.signalsModel
+
+    property bool newSignal: false
 
     property Connections parameterEditorConnections: Connections {
         target: childPane
@@ -47,6 +35,19 @@ DPaneBase {
     }
 
     property int editParameterIndex: -1
+
+
+    title: "Signal" + (componentSignal ? " - " + componentSignal.signalName : "")
+
+    hideToSide: hideToRight
+
+    creationWidth: 332
+    creationHeight: 118 + parameterFLow.height + DStyle.defaultMargin
+
+    minWidth: 332
+    minHeight: 118 + parameterFLow.height + DStyle.defaultMargin
+
+    enableResize: false
 
     state: stateCreate
 

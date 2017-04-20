@@ -303,7 +303,8 @@ void ComponentSignalsModel::updateSelectedSignal(const bool& aDoneEdit)
     if (mSelectedIndex != -1) {
         qDebug() << "ComponentSignalsModel::updateSelectedSignal - mSelectedIndex: " << mSelectedIndex;
 
-        // ...
+//        // Set Dirty
+//        setDirty(true);
 
         // Emit Data Changed Signal
         emit dataChanged(index(mSelectedIndex), index(mSelectedIndex));
@@ -372,8 +373,10 @@ QVariant ComponentSignalsModel::data(const QModelIndex& index, int role) const
 //==============================================================================
 QHash<int, QByteArray> ComponentSignalsModel::roleNames() const
 {
+    // Init Role Names
     QHash<int, QByteArray> rNames;
 
+    // Set Up Role Names
     rNames[ESMRName]        = "signalName";
     rNames[ESMRParameters]  = "signalParameters";
 

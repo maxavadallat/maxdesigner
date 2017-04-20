@@ -1066,11 +1066,11 @@ void MainWindow::saveProject(const QString& aFilePath)
         mRecentProjects->storeRecentProject(mProjectModel->absoluteProjectFilePath());
     }
 
-    // Check Open Fies Model
-    if (mOpenFiles) {
-        // Close Current Project
-        mOpenFiles->closeProject();
-    }
+//    // Check Open Fies Model
+//    if (mOpenFiles) {
+//        // Close Current Project
+//        mOpenFiles->closeProject();
+//    }
 }
 
 //==============================================================================

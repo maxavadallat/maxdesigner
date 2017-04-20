@@ -57,6 +57,7 @@ DPane {
                 ownPropertiesSection.close();
                 signalsSection.close();
                 slotsSection.close();
+                functionsSection.close();
                 statesSection.close();
                 transitionsSection.close();
             }
@@ -149,6 +150,7 @@ DPane {
             }
         }
     }
+
     // Object Name Row
     Row {
         id: objectNameRow
@@ -175,11 +177,13 @@ DPane {
             }
         }
     }
+
     // Spacer
     Item {
         width: propertiesPaneRoot.contentWidth
         height: DStyle.defaultSpacing
     }
+
     // Imports Section
     DSection {
         id: importsSection
@@ -217,12 +221,15 @@ DPane {
             id: addImportButton
             width: propertiesPaneRoot.contentWidth
             text: "Add Import"
+            enabled: importEditor.state === importEditor.stateCreate
+
             onClicked: {
                 // Emit New Import Launch
                 propertiesPaneRoot.newImportLaunch();
             }
         }
     }
+
     // Size & Pos Section
     DSection {
         id: sizeAndPosSection
@@ -341,6 +348,7 @@ DPane {
             }
         }
     }
+
     // Anchors Section
     DSection {
         id: anchorsSection
@@ -348,7 +356,6 @@ DPane {
         title: "Anchors & Margins"
 
         state: stateClosed
-        //state: stateOpen
 
         Row {
             //height: anchorTargetEditor.height
@@ -522,6 +529,7 @@ DPane {
         }
 
     }
+
     // Own Properties Section
     DSection {
         id: ownPropertiesSection
@@ -530,20 +538,20 @@ DPane {
         minHeight: ownPropertiesContainer.height + addOwnPropertyButton.height
         state: stateHidden
 
-        property Connections proppertiesControllerConnection: Connections {
-            target: propertiesController
+//        property Connections proppertiesControllerConnection: Connections {
+//            target: propertiesController
 
-            onFocusedComponentChanged: {
-                // Check Focused Component
-                if (propertiesController.focusedComponent) {
-                    // Open
-                    ownPropertiesSection.open();
-                } else {
-                    // Hide Section
-                    ownPropertiesSection.hide();
-                }
-            }
-        }
+//            onFocusedComponentChanged: {
+//                // Check Focused Component
+//                if (propertiesController.focusedComponent !== null) {
+//                    // Open
+//                    ownPropertiesSection.open();
+//                } else {
+//                    // Hide Section
+//                    ownPropertiesSection.hide();
+//                }
+//            }
+//        }
 
         // Own Properties
         Item {
@@ -608,6 +616,7 @@ DPane {
             }
         }
     }
+
     // Signals Section
     DSection {
         id: signalsSection
@@ -660,6 +669,7 @@ DPane {
             id: addSignalButton
             width: propertiesPaneRoot.contentWidth
             text: "Add Signal"
+            enabled: signalEditor.state === signalEditor.stateCreate
 
             onClicked: {
                 // Emit New Signal Launch Signal
@@ -667,6 +677,7 @@ DPane {
             }
         }
     }
+
     // Slots Section
     DSection {
         id: slotsSection
@@ -679,9 +690,36 @@ DPane {
         Item {
             id: slotsContainer
             width: propertiesPaneRoot.contentWidth
-            height: 0
+            height: CONSTS.defaultPaneItemHeight * Math.min(CONSTS.defaultSlotsMax, slotsListView.count)
+            Behavior on height { DAnimation { } }
 
-            // ...
+            DListView {
+                id: slotsListView
+                anchors.fill: parent
+                currentIndex: -1
+
+                model: propertiesController.slotsModel
+
+                delegate: DSlotItemDelegate {
+                    width: slotsListView.width
+                    itemIndex: index
+                    slotName: model.slName + ": {...}"
+                    itemCurrent: index === slotsListView.currentIndex
+
+                    onItemClicked: {
+                        slotsListView.currentIndex = itemIndex;
+                    }
+
+                    onItemDoubleClicked: {
+                        // Emit Edit Slot Launch Signal
+                        propertiesPaneRoot.editSlotLaunch(itemIndex);
+                    }
+
+                    onItemActionClicked: {
+                        propertiesController.slotsModel.removeSlot(itemIndex);
+                    }
+                }
+            }
         }
 
         Item {
@@ -693,6 +731,7 @@ DPane {
             id: addSlotButton
             width: propertiesPaneRoot.contentWidth
             text: "Add Slot"
+            enabled: slotEditor.state === slotEditor.stateCreate
 
             onClicked: {
                 // Emit New Slot Launch
@@ -700,6 +739,7 @@ DPane {
             }
         }
     }
+
     // Functions Section
     DSection {
         id: functionsSection
@@ -707,13 +747,40 @@ DPane {
         title: "Functions"
         minHeight: functionsContainer.height + addSignalButton.height
 
-        // Signals
+        // Functions Container
         Item {
             id: functionsContainer
             width: propertiesPaneRoot.contentWidth
-            height: 0
+            height: CONSTS.defaultPaneItemHeight * Math.min(CONSTS.defaultFunctionsMax, functionsListView.count)
+            Behavior on height { DAnimation { } }
 
-            // ...
+            DListView {
+                id: functionsListView
+                anchors.fill: parent
+                currentIndex: -1
+
+                model: propertiesController.functionsModel
+
+                delegate: DFunctionItemDelegate {
+                    width: functionsListView.width
+                    itemIndex: index
+                    functionName: model.fName + "(" + model.fParams + ") {...}"
+                    itemCurrent: index === functionsListView.currentIndex
+
+                    onItemClicked: {
+                        functionsListView.currentIndex = itemIndex;
+                    }
+
+                    onItemDoubleClicked: {
+                        // Emit Edit Function Launch Signal
+                        propertiesPaneRoot.editFunctionLaunch(itemIndex);
+                    }
+
+                    onItemActionClicked: {
+                        propertiesController.functionsModel.removeFunction(itemIndex);
+                    }
+                }
+            }
         }
 
         Item {
@@ -725,6 +792,7 @@ DPane {
             id: addFunctionButton
             width: propertiesPaneRoot.contentWidth
             text: "Add Function"
+            enabled: functionEditor.state === functionEditor.stateCreate
 
             onClicked: {
                 // Emit New Function Launch
@@ -732,6 +800,7 @@ DPane {
             }
         }
     }
+
     // States Section
     DSection {
         id: statesSection
@@ -759,6 +828,7 @@ DPane {
             id: addStateButton
             width: propertiesPaneRoot.contentWidth
             text: "Add State"
+            enabled: stateEditor.state === stateEditor.stateCreate
 
             onClicked: {
                 // Emit New State Launch
@@ -766,6 +836,7 @@ DPane {
             }
         }
     }
+
     // Transitions Section
     DSection {
         id: transitionsSection
@@ -793,6 +864,7 @@ DPane {
             id: addTransitionButton
             width: propertiesPaneRoot.contentWidth
             text: "Add Transition"
+            enabled: transitionEditor.state === transitionEditor.stateCreate
 
             onClicked: {
                 // Emit New Transition Launch
@@ -800,6 +872,7 @@ DPane {
             }
         }
     }
+
     // Base Properties Repeater
     Repeater {
         id: basePropertiesRepeater

@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.7
 import QtGraphicalEffects 1.0
 
 import enginecomponents 0.1
@@ -37,8 +37,29 @@ DRectangle {
         item.x = posX;
         item.y = posY;
     }
+/*
+    Rectangle {
+        anchors.fill: demoTextEdit
+        color: "transparent"
+        border.color: "orange"
+    }
 
-
+    TextEdit {
+        id: demoTextEdit
+        width: 300
+        height: 400
+        anchors.centerIn: parent
+        wrapMode: TextEdit.NoWrap
+        horizontalAlignment: TextEdit.AlignLeft
+        verticalAlignment: TextEdit.AlignTop
+        textFormat: TextEdit.RichText
+        color: DStyle.colorFontDark
+        activeFocusOnPress: true
+        font.pixelSize: DStyle.fontSizeL
+        focus: false
+    }
+*/
+/*
     Flow {
         anchors.centerIn: parent
         spacing: DStyle.defaultSpacing
@@ -57,9 +78,8 @@ DRectangle {
             }
         }
     }
-
-
-
+*/
+/*
     Flow {
         anchors.left: parent.left
         anchors.leftMargin: 32
@@ -349,7 +369,7 @@ DRectangle {
         creationX: initialX - transitionNodeEditor.width * 0.5
         creationY: initialY + 32
     }
-
+*/
 /*
 //    MouseArea {
 //        id: demoArea1

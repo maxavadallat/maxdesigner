@@ -160,6 +160,14 @@ Item {
             anchors.fill: parent
         }
 
+        DText {
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            text: "---"
+            opacity: 0.5
+            rotation: 90
+        }
+
         DButton {
             id: actionButton
             anchors.right: parent.right

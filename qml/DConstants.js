@@ -54,6 +54,8 @@ var defaultOwnPropertiesMax                     = 7;
 var defaultSignalsMax                           = 7;
 // Default Slots Max
 var defaultSlotsMax                             = 7;
+// Default Functions Max
+var defaultFunctionsMax                         = 7;
 
 // Default Swipe Area Width
 var defaultSwipeAreaWidth                       = 16;

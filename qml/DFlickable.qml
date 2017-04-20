@@ -14,6 +14,19 @@ Item {
 
     clip: true
 
+    // Flick To Ensure Rectangle Visibility
+    function flick(rectangle) {
+        // Check Content Position
+        if (contentContainerFlickable.contentY >= rectangle.y) {
+            // Set Content Position
+            contentContainerFlickable.contentY = rectangle.y;
+        // Check Content Position
+        } else if (contentContainerFlickable.contentY + contentContainerFlickable.height <= rectangle.y + rectangle.height) {
+            // Set Content Position
+            contentContainerFlickable.contentY = rectangle.y + rectangle.height - contentContainerFlickable.height;
+        }
+    }
+
     Flickable {
         id: contentContainerFlickable
         anchors.fill: parent

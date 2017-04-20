@@ -298,9 +298,10 @@ void ComponentFunctionsModel::updateSelectedFunction(const bool& aDoneEdit)
 {
     // Check Selected Index
     if (mSelectedIndex != -1) {
-        qDebug() << "ComponentFunctionsModel::updateSelectedSignal - mSelectedIndex: " << mSelectedIndex;
+        qDebug() << "ComponentFunctionsModel::updateSelectedFunction - mSelectedIndex: " << mSelectedIndex;
 
-        // ...
+//        // Set Dirty
+//        setDirty(true);
 
         // Emit Data Changed Signal
         emit dataChanged(index(mSelectedIndex), index(mSelectedIndex));
@@ -372,6 +373,7 @@ QHash<int, QByteArray> ComponentFunctionsModel::roleNames() const
     // Init Role Names
     QHash<int, QByteArray> rNames;
 
+    // Set Up Role Names
     rNames[FMRNameRole]     = "fName";
     rNames[FMRParamsRole]   = "fParams";
     rNames[FMRSoureRole]    = "fSource";

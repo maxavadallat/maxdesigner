@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.7
 
 import enginecomponents 0.1
 
@@ -11,7 +11,7 @@ DRectangle {
     width: 600
     height: 400
 
-    property alias formulaText: sourceTextInput.text
+    property string sourceText: sourceTextInput.getText(0, sourceTextInput.length)
 
     property string fontFamily: "Courier"
     property int fontSize: 16
@@ -22,10 +22,29 @@ DRectangle {
     property alias editorFocus: sourceTextInput.focus
     property bool showBorder: true
 
-    border.color: showBorder ? (sourceTextInput.focus ? DStyle.colorBorder : DStyle.colorBorderNoFocus) : "transparent"
+    border.color: {
+        if (invalidSource) {
+            return "red";
+        }
+
+        return showBorder ? (sourceTextInput.focus ? DStyle.colorBorder : DStyle.colorBorderNoFocus) : "transparent";
+    }
+
+    property bool invalidSource: false
 
     signal escapeClicked()
     signal sourceEditorActivated()
+
+    // Set Text
+    function setText(plainText) {
+        // Set Text
+        sourceTextInput.text = plainText;
+    }
+
+    // Get Text
+    function getText() {
+        return sourceTextInput.getText(0, sourceTextInput.length);
+    }
 
     // Set Editor Focus
     function setEditorFocus(aFocus, aSelect) {
@@ -106,6 +125,7 @@ DRectangle {
                 color: DStyle.colorFontDark
                 activeFocusOnPress: true
                 focus: false
+                selectByMouse: true
 
                 text: ""
 
@@ -120,6 +140,11 @@ DRectangle {
                         // Emit Escape Clicked Signal
                         sourceCodeEditorRoot.escapeClicked();
                     }
+                }
+
+                onCursorRectangleChanged: {
+                    // Flick Content To Ensure Cursor Visibility
+                    sourceCodeEditorFlickable.flick(sourceTextInput.cursorRectangle);
                 }
             }
         }

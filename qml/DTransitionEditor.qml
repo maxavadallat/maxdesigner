@@ -8,7 +8,13 @@ import "DConstants.js" as CONSTS
 DPaneBase {
     id: transitionEditorRoot
 
-    title: "Edit Transition"
+    property ComponentTransition componentTransition: null
+    property ComponentTransitionsModel transitionsModel: propertiesController.transitionsModel
+    property ComponentStatesModel statesModel: propertiesController.statesModel
+
+    property bool newTransition: false
+
+    title: "Transition"
 
     hideToSide: hideToRight
 
@@ -19,10 +25,6 @@ DPaneBase {
     minHeight: 118
 
     enableResize: false
-
-    //property ComponentInfo componentInfo: null
-
-    //property var stateModel: []
 
     signal newTransitionNode(var nodeType)
     signal editTransitionNode()
@@ -80,6 +82,7 @@ DPaneBase {
             id: fromOption
             width: fromToRow.optionWidth
             anchors.verticalCenter: parent.verticalCenter
+
             model: [
                 DPopupItemObject { text: "Option 1" },
                 DPopupItemObject { text: "Option 2" },

@@ -138,6 +138,7 @@ void ComponentSlotsModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
+        qDebug() << "ComponentSlotsModel::setCurrentComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
         // Save Previous Component Slots
         saveComponentSlots();
         // Set Current Component
@@ -202,15 +203,20 @@ void ComponentSlotsModel::renameSlot(const int& aIndex, const QString& aName)
 bool ComponentSlotsModel::slotValid(const QString& aName)
 {
     if (!aName.isEmpty()) {
-        // Get Slots Count
-        int sCount = rowCount();
+        // Check IF New Slot
+        if (mNewSlot) {
+            // Get Slots Count
+            int sCount = rowCount();
 
-        // Iterate Through Slots
-        for (int i=0; i<sCount; i++) {
-            // Check Slot Name
-            if (mSlots[i]->mName == aName) {
-                return false;
+            // Iterate Through Slots
+            for (int i=0; i<sCount; i++) {
+                // Check Slot Name
+                if (mSlots[i]->mName == aName) {
+                    return false;
+                }
             }
+        } else {
+            // ...
         }
 
         return true;
@@ -292,7 +298,8 @@ void ComponentSlotsModel::updateSelectedSlot(const bool& aDoneEdit)
     if (mSelectedIndex != -1) {
         qDebug() << "ComponentSlotsModel::updateSelectedSlot - mSelectedIndex: " << mSelectedIndex;
 
-        // ...
+//        // Set Dirty
+//        setDirty(true);
 
         // Emit Data Changed Signal
         emit dataChanged(index(mSelectedIndex), index(mSelectedIndex));
@@ -310,7 +317,7 @@ void ComponentSlotsModel::updateSelectedSlot(const bool& aDoneEdit)
 //==============================================================================
 int ComponentSlotsModel::rowCount(const QModelIndex& ) const
 {
-    return mComponent ? mComponent->mSlots.count() : 0;
+    return mSlots.count();
 }
 
 //==============================================================================
@@ -319,15 +326,15 @@ int ComponentSlotsModel::rowCount(const QModelIndex& ) const
 QVariant ComponentSlotsModel::data(const QModelIndex& index, int role) const
 {
     // Get Row
-    int fmRow = index.row();
+    int smRow = index.row();
 
     // Check Row
-    if (mComponent && fmRow >= 0 && fmRow < rowCount()) {
+    if (smRow >= 0 && smRow < rowCount()) {
         // Switch Role
         switch (role) {
             default:
-            case SMRNameRole:   return mSlots[fmRow]->slotName();
-            case SMRSoureRole:  return mSlots[fmRow]->slotSource();
+            case SMRNameRole:   return mSlots[smRow]->slotName();
+            case SMRSoureRole:  return mSlots[smRow]->slotSource();
         }
     }
 
@@ -342,8 +349,9 @@ QHash<int, QByteArray> ComponentSlotsModel::roleNames() const
     // Init Role Names
     QHash<int, QByteArray> rNames;
 
-    rNames[SMRNameRole]     = "slotName";
-    rNames[SMRSoureRole]    = "slotSource";
+    // Set Up Role Names
+    rNames[SMRNameRole]     = "slName";
+    rNames[SMRSoureRole]    = "slSource";
 
     return rNames;
 }
@@ -432,6 +440,7 @@ void ComponentSlot::setSlotName(const QString& aSlotName)
 {
     // Check Slot Name
     if (mName != aSlotName) {
+        qDebug() << "ComponentSlot::setSlotName - aSlotName: " << aSlotName;
         // Set Name
         mName = aSlotName;
         // Emit Slot Name Changed Signal
@@ -458,6 +467,7 @@ void ComponentSlot::setSlotSource(const QString& aSource)
 {
     // Check Source
     if (mSource != aSource) {
+        qDebug() << "ComponentSlot::setSlotSource - aSource: " << aSource;
         // Set Source
         mSource = aSource;
         // Emit Source Changed Signal

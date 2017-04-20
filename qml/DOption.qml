@@ -138,14 +138,6 @@ DControl {
                     opacity: checked ? 1.0 : optionRoot.unCheckedOpacity
                     preventStealing: true
 
-                    onEntered: {
-
-                    }
-
-                    onExited: {
-
-                    }
-
                     onClicked: {
                         optionPopup.focus = true;
                         optionRoot.itemClicked(itemIndex);

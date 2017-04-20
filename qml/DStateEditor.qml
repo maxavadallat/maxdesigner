@@ -8,6 +8,10 @@ import "DConstants.js" as CONSTS
 DPaneBase {
     id: stateEditorRoot
 
+    property ComponentState componentState: null
+    property ComponentStatesModel statesModel: propertiesController.statesModel
+    property bool newState: false
+
     hideToSide: hideToRight
 
     title: "State Editor"
@@ -19,10 +23,6 @@ DPaneBase {
     minHeight: 118
 
     enableResize: false
-
-    property ComponentInfo componentInfo: null
-
-    property var stateModel: []
 
     signal newPropertyChange()
     signal editPropertyChange()

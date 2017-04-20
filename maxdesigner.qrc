@@ -89,5 +89,7 @@
         <file>qml/DSlotEditor.qml</file>
         <file>qml/DImportEditor.qml</file>
         <file>qml/DTag.qml</file>
+        <file>qml/DFunctionItemDelegate.qml</file>
+        <file>qml/DSlotItemDelegate.qml</file>
     </qresource>
 </RCC>

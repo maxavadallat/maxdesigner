@@ -197,6 +197,8 @@ DPaneBase {
     }
 
     onFocusChanged: {
+        //console.log("DComponentRootContainer.onFocusChanged - focus: " + focus);
+
         // Check Focus & Component Info
         if (focus && componentInfo) {
             // Reset Scale Duration
