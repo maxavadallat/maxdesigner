@@ -49,6 +49,13 @@ DPane {
                     transitionsSection.close();
                 }
 
+                // Show Own Properties Section
+                ownPropertiesSection.open();
+
+                // Show Properties Section
+
+                // ...
+
             } else {
                 // Close All Sections
                 importsSection.close();
@@ -60,6 +67,7 @@ DPane {
                 functionsSection.close();
                 statesSection.close();
                 transitionsSection.close();
+                // Properties section
             }
         }
 
@@ -78,7 +86,7 @@ DPane {
         }
     }
 
-    property int namesColumnWidth: CONSTS.defaultNamesColumnWidth
+    property int namesColumnWidth: propertiesPaneRoot.width * 0.3 //CONSTS.defaultNamesColumnWidth
 
     title: "Properties" + (propertiesController.focusedComponent ? (" - " + propertiesController.focusedComponent.componentName) : "")
 
@@ -106,6 +114,8 @@ DPane {
     signal newPropertyLaunch()
     signal editPropertyLaunch(var index)
 
+    signal editFormulaLaunch(var index, var ownProperty, var baseName)
+
     signal newSignalLaunch()
     signal editSignalLaunch(var index)
 
@@ -114,8 +124,6 @@ DPane {
 
     signal newFunctionLaunch()
     signal editFunctionLaunch(var index)
-
-    signal editFormulaLaunch()
 
     signal newStateLaunch()
     signal editStateLaunch(var index)
@@ -564,38 +572,45 @@ DPane {
                 id: ownPropertiesListView
                 anchors.fill: parent
 
-                model: ComponentOwnPropertiesFilter {
+                property ComponentOwnPropertiesFilter opFilter: ComponentOwnPropertiesFilter {
                     filteredNames: propertiesController.filteredProperties
                     sourceModel: propertiesController.ownPropertiesModel
                 }
 
+                model: opFilter
+
                 delegate: DPropertyItem {
                     id: opiDelegateRoot
                     width: ownPropertiesListView.width
+
                     namesColumnWidth: propertiesPaneRoot.namesColumnWidth
 
                     itemIndex: index
 
-                    propertyName: pName
-                    propertyType: pType
-                    propertyValue: pValue
+                    propertyName: model.pName
+                    propertyType: model.pType
+                    propertyValue: model.pValue
+                    showFormula: model.pIsFormula
+
+                    property int sourceIndex: ownPropertiesListView.opFilter.getSourceIndex(itemIndex)
 
                     onItemActionClicked: {
-                        console.log("ownPropertiesListView.delegate.onDeleteItemClicked - itemIndex: " + itemIndex);
-                        //console.log("sourceIndex: " + ownPropertiesListView.opfilter.getSourceIndex(itemIndex));
+                        // Check Own Properties Model
+                        if (propertiesController.ownPropertiesModel !== null) {
+                            //console.log("ownPropertiesListView.delegate.onDeleteItemClicked - sourceIndex: " + ownPropertiesListView.opFilter.getSourceIndex(itemIndex));
+                            // Remove Own Property
+                            propertiesController.ownPropertiesModel.removeComponentProperty(sourceIndex);
+                        }
+                    }
 
-                        // Remove Component Property
-                        propertiesController.removeComponentProperty(propertyName);
-
-                        // ...
+                    onItemEditClicked: {
+                        // Emit Edit Property Launch Signal
+                        propertiesPaneRoot.editPropertyLaunch(sourceIndex);
                     }
 
                     onFormulaEditClicked: {
-                        console.log("ownPropertiesListView.delegate.onDeleteItemClicked - itemIndex: " + itemIndex);
-
                         // Emit Edit Formula Launch Signal
-                        propertiesPaneRoot.editFormulaLaunch();
-                        // ...
+                        propertiesPaneRoot.editFormulaLaunch(sourceIndex, true, "");
                     }
                 }
             }
@@ -876,17 +891,46 @@ DPane {
     // Base Properties Repeater
     Repeater {
         id: basePropertiesRepeater
+        visible: count > 0
         model: propertiesController.propertiesModel
-        visible: false
 
         delegate: DSection {
-            id: basePropertiesSection
+            id: basePropertiesSectionDelegate
             width: propertiesPaneRoot.contentWidth
-            title: "Item"
 
-            state: stateHidden
+            title: baseName
 
-            // ...
+            state: stateClosed
+
+            // Base Properties Container
+            Item {
+                id: basePropertiesContainer
+                width: parent.width
+                height: 0
+
+                DListView {
+                    id: basePropertiesListView
+                    anchors.fill: parent
+
+                    delegate: DPropertyItem {
+                        width: basePropertiesListView.width
+                        namesColumnWidth: propertiesPaneRoot.namesColumnWidth
+
+                        itemIndex: index
+
+                        // ...
+
+                        onItemActionClicked: {
+                            // Clear Component Property
+                        }
+
+                        onFormulaEditClicked: {
+                            // Emit Edit Formula Launch Signal
+                            //propertiesPaneRoot.editFormulaLaunch(sourceIndex, false, baseName);
+                        }
+                    }
+                }
+            }
         }
     }
 }

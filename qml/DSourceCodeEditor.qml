@@ -38,12 +38,15 @@ DRectangle {
     // Set Text
     function setText(plainText) {
         // Set Text
-        sourceTextInput.text = plainText;
+        sourceTextInput.text = convertTextToRichText(plainText);
     }
 
     // Get Text
     function getText() {
-        return sourceTextInput.getText(0, sourceTextInput.length);
+        // Set Source Text
+        sourceCodeEditorRoot.sourceText = convertUnicodeToPlainText(sourceTextInput.getText(0, sourceTextInput.length));
+
+        return sourceCodeEditorRoot.sourceText;
     }
 
     // Set Editor Focus
@@ -55,6 +58,70 @@ DRectangle {
             // Select All
             sourceTextInput.selectAll();
         }
+    }
+
+    // Convert PLain Text To Rich Text
+    function convertTextToRichText(sourceText) {
+        // Get Text Length
+        var stLength = sourceText.length;
+
+        //console.log("convertTextToRichText - sourceText: " + sourceText + " - length: " + stLength);
+
+        // Init Result Text
+        var resultText = "";
+        // Iterate Thru Input Text
+        for (var i=0; i<stLength; i++) {
+            // Get Char Code
+            var charCode = sourceText.charCodeAt(i);
+
+            //console.log("convertTextToRichText - charCode: " + charCode);
+
+            // Switch Car Code
+            switch (charCode) {
+                // New Line
+                case 10: resultText += "<br>";                      break;
+                // Space Character
+                case 32: resultText += "&nbsp;";                    break;
+                // Tab Character
+                case 9:  resultText += "&nbsp;&nbsp;&nbsp;&nbsp;";  break;
+                // Default
+                default: resultText += sourceText[i];               break;
+            }
+        }
+
+        return resultText;
+    }
+
+    // Convert Unicode To Plain Text
+    function convertUnicodeToPlainText(sourceText) {
+        // Get Text Length
+        var stLength = sourceText.length;
+
+        //console.log("convertUnicodeToPlainText - sourceText: " + sourceText + " - length: " + stLength);
+
+        // Init Result Text
+        var resultText = "";
+        // Iterate Thru Input Text
+        for (var i=0; i<stLength; i++) {
+            // Get Char Code
+            var charCode = sourceText.charCodeAt(i);
+
+            //console.log("convertUnicodeToPlainText - charCode: " + charCode);
+
+            // Switch Car Code
+            switch (charCode) {
+                // New Line
+                case 8232: resultText += "\n";          break;
+                // Space Character
+                case 160:  resultText += " ";           break;
+                // Tab Character
+                case 9:    resultText += "    ";        break;
+                // Default
+                default:   resultText += sourceText[i]; break;
+            }
+        }
+
+        return resultText;
     }
 
     DMouseArea {

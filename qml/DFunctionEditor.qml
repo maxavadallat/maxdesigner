@@ -68,12 +68,12 @@ DPaneBase {
             // Check Function Name
             if (functionEditorRoot.functionName !== "") {
                 // Set Source Text
-                sourceText = functionEditorRoot.functionName + "(" + functionEditorRoot.functionParameters + ") {<br>";
+                sourceText = functionEditorRoot.functionName + "(" + functionEditorRoot.functionParameters + ") {";
                 sourceText += functionEditorRoot.functionSource;
-                sourceText += "<br>}<br>";
+                sourceText += "}\n";
             } else {
                 // Set SourceText
-                sourceText = "newFunction() {<br><br>}<br>";
+                sourceText = "newFunction() {\n\n}\n";
             }
         } else {
             // Reset Function Name
@@ -172,7 +172,7 @@ DPaneBase {
             functionEditorRoot.functionSource = "";
         } else {
             // Set Function Source
-            functionEditorRoot.functionSource = sText.substring(ocbfPos + 1, ccblPos - 1).trim();
+            functionEditorRoot.functionSource = sText.substring(ocbfPos + 1, ccblPos - 1) + "\n";
         }
 
         // Check Functions Model

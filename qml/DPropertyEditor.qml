@@ -8,11 +8,15 @@ import "DConstants.js" as CONSTS
 DPaneBase {
     id: propertyEditorRoot
 
-    property ComponentInfo componentInfo: null
+    property ComponentOwnPropertiesModel ownPropertiesModel: propertiesController.ownPropertiesModel
 
     property alias propertyName: nameEditor.text
     property alias propertyType: typeOption.currentIndex
     property alias propertyDefault: defaultEditor.text
+
+    property bool newProperty: false
+
+    property int propertyIndex: -1
 
     title: "New Property"
 
@@ -27,6 +31,13 @@ DPaneBase {
     enableResize: false
 
     onTransitionStarted: {
+        // Check New State
+        if (newState === stateShown) {
+            // Reset Property Editor
+            resetPropertyEditor();
+        }
+
+        // Check New State
         if (newState === stateHidden) {
             // Set Focus
             nameEditor.setEditorFocus(false);
@@ -34,11 +45,37 @@ DPaneBase {
     }
 
     onTransitionFinished: {
+        // Check New State
         if (newState === stateShown) {
             // Set Focus
             nameEditor.setEditorFocus(true, true);
             propertyEditorRoot.clipContent = false;
         }
+    }
+
+    // Reset Property Editor
+    function resetPropertyEditor() {
+        // Check New Property
+        if (propertyEditorRoot.newProperty) {
+            // Reset Property Name
+            propertyEditorRoot.propertyName = "";
+            // Reset Property Type
+            propertyEditorRoot.propertyType = 0;
+            // Reset Default Value
+            propertyEditorRoot.propertyDefault = "";
+        } else {
+
+        }
+    }
+
+    // Check IF Property Valid
+    function propertyValid() {
+        // Check Own Properties Model
+        if (propertyEditorRoot.ownPropertiesModel !== null) {
+            return propertyEditorRoot.ownPropertiesModel.propertyValid(propertyEditorRoot.propertyName, propertyEditorRoot.newProperty);
+        }
+
+        return false;
     }
 
     DDisc {
@@ -47,10 +84,15 @@ DPaneBase {
         anchors.verticalCenter: parent.verticalCenter
 
         onClicked: {
-            // Emit Accepted Signal
-            propertyEditorRoot.accepted();
-
-            // ...
+            // Check If Property Valid
+            if (propertyEditorRoot.propertyValid()) {
+                // Emit Accepted Signal
+                propertyEditorRoot.accepted();
+            } else {
+                // Set Invalid Value
+                // Set Invalid Value
+                nameEditor.invalidValue = true;
+            }
         }
     }
 
@@ -80,6 +122,7 @@ DPaneBase {
                 id: nameEditor
                 width: typeOption.width
                 anchors.verticalCenter: parent.verticalCenter
+
                 onKeyEvent: {
                     switch (event.key) {
                         case Qt.Key_Escape:
@@ -92,6 +135,22 @@ DPaneBase {
                             typeOption.setOptionFocus(true);
                         break;
                     }
+                }
+
+                onAccepted: {
+                    // Check If Property Valid
+                    if (propertyEditorRoot.propertyValid()) {
+                        // Emit Accepted Signal
+                        propertyEditorRoot.accepted();
+                    } else {
+                        // Set Invalid Value
+                        nameEditor.invalidValue = true;
+                    }
+                }
+
+                onTextChanged: {
+                    // Reset Invalid Value
+                    nameEditor.invalidValue = false;
                 }
             }
         }

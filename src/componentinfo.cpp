@@ -1382,6 +1382,8 @@ QString ComponentInfo::generateLiveCode()
 
     // Check Properties Count
     if (opvhCount > 0 || pvhCount > 0) {
+        // Add New Line
+        liveCode += "\n";
         // Init Property Update Hook Function Code
         QString propertyHooks = QString("%1function __setProperty(key, value) {\n").arg(DEFAULT_SOURCE_INDENT);
         // Add Key Switch

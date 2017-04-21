@@ -714,9 +714,24 @@ void PropertiesController::setComponentProperty(const QString& aName, const QVar
         return;
     }
 
-    qDebug() << "PropertiesController::setComponentProperty - aName: " << aName << " - aValue: " << aValue;
+    // Check Component Own Properties Model
+    if (mComponentOwnProperties) {
+        // Set Component Own Property Value
+        if (mComponentOwnProperties->setComponentProperty(aName, aValue)) {
+            qDebug() << "PropertiesController::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - OWN";
+            return;
+        }
+    }
 
-    // ...
+    // Check Component Properties Model
+    if (mComponentProperties) {
+        // Set Component Property Value
+        if (mComponentProperties->setComponentProperty(aName, aValue)) {
+            qDebug() << "PropertiesController::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - BASE";
+        }
+    }
+
+    qWarning() << "PropertiesController::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - NO PROPERTY!!";
 }
 
 //==============================================================================

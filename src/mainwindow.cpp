@@ -447,6 +447,12 @@ void MainWindow::openProject(const QString& aFilePath)
 
         // ...
 
+        // Check Properties Controller
+        if (mPropertiesController) {
+            // Set Current Project
+            mPropertiesController->setCurrentProject(mProjectModel);
+        }
+
         // Check Project Tree Model
         if (mProjectTreeModel) {
             // Set Current Path
@@ -1175,6 +1181,8 @@ void MainWindow::closeProject()
 
     // Check Properties Controller
     if (mPropertiesController) {
+        // Set Current Project
+        mPropertiesController->setCurrentProject(NULL);
         // Reset Focused Component
         mPropertiesController->setFocusedComponent(NULL);
     }

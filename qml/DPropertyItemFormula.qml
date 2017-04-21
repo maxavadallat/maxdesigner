@@ -18,6 +18,7 @@ Item {
 
     Row {
         id: propertyItemFormulaRow
+        height: parent.height
         anchors.verticalCenter: parent.verticalCenter
         spacing: DStyle.defaultSpacing
 
@@ -32,14 +33,17 @@ Item {
         DText {
             id: formulaLabel
             width: propertyItemFormuleRoot.width - formulaTitleLabel.width - editFormulaButton.width - DStyle.defaultSpacing * 2
+            height: parent.height
             anchors.verticalCenter: parent.verticalCenter
-            text: propertyItemFormuleRoot.propertyFormula
-            elide: Text.ElideRight
+            text: "{...}"//propertyItemFormuleRoot.propertyFormula
+            wrapMode: Text.NoWrap
+            maximumLineCount: 1
+            elide: Text.ElideMiddle
         }
 
         DButton {
             id: editFormulaButton
-            width: 48
+            width: 40
             anchors.verticalCenter: parent.verticalCenter
             text: "Edit"
             onClicked: propertyItemFormuleRoot.formulaEditClicked();

@@ -62,9 +62,6 @@ void ComponentPropertiesModel::loadComponentProperties()
 
     // Build Hierarchy
     addComponentToHierarchy(mComponent->mBaseName);
-
-    // ...
-
 }
 
 //==============================================================================
@@ -72,9 +69,32 @@ void ComponentPropertiesModel::loadComponentProperties()
 //==============================================================================
 void ComponentPropertiesModel::addComponentToHierarchy(const QString& aBaseName)
 {
+    // Check Project Model
+    if (!mProject) {
+        qWarning() << "ComponentPropertiesModel::addComponentToHierarchy - NO PROJECT!!";
+        return;
+    }
+
     // Check Component Base Name
     if (!aBaseName.isEmpty()) {
-
+        // Get Component
+        ComponentInfo* baseComponent = mProject->getComponentByName(aBaseName);
+        // Check Base Component
+        if (baseComponent) {
+            // Get Filtered Own Property Keys
+            QStringList pKeys = baseComponent->mOwnProperties.keys();
+            // Check Filtered Property Keys
+            if (pKeys.count() > 0) {
+                // Begin Insert Rows
+                beginInsertRows(QModelIndex(), rowCount(), rowCount());
+                // Append To Hierarchy
+                mHierarchy << baseComponent;
+                // End Insert Rows
+                endInsertRows();
+            }
+            // Recursively Add Base Component's Base Component
+            addComponentToHierarchy(baseComponent->mBaseName);
+        }
     }
 }
 
@@ -100,6 +120,15 @@ void ComponentPropertiesModel::setCurrentComponent(ComponentInfo* aComponent)
         // Load Component Properties
         loadComponentProperties();
     }
+}
+
+//==============================================================================
+// Get Component Property Name By Index
+//==============================================================================
+QString ComponentPropertiesModel::componentPropertyName(const QString& aBaseName, const int& aIndex)
+{
+
+    return "";
 }
 
 //==============================================================================
@@ -144,6 +173,19 @@ bool ComponentPropertiesModel::clearComponentProperty(const QString& aName)
     // ...
 
     return false;
+}
+
+//==============================================================================
+// Get Component Property List
+//==============================================================================
+QAbstractListModel* ComponentPropertiesModel::componentPropertyList(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount()) {
+
+    }
+
+    return NULL;
 }
 
 //==============================================================================

@@ -37,6 +37,114 @@ DRectangle {
         item.x = posX;
         item.y = posY;
     }
+
+    Component.onCompleted: {
+
+    }
+
+/*
+    function convertTextToRichText(sourceText) {
+        // Get Text Length
+        var stLength = sourceText.length;
+
+        console.log("convertTextToRichText - sourceText: " + sourceText + " - length: " + stLength);
+
+        // Init Result Text
+        var resultText = "";
+        // Iterate Thru Input Text
+        for (var i=0; i<stLength; i++) {
+            // Get Char Code
+            var charCode = sourceText.charCodeAt(i);
+
+            console.log("convertTextToRichText - charCode: " + charCode);
+
+            // Switch Car Code
+            switch (charCode) {
+                // New Line
+                case 10: resultText += "<br>";                      break;
+                // Space Character
+                case 32: resultText += "&nbsp;";                    break;
+                // Tab Character
+                case 9:  resultText += "&nbsp;&nbsp;&nbsp;&nbsp;";  break;
+                // Default
+                default: resultText += sourceText[i];               break;
+            }
+        }
+
+        return resultText;
+    }
+
+    function convertUnicodeToPlainText(sourceText) {
+        // Get Text Length
+        var stLength = sourceText.length;
+
+        console.log("convertUnicodeToPlainText - sourceText: " + sourceText + " - length: " + stLength);
+
+        // Init Result Text
+        var resultText = "";
+        // Iterate Thru Input Text
+        for (var i=0; i<stLength; i++) {
+            // Get Char Code
+            var charCode = sourceText.charCodeAt(i);
+
+            console.log("convertUnicodeToPlainText - charCode: " + charCode);
+
+            // Switch Car Code
+            switch (charCode) {
+                // New Line
+                case 8232: resultText += "\n";          break;
+                // Space Character
+                case 160:  resultText += " ";           break;
+                // Tab Character
+                case 9:    resultText += "    ";        break;
+                // Default
+                default:   resultText += sourceText[i]; break;
+            }
+        }
+
+        return resultText;
+    }
+
+    Rectangle {
+        anchors.fill: demoTextEdit
+        color: "transparent"
+        border.color: "purple"
+    }
+
+    TextEdit {
+        id: demoTextEdit
+        width: 400
+        height: 600
+        anchors.centerIn: parent
+        horizontalAlignment: TextEdit.AlignLeft
+        verticalAlignment: TextEdit.AlignTop
+        textFormat: TextEdit.RichText
+        color: DStyle.colorFontDark
+        activeFocusOnPress: true
+        font.family: "Courier"
+        font.pixelSize: DStyle.fontSizeM
+        wrapMode: TextEdit.NoWrap
+        focus: false
+    }
+
+    DButton {
+        anchors.right: parent.right
+        anchors.rightMargin: 64
+        anchors.verticalCenter: parent.verticalCenter
+        text: "Get Text"
+        onClicked: {
+            // Get Editor Text
+            var editorText = convertUnicodeToPlainText(demoTextEdit.getText(0, demoTextEdit.length));
+
+            console.log("getText: " + editorText);
+
+            for (var i=0; i<editorText.length; i++) {
+                var charCode = editorText.charCodeAt(i);
+                console.log(i + ":" + charCode);
+            }
+        }
+    }
+*/
 /*
     Rectangle {
         anchors.fill: demoTextEdit

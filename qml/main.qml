@@ -163,6 +163,7 @@ Item {
         // ...
     }
 
+    // Connections - Open Files Model
     Connections {
         target: openFilesModel
 
@@ -204,6 +205,7 @@ Item {
         }
     }
 
+    // Background Container
     Rectangle {
         id: bgContainer
         anchors.fill: parent
@@ -305,7 +307,7 @@ Item {
 
             onNewImportLaunch: {
                 // Check Imports Model
-                if (propertiesController.importsModel !== null) {
+                if (propertiesController.importsModel !== null && importEditor.state === importEditor.stateCreate) {
                     // Set New Import
                     importEditor.newImport = true;
                     // Show Imports Editor
@@ -315,7 +317,7 @@ Item {
 
             onEditImportsLaunch: {
                 // Check Imports Model
-                if (propertiesController.importsModel !== null) {
+                if (propertiesController.importsModel !== null && importEditor.state === importEditor.stateCreate) {
                     // Set New Import
                     importEditor.newImport = false;
                     // Show Imports Editor
@@ -324,23 +326,39 @@ Item {
             }
 
             onNewPropertyLaunch: {
-                // Show Property Editor
-                propertyEditor.show();
+                // Check Own Properties Model
+                if (propertiesController.ownPropertiesModel !== null) {
+                    // Set New Property
+                    propertyEditor.newProperty = true;
+                    // Show Property Editor
+                    propertyEditor.show();
+                }
             }
 
             onEditPropertyLaunch: {
-                // Show Property Editor
-                propertyEditor.show();
+                // Check Own Properties Model
+                if (propertiesController.ownPropertiesModel !== null) {
+                    // Set New Property
+                    propertyEditor.newProperty = false;
+                    // Show Property Editor
+                    propertyEditor.show();
+                }
             }
 
             onEditFormulaLaunch: {
-                // Show Formula Editor
-                formulaEditor.show();
+                // Check Own Properties Model
+                if (propertiesController.ownPropertiesModel !== null) {
+
+                    // ...
+
+                    // Show Formula Editor
+                    formulaEditor.show();
+                }
             }
 
             onNewSignalLaunch: {
                 // Check Signals Model
-                if (propertiesController.signalsModel !== null) {
+                if (propertiesController.signalsModel !== null && signalEditor.state === signalEditor.stateCreate) {
                     // Set New Signal
                     signalEditor.newSignal = true;
                     // Set Component Signal
@@ -352,7 +370,7 @@ Item {
 
             onEditSignalLaunch: {
                 // Check Signals Model
-                if (propertiesController.signalsModel !== null) {
+                if (propertiesController.signalsModel !== null && signalEditor.state === signalEditor.stateCreate) {
                     // Reset New Signal
                     signalEditor.newSignal = false;
                     // Set Component Signal
@@ -363,47 +381,104 @@ Item {
             }
 
             onNewSlotLaunch: {
-                // Show Slot Editor
-                slotEditor.show();
+                // Check Slots Model
+                if (propertiesController.slotsModel !== null && slotEditor.state === slotEditor.stateCreate) {
+                    // Set New Slot
+                    slotEditor.newSlot = true;
+                    // Set Component Slot
+                    slotEditor.componentSlot = propertiesController.slotsModel.createNewSlot();
+                    // Show Slot Editor
+                    slotEditor.show();
+                }
             }
 
             onEditSlotLaunch: {
-                // Show Slot Editor
-                slotEditor.show();
+                // Check Slots Model
+                if (propertiesController.slotsModel !== null && slotEditor.state === slotEditor.stateCreate) {
+                    // Set New Slot
+                    slotEditor.newSlot = false;
+                    // Set Component Slot
+                    slotEditor.componentSlot = propertiesController.slotsModel.selectSlot(index);
+                    // Show Slot Editor
+                    slotEditor.show();
+                }
             }
 
             onNewFunctionLaunch: {
-                // Show Function Editor
-                functionEditor.show();
+                // Check Functions Model
+                if (propertiesController.functionsModel !== null && functionEditor.state === functionEditor.stateCreate) {
+                    // Set New Function
+                    functionEditor.newFunction = true;
+                    // Set Component Function
+                    functionEditor.componentFunction = propertiesController.functionsModel.createNewFunction();
+                    // Show Function Editor
+                    functionEditor.show();
+                }
             }
 
             onEditFunctionLaunch: {
-                // Show Function Editor
-                functionEditor.show();
+                // Check Functions Model
+                if (propertiesController.functionsModel !== null && functionEditor.state === functionEditor.stateCreate) {
+                    // Set New Function
+                    functionEditor.newFunction = false;
+                    // Set Component Function
+                    functionEditor.componentFunction = propertiesController.functionsModel.selectFunction(index);
+                    // Show Function Editor
+                    functionEditor.show();
+                }
             }
 
             onNewStateLaunch: {
-                // Show State Editor
-                stateEditor.show();
+                // Check States Model
+                if (propertiesController.statesModel !== null && stateEditor.state === stateEditor.stateCreate) {
+                    // Set New State
+                    stateEditor.newState = true;
+
+                    // Set Component State
+
+                    // Show State Editor
+                    stateEditor.show();
+                }
             }
 
             onEditStateLaunch: {
-                // Show State Editor
-                stateEditor.show();
+                // Check States Model
+                if (propertiesController.statesModel !== null && stateEditor.state === stateEditor.stateCreate) {
+                    // Set New State
+                    stateEditor.newState = false;
+
+                    // Set Component State
+
+                    // Show State Editor
+                    stateEditor.show();
+                }
             }
 
             onNewTransitionLaunch: {
-                // Show Transition Editor
-                transitionEditor.show();
+                // Check Transitions Model
+                if (propertiesController.transitionsModel !== null && transitionEditor.state === transitionEditor.stateCreate) {
+                    // Set New Transition
+                    transitionEditor.newTransition = true;
+
+                    // Set Component Transition
+
+                    // Show Transition Editor
+                    transitionEditor.show();
+                }
             }
 
             onEditTransitionLaunch: {
-                // Show Transition Editor
-                transitionEditor.show();
+                // Check Transitions Model
+                if (propertiesController.transitionsModel !== null && transitionEditor.state === transitionEditor.stateCreate) {
+                    // Set New Transition
+                    transitionEditor.newTransition = false;
+
+                    // Set Component Transition
+
+                    // Show Transition Editor
+                    transitionEditor.show();
+                }
             }
-
-            // ...
-
         }
 
         // Import Editor
@@ -432,12 +507,21 @@ Item {
             onAccepted: {
                 // Check Own Properties Model
                 if (propertiesController.ownPropertiesModel !== null) {
-                    // Add Own Property
-                    //propertiesController.ownPropertiesModel
+                    // Check New Property
+                    if (propertyEditor.newProperty) {
+                        // Add Property
+                        propertiesController.ownPropertiesModel.addComponentProperty(propertyEditor.propertyName,
+                                                                                     propertyEditor.propertyType,
+                                                                                     propertyEditor.propertyDefault);
+                        // Reset New Property
+                        propertyEditor.newProperty = false;
+                    } else {
+                        // Update Property
+                        propertiesController.ownPropertiesModel.updateComponentProperty(propertyEditor.propertyName,
+                                                                                        propertyEditor.propertyType,
+                                                                                        propertyEditor.propertyDefault);
+                    }
                 }
-
-//                // Add Own Property
-//                propertiesController.addOwnComponentProperty(propertyName, propertyType, propertyDefault);
             }
         }
 
@@ -521,7 +605,7 @@ Item {
                     signalParameterEditor.newParameter = false;
                 } else {
                     // Set Parameter
-                    //signalEditor.componentSignal.
+                    signalEditor.componentSignal.updateSignalParameter(signalEditor.editParameterIndex, signalParameterEditor.signalParameter);
                 }
             }
         }
@@ -534,7 +618,32 @@ Item {
             initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
 
             onAccepted: {
+                // Check If New Slot
+                if (slotEditor.newSlot) {
+                    // Append Component Slot
+                    propertiesController.slotsModel.appendSlot(slotEditor.componentSlot);
+                    // Reset Component Slot
+                    slotEditor.componentSlot = null;
+                    // Reset New Slot
+                    slotEditor.newSlot = false;
+                } else {
+                    // Update Component Slot
+                    propertiesController.slotsModel.updateSelectedSlot();
 
+                    // ...
+                }
+            }
+
+            onRejected: {
+                // Check If New Slot
+                if (slotEditor.newSlot) {
+                    // Discard New Slot
+                    propertiesController.slotsModel.discardNewSlot(slotEditor.componentSlot);
+                    // Reset Component Slot
+                    slotEditor.componentSlot = null;
+                    // Reset New Slot
+                    slotEditor.newSlot = false;
+                }
             }
         }
 
@@ -544,7 +653,6 @@ Item {
 
             initialX: propertiesPane.x
             initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
-
 
             // ...
         }
@@ -556,11 +664,33 @@ Item {
             initialX: propertiesPane.x
             initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
 
-            creationX: initialX - functionEditor.width - 32
-            creationY: initialY - functionEditor.height * 0.5
-
             onAccepted: {
+                // Check If New Function
+                if (functionEditor.newFunction) {
+                    // Append New Function
+                    propertiesController.functionsModel.appendFunction(functionEditor.componentFunction);
+                    // Reset Component Function
+                    functionEditor.componentFunction = null;
+                    // Reset New Function
+                    functionEditor.newFunction = false;
+                } else {
+                    // Update Component Function
+                    propertiesController.functionsModel.updateSelectedFunction();
 
+                    // ...
+                }
+            }
+
+            onRejected: {
+                // Check If New Function
+                if (functionEditor.newFunction) {
+                    // Discard New Function
+                    propertiesController.functionsModel.discardNewFunction(functionEditor.componentFunction);
+                    // Reset Component Function
+                    functionEditor.componentFunction = null;
+                    // Reset New Function
+                    functionEditor.newFunction = false;
+                }
             }
         }
 

@@ -7,9 +7,10 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
+class ProjectModel;
 class ComponentInfo;
 class PropertiesController;
-class ProjectModel;
+class ComponentPropertiesModel;
 
 //==============================================================================
 // Component Own Properties Model
@@ -26,14 +27,34 @@ public:
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
 
+    // Get Component Property Name By Index
+    Q_INVOKABLE QString componentPropertyName(const int& aIndex);
+
     // Add Own Property
-    void addComponentProperty(const QString& aName, const int& aType = 0, const QVariant& aDefault = QVariant());
+    Q_INVOKABLE bool addComponentProperty(const QString& aName, const int& aType = 0, const QVariant& aDefault = QVariant());
+
+    // Set Component Property Value
+    Q_INVOKABLE void setComponentProperty(const int& aIndex, const QVariant& aValue);
+    // Get Component Property Value
+    Q_INVOKABLE QVariant componentPropertyValue(const QString& aName);
+
+    // Update Own Property
+    Q_INVOKABLE void updateComponentProperty(const int& aIndex, const QString& aName, const int& aType = 0, const QVariant& aDefault = QVariant());
+
+    // Clear Component Property, Reset To Default/Base Component Value
+    Q_INVOKABLE void clearComponentProperty(const int& aIndex);
+    // Remove Property
+    Q_INVOKABLE void removeComponentProperty(const int& aIndex);
+
+    // Check If Property Name Valid For Addition Or Update
+    Q_INVOKABLE bool propertyValid(const QString& aName, const bool& aNewProperty = true);
+
     // Remove Own Property
-    void removeComponentProperty(const QString& aName);
+    Q_INVOKABLE bool removeComponentProperty(const QString& aName);
     // Set Component Own Property Value
-    bool setComponentProperty(const QString& aName, const QVariant& aValue);
+    Q_INVOKABLE bool setComponentProperty(const QString& aName, const QVariant& aValue);
     // Clear Component Property
-    bool clearComponentProperty(const QString& aName);
+    Q_INVOKABLE bool clearComponentProperty(const QString& aName);
 
     // Destructor
     ~ComponentOwnPropertiesModel();
@@ -41,6 +62,17 @@ public:
 signals:
     // Current Component Changed Signal
     void currentComponentChanged(ComponentInfo* aComponent);
+
+    // Own Property Added Signal
+    void ownPropertyAdded(const QString& aName);
+    // Own Property Updated Signal
+    void ownPropertyUpdated(const QString& aName, const int& aType, const QVariant& aDefault);
+    // Own Prperty Removed Signal
+    void ownPropertyRemoved(const QString& aName);
+    // Own Prperty Cleared Signal
+    void ownPropertyCleared(const QString& aName);
+    // Own Property Value Changed
+    void ownPropertyValueChanged(const QString& aName, const QVariant& aValue);
 
 public: // from QAbstractListModel
     // Row Count
@@ -59,13 +91,13 @@ protected:
     // Init
     void init();
     // Clear
-    void clear(const bool& aEndReset = true);
+    void clear();
 
     // Load Component Properties
     void loadComponentProperties();
 
-    // Generate Merged Keys
-    void generateMergedKeys();
+    // Generate Own Property Keys
+    void generateOwnPropertyKeys();
 
 protected slots:
 //    // Own Property Added Slot

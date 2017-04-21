@@ -53,11 +53,11 @@ DPaneBase {
             // Check Slot Name
             if (slotEditorRoot.componentSlot.slotName !== "") {
                 // Set Source Text
-                sourceText = slotEditorRoot.componentSlot.slotName + ": {<br>";
-                sourceText += (slotEditorRoot.componentSlot.slotSource + "<br>}<br>");
+                sourceText = slotEditorRoot.componentSlot.slotName + ": {";
+                sourceText += (slotEditorRoot.componentSlot.slotSource + "}\n");
             } else {
                 // Set Source
-                sourceText = "onNewSlot: {<br><br>}<br>";
+                sourceText = "onNewSlot: {\n\n}\n";
             }
         } else {
             // ...
@@ -82,6 +82,7 @@ DPaneBase {
     function slotSourceValid() {
         // Get Source Text
         var sText = slotSourceEditor.getText().trim();
+
         console.log("DSlotEditor.slotSourceValid - sText: " + sText);
         // Get Colon Position
         var colonPos = sText.indexOf(":");
@@ -90,27 +91,33 @@ DPaneBase {
             return false;
         }
 
+        // Get SLot Elements
+        var sElements = sText.split(":");
+
         // Get Opening Bracket Pos
-        var obPos = sText.indexOf("{");
+        var obPos = sElements[1].indexOf("{");
         // Check Opening Bracket Pos
-        if (obPos < colonPos) {
+        if (obPos < 0) {
             return false;
         }
 
         // Get Closing Bracket Pos
-        var cbPos = sText.lastIndexOf("}");
+        var cbPos = sElements[1].lastIndexOf("}");
         // Check CLosing Bracket Pos
         if (cbPos < obPos) {
             return false;
         }
 
-        // Get SLot Elements
-        var sElements = sText.split(":");
-
         // Set Slot Name
         slotEditorRoot.slotName = sElements[0];
-        // Set SLot Source
-        slotEditorRoot.slotSource = sElements[1].substring(sElements[1].indexOf("{") + 1, sElements[1].lastIndexOf("}") - 1).trim();
+        // Check Bracket Positions
+        if (cbPos - obPos === 1) {
+            // Set SLot Source
+            slotEditorRoot.slotSource = "\n";
+        } else {
+            // Set SLot Source
+            slotEditorRoot.slotSource = sElements[1].substring(obPos + 1, cbPos - 1) + "\n";
+        }
 
         // Check Compoennt Slot Model
         if (slotEditorRoot.slotsModel !== null) {

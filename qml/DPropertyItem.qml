@@ -13,6 +13,8 @@ Item {
     property string propertyType: "type"
     property string propertyValue: "value"
 
+    property bool showFormula: false
+
     property int itemIndex: -1
 
     property bool markFordeletion: swipeGesture.swipeOn
@@ -23,6 +25,7 @@ Item {
 
     //clip: true
 
+    signal itemEditClicked(var itemIndex)
     signal itemActionClicked(var itemIndex)
     signal formulaEditClicked(var itemIndex)
 
@@ -37,7 +40,7 @@ Item {
         anchors.rightMargin: CONSTS.defaultSwipeAreaWidth
         enabled: !propertyItemRoot.markFordeletion
 
-        flipped: propertyItemRoot.propertyValue.length > 0 && propertyItemRoot.propertyValue[0] === "{"
+        flipped: propertyItemRoot.showFormula
 
         front: DPropertyItemValue {
             width: propertyItemFlipable.width

@@ -26,14 +26,6 @@ ComponentOwnPropertiesModel::ComponentOwnPropertiesModel(ComponentInfo* aCompone
 //==============================================================================
 void ComponentOwnPropertiesModel::init()
 {
-    // Check Current Component
-    if (mComponent) {
-//        // Connect Signals
-//        connect(mComponent, SIGNAL(ownPropertiesUpdated()), this, SLOT(propertiesUpdated()));
-//        connect(mComponent, SIGNAL(ownPropertyAdded(int)), this, SLOT(propertyAdded(int)));
-//        connect(mComponent, SIGNAL(ownPropertyRemoved(int)), this, SLOT(propertyRemoved(int)));
-    }
-
     // Load Component Properties
     loadComponentProperties();
 
@@ -43,18 +35,16 @@ void ComponentOwnPropertiesModel::init()
 //==============================================================================
 // Clear
 //==============================================================================
-void ComponentOwnPropertiesModel::clear(const bool& aEndReset)
+void ComponentOwnPropertiesModel::clear()
 {
     // Begin Reset Model
     beginResetModel();
+
     // Clear Keys
     mKeys.clear();
 
-    // Check End Reset Flag
-    if (aEndReset) {
-        // End Reset Model
-        endResetModel();
-    }
+    // End Reset Model
+    endResetModel();
 }
 
 //==============================================================================
@@ -63,29 +53,30 @@ void ComponentOwnPropertiesModel::clear(const bool& aEndReset)
 void ComponentOwnPropertiesModel::loadComponentProperties()
 {
     // Clear
-    clear(false);
+    clear();
 
-    // Check Component
-    if (mComponent && mProject) {
-        // Generate Merged Keys
-        generateMergedKeys();
-    }
+    // Begin Reset Model
+    beginResetModel();
+
+    // Generate Merged Keys
+    generateOwnPropertyKeys();
 
     // End Reset Model
     endResetModel();
 }
 
 //==============================================================================
-// Generate Merged Keys
+// Generate Own Property Keys
 //==============================================================================
-void ComponentOwnPropertiesModel::generateMergedKeys()
+void ComponentOwnPropertiesModel::generateOwnPropertyKeys()
 {
     // Check Component
     if (!mComponent) {
         return;
     }
 
-    qDebug() << "ComponentOwnPropertiesModel::generateMergedKeys - mName: " << mComponent->mName;
+    qDebug() << "ComponentOwnPropertiesModel::generateOwnPropertyKeys - mName: " << mComponent->mName;
+
     // Set Keys
     mKeys = mComponent->mOwnProperties.keys();
 
@@ -99,62 +90,6 @@ void ComponentOwnPropertiesModel::generateMergedKeys()
         mKeys.removeDuplicates();
     }
 }
-
-/*
-//==============================================================================
-// Own Property Added Slot
-//==============================================================================
-void ComponentOwnPropertiesModel::propertyAdded(const int& aIndex)
-{
-    // Begin Inser Rows
-    beginInsertRows(QModelIndex(), aIndex, aIndex);
-
-    // ...
-
-    // End Insert Rows
-    endInsertRows();
-}
-
-//==============================================================================
-// Own Property Updated
-//==============================================================================
-void ComponentOwnPropertiesModel::propertyUpdated(const int& aIndex)
-{
-    // Emit Data Changed Signal
-
-    // ...
-}
-
-//==============================================================================
-// Own Property Removed Slot
-//==============================================================================
-void ComponentOwnPropertiesModel::propertyRemoved(const int& aIndex)
-{
-    // Begin Remove Rows
-    beginRemoveRows(QModelIndex(), aIndex, aIndex);
-
-    // ...
-
-    // End Remove Rows
-    endRemoveRows();
-}
-
-//==============================================================================
-// Properties Updated Slot
-//==============================================================================
-void ComponentOwnPropertiesModel::propertiesUpdated()
-{
-    //qDebug() << "ComponentOwnPropertiesModel::propertiesUpdated";
-
-    // Begin Reset Model
-    beginResetModel();
-
-    // ...
-
-    // End Reset Model
-    endResetModel();
-}
-*/
 
 //==============================================================================
 // Get Current Component
@@ -171,32 +106,10 @@ void ComponentOwnPropertiesModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
-//        // Check Current Component
-//        if (mComponent) {
-//            // Disconnect Signals
-//            disconnect(mComponent, SIGNAL(ownPropertiesUpdated()), this, SLOT(propertiesUpdated()));
-//            disconnect(mComponent, SIGNAL(ownPropertyAdded(int)), this, SLOT(propertyAdded(int)));
-//            disconnect(mComponent, SIGNAL(ownPropertyRemoved(int)), this, SLOT(propertyRemoved(int)));
-//        }
-
-//        // Begin Reset Model
-//        beginResetModel();
-
         qDebug() << "ComponentOwnPropertiesModel::setCurrentComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
 
         // Set Current Component
         mComponent = aComponent;
-
-//        // End Reset Model
-//        endResetModel();
-
-//        // Check Current Component
-//        if (mComponent) {
-//            // Connect Signals
-//            connect(mComponent, SIGNAL(ownPropertiesUpdated()), this, SLOT(propertiesUpdated()));
-//            connect(mComponent, SIGNAL(ownPropertyAdded(int)), this, SLOT(propertyAdded(int)));
-//            connect(mComponent, SIGNAL(ownPropertyRemoved(int)), this, SLOT(propertyRemoved(int)));
-//        }
 
         // Emit Current Component Changed Signal
         emit currentComponentChanged(mComponent);
@@ -206,15 +119,27 @@ void ComponentOwnPropertiesModel::setCurrentComponent(ComponentInfo* aComponent)
     }
 }
 
+//==============================================================================
+// Get Component Property Name By Index
+//==============================================================================
+QString ComponentOwnPropertiesModel::componentPropertyName(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        return mKeys[aIndex];
+    }
+
+    return "";
+}
 
 //==============================================================================
 // Add Own Property
 //==============================================================================
-void ComponentOwnPropertiesModel::addComponentProperty(const QString& aName, const int& aType, const QVariant& aDefault)
+bool ComponentOwnPropertiesModel::addComponentProperty(const QString& aName, const int& aType, const QVariant& aDefault)
 {
     // Check Component
     if (!mComponent) {
-        return;
+        return false;
     }
 
     // Get Key Index
@@ -238,70 +163,203 @@ void ComponentOwnPropertiesModel::addComponentProperty(const QString& aName, con
             break;
         }
 
-        // Check If Prototype
-        if (mComponent->mIsProtoType) {
-            // Set Dirty
-            mComponent->setDirty(true);
-        }
+        // Set Dirty
+        mComponent->setDirty(true);
+        // Emit Own Proerty Added Signal
+        emit ownPropertyAdded(aName);
 
         // Generate Merged Keys
-        generateMergedKeys();
-
+        generateOwnPropertyKeys();
         // Get Key Index
         kIndex = mKeys.indexOf(aName);
-
         // Begin Insert Rows
         beginInsertRows(QModelIndex(), kIndex, kIndex);
+        // ...
         // End Insert Rows
         endInsertRows();
 
+        return true;
+
     } else {
         qDebug() << "ComponentOwnPropertiesModel::addComponentProperty - aName: " << aName << " - ALREADY HAS PROPERTY";
+    }
+
+    return false;
+}
+
+//==============================================================================
+// Set Component Property Value
+//==============================================================================
+void ComponentOwnPropertiesModel::setComponentProperty(const int& aIndex, const QVariant& aValue)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        // Get Component Property Key
+        QString cpKey = mKeys[aIndex];
+        // Set Component Property
+        setComponentProperty(cpKey, aValue);
+    }
+}
+
+//==============================================================================
+// Get Component Own Property Value
+//==============================================================================
+QVariant ComponentOwnPropertiesModel::componentPropertyValue(const QString& aName)
+{
+    // Check Component
+    if (!mComponent) {
+        return QVariant();
+    }
+
+    // Has Key
+    bool hasKey = (mComponent->mOwnProperties.keys().indexOf(aName) >= 0);
+    // Get Type & Value
+    QString opTypeAndValue = mComponent->mOwnProperties.value(aName).toString();
+
+    // Chekc If Has Key
+    if (!hasKey && !mComponent->mIsProtoType && mComponent->mProtoType) {
+        // Get ProtoType Type & Value
+        opTypeAndValue = mComponent->mProtoType->mOwnProperties.value(aName).toString();
+    }
+
+    // Get Value Elements
+    QStringList valueElements = opTypeAndValue.split(":");
+
+    return valueElements.count() > 1 ? valueElements[1] : valueElements[0];
+}
+
+//==============================================================================
+// Update Own Property
+//==============================================================================
+void ComponentOwnPropertiesModel::updateComponentProperty(const int& aIndex, const QString& aName, const int& aType, const QVariant& aDefault)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        // Get Component Property Key
+        QString cpKey = mKeys[aIndex];
+
+        // Check Key
+        if (cpKey == aName) {
+            // Switch Type
+            switch ((ComponentInfo::EPropertyType)aType) {
+                default:
+                case ComponentInfo::EPropertyType::EPTString:          mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING).arg(aDefault.toString()); break;
+                case ComponentInfo::EPropertyType::EPTBool:            mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_BOOL).arg(aDefault.toString()); break;
+                case ComponentInfo::EPropertyType::EPTInt:             mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_INT).arg(aDefault.toString()); break;
+                case ComponentInfo::EPropertyType::EPTDouble:          mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_DOUBLE).arg(aDefault.toString()); break;
+                case ComponentInfo::EPropertyType::EPTReal:            mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_REAL).arg(aDefault.toString()); break;
+                case ComponentInfo::EPropertyType::EPTVar:             mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_VAR).arg(aDefault.toString()); break;
+                case ComponentInfo::EPropertyType::EPTQtObject:        mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_OBJECT).arg(aDefault.toString()); break;
+                case ComponentInfo::EPropertyType::EPTQtObjectList:    mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_LIST).arg(aDefault.toString()); break;
+                break;
+            }
+
+            // Set Dirty
+            mComponent->setDirty(true);
+            // Emit Property Updated
+            emit ownPropertyUpdated(aName, aType, aDefault);
+            // Emit Data Changed
+            emit dataChanged(index(aIndex), index(aIndex));
+
+            // ...
+
+        } else {
+            // Remove Component Property
+            removeComponentProperty(cpKey);
+            // Add Component Property
+            addComponentProperty(aName, aType, aDefault);
+        }
+    }
+}
+
+//==============================================================================
+// Clear Component Property, Reset To Default/Base Component Value
+//==============================================================================
+void ComponentOwnPropertiesModel::clearComponentProperty(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        // Get Key
+        QString cpKey = mKeys[aIndex];
+        // Clear Component Property
+        clearComponentProperty(cpKey);
     }
 }
 
 //==============================================================================
 // Remove Property
 //==============================================================================
-void ComponentOwnPropertiesModel::removeComponentProperty(const QString& aName)
+void ComponentOwnPropertiesModel::removeComponentProperty(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        // Get Key
+        QString cpKey = mKeys[aIndex];
+        // Remove Component Property
+        removeComponentProperty(cpKey);
+    }
+}
+
+//==============================================================================
+// Check If Property Name Valid For Addition Or Update
+//==============================================================================
+bool ComponentOwnPropertiesModel::propertyValid(const QString& aName, const bool& aNewProperty)
 {
     // Check Component
     if (!mComponent) {
-        return;
+        return false;
     }
 
-    qDebug() << "ComponentInfo::removeProperty - aName: " << aName;
+    // Check Name
+    if (aName.isEmpty()) {
+        return false;
+    }
 
-    // Get Key Index
-    int kIndex = mKeys.indexOf(aName);
-
-    // Check Key Index
-    if (kIndex >= 0) {
-        // Get Prototype Key Index
-        int popkIndex = mComponent->mProtoType ? mComponent->mProtoType->mOwnProperties.keys().indexOf(aName) : -1;
-
-        // Not Found In Prototype -> Own Property
-        if (popkIndex < 0) {
-
-            // Get Own Property Key
-            int opkIndex = mComponent->mOwnProperties.keys().indexOf(aName);
-
-            // Check Own Property Key Index
-            if (opkIndex >= 0) {
-                // Begin Remove Rows
-                beginRemoveRows(QModelIndex(), kIndex, kIndex);
-
-                // Remove Key
-                mComponent->mOwnProperties.remove(aName);
-
-                // Generate Merged Keys
-                generateMergedKeys();
-
-                // End Remove Rows
-                endRemoveRows();
-            }
+    // Check If New Property
+    if (aNewProperty) {
+        // Check Property Keys
+        if (mKeys.indexOf(aName) >= 0) {
+            return false;
         }
+    } else {
+
+        // ...
+
     }
+
+    return true;
+}
+
+//==============================================================================
+// Remove Property
+//==============================================================================
+bool ComponentOwnPropertiesModel::removeComponentProperty(const QString& aName)
+{
+    // Check Component
+    if (mComponent && mComponent->mIsProtoType && !aName.isEmpty() && mComponent->mOwnProperties.keys().indexOf(aName) >= 0) {
+        qDebug() << "ComponentOwnPropertiesModel::removeComponentProperty - aName: " << aName;
+
+        // Remove Key
+        mComponent->mOwnProperties.remove(aName);
+        // Set Component Dirty
+        mComponent->setDirty(true);
+        // Emit Property Removed Signal
+        emit ownPropertyRemoved(aName);
+
+        // Get Key Index
+        int cpkIndex = mKeys.indexOf(aName);
+
+        // Begin Remove Rows
+        beginRemoveRows(QModelIndex(), cpkIndex, cpkIndex);
+        // Generate Own Property Keys
+        generateOwnPropertyKeys();
+        // End Remove Rows
+        endRemoveRows();
+
+        return true;
+    }
+
+    return false;
 }
 
 //==============================================================================
@@ -314,28 +372,41 @@ bool ComponentOwnPropertiesModel::setComponentProperty(const QString& aName, con
         return false;
     }
 
-    qDebug() << "ComponentOwnPropertiesModel::setComponentProperty - aName: " << aName << " - aValue: " << aValue;
-
     // Get Key Index
-    int kIndex = mKeys.indexOf(aName);
+    int cpkIndex = mKeys.indexOf(aName);
 
     // Check Key Index
-    if (kIndex >= 0) {
-
-    } else {
-
+    if (cpkIndex < 0) {
+        return false;
     }
 
-//    // Check If Prototype
-//    if (mComponent->mIsProtoType) {
+    qDebug() << "ComponentOwnPropertiesModel::setComponentProperty - aName: " << aName << " - aValue: " << aValue;
 
-//    } else {
+    // Check If ProtoType
+    if (mComponent->mIsProtoType) {
+        // Get Property Type And Value
+        QString cpTypeAndValue = mComponent->mOwnProperties[aName].toString();
+        // Get Type And Value Elements
+        QStringList cpElements = cpTypeAndValue.split(":", QString::KeepEmptyParts);
+        // Update Value
+        cpElements[1] = aValue.toString();
+        // Set Component Own Property
+        mComponent->mOwnProperties[aName] = cpElements.join(":");
 
-//    }
+    } else {
+        // Set Component Property Value
+        mComponent->mOwnProperties[aName] = aValue.toString();
+    }
 
-    // ...
+    // Set Component Dirty
+    mComponent->setDirty(true);
+    // Emit Component Property Value Changed
+    emit ownPropertyValueChanged(aName, aValue);
 
-    return false;
+    // Emit Data Changed Signal
+    emit dataChanged(index(cpkIndex), index(cpkIndex));
+
+    return true;
 }
 
 //==============================================================================
@@ -355,7 +426,6 @@ bool ComponentOwnPropertiesModel::clearComponentProperty(const QString& aName)
 
     // Check If Prototype
     if (!mComponent->mIsProtoType && kIndex >= 0) {
-
         // Get Own Property Key
         int opkIndex = mComponent->mOwnProperties.keys().indexOf(aName);
 
@@ -363,6 +433,8 @@ bool ComponentOwnPropertiesModel::clearComponentProperty(const QString& aName)
         if (opkIndex >= 0) {
             // Remove Key
             mComponent->mOwnProperties.remove(aName);
+            // Set Component Dirty
+            mComponent->setDirty(true);
 
 //            // Generate Merged Keys
 //            generateMergedKeys();
@@ -395,7 +467,7 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
         return QVariant();
     }
 
-    // Get Row
+    // Get Row Index
     int copRow = index.row();
 
     // Check Row
@@ -425,19 +497,20 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
         // Check Own Property Type And Value
         if (!opTypeAndValue.isEmpty()) {
             // Get Type/Value Split
-            QStringList tvList = opTypeAndValue.split(":");
+            QStringList tvElements = opTypeAndValue.split(":");
             // Get Type
-            QString opType = tvList[0];
+            QString opType = tvElements.count() > 1 ? tvElements[0] : "";
             // Get Value
-            QString opValue = tvList[1];
-
+            QString opValue = tvElements.count() > 1 ? tvElements[1] : tvElements[0];
+            // Get Formula
+            bool opFormula = (opValue.indexOf("{") >= 0 && opValue.indexOf("}") >= 1);
             // Switch Role
             switch (role) {
                 default:
                 case PropertyNameRole:      return opKey;
                 case PropertyTypeRole:      return opType;
                 case PropertyValueRole:     return opValue;
-                case PropertyIsFormula:     return false;
+                case PropertyIsFormula:     return opFormula;
                 case PropertyIsProto:       return opProtoType;
             }
         }

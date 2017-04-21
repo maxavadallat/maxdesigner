@@ -27,10 +27,16 @@ public:
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
 
+    // Get Component Property Name By Index
+    Q_INVOKABLE QString componentPropertyName(const QString& aBaseName, const int& aIndex);
+
     // Set Component Own Property Value
-    bool setComponentProperty(const QString& aName, const QVariant& aValue);
+    Q_INVOKABLE bool setComponentProperty(const QString& aName, const QVariant& aValue);
     // Clear Component Property
-    bool clearComponentProperty(const QString& aName);
+    Q_INVOKABLE bool clearComponentProperty(const QString& aName);
+
+    // Get Component Property List
+    Q_INVOKABLE QAbstractListModel* componentPropertyList(const int& aIndex);
 
     // Destructor
     ~ComponentPropertiesModel();
