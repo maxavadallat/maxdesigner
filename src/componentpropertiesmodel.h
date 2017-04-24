@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QAbstractListModel>
-#include <QList>
+#include <QMap>
 #include <QJsonArray>
 #include <QJsonObject>
 
@@ -27,16 +27,16 @@ public:
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
 
-    // Get Component Property Name By Index
-    Q_INVOKABLE QString componentPropertyName(const QString& aBaseName, const int& aIndex);
-
     // Set Component Own Property Value
     Q_INVOKABLE bool setComponentProperty(const QString& aName, const QVariant& aValue);
     // Clear Component Property
     Q_INVOKABLE bool clearComponentProperty(const QString& aName);
 
+    // Check If Component Property Is Set
+    Q_INVOKABLE bool componentPropertyIsSet(const QString& aName);
+
     // Get Component Property List
-    Q_INVOKABLE QAbstractListModel* componentPropertyList(const int& aIndex);
+    Q_INVOKABLE ComponentOwnPropertiesModel* componentPropertyList(const int& aIndex);
 
     // Destructor
     ~ComponentPropertiesModel();
@@ -65,6 +65,8 @@ protected:
 
     // Load Component Properties
     void loadComponentProperties();
+    // Clear Component Properties
+    void clearComponentProperties();
 
     // Add Component To Hierarchy
     void addComponentToHierarchy(const QString& aBaseName);
@@ -77,11 +79,11 @@ public:
 
 protected: // Data
     // Current Component
-    ComponentInfo*          mComponent;
+    ComponentInfo*                              mComponent;
     // Project Model
-    ProjectModel*           mProject;
-    // Component Bases/Hierarchy
-    QList<ComponentInfo*>   mHierarchy;
+    ProjectModel*                               mProject;
+    // Base Components Own Properties Model Map
+    QMap<QString, ComponentOwnPropertiesModel*> mBaseComponentProperties;
 };
 
 #endif // COMPONENTPROPERTIESMODEL_H

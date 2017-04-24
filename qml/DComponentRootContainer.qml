@@ -311,25 +311,29 @@ DPaneBase {
         anchors.fill: parent
         visible: componentRootContainerRoot.focus
 
+        property real scaleMin: 1.0
+        property real scaleMax: 2.0
+        property real scaleSpeed: 0.05
+
         onWheel: {
             //console.log("#### delta: " + wheel.angleDelta.y);
 
             // Check Wheel Delta
             if (wheel.angleDelta.y > 2) {
                 // Check Enable Scaling & Scale level
-                if (componentRootContainerRoot.enableScaling && componentRootContainerRoot.scale < 1.5) {
+                if (componentRootContainerRoot.enableScaling && componentRootContainerRoot.scale < wheelArea.scaleMax) {
                     // Reset Scale Duration
                     componentRootContainerRoot.scaleDuration = 0;
                     // Inc Scale Level
-                    componentRootContainerRoot.scale += 0.025;
+                    componentRootContainerRoot.scale += wheelArea.scaleSpeed;
                 }
             } else if (wheel.angleDelta.y < -2) {
                 // Check Enable Scaling & Scale level
-                if (componentRootContainerRoot.enableScaling && componentRootContainerRoot.scale > 1.0) {
+                if (componentRootContainerRoot.enableScaling && componentRootContainerRoot.scale > wheelArea.scaleMin) {
                     // Reset Scale Duration
                     componentRootContainerRoot.scaleDuration = 0;
                     // Dec Scale Level
-                    componentRootContainerRoot.scale -= 0.025;
+                    componentRootContainerRoot.scale -= wheelArea.scaleSpeed;
                 }
             }
         }

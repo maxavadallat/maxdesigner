@@ -438,7 +438,7 @@ int SettingsController::projectPaneWidth()
 void SettingsController::setProjectPaneWidth(const int& aWidth)
 {
     // Check Project Pane Width
-    if (mProjectPaneWidth != aWidth) {
+    if (mProjectPaneWidth != aWidth && aWidth != 0) {
         // Set Project Pane Width
         mProjectPaneWidth = aWidth;
         // Emit Project Pane Width Changed Signal
@@ -462,7 +462,7 @@ int SettingsController::projectPaneHeight()
 void SettingsController::setProjectPaneHeight(const int& aHeight)
 {
     // Check Project Pane Height
-    if (mProjectPaneHeight != aHeight) {
+    if (mProjectPaneHeight != aHeight && aHeight != 0) {
         // Set Project Pane Height
         mProjectPaneHeight = aHeight;
         // Emit Project Pane Height Changed Signal
@@ -558,7 +558,7 @@ int SettingsController::propertiesPaneWidth()
 void SettingsController::setPropertiesPaneWidth(const int& aWidth)
 {
     // Check Properties Pane Width
-    if (mPropertiesPaneWidth != aWidth) {
+    if (mPropertiesPaneWidth != aWidth && aWidth != 0) {
         // Set Properties Pane Width
         mPropertiesPaneWidth = aWidth;
         // Emit Properties Pane Width Changed Signal
@@ -582,7 +582,7 @@ int SettingsController::propertiesPaneHeight()
 void SettingsController::setPropertiesPaneHeight(const int& aHeight)
 {
     // Check Properties Pane Height
-    if (mPropertiesPaneHeight != aHeight) {
+    if (mPropertiesPaneHeight != aHeight && aHeight != 0) {
         // Set Properties Pane Height
         mPropertiesPaneHeight = aHeight;
         // Emit Properties Pane Height Changed Signal

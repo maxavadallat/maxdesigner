@@ -134,13 +134,13 @@ public:
     Q_INVOKABLE QVariant componentProperty(const QString& aName);
     // Set Property
     Q_INVOKABLE void setComponentProperty(const QString& aName, const QVariant& aValue);
+    // Clear Component Property
+    Q_INVOKABLE void clearComponentProperty(const QString& aName);
 
     // Add Own Property
     Q_INVOKABLE void addOwnComponentProperty(const QString& aName, const int& aType, const QVariant& aDefaultValue = QVariant());
     // Remove Own Property
     Q_INVOKABLE void removeComponentProperty(const QString& aName);
-    // Clear Property
-    Q_INVOKABLE void clearComponentProperty(const QString& aName);
 
     // Anchors
 

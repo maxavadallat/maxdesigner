@@ -14,6 +14,7 @@ Item {
     property string propertyName: "name"
     property string propertyType: "type"
     property string propertyValue: "value"
+    property bool propertyIsFormula: false
 
     property alias propertyValueMin: propertyValueSpinner.minValue
     property alias propertyValueMax: propertyValueSpinner.maxValue
@@ -24,7 +25,9 @@ Item {
 
     property int valueEditorWidth: width - nameLabel.width - DStyle.defaultSpacing
 
-    signal accepted()
+    property real propertyStep: 1
+
+    signal valueChanged(var newValue)
 
     onPropertyValueChanged: {
         // Check Property Value Editor Text
@@ -84,7 +87,11 @@ Item {
             }
 
             onAccepted: {
-                propertyItemValueRoot.accepted();
+                // Check New Value
+                if (propertyValueEditor.text !== propertyItemValueRoot.propertyValue) {
+                    // Emit Value Changed Signal
+                    propertyItemValueRoot.valueChanged(propertyValueEditor.text);
+                }
             }
         }
 
@@ -100,6 +107,28 @@ Item {
                 }
 
                 return false;
+            }
+
+            step: propertyItemValueRoot.propertyStep
+
+            value: !propertyItemValueRoot.propertyIsFormula ? Number(propertyItemValueRoot.propertyValue) : Number(0);
+
+            onValueIncreased: {
+                // Emit Value Changed Signal
+                propertyItemValueRoot.valueChanged(newValue);
+            }
+
+            onValueDecreased: {
+                // Emit Value Changed Signal
+                propertyItemValueRoot.valueChanged(newValue);
+            }
+
+            onValueEntered: {
+                // Check New Value
+                if (newValue !== propertyItemValueRoot.propertyValue) {
+                    // Emit Value Changed Signal
+                    propertyItemValueRoot.valueChanged(newValue);
+                }
             }
         }
 
@@ -122,6 +151,10 @@ Item {
                 anchors.right: parent.right
                 text: ""
                 checked: propertyItemValueRoot.propertyValue === "true"
+                onClicked: {
+                    // Emit Value Changed Signal
+                    propertyItemValueRoot.valueChanged(!checked);
+                }
             }
         }
     }

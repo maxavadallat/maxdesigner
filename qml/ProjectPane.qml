@@ -12,8 +12,8 @@ DPane {
 
     title: "Project" + (mainController.currentProject ? (" - " + mainController.currentProject.projectName) : "")
 
-    creationWidth: 360
-    creationHeight: 600
+    creationWidth: settingsController ? settingsController.projectPaneWidth : 360
+    creationHeight: settingsController ? settingsController.projectPaneHeight : 600
 
     minWidth: 300
     minHeight: 400
@@ -64,6 +64,22 @@ DPane {
                 // Set Open Files List View Current Index
                 openFilesListView.currentIndex = openFilesModel.currentIndex;
             }
+        }
+    }
+
+    onWidthChanged: {
+        // Check State
+        if (projectPaneRoot.state === projectPaneRoot.stateShown) {
+            // Store Width
+            settingsController.projectPaneWidth = projectPaneRoot.width;
+        }
+    }
+
+    onHeightChanged: {
+        // Check State
+        if (projectPaneRoot.state === projectPaneRoot.stateShown) {
+            // Store Height
+            settingsController.projectPaneHeight = projectPaneRoot.height;
         }
     }
 

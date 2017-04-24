@@ -58,14 +58,7 @@ void PropertiesController::init()
 //==============================================================================
 void PropertiesController::clear()
 {
-    // Check Component Properties Model
-    if (mComponentProperties) {
-        // Delete Component Properties Model
-        delete mComponentProperties;
-        mComponentProperties = NULL;
-        // Set Component Properties Model
-        setPropertiesModel(NULL);
-    }
+    qDebug() << "PropertiesController::clear";
 
     // Check Component Imports Model
     if (mComponentImports) {
@@ -92,6 +85,15 @@ void PropertiesController::clear()
         mComponentOwnProperties = NULL;
         // Set Component Own Properties Model
         setOwnPropertiesModel(NULL);
+    }
+
+    // Check Component Properties Model
+    if (mComponentProperties) {
+        // Delete Component Properties Model
+        delete mComponentProperties;
+        mComponentProperties = NULL;
+        // Set Component Properties Model
+        setPropertiesModel(NULL);
     }
 
     // Check Component Signals Model
@@ -357,6 +359,17 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
             setOwnPropertiesModel(newOwnPropertiesModel);
         }
 
+        // Check Inherited Properties Model
+        if (mComponentProperties) {
+            // Set Current Component
+            mComponentProperties->setCurrentComponent(aComponent);
+        } else {
+            // Create New Compoennt Inherited Properties Model
+            ComponentPropertiesModel* newComponentPropertiesModel = new ComponentPropertiesModel(mFocusedComponent, mProject);
+            // Set Component Inherited Properties Model
+            setPropertiesModel(newComponentPropertiesModel);
+        }
+
         // Check Anchors Model
         if (mComponentAnchors) {
             // Set Current Component
@@ -421,17 +434,6 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
             ComponentTransitionsModel* newComponentTransitionsModel = new ComponentTransitionsModel(mFocusedComponent);
             // Set Component Transitions Model
             setTransitionsModel(newComponentTransitionsModel);
-        }
-
-        // Check Inherited Properties Model
-        if (mComponentProperties) {
-            // Set Current Component
-            mComponentProperties->setCurrentComponent(aComponent);
-        } else {
-            // Create New Compoennt Inherited Properties Model
-            ComponentPropertiesModel* newComponentPropertiesModel = new ComponentPropertiesModel(mFocusedComponent, mProject);
-            // Set Component Inherited Properties Model
-            setPropertiesModel(newComponentPropertiesModel);
         }
 
         // ...
@@ -718,7 +720,7 @@ void PropertiesController::setComponentProperty(const QString& aName, const QVar
     if (mComponentOwnProperties) {
         // Set Component Own Property Value
         if (mComponentOwnProperties->setComponentProperty(aName, aValue)) {
-            qDebug() << "PropertiesController::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - OWN";
+            //qDebug() << "PropertiesController::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - OWN";
             return;
         }
     }
@@ -727,11 +729,44 @@ void PropertiesController::setComponentProperty(const QString& aName, const QVar
     if (mComponentProperties) {
         // Set Component Property Value
         if (mComponentProperties->setComponentProperty(aName, aValue)) {
-            qDebug() << "PropertiesController::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - BASE";
+            //qDebug() << "PropertiesController::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - BASE";
+            return;
         }
     }
 
     qWarning() << "PropertiesController::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - NO PROPERTY!!";
+}
+
+//==============================================================================
+// Clear Component Property
+//==============================================================================
+void PropertiesController::clearComponentProperty(const QString& aName)
+{
+    // Check Name
+    if (aName.isEmpty()) {
+        qWarning() << "PropertiesController::clearComponentProperty - aName: IS EMPTY!";
+        return;
+    }
+
+    // Check Component Own Properties Model
+    if (mComponentOwnProperties) {
+        // Set Component Own Property Value
+        if (mComponentOwnProperties->clearComponentProperty(aName)) {
+            qDebug() << "PropertiesController::clearComponentProperty - aName: " << aName << " - OWN";
+            return;
+        }
+    }
+
+    // Check Component Properties Model
+    if (mComponentProperties) {
+        // Set Component Property Value
+        if (mComponentProperties->clearComponentProperty(aName)) {
+            qDebug() << "PropertiesController::clearComponentProperty - aName: " << aName << " - BASE";
+            return;
+        }
+    }
+
+    qWarning() << "PropertiesController::clearComponentProperty - aName: " << aName << " - NO PROPERTY!!";
 }
 
 //==============================================================================
@@ -756,39 +791,6 @@ void PropertiesController::removeComponentProperty(const QString& aName)
         // Remove Component Property
         mComponentOwnProperties->removeComponentProperty(aName);
     }
-}
-
-//==============================================================================
-// Clear Property
-//==============================================================================
-void PropertiesController::clearComponentProperty(const QString& aName)
-{
-    // Check Name
-    if (aName.isEmpty()) {
-        qWarning() << "PropertiesController::clearComponentProperty - aName: IS EMPTY!";
-        return;
-    }
-
-    // Check Focused Component
-    if (mFocusedComponent && !mFocusedComponent->hasProperty(aName)) {
-        // Has No Property
-        return;
-    }
-
-    // Check Compontn Own Properties Model
-    if (mComponentOwnProperties) {
-        // Clear Property
-
-
-    }
-
-    // Check Component Inherited Properties Model
-    if (mComponentProperties) {
-        // Clear Property
-
-    }
-
-    // ...
 }
 
 //==============================================================================

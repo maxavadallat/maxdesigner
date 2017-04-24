@@ -50,12 +50,14 @@ var defaultNamesColumnWidth                     = 96;
 
 // Default Own Properties Max
 var defaultOwnPropertiesMax                     = 7;
+// Default Properties Max
+var defaultPropertiesMax                        = defaultOwnPropertiesMax;
 // Default Signals Max
-var defaultSignalsMax                           = 7;
+var defaultSignalsMax                           = defaultOwnPropertiesMax;
 // Default Slots Max
-var defaultSlotsMax                             = 7;
+var defaultSlotsMax                             = defaultOwnPropertiesMax;
 // Default Functions Max
-var defaultFunctionsMax                         = 7;
+var defaultFunctionsMax                         = defaultOwnPropertiesMax;
 
 // Default Swipe Area Width
 var defaultSwipeAreaWidth                       = 16;

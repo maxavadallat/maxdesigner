@@ -21,6 +21,11 @@ Item {
 
     signal actionButtonClicked()
 
+    Component.onCompleted: {
+        // Reset Action Button Container X Position
+        actionButtonContainer.x = Qt.binding(function() { return swipeGestureRoot.width - 16; });
+    }
+
     onSwipeOnChanged: {
         if (swipeOn) {
             focus = true;
@@ -61,7 +66,7 @@ Item {
     DMouseArea {
         id: actionButtonContainer
 
-        x: parent.width - 16
+        x: swipeGestureRoot.width - 16
 
         width: CONSTS.defaultButtonWidth + 64
         height: parent.height
@@ -164,7 +169,9 @@ Item {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             text: "---"
-            opacity: 0.5
+            opacity: (actionButtonContainer.x === actionButtonContainer.swipeMaxX) ? 0.5 : 0.0
+            Behavior on opacity { DFadeAnimation { } }
+            visible: swipeGestureRoot.enableSwipe && opacity > 0.0
             rotation: 90
         }
 

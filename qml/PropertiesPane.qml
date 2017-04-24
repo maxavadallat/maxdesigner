@@ -86,12 +86,12 @@ DPane {
         }
     }
 
-    property int namesColumnWidth: propertiesPaneRoot.width * 0.3 //CONSTS.defaultNamesColumnWidth
+    property int namesColumnWidth: propertiesPaneRoot.width * 0.35 //CONSTS.defaultNamesColumnWidth
 
     title: "Properties" + (propertiesController.focusedComponent ? (" - " + propertiesController.focusedComponent.componentName) : "")
 
-    creationWidth: 300
-    creationHeight: 600
+    creationWidth: settingsController ? settingsController.propertiesPaneWidth : 300
+    creationHeight: settingsController ? settingsController.propertiesPaneHeight : 600
 
     minWidth: 300
     minHeight: 400
@@ -114,7 +114,7 @@ DPane {
     signal newPropertyLaunch()
     signal editPropertyLaunch(var index)
 
-    signal editFormulaLaunch(var index, var ownProperty, var baseName)
+    signal editFormulaLaunch(var propertyName, var ownProperty)
 
     signal newSignalLaunch()
     signal editSignalLaunch(var index)
@@ -132,6 +132,22 @@ DPane {
     signal editTransitionLaunch(var index)
 
     signal stateSelectionLaunch()
+
+    onWidthChanged: {
+        // Check State
+        if (propertiesPaneRoot.state === propertiesPaneRoot.stateShown) {
+            // Store Properties Pane Width
+            settingsController.propertiesPaneWidth = propertiesPaneRoot.width;
+        }
+    }
+
+    onHeightChanged: {
+        // Check State
+        if (propertiesPaneRoot.state === propertiesPaneRoot.stateShown) {
+            // Store Properties Pane Height
+            settingsController.propertiesPaneHeight = propertiesPaneRoot.height;
+        }
+    }
 
     // ID Row
     Row {
@@ -277,6 +293,12 @@ DPane {
                     onValueEntered: {
                         propertiesController.requestCX(newValue);
                     }
+                    onKeyEvent: {
+                        if (event.key === Qt.Key_Tab) {
+                            // Set Y Spinner Focus
+                            ySpinner.setSpinnerFocus(true, true);
+                        }
+                    }
                 }
 
                 DText {
@@ -298,6 +320,12 @@ DPane {
                     }
                     onValueEntered: {
                         propertiesController.requestCY(newValue);
+                    }
+                    onKeyEvent: {
+                        if (event.key === Qt.Key_Tab) {
+                            // Set Width Spinner Focus
+                            widthSpinner.setSpinnerFocus(true, true);
+                        }
                     }
                 }
             }
@@ -329,6 +357,12 @@ DPane {
                     onValueEntered: {
                         propertiesController.requestCWidth(newValue);
                     }
+                    onKeyEvent: {
+                        if (event.key === Qt.Key_Tab) {
+                            // Set Height Spinner Focus
+                            heightSpinner.setSpinnerFocus(true, true);
+                        }
+                    }
                 }
 
                 DText {
@@ -351,6 +385,18 @@ DPane {
                     }
                     onValueEntered: {
                         propertiesController.requestCHeight(newValue);
+                    }
+                    onKeyEvent: {
+                        if (event.key === Qt.Key_Tab) {
+                            // Check Pos Row height
+                            if (posRow.height > 0) {
+                                // Set X Spinner Focus
+                                xSpinner.setSpinnerFocus(true, true);
+                            } else {
+                                // Set Width Spinner Focus
+                                widthSpinner.setSpinnerFocus(true, true);
+                            }
+                        }
                     }
                 }
             }
@@ -542,24 +588,11 @@ DPane {
     DSection {
         id: ownPropertiesSection
         width: propertiesPaneRoot.contentWidth
+
         title: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentName : "NULL"
         minHeight: ownPropertiesContainer.height + addOwnPropertyButton.height
+
         state: stateHidden
-
-//        property Connections proppertiesControllerConnection: Connections {
-//            target: propertiesController
-
-//            onFocusedComponentChanged: {
-//                // Check Focused Component
-//                if (propertiesController.focusedComponent !== null) {
-//                    // Open
-//                    ownPropertiesSection.open();
-//                } else {
-//                    // Hide Section
-//                    ownPropertiesSection.hide();
-//                }
-//            }
-//        }
 
         // Own Properties
         Item {
@@ -610,7 +643,12 @@ DPane {
 
                     onFormulaEditClicked: {
                         // Emit Edit Formula Launch Signal
-                        propertiesPaneRoot.editFormulaLaunch(sourceIndex, true, "");
+                        propertiesPaneRoot.editFormulaLaunch(propertyName, true);
+                    }
+
+                    onItemValueChanged: {
+                        // Set Own Property Value
+                        propertiesController.setComponentProperty(propertyName, newValue);
                     }
                 }
             }
@@ -891,42 +929,67 @@ DPane {
     // Base Properties Repeater
     Repeater {
         id: basePropertiesRepeater
-        visible: count > 0
+
         model: propertiesController.propertiesModel
 
+        // Base Property Section Delegate
         delegate: DSection {
             id: basePropertiesSectionDelegate
             width: propertiesPaneRoot.contentWidth
-
             title: baseName
 
-            state: stateClosed
+            minHeight: basePropertiesContainer.height + 1
+
+            state: basePropertiesListView.count > 0 ? stateClosed : stateHidden
+
+            property int sectionIndex: index
 
             // Base Properties Container
             Item {
                 id: basePropertiesContainer
-                width: parent.width
-                height: 0
+                width: propertiesPaneRoot.contentWidth
+                height: CONSTS.defaultPaneItemHeight * Math.min(CONSTS.defaultPropertiesMax, basePropertiesListView.count)
+                Behavior on height { DAnimation { } }
 
+                // Base Properties List View
                 DListView {
                     id: basePropertiesListView
                     anchors.fill: parent
 
+                    model: ComponentOwnPropertiesFilter {
+                        filteredNames: propertiesController.filteredProperties
+                        sourceModel: propertiesController.propertiesModel ? propertiesController.propertiesModel.componentPropertyList(sectionIndex) : undefined
+                    }
+
                     delegate: DPropertyItem {
-                        width: basePropertiesListView.width
+                        id: propertyItemDelegate
+                        width: propertiesPaneRoot.contentWidth
                         namesColumnWidth: propertiesPaneRoot.namesColumnWidth
 
                         itemIndex: index
 
-                        // ...
+                        propertyName: model.pName
+                        propertyType: model.pType
+                        propertyValue: model.pValue
+                        showFormula: model.pIsFormula
+                        enableSwipe: !model.pIsBase
+                        opacity: !model.pIsBase ? 1.0 : 0.6
+                        actionButtonText: "Clear"
 
                         onItemActionClicked: {
                             // Clear Component Property
+                            propertiesController.clearComponentProperty(propertyName);
                         }
 
                         onFormulaEditClicked: {
                             // Emit Edit Formula Launch Signal
-                            //propertiesPaneRoot.editFormulaLaunch(sourceIndex, false, baseName);
+                            propertiesPaneRoot.editFormulaLaunch(propertyName, false);
+                        }
+
+                        onItemValueChanged: {
+                            console.log("PropertiesPane.propertyItemDelegate.onItemValueChanged - propertyName: " + propertyName + " - newValue: " + newValue);
+                            // Set Property Value
+                            propertiesController.setComponentProperty(propertyName, newValue);
                         }
                     }
                 }

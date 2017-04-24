@@ -346,14 +346,12 @@ Item {
             }
 
             onEditFormulaLaunch: {
-                // Check Own Properties Model
-                if (propertiesController.ownPropertiesModel !== null) {
-
-                    // ...
-
-                    // Show Formula Editor
-                    formulaEditor.show();
-                }
+                // Set Own Property
+                formulaEditor.ownProperty = ownProperty;
+                // Set Proprty Name
+                formulaEditor.propertyName = propertyName;
+                // Show Formula Editor
+                formulaEditor.show();
             }
 
             onNewSignalLaunch: {
@@ -525,6 +523,25 @@ Item {
             }
         }
 
+        // Formula Editor
+        DFormulaEditor {
+            id: formulaEditor
+
+            initialX: propertiesPane.x
+            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+
+            onAccepted: {
+                // Check Own Property
+                if (formulaEditor.ownProperty) {
+                    // Set Compoennt Own Property Value
+                    propertiesController.ownPropertiesModel.setComponentProperty(formulaEditor.propertyName, formulaEditor.propertyFormula);
+                } else {
+                    // Set Component Property Value
+                    propertiesController.propertiesModel.setComponentProperty(formulaEditor.propertyName, formulaEditor.propertyFormula);
+                }
+            }
+        }
+
         // Signal Editor
         DSignalEditor {
             id: signalEditor
@@ -645,16 +662,6 @@ Item {
                     slotEditor.newSlot = false;
                 }
             }
-        }
-
-        // Formula Editor
-        DFormulaEditor {
-            id: formulaEditor
-
-            initialX: propertiesPane.x
-            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
-
-            // ...
         }
 
         // Function Editor

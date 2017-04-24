@@ -10,10 +10,11 @@
 //==============================================================================
 // Constructor
 //==============================================================================
-ComponentOwnPropertiesModel::ComponentOwnPropertiesModel(ComponentInfo* aComponent, ProjectModel* aProject, QObject* aParent)
+ComponentOwnPropertiesModel::ComponentOwnPropertiesModel(ComponentInfo* aComponent, ProjectModel* aProject, ComponentInfo* aDerivedComponent, QObject* aParent)
     : QAbstractListModel(aParent)
     , mComponent(aComponent)
     , mProject(aProject)
+    , mDerivedComponent(aDerivedComponent)
 {
     qDebug() << "ComponentOwnPropertiesModel created.";
 
@@ -88,6 +89,29 @@ void ComponentOwnPropertiesModel::generateOwnPropertyKeys()
         mKeys += (mComponent->mProtoType ? mComponent->mProtoType->mOwnProperties.keys() : QStringList());
         // Remove Duplicates
         mKeys.removeDuplicates();
+    }
+
+    qDebug() << "ComponentOwnPropertiesModel::generateOwnPropertyKeys - mComponent: " << mComponent->mName << " - mKeys: " << mKeys;
+}
+
+//==============================================================================
+// Refresh Property For Inherited Property Set
+//==============================================================================
+void ComponentOwnPropertiesModel::refreshProperty(const QString& aName)
+{
+    // Check Name
+    if (aName.isEmpty() || !mComponent) {
+        return;
+    }
+
+    // Get Property Key Index
+    int pkIndex = mKeys.indexOf(aName);
+
+    // Check Property Key Index
+    if (pkIndex >= 0) {
+        qDebug() << "ComponentOwnPropertiesModel::refreshProperty - aName: " << aName;
+        // Emit Data Changed Signal
+        emit dataChanged(index(pkIndex), index(pkIndex));
     }
 }
 
@@ -331,6 +355,19 @@ bool ComponentOwnPropertiesModel::propertyValid(const QString& aName, const bool
 }
 
 //==============================================================================
+// Check IF Has Property
+//==============================================================================
+bool ComponentOwnPropertiesModel::hasProperty(const QString& aName)
+{
+    // Check Component
+    if (mComponent) {
+        return (mComponent->mOwnProperties.keys().indexOf(aName) >= 0);
+    }
+
+    return false;
+}
+
+//==============================================================================
 // Remove Property
 //==============================================================================
 bool ComponentOwnPropertiesModel::removeComponentProperty(const QString& aName)
@@ -474,14 +511,19 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
     if (copRow >= 0 && copRow < rowCount()) {
         // Get Key
         QString opKey = mKeys[copRow];
-
         // Get Own Property Key Index
         int opkIndex = mComponent->mOwnProperties.keys().indexOf(opKey);
 
         // Init Type & Value
         QString opTypeAndValue = "";
+
         // Init Property Is Prototype
         bool opProtoType = false;
+
+        // Get Inherited Property Index
+        int ipkIndex = mDerivedComponent ? mDerivedComponent->mProperties.keys().indexOf(opKey) : -1;
+        // Init Using Base Property
+        bool opBase = (ipkIndex < 0);
 
         // Check Own Property Key Index
         if (opkIndex >= 0) {
@@ -500,18 +542,35 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
             QStringList tvElements = opTypeAndValue.split(":");
             // Get Type
             QString opType = tvElements.count() > 1 ? tvElements[0] : "";
-            // Get Value
-            QString opValue = tvElements.count() > 1 ? tvElements[1] : tvElements[0];
+            // Init Property Value
+            QString opValue = "";
+
+            // Check Own Property Base
+            if (opBase) {
+                // Set Own Property Value
+                opValue = tvElements.count() > 1 ? tvElements[1] : tvElements[0];
+            } else {
+                // Set Own Property Value Value
+                opValue = mDerivedComponent->mProperties.value(opKey).toString();
+            }
+
             // Get Formula
             bool opFormula = (opValue.indexOf("{") >= 0 && opValue.indexOf("}") >= 1);
+            // Get Property Bind
+            bool opBind = false;
+
+            //qDebug() << "ComponentOwnPropertiesModel::data - opKey: " << opKey << " - opValue: " << opValue << " - opBase: " << opBase;
+
             // Switch Role
             switch (role) {
                 default:
                 case PropertyNameRole:      return opKey;
                 case PropertyTypeRole:      return opType;
                 case PropertyValueRole:     return opValue;
+                case PropertyIsBind:        return opBind;
                 case PropertyIsFormula:     return opFormula;
                 case PropertyIsProto:       return opProtoType;
+                case PropertyIsBase:        return opBase;
             }
         }
     }
@@ -530,8 +589,10 @@ QHash<int, QByteArray> ComponentOwnPropertiesModel::roleNames() const
     rNames[PropertyNameRole]  = "pName";
     rNames[PropertyTypeRole]  = "pType";
     rNames[PropertyValueRole] = "pValue";
+    rNames[PropertyIsBind]    = "pIsBind";
     rNames[PropertyIsFormula] = "pIsFormula";
     rNames[PropertyIsProto]   = "pIsProto";
+    rNames[PropertyIsBase]    = "pIsBase";
 
     return rNames;
 }

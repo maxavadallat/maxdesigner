@@ -36,15 +36,10 @@ void ComponentPropertiesModel::init()
 //==============================================================================
 void ComponentPropertiesModel::clear()
 {
-    // Chekc Hierarchy
-    if (mHierarchy.count() > 0) {
-        // Begin Reset Model
-        beginResetModel();
-        // Clear
-        mHierarchy.clear();
-        // End Reset Model
-        endResetModel();
-    }
+    // Clear Component Properties
+    clearComponentProperties();
+
+    // ...
 }
 
 //==============================================================================
@@ -52,16 +47,44 @@ void ComponentPropertiesModel::clear()
 //==============================================================================
 void ComponentPropertiesModel::loadComponentProperties()
 {
-    // Clear
-    clear();
-
     // Check Component
     if (!mComponent) {
         return;
     }
 
+    qDebug() << "ComponentPropertiesModel::loadComponentProperties";
+
     // Build Hierarchy
     addComponentToHierarchy(mComponent->mBaseName);
+}
+
+//==============================================================================
+// Clear Component Properties
+//==============================================================================
+void ComponentPropertiesModel::clearComponentProperties()
+{
+    // Chekc Hierarchy
+    if (mBaseComponentProperties.count() > 0) {
+        qDebug() << "ComponentPropertiesModel::clearComponentProperties";
+
+        // Begin Reset Model
+        beginResetModel();
+
+        // Get Keys Count
+        int kCount = mBaseComponentProperties.keys().count();
+
+        // Iterate Through Keys
+        for (int i=kCount-1; i>=0; i--) {
+            // Delete Base Component Own Properties Model
+            delete mBaseComponentProperties.take(mBaseComponentProperties.keys()[i]);
+        }
+
+        // Clear Keys
+        mBaseComponentProperties.clear();
+
+        // End Reset Model
+        endResetModel();
+    }
 }
 
 //==============================================================================
@@ -81,19 +104,25 @@ void ComponentPropertiesModel::addComponentToHierarchy(const QString& aBaseName)
         ComponentInfo* baseComponent = mProject->getComponentByName(aBaseName);
         // Check Base Component
         if (baseComponent) {
+            qDebug() << "ComponentPropertiesModel::addComponentToHierarchy - aBaseName: " << aBaseName;
+
             // Get Filtered Own Property Keys
             QStringList pKeys = baseComponent->mOwnProperties.keys();
             // Check Filtered Property Keys
-            if (pKeys.count() > 0) {
+            if (pKeys.count() > 0 && mBaseComponentProperties.keys().indexOf(aBaseName) < 0) {
                 // Begin Insert Rows
                 beginInsertRows(QModelIndex(), rowCount(), rowCount());
-                // Append To Hierarchy
-                mHierarchy << baseComponent;
+                // Set Base Component Own Properties Model
+                mBaseComponentProperties[aBaseName] = new ComponentOwnPropertiesModel(baseComponent, mProject, mComponent);
                 // End Insert Rows
                 endInsertRows();
+            } else {
+                qDebug() << "ComponentPropertiesModel::addComponentToHierarchy - aBaseName: " << aBaseName << " - SKIPPING.";
             }
             // Recursively Add Base Component's Base Component
             addComponentToHierarchy(baseComponent->mBaseName);
+        } else {
+            qWarning() << "ComponentPropertiesModel::addComponentToHierarchy - aBaseName: " << aBaseName << " - COMPONENT NOT FOUND!!";
         }
     }
 }
@@ -113,6 +142,8 @@ void ComponentPropertiesModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
+        // Clear
+        clear();
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Component Changed Signal
@@ -120,15 +151,6 @@ void ComponentPropertiesModel::setCurrentComponent(ComponentInfo* aComponent)
         // Load Component Properties
         loadComponentProperties();
     }
-}
-
-//==============================================================================
-// Get Component Property Name By Index
-//==============================================================================
-QString ComponentPropertiesModel::componentPropertyName(const QString& aBaseName, const int& aIndex)
-{
-
-    return "";
 }
 
 //==============================================================================
@@ -141,9 +163,31 @@ bool ComponentPropertiesModel::setComponentProperty(const QString& aName, const 
         return false;
     }
 
-    qDebug() << "ComponentPropertiesModel::setComponentProperty - aName: " << aName << " - aValue: " << aValue;
+    //qDebug() << "ComponentPropertiesModel::setComponentProperty - aName: " << aName << " - aValue: " << aValue;
 
-    // ...
+    // Get Base Components Count
+    int bcCount = rowCount();
+
+    // Go Thru Hieararchy
+    for (int i=0; i<bcCount; i++) {
+        // Get Base Component's Own Property Model
+        ComponentOwnPropertiesModel* bcopModel = mBaseComponentProperties.value(mBaseComponentProperties.keys()[i]);
+        // Check Model
+        if (bcopModel) {
+            // Check If Has Property
+            if (bcopModel->hasProperty(aName)) {
+                qDebug() << "ComponentPropertiesModel::setComponentProperty - mComponent: " <<  mComponent->mName << " - aName: " << aName << " - aValue: " << aValue;
+                // Set Component Property
+                mComponent->mProperties[aName] = aValue.toString();
+                // Set Component Dirty
+                mComponent->setDirty(true);
+                // Refresh Base Component Own Properties Model
+                bcopModel->refreshProperty(aName);
+
+                return true;
+            }
+        }
+    }
 
     return false;
 }
@@ -160,29 +204,52 @@ bool ComponentPropertiesModel::clearComponentProperty(const QString& aName)
 
     qDebug() << "ComponentPropertiesModel::clearComponentProperty - aName: " << aName;
 
-    // Check Property Keys
-    if (mComponent->mProperties.keys().indexOf(aName) >= 0) {
+    // Get Base Components Model Count
+    int bcmCount = rowCount();
 
-        // Remove Key
-        mComponent->mProperties.remove(aName);
+    // Iterate Thru Base Components
+    for (int i=0; i<bcmCount; i++) {
+        // Get Base Component Own Properties Model
+        ComponentOwnPropertiesModel* bcopModel = mBaseComponentProperties.value(mBaseComponentProperties.keys()[i]);
+        // Check Model
+        if (bcopModel && bcopModel->hasProperty(aName)) {
+            // Remove Key
+            mComponent->mProperties.remove(aName);
+            // Set Component Dirty
+            mComponent->setDirty(true);
+            // Refresh For base Component Property List Update
+            bcopModel->refreshProperty(aName);
 
-
-        return true;
+            return true;
+        }
     }
-
-    // ...
 
     return false;
 }
 
 //==============================================================================
+// Check If Component Property Is Set
+//==============================================================================
+bool ComponentPropertiesModel::componentPropertyIsSet(const QString& aName)
+{
+    // Check Component
+    if (!mComponent) {
+        return false;
+    }
+
+    return (mComponent->mProperties.keys().indexOf(aName) >= 0);
+}
+
+//==============================================================================
 // Get Component Property List
 //==============================================================================
-QAbstractListModel* ComponentPropertiesModel::componentPropertyList(const int& aIndex)
+ComponentOwnPropertiesModel* ComponentPropertiesModel::componentPropertyList(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
-
+        return mBaseComponentProperties.value(mBaseComponentProperties.keys()[aIndex]);
+    } else {
+        qWarning() << "ComponentPropertiesModel::componentPropertyList - aIndex: " << aIndex << " - OUT OF BOUNDS!!";
     }
 
     return NULL;
@@ -193,7 +260,7 @@ QAbstractListModel* ComponentPropertiesModel::componentPropertyList(const int& a
 //==============================================================================
 int ComponentPropertiesModel::rowCount(const QModelIndex& ) const
 {
-    return mHierarchy.count();
+    return mBaseComponentProperties.keys().count();
 }
 
 //==============================================================================
@@ -209,7 +276,7 @@ QVariant ComponentPropertiesModel::data(const QModelIndex& index, int role) cons
         // Switch Role
         switch (role) {
             default:
-            case ESMRBaseName:  return mHierarchy[pmRow]->componentName();
+            case ESMRBaseName:  return mBaseComponentProperties.keys()[pmRow];
         }
     }
 

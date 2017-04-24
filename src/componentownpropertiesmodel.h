@@ -49,6 +49,9 @@ public:
     // Check If Property Name Valid For Addition Or Update
     Q_INVOKABLE bool propertyValid(const QString& aName, const bool& aNewProperty = true);
 
+    // Check IF Has Property
+    Q_INVOKABLE bool hasProperty(const QString& aName);
+
     // Remove Own Property
     Q_INVOKABLE bool removeComponentProperty(const QString& aName);
     // Set Component Own Property Value
@@ -84,9 +87,10 @@ public: // from QAbstractListModel
 
 protected:
     friend class PropertiesController;
+    friend class ComponentPropertiesModel;
 
     // Constructor
-    explicit ComponentOwnPropertiesModel(ComponentInfo* aComponent, ProjectModel* aProject, QObject* aParent = NULL);
+    explicit ComponentOwnPropertiesModel(ComponentInfo* aComponent, ProjectModel* aProject, ComponentInfo* aDerivedComponent = NULL, QObject* aParent = NULL);
 
     // Init
     void init();
@@ -95,19 +99,12 @@ protected:
 
     // Load Component Properties
     void loadComponentProperties();
-
     // Generate Own Property Keys
     void generateOwnPropertyKeys();
 
-protected slots:
-//    // Own Property Added Slot
-//    void propertyAdded(const int& aIndex);
-//    // Own Property Updated
-//    void propertyUpdated(const int& aIndex);
-//    // Own Property Removed Slot
-//    void propertyRemoved(const int& aIndex);
-//    // Properties Updated Slot
-//    void propertiesUpdated();
+    // Refresh Property For Inherited Property Set
+    void refreshProperty(const QString& aName);
+
 
 public:
     // Item Field Roles
@@ -115,8 +112,10 @@ public:
         PropertyNameRole = Qt::UserRole + 1,
         PropertyTypeRole,
         PropertyValueRole,
+        PropertyIsBind,
         PropertyIsFormula,
-        PropertyIsProto
+        PropertyIsProto,
+        PropertyIsBase
     };
 
 protected: // Data
@@ -126,6 +125,8 @@ protected: // Data
     ProjectModel*   mProject;
     // Property Keys
     QStringList     mKeys;
+    // Derived Component
+    ComponentInfo*  mDerivedComponent;
 };
 
 #endif // COMPONENTOWNPROPERTIESMODEL_H

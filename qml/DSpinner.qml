@@ -12,13 +12,14 @@ DControl {
 
     property double step: 1.0
 
-    property double minValue: Number.MIN_VALUE
+    property double minValue: -Number.MAX_VALUE
     property double maxValue: Number.MAX_VALUE
 
     signal valueIncreased(var newValue)
     signal valueDecreased(var newValue)
     signal valueEntered(var newValue)
     signal textUpdated(var newValue)
+    signal keyEvent(var event)
 
     Component.onCompleted: {
         // Set Text
@@ -50,6 +51,11 @@ DControl {
         if (newValue !== value) {
             valueDecreased(newValue);
         }
+    }
+
+    // Set Spinner Focus
+    function setSpinnerFocus(aFocus, aSelect) {
+        textInput.setEditorFocus(aFocus, aSelect);
     }
 
     DTextInput {
@@ -116,6 +122,8 @@ DControl {
                 case Qt.Key_Escape:
                     textInput.text = String(spinnerRoot.value);
                 break;
+
+                default: spinnerRoot.keyEvent(event);
             }
         }
 

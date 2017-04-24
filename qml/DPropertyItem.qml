@@ -23,11 +23,21 @@ Item {
 
     property bool enableSwipe: true
 
-    //clip: true
+    property alias actionButtonText: swipeGesture.actionButtonText
+
+    property real propertyStep: {
+        // Check Property Type
+        if (propertyType === CONSTS.propertyTypes[3] || propertyType === CONSTS.propertyTypes[4]) {
+            return 0.1;
+        }
+
+        return 1;
+    }
 
     signal itemEditClicked(var itemIndex)
     signal itemActionClicked(var itemIndex)
     signal formulaEditClicked(var itemIndex)
+    signal itemValueChanged(var itemIndex, var newValue)
 
     onMarkFordeletionChanged: {
         propertyItemFlipable.front.setEditorFocus(!markFordeletion);
@@ -46,11 +56,11 @@ Item {
             width: propertyItemFlipable.width
             height: propertyItemFlipable.height
             namesColumnWidth: propertyItemRoot.namesColumnWidth
-            //editorMouseSelection: false
-            //editorFocus: !propertyItemRoot.markFordeletion
             propertyName: propertyItemRoot.propertyName
             propertyType: propertyItemRoot.propertyType
             propertyValue: propertyItemRoot.propertyValue
+            propertyStep: propertyItemRoot.propertyStep
+            onValueChanged: propertyItemRoot.itemValueChanged(itemIndex, newValue);
         }
 
         back: DPropertyItemFormula {
@@ -69,8 +79,7 @@ Item {
     DSwipeGesture {
         id: swipeGesture
         anchors.fill: parent
-        enabled: propertyItemRoot.enableSwipe
-
+        enableSwipe: propertyItemRoot.enableSwipe
         onActionButtonClicked: {
             //console.log("DPropertyItem.swipeGesture.onActionButtonClicked");
             // Emit Item Action Clicked Signal

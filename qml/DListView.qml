@@ -12,6 +12,12 @@ DControl {
     property alias currentIndex: listView.currentIndex
     property int itemHeight: CONSTS.defaultPaneItemHeight
 
+    property alias addTransition: listView.add
+    property alias addDisplacedTransition: listView.addDisplaced
+    property alias moveTransition: listView.move
+    property alias removeTransition: listView.remove
+    property alias removeDisplacedTransition: listView.removeDisplaced
+
     clip: true
 
     ListView {
