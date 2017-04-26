@@ -27,7 +27,7 @@ ComponentsModel::ComponentsModel(ProjectModel* aProjectModel, QObject* aParent)
 void ComponentsModel::init()
 {
     // Load Components
-    loadComponents();
+    //loadComponents();
 }
 
 //==============================================================================
@@ -41,7 +41,7 @@ void ComponentsModel::clear()
     // Get Keys Count
     int bckCount = rowCount();
 
-    qDebug() << "ComponentsModel::clear - count: " << bckCount;
+    //qDebug() << "ComponentsModel::clear - count: " << bckCount;
 
     // Iterate Thru Keys
     for (int i=0; i<bckCount; i++) {
@@ -68,7 +68,7 @@ void ComponentsModel::loadComponents()
         return;
     }
 
-    qDebug() << "ComponentsModel::loadComponents - mComponentsDir: " << mComponentsDir;
+    //qDebug() << "ComponentsModel::loadComponents - mComponentsDir: " << mComponentsDir;
 
     // Init Info Filter
     QString infoFilter = QString("*.%1").arg(DEFAULT_JSON_SUFFIX);
@@ -80,20 +80,25 @@ void ComponentsModel::loadComponents()
     while (cIterator.hasNext()) {
         // Get Next Item
         cIterator.next();
-        // Get Item Path
-        QString itemPath = cIterator.filePath();
-
-        qDebug() << "ComponentsModel::loadComponents - itemPath: " << itemPath;
-
-        // Create New Component Info
-        ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
-        // Add Component
-        addComponent(newComponent);
+        // Get Item NAme
+        QString itemName = cIterator.fileInfo().baseName();
+        // Check If Component HAs Been Already Loaded
+        if (mComponents.keys().indexOf(itemName) < 0) {
+            // Get Item Path
+            QString itemPath = cIterator.filePath();
+            //qDebug() << "ComponentsModel::loadComponents - itemPath: " << itemPath;
+            // Create New Component Info
+            ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
+            // Add Component
+            addComponent(newComponent);
+        } else {
+            qDebug() << "ComponentsModel::loadComponents - itemName: " << itemName << " - Component Already Added.";
+        }
     }
 }
 
 //==============================================================================
-// Update Base Components
+// Update Components
 //==============================================================================
 void ComponentsModel::updateBaseComponents()
 {
@@ -110,7 +115,7 @@ void ComponentsModel::updateBaseComponents()
         ComponentInfo* component = getComponentByIndex(i);
         // Check Base Name
         if (component && !component->mBaseName.isEmpty() && !component->mBase) {
-            qDebug() << "ComponentsModel::updateBaseComponents - name: " << component->mName;
+            //qDebug() << "ComponentsModel::updateBaseComponents - name: " << component->mName;
             // Set Base Component
             component->mBase = mProjectModel->getComponentByName(component->mBaseName);
         }
@@ -152,7 +157,7 @@ bool ComponentsModel::addComponent(ComponentInfo* aComponent)
             return false;
         }
 
-        qDebug() << "ComponentsModel::addBaseComponent - name: " << cName;
+        //qDebug() << "ComponentsModel::addComponent - name: " << cName;
 
         // Add Base Component To Base Component Map
         mComponents[cName] = aComponent;
@@ -216,9 +221,39 @@ int ComponentsModel::getComponentIndex(const QString& aName)
 //==============================================================================
 // Get Component By Name
 //==============================================================================
-ComponentInfo* ComponentsModel::getComponent(const QString& aName)
+ComponentInfo* ComponentsModel::getComponent(const QString& aName, const bool& aPreload)
 {
-    return mComponents.value(aName);
+    // Check Name
+    if (aName.isEmpty()) {
+        return NULL;
+    }
+
+    // Get Component Info
+    ComponentInfo* cInfo = mComponents.value(aName);
+
+    // Check Component Info
+    if (cInfo) {
+        return cInfo;
+    }
+
+    // Check Preload
+    if (aPreload) {
+        // Get Full File Path
+        QString cFilePath = QString("%1/%2.%3").arg(mComponentsDir).arg(aName).arg(DEFAULT_JSON_SUFFIX);
+
+        qDebug() << "ComponentsModel::getComponent - cFilePath: " << cFilePath << " - Trying to Load...";
+
+        // Try To Load Component From Info File
+        cInfo = ComponentInfo::fromInfoFile(cFilePath, mProjectModel);
+
+        // Check Component Info
+        if (cInfo) {
+            // Add Component
+            addComponent(cInfo);
+        }
+    }
+
+    return cInfo;
 }
 
 //==============================================================================

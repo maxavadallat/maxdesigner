@@ -176,7 +176,7 @@ Item {
                 return;
             }
 
-            console.log("openFilesModel.onFileOpened - aFilePath: " + aFilePath);
+            //console.log("openFilesModel.onFileOpened - aFilePath: " + aFilePath);
 
             // Check Current Project
             if (mainController.currentProject !== null) {

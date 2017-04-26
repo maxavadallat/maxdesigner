@@ -12,7 +12,7 @@ ComponentImportsModel::ComponentImportsModel(ComponentInfo* aComponent, QObject*
     : QAbstractListModel(aParent)
     , mComponent(aComponent)
 {
-    qDebug() << "ComponentImportsModel created.";
+    //qDebug() << "ComponentImportsModel created.";
 
     // Init
     init();
@@ -42,9 +42,6 @@ void ComponentImportsModel::clear()
 //==============================================================================
 void ComponentImportsModel::loadComponentImports()
 {
-    // Clear
-    clear();
-
     // Begin Reset Model
     beginResetModel();
 
@@ -79,6 +76,8 @@ void ComponentImportsModel::setCurrentComponent(ComponentInfo* aComponent)
     if (mComponent != aComponent) {
         // Save Previous Component Imports
         saveComponentImports();
+        // Clear
+        clear();
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Component Changed Signal
@@ -98,7 +97,7 @@ void ComponentImportsModel::addImport(const QString& aImport)
         return;
     }
 
-    qDebug() << "ComponentImportsModel::addImport - aImport: " << aImport;
+    //qDebug() << "ComponentImportsModel::addImport - aImport: " << aImport;
 
     // Begin Insert Rows
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
@@ -132,6 +131,8 @@ void ComponentImportsModel::removeImport(const QString& aImport)
         QString jsonValueString = mComponent->mImports[i].toString();
         // Check JS String Value
         if (jsonValueString == aImport) {
+            //qDebug() << "ComponentImportsModel::removeImport - aImport: " << aImport;
+
             // Begin Remove Rows
             beginRemoveRows(QModelIndex(), i, i);
             // Remove Import
@@ -155,6 +156,7 @@ void ComponentImportsModel::removeImport(const int& aIndex)
 {
     // Check Index
     if (mComponent && aIndex >= 0 && aIndex < mComponent->mImports.count()) {
+        //qDebug() << "ComponentImportsModel::removeImport - aIndex: " << aIndex;
         // Begin Remove Rows
         beginRemoveRows(QModelIndex(), aIndex, aIndex);
         // Remove Import
@@ -249,5 +251,5 @@ ComponentImportsModel::~ComponentImportsModel()
 
     // ...
 
-    qDebug() << "ComponentImportsModel deleted.";
+    //qDebug() << "ComponentImportsModel deleted.";
 }

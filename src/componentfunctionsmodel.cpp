@@ -14,7 +14,7 @@ ComponentFunctionsModel::ComponentFunctionsModel(ComponentInfo* aComponent, QObj
     , mDirty(false)
     , mSelectedIndex(-1)
 {
-    qDebug() << "ComponentFunctionsModel created.";
+    //qDebug() << "ComponentFunctionsModel created.";
 
     // Init
     init();
@@ -36,6 +36,8 @@ void ComponentFunctionsModel::init()
 //==============================================================================
 void ComponentFunctionsModel::clear()
 {
+    //qDebug() << "ComponentFunctionsModel::clear";
+
     // Begin Reset Model
     beginResetModel();
 
@@ -66,19 +68,18 @@ void ComponentFunctionsModel::setDirty(const bool& aDirty)
 //==============================================================================
 void ComponentFunctionsModel::loadComponentFunctions()
 {
-    // Clear
-    clear();
-
     // Check Component
-    if (mComponent) {
-        qDebug() << "ComponentFunctionsModel::loadComponentFunctions";
-        // Get Functions Count
-        int fCount = mComponent->mFunctions.count();
-        // Iterate Through Component Function
-        for (int i=0; i<fCount; i++) {
-            // Append Function
-            appendFunction(ComponentFunction::fromJSONObject(this, mComponent->mFunctions[i].toObject()));
-        }
+    if (!mComponent) {
+        return;
+    }
+
+    //qDebug() << "ComponentFunctionsModel::loadComponentFunctions - mComponent: " << mComponent->mName;
+    // Get Functions Count
+    int fCount = mComponent->mFunctions.count();
+    // Iterate Through Component Function
+    for (int i=0; i<fCount; i++) {
+        // Append Function
+        appendFunction(ComponentFunction::fromJSONObject(this, mComponent->mFunctions[i].toObject()));
     }
 
     // Set Dirty
@@ -92,7 +93,7 @@ void ComponentFunctionsModel::saveComponentFunctions()
 {
     // Check Compoennt
     if (mComponent && mDirty) {
-        qDebug() << "ComponentFunctionsModel::saveComponentFunctions";
+        //qDebug() << "ComponentFunctionsModel::saveComponentFunctions - mComponent: " << mComponent->mName;
         // Set Functions
         mComponent->mFunctions = toJSONArray();
         // Set Component Dirty
@@ -109,7 +110,7 @@ void ComponentFunctionsModel::clearComponentFunctions()
 {
     // Check Component
     if (mComponent) {
-        qDebug() << "ComponentFunctionsModel::clearComponentFunctions";
+        //qDebug() << "ComponentFunctionsModel::clearComponentFunctions";
         // Iterate Through Functions
         while (mComponent->mFunctions.count() > 0) {
             // Remove Last
@@ -136,8 +137,11 @@ void ComponentFunctionsModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
+        //qDebug() << "ComponentFunctionsModel::setCurrentComponent - mName: " << (aComponent ? aComponent->mName : "NULL");
         // Save Previous Component Functions
         saveComponentFunctions();
+        // Clear
+        clear();
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Component Changed Signal
@@ -154,7 +158,7 @@ void ComponentFunctionsModel::addFunction(const QString& aName, const QStringLis
 {
     // Check Function
     if (functionValid(aName)) {
-        qDebug() << "ComponentFunctionsModel::addFunction - aName: " << aName;
+        //qDebug() << "ComponentFunctionsModel::addFunction - aName: " << aName;
         // Append Function
         appendFunction(new ComponentFunction(this, aName, aSource, aParameters));
     }
@@ -167,7 +171,7 @@ void ComponentFunctionsModel::removeFunction(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
-        qDebug() << "ComponentFunctionsModel::removeFunction - aIndex: " << aIndex;
+        //qDebug() << "ComponentFunctionsModel::removeFunction - aIndex: " << aIndex;
         // Begin Remove Rows
         beginRemoveRows(QModelIndex(), aIndex, aIndex);
         // Delete Function
@@ -186,7 +190,7 @@ void ComponentFunctionsModel::renameFunction(const int& aIndex, const QString& a
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount() && functionValid(aName)) {
-        qDebug() << "ComponentFunctionsModel::renameFunction - aIndex: " << aIndex;
+        //qDebug() << "ComponentFunctionsModel::renameFunction - aIndex: " << aIndex;
         // Set Function Name
         mFunctions[aIndex]->mName = aName;
         // Emit Data Changed Signal
@@ -229,7 +233,7 @@ bool ComponentFunctionsModel::functionValid(const QString& aName)
 //==============================================================================
 ComponentFunction* ComponentFunctionsModel::createNewFunction()
 {
-    qDebug() << "ComponentFunctionsModel::createNewFunction";
+    //qDebug() << "ComponentFunctionsModel::createNewFunction";
 
     // Set New Function
     mNewFunction = true;
@@ -245,7 +249,7 @@ ComponentFunction* ComponentFunctionsModel::selectFunction(const int& aIndex)
 {
     // Check index
     if (aIndex >= 0 && aIndex < rowCount()) {
-        qDebug() << "ComponentFunctionsModel::selectFunction - aIndex: " << aIndex;
+        //qDebug() << "ComponentFunctionsModel::selectFunction - aIndex: " << aIndex;
         // Set New Function
         mNewFunction = false;
         // Set Selected Function Index
@@ -264,7 +268,7 @@ void ComponentFunctionsModel::appendFunction(ComponentFunction* aFunction)
 {
     // Check Function
     if (aFunction) {
-        qDebug() << "ComponentFunctionsModel::appendFunction - mName: " << aFunction->mName;
+        //qDebug() << "ComponentFunctionsModel::appendFunction - mName: " << aFunction->mName;
         // Begin Insert Rows
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
         // Append Function
@@ -283,7 +287,7 @@ void ComponentFunctionsModel::discardNewFunction(ComponentFunction* aFunction)
 {
     // Check Signal
     if (aFunction) {
-        qDebug() << "ComponentFunctionsModel::discardNewFunction";
+        //qDebug() << "ComponentFunctionsModel::discardNewFunction";
         // Reset New Function
         mNewFunction = false;
         // Delete New Function
@@ -298,7 +302,7 @@ void ComponentFunctionsModel::updateSelectedFunction(const bool& aDoneEdit)
 {
     // Check Selected Index
     if (mSelectedIndex != -1) {
-        qDebug() << "ComponentFunctionsModel::updateSelectedFunction - mSelectedIndex: " << mSelectedIndex;
+        //qDebug() << "ComponentFunctionsModel::updateSelectedFunction - mSelectedIndex: " << mSelectedIndex;
 
 //        // Set Dirty
 //        setDirty(true);
@@ -391,7 +395,7 @@ ComponentFunctionsModel::~ComponentFunctionsModel()
 
     // ...
 
-    qDebug() << "ComponentFunctionsModel deleted.";
+    //qDebug() << "ComponentFunctionsModel deleted.";
 }
 
 

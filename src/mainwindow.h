@@ -28,6 +28,7 @@ class ProjectPropertiesDialog;
 class CreateComponentDialog;
 class CreateViewDialog;
 class LiveWindow;
+class MinimizedComponents;
 
 //==============================================================================
 // Main Window Class

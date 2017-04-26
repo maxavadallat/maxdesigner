@@ -28,7 +28,7 @@ BaseComponentsModel::BaseComponentsModel(ProjectModel* aProjectModel, QObject* a
 void BaseComponentsModel::init()
 {
     // Load Base Components
-    loadBaseComponents();
+    //loadBaseComponents();
 }
 
 //==============================================================================
@@ -42,7 +42,7 @@ void BaseComponentsModel::clear()
     // Get Keys Count
     int bckCount = rowCount();
 
-    qDebug() << "BaseComponentsModel::clear - count: " << bckCount;
+    //qDebug() << "BaseComponentsModel::clear - count: " << bckCount;
 
     // Iterate Thru Keys
     for (int i=0; i<bckCount; i++) {
@@ -60,7 +60,7 @@ void BaseComponentsModel::clear()
 }
 
 //==============================================================================
-// Update Base Components
+// Update Components
 //==============================================================================
 void BaseComponentsModel::updateBaseComponents()
 {
@@ -77,7 +77,7 @@ void BaseComponentsModel::updateBaseComponents()
         ComponentInfo* component = getComponentByIndex(i);
         // Check Base Name
         if (component && !component->mBaseName.isEmpty() && !component->mBase) {
-            qDebug() << "BaseComponentsModel::updateBaseComponents - name: " << component->mName;
+            //qDebug() << "BaseComponentsModel::updateBaseComponents - name: " << component->mName;
             // Set Base Component
             component->mBase = mProjectModel->getComponentByName(component->mBaseName);
         }
@@ -94,7 +94,7 @@ void BaseComponentsModel::loadBaseComponents()
         return;
     }
 
-    qDebug() << "BaseComponentsModel::loadBaseComponents - mBaseComponentsDir: " << mBaseComponentsDir;
+    //qDebug() << "BaseComponentsModel::loadBaseComponents - mBaseComponentsDir: " << mBaseComponentsDir;
 
     // Init Info Filter
     QString infoFilter = QString("*.%1").arg(DEFAULT_JSON_SUFFIX);
@@ -106,15 +106,23 @@ void BaseComponentsModel::loadBaseComponents()
     while (bcIterator.hasNext()) {
         // Get Next Item
         bcIterator.next();
-        // Get Item Path
-        QString itemPath = bcIterator.filePath();
+        // Get Item NAme
+        QString itemName = bcIterator.fileInfo().baseName();
 
-        //qDebug() << "BaseComponentsModel::loadBaseComponents - itemPath: " << itemPath;
+        //qDebug() << "BaseComponentsModel::loadBaseComponents - itemName: " << itemName;
 
-        // Create Base Component
-        ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
-        // Add Base Component
-        addBaseComponent(newComponent);
+        // Check If Component HAs Been Already Loaded
+        if (mBaseComponents.keys().indexOf(itemName) < 0) {
+            // Get Item Path
+            QString itemPath = bcIterator.filePath();
+            //qDebug() << "BaseComponentsModel::loadBaseComponents - itemPath: " << itemPath;
+            // Create Base Component
+            ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
+            // Add Base Component
+            addBaseComponent(newComponent);
+        } else {
+            qDebug() << "BaseComponentsModel::loadBaseComponents - itemName: " << itemName << " - Component Already Added.";
+        }
     }
 }
 
@@ -153,10 +161,11 @@ bool BaseComponentsModel::addBaseComponent(ComponentInfo* aComponent)
             return false;
         }
 
-        qDebug() << "BaseComponentsModel::addBaseComponent - name: " << cName;
+        //qDebug() << "BaseComponentsModel::addBaseComponent - name: " << cName;
 
         // Add Base Component To Base Component Map
         mBaseComponents[cName] = aComponent;
+
         // Get New Key Index
         int newIndex = mBaseComponents.keys().indexOf(cName);
 
@@ -217,9 +226,39 @@ int BaseComponentsModel::getComponentIndex(const QString& aName)
 //==============================================================================
 // Get Component By Name
 //==============================================================================
-ComponentInfo* BaseComponentsModel::getComponent(const QString& aName)
+ComponentInfo* BaseComponentsModel::getComponent(const QString& aName, const bool& aPreload)
 {
-    return mBaseComponents.value(aName);
+    // Check Name
+    if (aName.isEmpty()) {
+        return NULL;
+    }
+
+    // Get Base Component Info
+    ComponentInfo* bcInfo = mBaseComponents.value(aName);
+
+    // Check Base Component Info
+    if (bcInfo) {
+        return bcInfo;
+    }
+
+    // Check Preload
+    if (aPreload) {
+        // Get Full File Path
+        QString bcFilePath = QString("%1/%2.%3").arg(mBaseComponentsDir).arg(aName).arg(DEFAULT_JSON_SUFFIX);
+
+        qDebug() << "BaseComponentsModel::getComponent - bcFilePath: " << bcFilePath << " - Trying to Load...";
+
+        // Try To Load Component From Info File
+        bcInfo = ComponentInfo::fromInfoFile(bcFilePath, mProjectModel);
+
+        // Check Base Component Info
+        if (bcInfo) {
+            // Add Base Component
+            addBaseComponent(bcInfo);
+        }
+    }
+
+    return bcInfo;
 }
 
 //==============================================================================
@@ -239,6 +278,7 @@ ComponentInfo* BaseComponentsModel::getComponentByIndex(const int& aIndex)
 //==============================================================================
 int BaseComponentsModel::rowCount(const QModelIndex& ) const
 {
+    //qDebug() << "BaseComponentsModel::rowCount - keys: " << mBaseComponents.keys();
     return mBaseComponents.keys().count();
 }
 
@@ -254,6 +294,7 @@ QVariant BaseComponentsModel::data(const QModelIndex& index, int role) const
     if (bcRow >= 0 && bcRow < rowCount()) {
         // Get Component Info
         ComponentInfo* component = mBaseComponents[mBaseComponents.keys()[bcRow]];
+
         // Switch Role
         switch (role) {
             case Qt::DisplayRole:

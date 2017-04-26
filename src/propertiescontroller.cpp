@@ -302,7 +302,7 @@ void PropertiesController::setCurrentProject(ProjectModel* aProjectModel)
 {
     // Check Current Project Model
     if (mProject != aProjectModel) {
-        qDebug() << "PropertiesController::setCurrentProject - projectName: " << (aProjectModel ? aProjectModel->projectName() : "NULL");
+        qDebug() << "PropertiesController::setCurrentProject - aProjectModel: " << (aProjectModel ? aProjectModel->projectName() : "NULL");
         // Set Current Project Model
         mProject = aProjectModel;
         // Emit Current Project Changed Signal
@@ -329,7 +329,7 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
         // Check Previous Focused Component
 
 
-        qDebug() << "PropertiesController::setFocusedCompoenent - componentName: " << (aComponent ? aComponent->mName : "NULL");
+        qDebug() << "PropertiesController::setFocusedComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
 
         // Set Focused Component
         mFocusedComponent = aComponent;

@@ -57,6 +57,12 @@ DPane {
                 // ...
 
             } else {
+                // Reset Editors
+                idEditor.text = "";
+                objectNameEditor.text = "";
+
+                // ...
+
                 // Close All Sections
                 importsSection.close();
                 sizeAndPosSection.close();
@@ -77,13 +83,6 @@ DPane {
     property Connections focusedComponentConnection: Connections {
         target: propertiesController.focusedComponent
 
-        onWidthChanged: {
-            console.log("PropertiesPane.focusedComponentConnection.onWidthChanged - width: " + propertiesController.focusedComponent.width);
-        }
-
-        onHeightChanged: {
-            console.log("PropertiesPane.focusedComponentConnection.onHeightChanged - height: " + propertiesController.focusedComponent.height);
-        }
     }
 
     property int namesColumnWidth: propertiesPaneRoot.width * 0.35 //CONSTS.defaultNamesColumnWidth
@@ -94,7 +93,7 @@ DPane {
     creationHeight: settingsController ? settingsController.propertiesPaneHeight : 600
 
     minWidth: 300
-    minHeight: 400
+    minHeight: parent ? parent.height * 0.6 : 600
 
     enablePaneContent: propertiesController.focusedComponent !== null
 
@@ -156,21 +155,23 @@ DPane {
 
         DText {
             id: idTitle
+            width: objectNameTitle.width
             anchors.verticalCenter: parent.verticalCenter
+            horizontalAlignment: Text.AlignRight
             text: "id:"
         }
 
         DTextInput {
             id: idEditor
             width: propertiesPaneRoot.contentWidth - idTitle.width - 2
-            text: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentID : ""
-            onAccepted: {
-                // Request ID
-                propertiesController.requestCID(text);
-                // Bind To Focused Component ID
-                text = Qt.binding(function() {
-                    return propertiesController.focusedComponent ? propertiesController.focusedComponent.componentID : "";
-                })
+            text: ""
+
+            onTextChanged: {
+                // Check Current Component ID
+                if (propertiesController.cID !== idEditor.text) {
+                    // Request New Component ID
+                    propertiesController.requestCID(idEditor.text);
+                }
             }
         }
     }
@@ -184,20 +185,21 @@ DPane {
             id: objectNameTitle
             //width: propertiesPaneRoot.contentWidth
             anchors.verticalCenter: parent.verticalCenter
+            horizontalAlignment: Text.AlignRight
             text: "objectName:"
         }
 
         DTextInput {
             id: objectNameEditor
             width: propertiesPaneRoot.contentWidth - objectNameTitle.width - 2
-            text: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentObjectName : ""
-            onAccepted: {
-                // Request Object Name
-                propertiesController.requestCObjectName(text);
-                // Bind To Focused Component Object Name
-                text = Qt.binding(function() {
-                    return propertiesController.focusedComponent ? propertiesController.focusedComponent.componentObjectName : "";
-                })
+            text: ""
+
+            onTextChanged: {
+                // Check Component Object Name
+                if (propertiesController.cObjectName !== objectNameEditor.text) {
+                    // Request New Object Name
+                    propertiesController.requestCObjectName(objectNameEditor.text);
+                }
             }
         }
     }
@@ -284,15 +286,19 @@ DPane {
                     id: xSpinner
                     anchors.verticalCenter: parent.verticalCenter
                     value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.posX) : 0
+
                     onValueIncreased: {
                         propertiesController.requestCX(newValue);
                     }
+
                     onValueDecreased: {
                         propertiesController.requestCX(newValue);
                     }
+
                     onValueEntered: {
                         propertiesController.requestCX(newValue);
                     }
+
                     onKeyEvent: {
                         if (event.key === Qt.Key_Tab) {
                             // Set Y Spinner Focus
@@ -312,15 +318,19 @@ DPane {
                     id: ySpinner
                     anchors.verticalCenter: parent.verticalCenter
                     value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.posY) : 0
+
                     onValueIncreased: {
                         propertiesController.requestCY(newValue);
                     }
+
                     onValueDecreased: {
                         propertiesController.requestCY(newValue);
                     }
+
                     onValueEntered: {
                         propertiesController.requestCY(newValue);
                     }
+
                     onKeyEvent: {
                         if (event.key === Qt.Key_Tab) {
                             // Set Width Spinner Focus
@@ -348,15 +358,19 @@ DPane {
                     anchors.verticalCenter: parent.verticalCenter
                     value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.width) : 0
                     minValue: 0
+
                     onValueIncreased: {
                         propertiesController.requestCWidth(newValue);
                     }
+
                     onValueDecreased: {
                         propertiesController.requestCWidth(newValue);
                     }
+
                     onValueEntered: {
                         propertiesController.requestCWidth(newValue);
                     }
+
                     onKeyEvent: {
                         if (event.key === Qt.Key_Tab) {
                             // Set Height Spinner Focus
@@ -377,15 +391,19 @@ DPane {
                     anchors.verticalCenter: parent.verticalCenter
                     value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.height) : 0
                     minValue: 0
+
                     onValueIncreased: {
                         propertiesController.requestCHeight(newValue);
                     }
+
                     onValueDecreased: {
                         propertiesController.requestCHeight(newValue);
                     }
+
                     onValueEntered: {
                         propertiesController.requestCHeight(newValue);
                     }
+
                     onKeyEvent: {
                         if (event.key === Qt.Key_Tab) {
                             // Check Pos Row height

@@ -12,6 +12,8 @@ ComponentStatesModel::ComponentStatesModel(ComponentInfo* aComponent, QObject* a
     : QAbstractListModel(aParent)
     , mComponent(aComponent)
 {
+    //qDebug() << "ComponentStatesModel created.";
+
     // Init
     init();
 }
@@ -30,15 +32,14 @@ void ComponentStatesModel::init()
 //==============================================================================
 void ComponentStatesModel::clear()
 {
+    //qDebug() << "ComponentStatesModel::clear";
     // Begin Reset Model
     beginResetModel();
-
     // Iterate Through States
     while (mStates.count() > 0) {
         // Delete Last
         delete mStates.takeLast();
     }
-
     // End Reset Model
     endResetModel();
 }
@@ -48,9 +49,6 @@ void ComponentStatesModel::clear()
 //==============================================================================
 void ComponentStatesModel::loadComponentStates()
 {
-    // Clear
-    clear();
-
     // Check Compoent Info
     if (!mComponent) {
         return;
@@ -95,6 +93,7 @@ void ComponentStatesModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
+        //qDebug() << "ComponentStatesModel::setCurrentComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Component Changed Signal
@@ -370,6 +369,8 @@ ComponentStatesModel::~ComponentStatesModel()
     clear();
 
     // ...
+
+    //qDebug() << "ComponentStatesModel deleted.";
 }
 
 

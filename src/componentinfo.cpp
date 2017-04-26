@@ -17,17 +17,6 @@
 #include "constants.h"
 
 //==============================================================================
-// Create Component From QML File
-//==============================================================================
-ComponentInfo* ComponentInfo::fromQML(const QString& aFilePath, ProjectModel* aProject)
-{
-    // Init Parser
-    QMLParser parser;
-    // Parse QML
-    return parser.parseQML(aFilePath, aProject);
-}
-
-//==============================================================================
 // Create Component From Component Info File
 //==============================================================================
 ComponentInfo* ComponentInfo::fromInfoFile(const QString& aFilePath, ProjectModel* aProject)
@@ -35,9 +24,18 @@ ComponentInfo* ComponentInfo::fromInfoFile(const QString& aFilePath, ProjectMode
     // Create Component Info
     ComponentInfo* newComponent = new ComponentInfo("", "", "", aProject);
     // Load Component
-    newComponent->load(aFilePath);
+    if (newComponent->load(aFilePath)) {
+        return newComponent;
+    }
 
-    return newComponent;
+    qWarning() << "ComponentInfo::fromInfoFile - aFilePath: " << aFilePath << " - UNABLE TO LOAD COMPONENT!!";
+
+    // Reset ProtoType Flag to Avoid Saving At Delete
+    newComponent->mIsProtoType = false;
+
+    delete newComponent;
+
+    return NULL;
 }
 
 //==============================================================================
@@ -187,13 +185,13 @@ void ComponentInfo::clearIDMap()
 //==============================================================================
 // Load
 //==============================================================================
-void ComponentInfo::load(const QString& aFilePath)
+bool ComponentInfo::load(const QString& aFilePath)
 {
     // Check File Path
     if (aFilePath.isEmpty()) {
         // Check Project
         if (!mProject) {
-            return;
+            return false;
         }
     } else {
         // Set Info Path
@@ -216,26 +214,30 @@ void ComponentInfo::load(const QString& aFilePath)
         fromJSON(ciFileContent.toUtf8());
         // Set Dirty State
         setDirty(false);
+
+        return true;
     } else {
         qWarning() << "ComponentInfo::load - mInfoPath: " << mInfoPath << " - ERROR LOADING COMPONENT INFO!";
     }
+
+    return false;
 }
 
 //==============================================================================
 // Save
 //==============================================================================
-void ComponentInfo::save(const QString& aFilePath)
+bool ComponentInfo::save(const QString& aFilePath)
 {
     // Check If Prototype
     if (!mIsProtoType) {
         // Saving Only Prototypes...
-        return;
+        return false;
     }
 
     // Check File Path
     if (aFilePath.isEmpty() && !mDirty) {
         // No Need to Save
-        return;
+        return false;
     }
 
     // Init File Info
@@ -247,7 +249,7 @@ void ComponentInfo::save(const QString& aFilePath)
         // Try to Create Path
         if (!fileInfoDir.mkpath(fileInfoDir.absolutePath())) {
             qWarning() << "ComponentInfo::save - ERROR CREATING COMPONENT DIR!!";
-            return;
+            return false;
         }
     }
 
@@ -269,9 +271,12 @@ void ComponentInfo::save(const QString& aFilePath)
         // Reset Dirty
         setDirty(false);
 
+        return true;
     } else {
         qWarning() << "ComponentInfo::load - mInfoPath: " << mInfoPath << " - ERROR LOADING COMPONENT INFO!";
     }
+
+    return false;
 }
 
 //==============================================================================
@@ -727,32 +732,34 @@ QStringList ComponentInfo::idList()
 }
 
 //==============================================================================
-// Export To QML
-//==============================================================================
-void ComponentInfo::exportToQML(const QString& aFilePath)
-{
-    // Generate QML
-    QMLGenerator::generateQML(this, aFilePath);
-}
-
-//==============================================================================
 // Get JSON Object
 //==============================================================================
-QJsonObject ComponentInfo::toJSONObject()
+QJsonObject ComponentInfo::toJSONObject(const bool& aChild)
 {
     // Init JSON Object
     QJsonObject ciObject;
 
     // Set Component Name
     ciObject[JSON_KEY_COMPONENT_NAME] = QJsonValue(mName);
+
+    // Check Parent Component
+    if (mParent) {
+        // Save Parent
+        ciObject[JSON_KEY_COMPONENT_PARENT] = mParent->componentName();
+    }
+
     // Set Component Type
     ciObject[JSON_KEY_COMPONENT_TYPE] = QJsonValue(mType);
-    // Set Category
-    ciObject[JSON_KEY_COMPONENT_CATEGORY] = QJsonValue(mCategory);
-    // Set Component Base Name
-    ciObject[JSON_KEY_COMPONENT_BASE] = QJsonValue(mBaseName);
-    // Set Built In
-    ciObject[JSON_KEY_COMPONENT_BUILTIN] = QJsonValue(mBuiltIn);
+
+    // Check If Child Component
+    if (!aChild) {
+        // Set Category
+        ciObject[JSON_KEY_COMPONENT_CATEGORY] = QJsonValue(mCategory);
+        // Set Component Base Name
+        ciObject[JSON_KEY_COMPONENT_BASE] = QJsonValue(mBaseName);
+        // Set Built In
+        ciObject[JSON_KEY_COMPONENT_BUILTIN] = QJsonValue(mBuiltIn);
+    }
 
     // ...
 
@@ -772,12 +779,6 @@ QJsonObject ComponentInfo::toJSONObject()
     if (!mProperties.isEmpty()) {
         // Set Properties
         ciObject[JSON_KEY_COMPONENT_PROPERTIES] = mProperties;
-    }
-
-    // Check Parent Component
-    if (mParent) {
-        // Save Parent
-        ciObject[JSON_KEY_COMPONENT_PARENT] = mParent->componentName();
     }
 
     // Imports
@@ -827,7 +828,7 @@ QJsonObject ComponentInfo::toJSONObject()
         // Iterate Through Children Array
         for (int i=0; i<cCount; i++) {
             // Append Child
-            cArray << mChildren[i]->toJSONObject();
+            cArray << mChildren[i]->toJSONObject(true);
         }
 
         // Save Children
@@ -905,16 +906,23 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
     for (int i=0; i<caCount; i++) {
         // Get Array Item
         QJsonObject childObject = childrenArray[i].toObject();
+
         // Get Child Component Name
         QString ccName = childObject[JSON_KEY_COMPONENT_NAME].toString();
-        // Get Compoennt ProtoType
-        ComponentInfo* componentProtoType = mProject ? mProject->getComponentByName(ccName) : NULL;
+        // Get Child Component Type
+        QString ccType = childObject[JSON_KEY_COMPONENT_TYPE].toString();
+
+        // Get Child Compoennt ProtoType
+        ComponentInfo* componentProtoType = mProject ? mProject->getComponentByName(ccName, ccType, true) : NULL;
+
         // Check Child Component
         if (componentProtoType) {
             // Clone Component
             ComponentInfo* childComponent = componentProtoType->clone();
-            // Set Up Child Component
+            // Set Up/Update Child Component from JSON Object
             childComponent->fromJSONObject(childObject);
+            // Reset ProtoType Flag
+            childComponent->mIsProtoType = false;
             // Add To Children
             mChildren << childComponent;
         } else {
@@ -955,6 +963,56 @@ void ComponentInfo::requestClose()
         // Emit Request Container Close
         emit requestContainerClose();
     }
+}
+
+//==============================================================================
+// Register Object ID
+//==============================================================================
+void ComponentInfo::registerObjectID(const QString& aID, QObject* aObject)
+{
+    // Check ID
+    if (aID.isEmpty()) {
+        qWarning() << "ComponentInfo::registerObjectID - aID IS EMPTY!!";
+        return;
+    }
+
+    // Check Object
+    if (!aObject) {
+        qWarning() << "ComponentInfo::registerObjectID - aObject IS NULL!!";
+        return;
+    }
+
+    // Check If ID Is Already Registered
+    if (mIDMap.keys().indexOf(aID) < 0) {
+
+        // Add Object ID
+        mIDMap[aID] = aObject;
+
+    } else {
+        qWarning() << "ComponentInfo::registerObjectID - aID: " << aID << " - ID IS ALREADY IN USE!!";
+    }
+}
+
+//==============================================================================
+// Clear Object ID
+//==============================================================================
+void ComponentInfo::clearObjectID(const QString& aID)
+{
+    // Check If ID Is Already Registered
+    if (mIDMap.keys().indexOf(aID) >= 0) {
+        // Remove Object ID
+        mIDMap.remove(aID);
+    } else {
+        qWarning() << "ComponentInfo::clearObjectID - aID: " << aID << " - IS NOT REGISTERED!!";
+    }
+}
+
+//==============================================================================
+// Get Child Object By ID
+//==============================================================================
+QObject* ComponentInfo::getObject(const QString& aID)
+{
+    return mIDMap.value(aID);
 }
 
 //==============================================================================
@@ -1616,6 +1674,7 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
         int cIndex = mChildren.indexOf(aChild);
         // Check Child Index
         if (cIndex >= 0 && cIndex < mChildren.count()) {
+            qDebug() << "ComponentInfo::removeChild - mComponent: " << mChildren[cIndex]->mName;
             // Check Delete
             if (aDelete) {
                 // Delete Child
@@ -1627,6 +1686,7 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
 
             // Set Dirty
             setDirty(true);
+
             // Emit Child Count Changed Signal
             emit childCountChanged(mChildren.count());
 
@@ -1642,6 +1702,19 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
 int ComponentInfo::childCount()
 {
     return mChildren.count();
+}
+
+//==============================================================================
+// Get Child
+//==============================================================================
+ComponentInfo* ComponentInfo::childInfo(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < mChildren.count()) {
+        return mChildren[aIndex];
+    }
+
+    return NULL;
 }
 
 //==============================================================================

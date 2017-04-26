@@ -12,6 +12,8 @@ ComponentTransitionsModel::ComponentTransitionsModel(ComponentInfo* aComponent, 
     : QAbstractListModel(aParent)
     , mComponent(aComponent)
 {
+    //qDebug() << "ComponentTransitionsModel created.";
+
     // Init
     init();
 }
@@ -57,14 +59,9 @@ void ComponentTransitionsModel::clear()
 //==============================================================================
 void ComponentTransitionsModel::loadComponentTransitions()
 {
-    // Clear
-    clear();
-
     // Check Component
-    if (mComponent) {
-
-        // ...
-
+    if (!mComponent) {
+        return;
     }
 }
 
@@ -360,11 +357,13 @@ void ComponentTransitionsModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
+        //qDebug() << "ComponentTransitionsModel::setCurrentComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
+        // Clear
+        clear();
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Compoennt Changed Signal
         emit currentComponentChanged(mComponent);
-
         // Load Component Transitions
         loadComponentTransitions();
     }
@@ -494,6 +493,8 @@ ComponentTransitionsModel::~ComponentTransitionsModel()
     clear();
 
     // ...
+
+    //qDebug() << "ComponentTransitionsModel deleted.";
 }
 
 

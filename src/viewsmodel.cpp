@@ -27,7 +27,7 @@ ViewsModel::ViewsModel(ProjectModel* aProjectModel, QObject* aParent)
 void ViewsModel::init()
 {
     // Load Views
-    loadViews();
+    //loadViews();
 }
 
 //==============================================================================
@@ -41,7 +41,7 @@ void ViewsModel::clear()
     // Get Keys Count
     int bckCount = rowCount();
 
-    qDebug() << "ViewsModel::clear - count: " << bckCount;
+    //qDebug() << "ViewsModel::clear - count: " << bckCount;
 
     // Iterate Thru Keys
     for (int i=0; i<bckCount; i++) {
@@ -68,7 +68,7 @@ void ViewsModel::loadViews()
         return;
     }
 
-    qDebug() << "ViewsModel::loadViews - mViewsDir: " << mViewsDir;
+    //qDebug() << "ViewsModel::loadViews - mViewsDir: " << mViewsDir;
 
     // Init Info Filter
     QString infoFilter = QString("*.%1").arg(DEFAULT_JSON_SUFFIX);
@@ -80,20 +80,27 @@ void ViewsModel::loadViews()
     while (vIterator.hasNext()) {
         // Get Next Item
         vIterator.next();
-        // Get Item Path
-        QString itemPath = vIterator.filePath();
 
-        qDebug() << "ViewsModel::loadViews - itemPath: " << itemPath;
+        // Get Item NAme
+        QString itemName = vIterator.fileInfo().baseName();
 
-        // Create View Info
-        ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
-        // Add View
-        addView(newComponent);
+        // Check If Component HAs Been Already Loaded
+        if (mViews.keys().indexOf(itemName) < 0) {
+            // Get Item Path
+            QString itemPath = vIterator.filePath();
+            //qDebug() << "ViewsModel::loadViews - itemPath: " << itemPath;
+            // Create View Info
+            ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
+            // Add View
+            addView(newComponent);
+        } else {
+            qDebug() << "ViewsModel::loadViews - itemName: " << itemName << " - View Already Added.";
+        }
     }
 }
 
 //==============================================================================
-// Update Base Components
+// Update Components
 //==============================================================================
 void ViewsModel::updateBaseComponents()
 {
@@ -110,7 +117,7 @@ void ViewsModel::updateBaseComponents()
         ComponentInfo* component = getViewByIndex(i);
         // Check Base Name
         if (component && !component->mBaseName.isEmpty() && !component->mBase) {
-            qDebug() << "ViewsModel::updateBaseComponents - name: " << component->mName;
+            //qDebug() << "ViewsModel::updateBaseComponents - name: " << component->mName;
             // Set Base Component
             component->mBase = mProjectModel->getComponentByName(component->mBaseName);
         }
@@ -152,7 +159,7 @@ bool ViewsModel::addView(ComponentInfo* aView)
             return false;
         }
 
-        qDebug() << "ViewsModel::addBaseComponent - name: " << cName;
+        //qDebug() << "ViewsModel::addView - name: " << cName;
 
         // Add Base Component To Base Component Map
         mViews[cName] = aView;
@@ -216,9 +223,39 @@ int ViewsModel::getViewIndex(const QString& aName)
 //==============================================================================
 // Get Views By Name
 //==============================================================================
-ComponentInfo* ViewsModel::getView(const QString& aName)
+ComponentInfo* ViewsModel::getView(const QString& aName, const bool& aPreload)
 {
-    return mViews.value(aName);
+    // Check Name
+    if (aName.isEmpty()) {
+        return NULL;
+    }
+
+    // Get View Component Info
+    ComponentInfo* vInfo = mViews.value(aName);
+
+    // Check View Component Info
+    if (vInfo) {
+        return vInfo;
+    }
+
+    // Check Preload
+    if (aPreload) {
+        // Get Full File Path
+        QString vFilePath = QString("%1/%2.%3").arg(mViewsDir).arg(aName).arg(DEFAULT_JSON_SUFFIX);
+
+        qDebug() << "ViewsModel::getView - vFilePath: " << vFilePath << " - Trying to Load...";
+
+        // Try To Load Component From Info File
+        vInfo = ComponentInfo::fromInfoFile(vFilePath, mProjectModel);
+
+        // Check Base Component Info
+        if (vInfo) {
+            // Add View Component
+            addView(vInfo);
+        }
+    }
+
+    return vInfo;
 }
 
 //==============================================================================

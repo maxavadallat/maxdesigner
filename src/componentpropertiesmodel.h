@@ -36,7 +36,7 @@ public:
     Q_INVOKABLE bool componentPropertyIsSet(const QString& aName);
 
     // Get Component Property List
-    Q_INVOKABLE ComponentOwnPropertiesModel* componentPropertyList(const int& aIndex);
+    Q_INVOKABLE ComponentOwnPropertiesModel* componentPropertyList(const int& aIndex) const;
 
     // Destructor
     ~ComponentPropertiesModel();

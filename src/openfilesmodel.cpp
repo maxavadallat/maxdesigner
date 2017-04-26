@@ -17,7 +17,7 @@ OpenFilesModel::OpenFilesModel(QObject* aParent)
     , mCurrentIndex(-1)
     , mFocusedFile("")
 {
-    qDebug() << "OpenFilesModel created.";
+    //qDebug() << "OpenFilesModel created.";
 
     // Init
     init();
@@ -79,7 +79,7 @@ void OpenFilesModel::setCurrentIndex(const int& aCurrentIndex)
     int ofCount = rowCount();
     // Check Current Index
     if (mCurrentIndex != aCurrentIndex && aCurrentIndex >= -1 && aCurrentIndex < ofCount) {
-        qDebug() << "OpenFilesModel::setCurrentIndex - aCurrentIndex: " << aCurrentIndex;
+        //qDebug() << "OpenFilesModel::setCurrentIndex - aCurrentIndex: " << aCurrentIndex;
 
         // Set Current Index
         mCurrentIndex = aCurrentIndex;
@@ -121,7 +121,7 @@ void OpenFilesModel::setFocusedFile(const QString& aFilePath)
 //==============================================================================
 void OpenFilesModel::setProjectModel(ProjectModel* aProject)
 {
-    qDebug() << "OpenFilesModel::setProjectModel - aProject.projectName: " << (aProject ? aProject->projectName() : "");
+    //qDebug() << "OpenFilesModel::setProjectModel - aProject.projectName: " << (aProject ? aProject->projectName() : "");
 
     // Check Project
     if (mProject) {
@@ -274,7 +274,7 @@ void OpenFilesModel::closeFile(const QString& aFilePath)
 //==============================================================================
 void OpenFilesModel::closeFocusedFile()
 {
-    qDebug() << "OpenFilesModel::closeFocusedFile - mCurrentIndex: " << mCurrentIndex;
+    //qDebug() << "OpenFilesModel::closeFocusedFile - mCurrentIndex: " << mCurrentIndex;
 
     // Close File
     closeFile(mCurrentIndex);
@@ -409,7 +409,7 @@ void OpenFilesModel::openRecentFiles()
 
     // Open Recent Files
     if (rFiles.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "OpenFilesModel::openRecentFiles - recentFilesPath: " << recentFilesPath;
+        //qDebug() << "OpenFilesModel::openRecentFiles - recentFilesPath: " << recentFilesPath;
         // Read All Content
         QString rfContent = rFiles.readAll();
         // Set Recent File List
@@ -455,7 +455,7 @@ void OpenFilesModel::saveRecentFiles()
 
     // Open Recent Files
     if (rFiles.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qDebug() << "OpenFilesModel::saveRecentFiles - recentFilesPath: " << recentFilesPath;
+        //qDebug() << "OpenFilesModel::saveRecentFiles - recentFilesPath: " << recentFilesPath;
         // Init Text Stream
         QTextStream rfStream(&rFiles);
         // Get Open Files Count
@@ -561,5 +561,5 @@ OpenFilesModel::~OpenFilesModel()
     // Clear
     clear();
 
-    qDebug() << "OpenFilesModel deleted.";
+    //qDebug() << "OpenFilesModel deleted.";
 }

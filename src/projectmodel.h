@@ -152,7 +152,7 @@ public:
     ViewsModel* viewsModel();
 
     // Get Component By Name
-    Q_INVOKABLE ComponentInfo* getComponentByName(const QString& aName, const QString& aType = "");
+    Q_INVOKABLE ComponentInfo* getComponentByName(const QString& aName, const QString& aType = "", const bool& aPreload = false);
     // Get Component By File Path
     Q_INVOKABLE ComponentInfo* getComponentByPath(const QString& aFilePath);
 
@@ -222,13 +222,6 @@ protected:
     // Init
     void init();
 
-    // Create QML Project
-    void createQMLProject();
-    // Load QML Project File
-    void loadQMLProject(const QString& aFileName);
-    // Save QML Project
-    void saveQMLProject();
-
     // Set Project Properties Dirty State
     void setDirty(const bool& aDirty);
 
@@ -249,8 +242,6 @@ protected:
     // Set Views Model
     void setViewsModel(ViewsModel* aViews);
 
-    // Create/register Base Components
-    void createBaseComponents();
     // Update Base Components
     void updateBaseComponents();
 

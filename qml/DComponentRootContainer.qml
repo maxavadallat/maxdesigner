@@ -18,6 +18,8 @@ DPaneBase {
 
     property bool updateComponentInfoEnabled: false
 
+    property bool childComponentsCreated: false
+
     title: "Component" + (componentInfo ? (" - " + componentInfo.componentName  ) : "")
 
     hideToSide: hideToBottom
@@ -87,7 +89,7 @@ DPaneBase {
         target: openFilesModel
 
         onComponentSelected: {
-            console.log("DComponentRootContainer.openFilesModelConnection.onComponentSelected - aComponent: " + aComponent);
+            //console.log("DComponentRootContainer.openFilesModelConnection.onComponentSelected - aComponent: " + aComponent);
 
             // Check Component Info
             if (componentRootContainerRoot.componentInfo === aComponent) {
@@ -107,7 +109,7 @@ DPaneBase {
         }
 
         onFileSelected: {
-            console.log("DComponentRootContainer.openFilesModelConnection.onFileSelected - aFilePath: " + aFilePath);
+            //console.log("DComponentRootContainer.openFilesModelConnection.onFileSelected - aFilePath: " + aFilePath);
 
             // Check File Path
             if (componentRootContainerRoot.componentInfo && componentRootContainerRoot.componentInfo.infoPath === aFilePath) {
@@ -127,7 +129,7 @@ DPaneBase {
         }
 
         onComponentClosed: {
-            console.log("DComponentRootContainer.openFilesModelConnection.onComponentClosed - aComponent: " + aComponent);
+            //console.log("DComponentRootContainer.openFilesModelConnection.onComponentClosed - aComponent: " + aComponent);
 
             // Check Component Info
             if (componentRootContainerRoot.componentInfo === aComponent) {
@@ -137,7 +139,7 @@ DPaneBase {
         }
 
         onFileClosed: {
-            console.log("DComponentRootContainer.openFilesModelConnection.onFileClosed - aFilePath: " + aFilePath);
+            //console.log("DComponentRootContainer.openFilesModelConnection.onFileClosed - aFilePath: " + aFilePath);
 
             // Check File Path
             if (componentRootContainerRoot.componentInfo && componentRootContainerRoot.componentInfo.infoPath === aFilePath) {
@@ -200,13 +202,22 @@ DPaneBase {
         //console.log("DComponentRootContainer.onFocusChanged - focus: " + focus);
 
         // Check Focus & Component Info
-        if (focus && componentInfo) {
+        if (focus) {
+//            // Check Previous Scale Level
+//            if (componentRootContainerRoot.previousScale !== componentRootContainerRoot.scale) {
+//                // Set Scale Duration
+//                componentRootContainerRoot.scaleDuration = 100;
+//                // Reset Scale
+//                componentRootContainerRoot.scale = componentRootContainerRoot.previousScale;
+//            } else {
+//                // Reset Scale Duration
+//                componentRootContainerRoot.scaleDuration = 0;
+//            }
+
             // Reset Scale Duration
             componentRootContainerRoot.scaleDuration = 0;
-
             // Set Focused Component
             propertiesController.focusedComponent = componentRootContainerRoot.componentInfo;
-
             // Set Focused File
             openFilesModel.focusedFile = componentRootContainerRoot.componentInfo ? componentRootContainerRoot.componentInfo.infoPath : "";
 
@@ -246,7 +257,6 @@ DPaneBase {
             propertiesController.requestCWidth(componentRootContainerRoot.width);
         }
 
-
         // ...
     }
 
@@ -267,6 +277,8 @@ DPaneBase {
         if (componentRootContainerRoot.state === componentRootContainerRoot.stateShown) {
             // Set Focus
             componentRootContainerRoot.focus = true;
+            // Create Child Components
+            componentRootContainerRoot.createChildComponents();
             // Set Update Component Info Enabled
             componentRootContainerRoot.updateComponentInfoEnabled = true;
         } else {
@@ -283,11 +295,51 @@ DPaneBase {
         }
     }
 
+    // Create Child Components
+    function createChildComponents() {
+        // Get Number Of Child Components
+        var cCount = componentRootContainerRoot.componentInfo !== null ? componentRootContainerRoot.componentInfo.childCount : 0;
+        // Check Component Info
+        if (cCount > 0 && !componentRootContainerRoot.childComponentsCreated) {
+            console.log("DComponentRootContainer.createChildComponents");
+            // Iterate Through Child Components
+            for (var i=0; i<cCount; i++) {
+                // Get Child Component Info
+                var ccInfo = componentRootContainerRoot.componentInfo.childInfo(i);
+                // Create Child Container Object
+                var newObject = newComponent.createObject(paneContainer, { "parentContainer": componentRootContainerRoot });
+                // Check New Object
+                if (newObject) {
+                    // Update Child Component Container Object
+                    componentRootContainerRoot.updateChildContainerObject(newObject, ccInfo, false);
+
+                } else {
+                    console.error("DComponentRootContainer.createChildComponents - ccInfo: " + ccInfo.componentName + " - ERROR CREATING CHILD OBJECT!!");
+                }
+            }
+
+            // Set Child Components Created
+            componentRootContainerRoot.childComponentsCreated = true;
+        }
+    }
+
+    // Add Child Component Info
+    function addChildComponent(aComponentInfo) {
+        // Check Root Container Component Info
+        if (componentRootContainerRoot.componentInfo !== null) {
+            // Add Child Component Info
+            componentRootContainerRoot.componentInfo.addChild(aComponentInfo);
+
+        } else {
+            console.error("DComponentRootContainer.addChildComponent - NO PARENT COMPONENT INFO!!");
+        }
+    }
+
     // Remove Child Component
     function removeChildComponent(childComponentObject) {
         console.log("DComponentRootContainer.removeChildComponent - childComponentObject: " + childComponentObject);
 
-        // Set Focus
+        // Set Root Container Focus
         componentRootContainerRoot.focus = true;
 
         // Check ComponentInfo
@@ -304,6 +356,36 @@ DPaneBase {
             childComponentObject.destroy();
         }
 
+    }
+
+    // Update Child Component Container Object
+    function updateChildContainerObject(childObject, aComponentInfo, aFocus) {
+        // Check Child Object & Component Info
+        if (childObject && aComponentInfo) {
+            console.log("DComponentRootContainer.updateChildContainerObject");
+
+            // Set Component Info
+            childObject.componentInfo = aComponentInfo;
+            // Set Focus
+            childObject.focus = aFocus;
+            // Enable Component Info Update
+            childObject.updateComponentInfoEnabled = true;
+
+            // Set Pos X
+            childObject.x = aComponentInfo.posX;
+            // Set Pos Y
+            childObject.y = aComponentInfo.posY;
+            // Set Width
+            childObject.width = aComponentInfo.width;
+            // Set Height
+            childObject.height = aComponentInfo.height;
+
+            // ...
+
+            // Set Anchors
+
+            // ...
+        }
     }
 
     DMouseArea {
@@ -404,24 +486,23 @@ DPaneBase {
             componentRootContainerRoot.previousScale = 1.0;
 
             // Create New Object
-            var newObject = newComponent.createObject(paneContainer, { "x": drop.x - CONSTS.componentItemWidth / 2,
-                                                                       "y": drop.y - CONSTS.componentItemHeight / 2,
-                                                                       "parentContainer": componentRootContainerRoot });
+            var newObject = newComponent.createObject(paneContainer, { "parentContainer": componentRootContainerRoot });
             // Check New Object
             if (newObject) {
-                // Set Cloned Component Info
-                newObject.componentInfo = drop.source.clone();
-                // Add Child
-                componentRootContainerRoot.componentInfo.addChild(newObject.componentInfo);
-                // Set Focus
-                newObject.focus = true;
+                // Update Child Component Container Object
+                componentRootContainerRoot.updateChildContainerObject(newObject, drop.source.clone(), true);
+
+                // Set Pos X
+                newObject.x = drop.x - CONSTS.componentItemWidth * 0.5;
+                // Set Pos Y
+                newObject.y = drop.y - CONSTS.componentItemHeight * 0.5;
+
+                // Add Child Component Info
+                addChildComponent(newObject.componentInfo);
 
             } else {
                 console.error("DComponentRootContainer.dropArea.onDropped - ERROR CREATING NEW OBJECT!");
             }
-
-            // ...
-
         }
 
         Canvas {
@@ -460,7 +541,4 @@ DPaneBase {
         font.pixelSize: 48
         text: componentInfo ? componentInfo.componentName : ""
     }
-
-    // ...
-
 }

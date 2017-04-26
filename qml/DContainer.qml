@@ -3,6 +3,7 @@ import QtGraphicalEffects 1.0
 
 import "DConstants.js" as CONSTS
 import "style"
+import "system"
 
 DMouseArea {
     id: containerRoot
@@ -39,16 +40,30 @@ DMouseArea {
     property QtObject parentContainer: null
 
     drag.target: enableDrag ? containerRoot : undefined
+
     drag.minimumX: 0
     drag.minimumY: 0
     drag.maximumX: parent ? (parent.width - containerRoot.width) : 0
     drag.maximumY: parent ? (parent.height - containerRoot.height) : 0
+
     drag.threshold: 0
-    // For Some re
+
     drag.filterChildren: true
-    //drag.smoothed: true
 
     signal resizePressed()
+
+    onPressed: {
+        // Set Last Mouse Press Owner
+        DSystemModel.lastMousePressOwner = "cRoot";
+    }
+
+    onReleased: {
+        // Check Last Mouse Press Owner
+        if (DSystemModel.lastMousePressOwner === "cRoot") {
+            // Reset Last Mouse Press Owner
+            DSystemModel.lastMousePressOwner = "";
+        }
+    }
 
     Keys.onPressed: {
         //console.log("DContainer.Keys.onPressed - key: " + event.key);

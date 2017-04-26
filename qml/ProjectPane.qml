@@ -16,7 +16,7 @@ DPane {
     creationHeight: settingsController ? settingsController.projectPaneHeight : 600
 
     minWidth: 300
-    minHeight: 400
+    minHeight: parent ? parent.height * 0.6 : 600
 
     enablePaneContent: true
 

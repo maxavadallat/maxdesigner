@@ -71,7 +71,7 @@ void ProjectTreeModel::setCurrentPath(const QString& aPath)
 {
     // Check Current Path
     if (mCurrentPath != aPath) {
-        qDebug() << "ProjectTreeModel::setCurrentPath - aPath: " << aPath;
+        //qDebug() << "ProjectTreeModel::setCurrentPath - aPath: " << aPath;
         // Set Current Path
         mCurrentPath = aPath;
 

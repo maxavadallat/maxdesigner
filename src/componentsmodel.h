@@ -27,7 +27,7 @@ public:
     // Get Component Index By Name
     int getComponentIndex(const QString& aName);
     // Get Component By Name
-    ComponentInfo* getComponent(const QString& aName);
+    ComponentInfo* getComponent(const QString& aName, const bool& aPreload = false);
     // Get Compoennt By Index
     Q_INVOKABLE ComponentInfo* getComponentByIndex(const int& aIndex);
 

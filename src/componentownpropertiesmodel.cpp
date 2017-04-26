@@ -16,7 +16,7 @@ ComponentOwnPropertiesModel::ComponentOwnPropertiesModel(ComponentInfo* aCompone
     , mProject(aProject)
     , mDerivedComponent(aDerivedComponent)
 {
-    qDebug() << "ComponentOwnPropertiesModel created.";
+    qDebug() << "ComponentOwnPropertiesModel created for " << (mComponent ? mComponent->mName : "NULL");
 
     // Init
     init();
@@ -41,8 +41,14 @@ void ComponentOwnPropertiesModel::clear()
     // Begin Reset Model
     beginResetModel();
 
-    // Clear Keys
-    mKeys.clear();
+    // Check Keys Count
+    if (mKeys.count() > 0) {
+        qDebug() << "ComponentOwnPropertiesModel::clear - mKeys: " << mKeys;
+        // Clear Keys
+        mKeys.clear();
+    } else {
+        //qDebug() << "ComponentOwnPropertiesModel::clear - NO KEYS!";
+    }
 
     // End Reset Model
     endResetModel();
@@ -53,8 +59,12 @@ void ComponentOwnPropertiesModel::clear()
 //==============================================================================
 void ComponentOwnPropertiesModel::loadComponentProperties()
 {
-    // Clear
-    clear();
+    // Check Component
+    if (!mComponent) {
+        return;
+    }
+
+    //qDebug() << "ComponentOwnPropertiesModel::loadComponentProperties - mComponent: " << mComponent->mName;
 
     // Begin Reset Model
     beginResetModel();
@@ -76,7 +86,7 @@ void ComponentOwnPropertiesModel::generateOwnPropertyKeys()
         return;
     }
 
-    qDebug() << "ComponentOwnPropertiesModel::generateOwnPropertyKeys - mName: " << mComponent->mName;
+    //qDebug() << "ComponentOwnPropertiesModel::generateOwnPropertyKeys - mName: " << mComponent->mName;
 
     // Set Keys
     mKeys = mComponent->mOwnProperties.keys();
@@ -91,7 +101,7 @@ void ComponentOwnPropertiesModel::generateOwnPropertyKeys()
         mKeys.removeDuplicates();
     }
 
-    qDebug() << "ComponentOwnPropertiesModel::generateOwnPropertyKeys - mComponent: " << mComponent->mName << " - mKeys: " << mKeys;
+    //qDebug() << "ComponentOwnPropertiesModel::generateOwnPropertyKeys - mComponent: " << mComponent->mName << " - mKeys: " << mKeys;
 }
 
 //==============================================================================
@@ -109,7 +119,7 @@ void ComponentOwnPropertiesModel::refreshProperty(const QString& aName)
 
     // Check Property Key Index
     if (pkIndex >= 0) {
-        qDebug() << "ComponentOwnPropertiesModel::refreshProperty - aName: " << aName;
+        //qDebug() << "ComponentOwnPropertiesModel::refreshProperty - aName: " << aName;
         // Emit Data Changed Signal
         emit dataChanged(index(pkIndex), index(pkIndex));
     }
@@ -131,6 +141,9 @@ void ComponentOwnPropertiesModel::setCurrentComponent(ComponentInfo* aComponent)
     // Check Current Component
     if (mComponent != aComponent) {
         qDebug() << "ComponentOwnPropertiesModel::setCurrentComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
+
+        // Clear
+        clear();
 
         // Set Current Component
         mComponent = aComponent;
@@ -171,7 +184,7 @@ bool ComponentOwnPropertiesModel::addComponentProperty(const QString& aName, con
 
     // Check Index
     if (kIndex < 0) {
-        qDebug() << "ComponentOwnPropertiesModel::addComponentProperty - aName: " << aName << " - aType: " << aType << " - aDefault: " << aDefault;
+        //qDebug() << "ComponentOwnPropertiesModel::addComponentProperty - aName: " << aName << " - aType: " << aType << " - aDefault: " << aDefault;
 
         // Switch Type
         switch ((ComponentInfo::EPropertyType)aType) {
@@ -374,7 +387,7 @@ bool ComponentOwnPropertiesModel::removeComponentProperty(const QString& aName)
 {
     // Check Component
     if (mComponent && mComponent->mIsProtoType && !aName.isEmpty() && mComponent->mOwnProperties.keys().indexOf(aName) >= 0) {
-        qDebug() << "ComponentOwnPropertiesModel::removeComponentProperty - aName: " << aName;
+        //qDebug() << "ComponentOwnPropertiesModel::removeComponentProperty - aName: " << aName;
 
         // Remove Key
         mComponent->mOwnProperties.remove(aName);
@@ -417,7 +430,7 @@ bool ComponentOwnPropertiesModel::setComponentProperty(const QString& aName, con
         return false;
     }
 
-    qDebug() << "ComponentOwnPropertiesModel::setComponentProperty - aName: " << aName << " - aValue: " << aValue;
+    //qDebug() << "ComponentOwnPropertiesModel::setComponentProperty - aName: " << aName << " - aValue: " << aValue;
 
     // Check If ProtoType
     if (mComponent->mIsProtoType) {
@@ -456,7 +469,7 @@ bool ComponentOwnPropertiesModel::clearComponentProperty(const QString& aName)
         return false;
     }
 
-    qDebug() << "ComponentOwnPropertiesModel::clearComponentProperty - aName: " << aName;
+    //qDebug() << "ComponentOwnPropertiesModel::clearComponentProperty - aName: " << aName;
 
     // Get Key Index
     int kIndex = mKeys.indexOf(aName);

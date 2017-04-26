@@ -15,6 +15,8 @@ ComponentSlotsModel::ComponentSlotsModel(ComponentInfo* aComponent, QObject* aPa
     , mDirty(false)
     , mSelectedIndex(-1)
 {
+    //qDebug() << "ComponentSlotsModel created.";
+
     // Init
     init();
 }
@@ -35,20 +37,19 @@ void ComponentSlotsModel::init()
 //==============================================================================
 void ComponentSlotsModel::clear()
 {
-    // Check Component
-    if (mComponent) {
-        // Begin Reset Model
-        beginResetModel();
+    //qDebug() << "ComponentSlotsModel::clear";
 
-        // Iterate Through Slots
-        while (mSlots.count() > 0) {
-            // Delete Last
-            delete mSlots.takeLast();
-        }
+    // Begin Reset Model
+    beginResetModel();
 
-        // End Reset Model
-        endResetModel();
+    // Iterate Through Slots
+    while (mSlots.count() > 0) {
+        // Delete Last
+        delete mSlots.takeLast();
     }
+
+    // End Reset Model
+    endResetModel();
 }
 
 //==============================================================================
@@ -68,19 +69,18 @@ void ComponentSlotsModel::setDirty(const bool& aDirty)
 //==============================================================================
 void ComponentSlotsModel::loadComponentSlots()
 {
-    // Clear
-    clear();
-
     // Check Component
-    if (mComponent) {
-        qDebug() << "ComponentSlotsModel::loadComponentSlots - mName: " << mComponent->mName;
-        // Get Slots Count
-        int sCount = mComponent->mSlots.count();
-        // Iterate Through Component Slots
-        for (int i=0; i<sCount; i++) {
-            // Append Slot
-            appendSlot(ComponentSlot::fromJSONObject(this, mComponent->mSlots[i].toObject()));
-        }
+    if (!mComponent) {
+        return;
+    }
+
+    //qDebug() << "ComponentSlotsModel::loadComponentSlots - mName: " << mComponent->mName;
+    // Get Slots Count
+    int sCount = mComponent->mSlots.count();
+    // Iterate Through Component Slots
+    for (int i=0; i<sCount; i++) {
+        // Append Slot
+        appendSlot(ComponentSlot::fromJSONObject(this, mComponent->mSlots[i].toObject()));
     }
 
     // Set Dirty
@@ -94,7 +94,7 @@ void ComponentSlotsModel::saveComponentSlots()
 {
     // Check Component
     if (mComponent && mDirty) {
-        qDebug() << "ComponentSlotsModel::saveComponentSlots - mName: " << mComponent->mName;
+        //qDebug() << "ComponentSlotsModel::saveComponentSlots - mComponent: " << mComponent->mName;
         // Set Component Slots
         mComponent->mSlots = toJSONArray();
         // Set Component Dirty
@@ -114,7 +114,7 @@ void ComponentSlotsModel::clearComponentSlots()
         return;
     }
 
-    qDebug() << "ComponentSlotsModel::clearComponentSlots - mName: " << mComponent->mName;
+    //qDebug() << "ComponentSlotsModel::clearComponentSlots - mComponent: " << mComponent->mName;
 
     // Iterate Through Component Slots
     while (mComponent->mSlots.count() > 0) {
@@ -138,9 +138,11 @@ void ComponentSlotsModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
-        qDebug() << "ComponentSlotsModel::setCurrentComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
+        //qDebug() << "ComponentSlotsModel::setCurrentComponent - mName: " << (aComponent ? aComponent->mName : "NULL");
         // Save Previous Component Slots
         saveComponentSlots();
+        // Clear
+        clear();
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Component Changed Signal
@@ -157,7 +159,7 @@ void ComponentSlotsModel::addSlot(const QString& aName, const QString& aSource)
 {
     // Check If Slot Valid
     if (slotValid(aName)) {
-        qDebug() << "ComponentSlotsModel::addSlot - aName: " << aName;
+        //qDebug() << "ComponentSlotsModel::addSlot - aName: " << aName;
         // Append Slot
         appendSlot(new ComponentSlot(this, aName, aSource));
     }
@@ -170,6 +172,7 @@ void ComponentSlotsModel::removeSlot(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < mSlots.count()) {
+        //qDebug() << "ComponentSlotsModel::removeSlot - aIndex: " << aIndex;
         // Begin Remove Rows
         beginRemoveRows(QModelIndex(), aIndex, aIndex);
         // Remove Slot
@@ -188,6 +191,7 @@ void ComponentSlotsModel::renameSlot(const int& aIndex, const QString& aName)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount() && slotValid(aName)) {
+        //qDebug() << "ComponentSlotsModel::renameSlot - aIndex: " << aIndex << " - aName: " << aName;
         // Set Slot Name
         mSlots[aIndex]->mName = aName;
         // Emit Data Changed Signal
@@ -230,7 +234,7 @@ bool ComponentSlotsModel::slotValid(const QString& aName)
 //==============================================================================
 ComponentSlot* ComponentSlotsModel::createNewSlot()
 {
-    qDebug() << "ComponentSlotsModel::createNewSlot";
+    //qDebug() << "ComponentSlotsModel::createNewSlot";
     // Set New Slot
     mNewSlot = true;
     // Create New Empty Slot
@@ -244,7 +248,7 @@ ComponentSlot* ComponentSlotsModel::selectSlot(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
-        qDebug() << "ComponentSlotsModel::selectSlot - aIndex: " << aIndex;
+        //qDebug() << "ComponentSlotsModel::selectSlot - aIndex: " << aIndex;
         // Set New Slot
         mNewSlot = false;
         // Set Selected Index
@@ -263,7 +267,7 @@ void ComponentSlotsModel::appendSlot(ComponentSlot* aSlot)
 {
     // Check Slot
     if (aSlot) {
-        qDebug() << "ComponentSlotsModel::appendSlot - mName: " << aSlot->mName;
+        //qDebug() << "ComponentSlotsModel::appendSlot - mName: " << aSlot->mName;
         // Begin Insert Rows
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
         // Append Slot
@@ -282,6 +286,7 @@ void ComponentSlotsModel::discardNewSlot(ComponentSlot* aSlot)
 {
     // Check Slot
     if (aSlot) {
+        //qDebug() << "ComponentSlotsModel::discardNewSlot";
         // Delete Slot
         delete aSlot;
         // Reset New Slot
@@ -296,7 +301,7 @@ void ComponentSlotsModel::updateSelectedSlot(const bool& aDoneEdit)
 {
     // Check Selected Index
     if (mSelectedIndex != -1) {
-        qDebug() << "ComponentSlotsModel::updateSelectedSlot - mSelectedIndex: " << mSelectedIndex;
+        //qDebug() << "ComponentSlotsModel::updateSelectedSlot - mSelectedIndex: " << mSelectedIndex;
 
 //        // Set Dirty
 //        setDirty(true);
@@ -384,6 +389,8 @@ ComponentSlotsModel::~ComponentSlotsModel()
     clear();
 
     // ...
+
+    //qDebug() << "ComponentSlotsModel deleted.";
 }
 
 

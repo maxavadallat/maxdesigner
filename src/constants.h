@@ -80,7 +80,7 @@
 // Open Files List Model Name
 #define MODEL_NAME_OPEN_FILES                               "openFilesModel"
 // Open Files List Model Name
-#define MODEL_NAME_MINIMIZED_COMPONENTS                     "minimizedCompoenntsModel"
+#define MODEL_NAME_MINIMIZED_COMPONENTS                     "minimizedComponentsModel"
 // Open Project Model Name
 #define MODEL_NAME_RECENT_PROJECTS                          "recentProjectsModel"
 

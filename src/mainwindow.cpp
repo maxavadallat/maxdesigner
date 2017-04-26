@@ -29,6 +29,8 @@
 #include "componentsmodel.h"
 #include "viewsmodel.h"
 
+#include "minimizedcomponents.h"
+
 #include "projectitemmodel.h"
 #include "openfilesmodel.h"
 #include "recentprojectsmodel.h"
@@ -102,16 +104,16 @@ MainWindow::MainWindow(QWidget* aParent)
 //==============================================================================
 void MainWindow::init()
 {
-    qDebug() << "MainWindow::init";
+    //qDebug() << "MainWindow::init";
 
-    // Check Event Filter
-    if (!mEventFilter) {
-        // Create Event Filter
-        mEventFilter = new DesignerEventFilter();
-    }
+//    // Check Event Filter
+//    if (!mEventFilter) {
+//        // Create Event Filter
+//        mEventFilter = new DesignerEventFilter();
+//    }
 
-    // Install Event Filter
-    //installEventFilter(mEventFilter);
+//    // Install Event Filter
+//    installEventFilter(mEventFilter);
 
     // Check Project Tree Model
     if (!mProjectTreeModel) {
@@ -166,6 +168,10 @@ void MainWindow::init()
     // Set Context Properties - Recent Projects List Model
     ctx->setContextProperty(MODEL_NAME_RECENT_PROJECTS, mRecentProjects);
 
+    // Check Minimized Components Model
+
+    // ...
+
     // Check Properties Controller
     if (!mPropertiesController) {
         // Create Properties Controller
@@ -200,6 +206,11 @@ void MainWindow::init()
 
     // Register Component Own Properties Model
     qmlRegisterUncreatableType<ComponentOwnPropertiesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_OWN_PROPERTIES_MODEL, "");
+    // Register Component Properties Model
+    qmlRegisterUncreatableType<ComponentPropertiesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_PROPERTIES_MODEL, "");
+
+    // Register Component Anchors Model
+    qmlRegisterUncreatableType<ComponentAnchorsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_ANCHORS_MODEL, "");
 
     // Register Component Signals Model
     qmlRegisterUncreatableType<ComponentSignalsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_SIGNALS_MODEL, "");
@@ -226,8 +237,6 @@ void MainWindow::init()
     // Register Component Transition
     qmlRegisterUncreatableType<ComponentTransition>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENT_TRANSITION, "");
 
-    // Register Component Properties Model
-    qmlRegisterUncreatableType<ComponentPropertiesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_PROPERTIES_MODEL, "");
 
     // Get Engine
     QQmlEngine* engine = ui->mainQuickWidget->engine();
@@ -280,25 +289,22 @@ void MainWindow::restoreUI()
 //==============================================================================
 void MainWindow::takeScreenShot()
 {
-    // Check Current Project & Current Component
-    if (mProjectModel && mCurrentComponent && mCurrentComponent->componentType() == COMPONENT_TYPE_VIEW) {
-        qDebug() << "MainWindow::takeScreenShot";
+//    // Check Current Project & Current Component
+//    if (mProjectModel && mCurrentComponent && mCurrentComponent->componentType() == COMPONENT_TYPE_VIEW) {
+//        qDebug() << "MainWindow::takeScreenShot";
 
-        // Set Screen Shot Mode
-        setScreenShotMode(true);
+//        // Set Screen Shot Mode
+//        setScreenShotMode(true);
 
-        // Grab Fram Buffer
-        QImage ssImage = ui->mainQuickWidget->grabFramebuffer();
+//        // Grab Fram Buffer
+//        QImage ssImage = ui->mainQuickWidget->grabFramebuffer();
 
-        // Reset Screen Shot Mode
-        setScreenShotMode(false);
+//        // Reset Screen Shot Mode
+//        setScreenShotMode(false);
 
+//        // ...
 
-
-        // ...
-
-
-    }
+//    }
 }
 
 //==============================================================================
@@ -397,7 +403,7 @@ bool MainWindow::screenshotMode()
 //==============================================================================
 void MainWindow::openProject(const QString& aFilePath)
 {
-    qDebug() << "MainWindow::openProject - aFilePath: " << aFilePath;
+    //qDebug() << "MainWindow::openProject - aFilePath: " << aFilePath;
 
     // Check Open Fies Model
     if (mOpenFiles) {
@@ -930,7 +936,7 @@ void MainWindow::toggleSlowMotion()
 //==============================================================================
 void MainWindow::createNewProject()
 {
-    qDebug() << "MainWindow::createNewProject";
+    //qDebug() << "MainWindow::createNewProject";
 
     // Check Project Model
     if (!mProjectModel) {
@@ -1013,7 +1019,7 @@ void MainWindow::createNewComponent(const QString& aName,
 
     // Check Name
     if (!aName.isEmpty()) {
-        qDebug() << "MainWindow::createNewComponent - aName: " << aName << " - aType: " << aType << " - aBase: " << aBase << " - aCategory: " << aCategory;
+        //qDebug() << "MainWindow::createNewComponent - aName: " << aName << " - aType: " << aType << " - aBase: " << aBase << " - aCategory: " << aCategory;
 
         // Init New Component
         ComponentInfo* newComponent = NULL;
@@ -1064,7 +1070,7 @@ void MainWindow::saveProject(const QString& aFilePath)
         return;
     }
 
-    qDebug() << "MainWindow::saveProject - aFilePath: " << aFilePath;
+    //qDebug() << "MainWindow::saveProject - aFilePath: " << aFilePath;
 
     // Save Project
     if (mProjectModel->saveProject(aFilePath) && mRecentProjects) {
@@ -1112,7 +1118,7 @@ void MainWindow::updateProject()
         return;
     }
 
-    qDebug() << "MainWindow::updateProject";
+    //qDebug() << "MainWindow::updateProject";
 
     // Set Properties Controller
     mProjectModel->setPropertiesController(mPropertiesController);
@@ -1187,7 +1193,7 @@ void MainWindow::closeProject()
         mPropertiesController->setFocusedComponent(NULL);
     }
 
-    qDebug() << "MainWindow::closeProject";
+    //qDebug() << "MainWindow::closeProject";
 
     // Save Project
     saveProject();
@@ -1248,7 +1254,7 @@ void MainWindow::closeProject()
 //==============================================================================
 void MainWindow::closeComponent()
 {
-    qDebug() << "MainWindow::closeComponent";
+    //qDebug() << "MainWindow::closeComponent";
 
     // Check Properties Controller
     if (mPropertiesController) {
@@ -1271,7 +1277,7 @@ void MainWindow::closeComponent()
 //==============================================================================
 void MainWindow::closeAllComponents()
 {
-    qDebug() << "MainWindow::closeAllComponents";
+    //qDebug() << "MainWindow::closeAllComponents";
 
     // Check Properties Controller
     if (mPropertiesController) {
@@ -1301,7 +1307,7 @@ void MainWindow::removeComponent(const QString& aName)
 
     // Check Name
     if (!aName.isEmpty()) {
-        qDebug() << "MainWindow::removeComponent - aName: " << aName;
+        //qDebug() << "MainWindow::removeComponent - aName: " << aName;
 
         // ...
     }
@@ -1393,7 +1399,7 @@ void MainWindow::importPathAdded(const QString& aImportPath)
 
     // Check Engine
     if (engine) {
-        qDebug() << "MainWindow::importPathAdded - aImportPath: " << aImportPath;
+        //qDebug() << "MainWindow::importPathAdded - aImportPath: " << aImportPath;
 
         // Add Import Path
         engine->addImportPath(aImportPath);
@@ -1418,7 +1424,7 @@ void MainWindow::importPathRemoved(const QString& aImportPath)
         int ipIndex = ipList.indexOf(aImportPath);
         // Check Import Path Index
         if (ipIndex >= 0) {
-            qDebug() << "MainWindow::importPathRemoved - aImportPath: " << aImportPath;
+            //qDebug() << "MainWindow::importPathRemoved - aImportPath: " << aImportPath;
             // Remove Import Path
             ipList.removeAt(ipIndex);
             // Set Import Path List
@@ -1439,7 +1445,7 @@ void MainWindow::importPathsChanged(const QStringList& aImportPaths)
 
     // Check Engine
     if (engine) {
-        qDebug() << "MainWindow::importPathsChanged - aImportPaths: " << aImportPaths;
+        //qDebug() << "MainWindow::importPathsChanged - aImportPaths: " << aImportPaths;
         // Set Import Paths
         engine->setImportPathList(aImportPaths);
     }
@@ -1457,7 +1463,7 @@ void MainWindow::pluginPathAdded(const QString& aPluginPath)
 
     // Check Engine
     if (engine) {
-        qDebug() << "MainWindow::pluginPathAdded - aPluginPath: " << aPluginPath;
+        //qDebug() << "MainWindow::pluginPathAdded - aPluginPath: " << aPluginPath;
         // Add Plugin Path
         engine->addPluginPath(aPluginPath);
     }
@@ -1481,7 +1487,7 @@ void MainWindow::pluginPathRemoved(const QString& aPluginPath)
         int ppIndex = ppList.indexOf(aPluginPath);
         // Check Import Path Index
         if (ppIndex >= 0) {
-            qDebug() << "MainWindow::pluginPathRemoved - aPluginPath: " << aPluginPath;
+            //qDebug() << "MainWindow::pluginPathRemoved - aPluginPath: " << aPluginPath;
             // Remove Import Path
             ppList.removeAt(ppIndex);
             // Set Plugin Path List
@@ -1502,7 +1508,7 @@ void MainWindow::pluginPathsChanged(const QStringList& aPluginPaths)
 
     // Check Engine
     if (engine) {
-        qDebug() << "MainWindow::pluginPathsChanged - aPluginPaths: " << aPluginPaths;
+        //qDebug() << "MainWindow::pluginPathsChanged - aPluginPaths: " << aPluginPaths;
         // Set Plugin Paths
         engine->setPluginPathList(aPluginPaths);
     }
@@ -1511,9 +1517,9 @@ void MainWindow::pluginPathsChanged(const QStringList& aPluginPaths)
 //==============================================================================
 // Base Component Created Slot
 //==============================================================================
-void MainWindow::baseComponentCreated(ComponentInfo* aComponent)
+void MainWindow::baseComponentCreated(ComponentInfo* )
 {
-    qDebug() << "MainWindow::baseComponentCreated - aComponent: " << aComponent;
+    //qDebug() << "MainWindow::baseComponentCreated - aComponent: " << aComponent;
 
     // ...
 }
@@ -1521,9 +1527,9 @@ void MainWindow::baseComponentCreated(ComponentInfo* aComponent)
 //==============================================================================
 // Component Created Slot
 //==============================================================================
-void MainWindow::componentCreated(ComponentInfo* aComponent)
+void MainWindow::componentCreated(ComponentInfo* )
 {
-    qDebug() << "MainWindow::componentCreated - aComponent: " << aComponent;
+    //qDebug() << "MainWindow::componentCreated - aComponent: " << aComponent;
 
     // ...
 }
@@ -1531,9 +1537,9 @@ void MainWindow::componentCreated(ComponentInfo* aComponent)
 //==============================================================================
 // View Creaeted Slot
 //==============================================================================
-void MainWindow::viewCreated(ComponentInfo* aComponent)
+void MainWindow::viewCreated(ComponentInfo* )
 {
-    qDebug() << "MainWindow::viewCreated - aComponent: " << aComponent;
+    //qDebug() << "MainWindow::viewCreated - aComponent: " << aComponent;
 
     // ...
 }
@@ -1543,7 +1549,7 @@ void MainWindow::viewCreated(ComponentInfo* aComponent)
 //==============================================================================
 void MainWindow::fileOpened(const QString& aFilePath)
 {
-    qDebug() << "MainWindow::fileOpened - aFilePath: " << aFilePath;
+    //qDebug() << "MainWindow::fileOpened - aFilePath: " << aFilePath;
 
     // Check Project Model
     if (mProjectModel) {
@@ -1582,9 +1588,9 @@ void MainWindow::fileSelected(const QString& aFilePath)
 //==============================================================================
 // File Closed Slot
 //==============================================================================
-void MainWindow::fileClosed(const QString& aFilePath)
+void MainWindow::fileClosed(const QString& )
 {
-    qDebug() << "MainWindow::fileClosed - aFilePath: " << aFilePath;
+    //qDebug() << "MainWindow::fileClosed - aFilePath: " << aFilePath;
 
     // Check Open Files Model
     if (!mOpenFiles || mOpenFiles->rowCount() == 0) {
@@ -1597,9 +1603,9 @@ void MainWindow::fileClosed(const QString& aFilePath)
 //==============================================================================
 // Component Opened Slot
 //==============================================================================
-void MainWindow::componentOpened(ComponentInfo* aComponent)
+void MainWindow::componentOpened(ComponentInfo* )
 {
-    qDebug() << "MainWindow::componentOpened - aComponent: " << (aComponent ? aComponent->componentName() : "NULL!");
+    //qDebug() << "MainWindow::componentOpened - aComponent: " << (aComponent ? aComponent->componentName() : "NULL!");
 
     // Check Open Files Model
     if (mOpenFiles && mOpenFiles->rowCount() > 0) {

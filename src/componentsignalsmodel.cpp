@@ -14,7 +14,7 @@ ComponentSignalsModel::ComponentSignalsModel(ComponentInfo* aComponent, QObject*
     , mDirty(false)
     , mSelectedIndex(-1)
 {
-    qDebug() << "ComponentSignalsModel created.";
+    //qDebug() << "ComponentSignalsModel created.";
 
     // Init
     init();
@@ -36,6 +36,8 @@ void ComponentSignalsModel::init()
 //==============================================================================
 void ComponentSignalsModel::clear()
 {
+    //qDebug() << "ComponentSignalsModel::clear";
+
     // Begin Reset Model
     beginResetModel();
 
@@ -66,24 +68,23 @@ void ComponentSignalsModel::setDirty(const bool& aDirty)
 //==============================================================================
 void ComponentSignalsModel::loadComponentSignals()
 {
-    // Clear
-    clear();
-
     // Check Component
-    if (mComponent) {
-        qDebug() << "ComponentSignalsModel::loadComponentSignals - mName: " << mComponent->mName;
-
-        // Get Signals Count
-        int sCount = mComponent->mSignals.count();
-        // Iterate Through Signals
-        for (int i=0; i<sCount; i++) {
-            // Append Signal
-            appendSignal(ComponentSignal::fromJSONObject(this, mComponent->mSignals[i].toObject()));
-        }
-
-        // Set Dirty
-        setDirty(false);
+    if (!mComponent) {
+        return;
     }
+
+    //qDebug() << "ComponentSignalsModel::loadComponentSignals - mName: " << mComponent->mName;
+
+    // Get Signals Count
+    int sCount = mComponent->mSignals.count();
+    // Iterate Through Signals
+    for (int i=0; i<sCount; i++) {
+        // Append Signal
+        appendSignal(ComponentSignal::fromJSONObject(this, mComponent->mSignals[i].toObject()));
+    }
+
+    // Set Dirty
+    setDirty(false);
 }
 
 //==============================================================================
@@ -93,7 +94,7 @@ void ComponentSignalsModel::saveComponentSignals()
 {
     // Check Current Component
     if (mComponent && mDirty) {
-        qDebug() << "ComponentSignalsModel::saveComponentSignals - mName: " << mComponent->mName;
+        //qDebug() << "ComponentSignalsModel::saveComponentSignals - mName: " << mComponent->mName;
         // Set Component Signals
         mComponent->mSignals = toJSONArray();
         // Set Dirty
@@ -110,7 +111,7 @@ void ComponentSignalsModel::clearComponentSignals()
 {
     // Check Component
     if (mComponent) {
-        qDebug() << "ComponentSignalsModel::clearComponentSignals - mName: " << mComponent->mName;
+        //qDebug() << "ComponentSignalsModel::clearComponentSignals - mName: " << mComponent->mName;
         // Iterate Through Signals
         while (mComponent->mSignals.count() > 0) {
             // Remove Last
@@ -136,10 +137,11 @@ void ComponentSignalsModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
-        qDebug() << "ComponentSignalsModel::setCurrentComponent - mName: " << (aComponent ? aComponent->mName : "NULL");
-
+        //qDebug() << "ComponentSignalsModel::setCurrentComponent - mName: " << (aComponent ? aComponent->mName : "NULL");
         // Save Previous Component Signals
         saveComponentSignals();
+        // Clear
+        clear();
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Component Changed Signal
@@ -156,7 +158,7 @@ void ComponentSignalsModel::addSignal(const QString& aName, const QStringList& a
 {
     // Check If Signal Valid
     if (signalValid(aName)) {
-        qDebug() << "ComponentSignalsModel::addSignal - aName: " << aName << " - aParameters: " << aParameters;
+        //qDebug() << "ComponentSignalsModel::addSignal - aName: " << aName << " - aParameters: " << aParameters;
         // Append New Signal
         appendSignal(new ComponentSignal(this, aName, aParameters));
     }
@@ -169,7 +171,7 @@ void ComponentSignalsModel::removeSignal(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
-        qDebug() << "ComponentSignalsModel::removeSignal - aIndex: " << aIndex;
+        //qDebug() << "ComponentSignalsModel::removeSignal - aIndex: " << aIndex;
         // Begin Remove Rows
         beginRemoveRows(QModelIndex(), aIndex, aIndex);
         // Delete Signal
@@ -188,7 +190,7 @@ void ComponentSignalsModel::renameSignal(const int& aIndex, const QString& aName
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount() && signalValid(aName)) {
-        qDebug() << "ComponentSignalsModel::renameSignal - aName: " << aName;
+        //qDebug() << "ComponentSignalsModel::renameSignal - aName: " << aName;
         // Set Signal Name
         mSignals[aIndex]->mName = aName;
         // Emit Data Changed Signal
@@ -231,7 +233,7 @@ bool ComponentSignalsModel::signalValid(const QString& aName)
 //==============================================================================
 ComponentSignal* ComponentSignalsModel::createNewSignal()
 {
-    qDebug() << "ComponentSignalsModel::createNewSignal";
+    //qDebug() << "ComponentSignalsModel::createNewSignal";
     // Set New Signal
     mNewSignal = true;
     // Create New Empty Signal
@@ -245,7 +247,7 @@ ComponentSignal* ComponentSignalsModel::selectSignal(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
-        qDebug() << "ComponentSignalsModel::selectSignal - aIndex: " << aIndex;
+        //qDebug() << "ComponentSignalsModel::selectSignal - aIndex: " << aIndex;
 
         // Reset New Signal
         mNewSignal = false;
@@ -265,15 +267,13 @@ void ComponentSignalsModel::appendSignal(ComponentSignal* aSignal)
 {
     // Check Signal
     if (aSignal) {
-        qDebug() << "ComponentSignalsModel::appendSignal - aSignal: " << aSignal->mName;
-
+        //qDebug() << "ComponentSignalsModel::appendSignal - aSignal: " << aSignal->mName;
         // Begin Insert Rows
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
         // Append Signal
         mSignals << aSignal;
         // End Insert Rows
         endInsertRows();
-
         // Set Dirty
         setDirty(true);
     }
@@ -286,7 +286,7 @@ void ComponentSignalsModel::discardNewSignal(ComponentSignal* aSignal)
 {
     // Check Signal
     if (aSignal) {
-        qDebug() << "ComponentSignalsModel::discardNewSignal";
+        //qDebug() << "ComponentSignalsModel::discardNewSignal";
         // Delete Signal
         delete aSignal;
         // Reset New Signal
@@ -301,7 +301,7 @@ void ComponentSignalsModel::updateSelectedSignal(const bool& aDoneEdit)
 {
     // Check Selected Index
     if (mSelectedIndex != -1) {
-        qDebug() << "ComponentSignalsModel::updateSelectedSignal - mSelectedIndex: " << mSelectedIndex;
+        //qDebug() << "ComponentSignalsModel::updateSelectedSignal - mSelectedIndex: " << mSelectedIndex;
 
 //        // Set Dirty
 //        setDirty(true);
@@ -393,7 +393,7 @@ ComponentSignalsModel::~ComponentSignalsModel()
 
     // ...
 
-    qDebug() << "ComponentSignalsModel deleted.";
+    //qDebug() << "ComponentSignalsModel deleted.";
 }
 
 

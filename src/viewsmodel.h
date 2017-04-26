@@ -27,7 +27,7 @@ public:
     // Get View Index By Name
     int getViewIndex(const QString& aName);
     // Get View By Name
-    ComponentInfo* getView(const QString& aName);
+    ComponentInfo* getView(const QString& aName, const bool& aPreload = false);
     // Get View By Index
     Q_INVOKABLE ComponentInfo* getViewByIndex(const int& aIndex);
 

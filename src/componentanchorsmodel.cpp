@@ -12,7 +12,7 @@ ComponentAnchorsModel::ComponentAnchorsModel(ComponentInfo* aComponent, QObject*
     : QObject(aParent)
     , mComponent(aComponent)
 {
-    qDebug() << "ComponentAnchorsModel created.";
+    //qDebug() << "ComponentAnchorsModel created.";
 
     // Init
     init();
@@ -32,23 +32,6 @@ void ComponentAnchorsModel::clear()
 {
     // ...
 }
-
-////==============================================================================
-//// Load Component Anchors
-////==============================================================================
-//void ComponentAnchorsModel::loadComponentAnchors()
-//{
-
-//    // ...
-//}
-
-////==============================================================================
-//// Save Component Anchors
-////==============================================================================
-//void ComponentAnchorsModel::saveComponentAnchors()
-//{
-//    //
-//}
 
 //==============================================================================
 // Get Current Component
@@ -556,5 +539,5 @@ ComponentAnchorsModel::~ComponentAnchorsModel()
 
     // ...
 
-    qDebug() << "ComponentAnchorsModel deleted.";
+    //qDebug() << "ComponentAnchorsModel deleted.";
 }

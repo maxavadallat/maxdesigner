@@ -70,6 +70,11 @@ class ComponentInfo : public QObject
     Q_PROPERTY(QString width READ width NOTIFY widthChanged)
     Q_PROPERTY(QString height READ height NOTIFY heightChanged)
 
+    // Anchors
+
+    // ...
+
+
 public:
     // Property Type
     enum class EPropertyType {
@@ -86,8 +91,6 @@ public:
     Q_ENUM(EPropertyType)
 
 public:
-    // Create Component From QML File
-    static ComponentInfo* fromQML(const QString& aFilePath, ProjectModel* aProject);
     // Create Component From Component Info File
     static ComponentInfo* fromInfoFile(const QString& aFilePath, ProjectModel* aProject);
 
@@ -183,15 +186,18 @@ public:
 
     // Get Child Count
     int childCount();
-
-    // Export To QML
-    void exportToQML(const QString& aFilePath);
+    // Get Child
+    Q_INVOKABLE ComponentInfo* childInfo(const int& aIndex);
 
     // Request Close
     Q_INVOKABLE void requestClose();
 
-    // Generate Live Code
-    QString generateLiveCode();
+    // Register Object ID
+    Q_INVOKABLE void registerObjectID(const QString& aID, QObject* aObject);
+    // Clear Object ID
+    Q_INVOKABLE void clearObjectID(const QString& aID);
+    // Get Child Object By ID
+    Q_INVOKABLE QObject* getObject(const QString& aID);
 
     // Destructor
     ~ComponentInfo();
@@ -276,9 +282,9 @@ signals:
     void anchorCenterInChanged(const QString& aCenterIn);
 
     // Horizontal Center Anchor Changed Signal
-    void anchorHorizontalCenterChanged(const QString& aLeft);
+    void anchorHorizontalCenterChanged(const QString& aHorizontalCenter);
     // Vertical Center Anchor Changed Signal
-    void anchorVerticalCenterChanged(const QString& aLeft);
+    void anchorVerticalCenterChanged(const QString& aVerticalCenter);
 
     // Horizontal Center Anchor Offset Changed Signal
     void anchorHorizontalCenterOffsetChanged(const QString& aOffset);
@@ -373,12 +379,12 @@ protected:
     void clearIDMap();
 
     // Load
-    void load(const QString& aFilePath = "");
+    bool load(const QString& aFilePath = "");
     // Save
-    void save(const QString& aFilePath = "");
+    bool save(const QString& aFilePath = "");
 
     // Get JSON Object
-    QJsonObject toJSONObject();
+    QJsonObject toJSONObject(const bool& aChild = false);
     // Get JSON Content/Sting
     QByteArray toJSONContent();
 
@@ -414,6 +420,9 @@ protected:
 
     // Set Dirty State
     void setDirty(const bool& aDirty);
+
+    // Generate Live Code
+    QString generateLiveCode();
 
 protected slots:
     // Base Components Dir Changed Slot

@@ -7,6 +7,8 @@ QtObject {
 
     property string lastMousePressOwner: ""
 
+    property bool systemBusy: false
+
     signal cancelMarkForDeletion()
 
     // ...

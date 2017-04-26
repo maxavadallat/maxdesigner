@@ -38,10 +38,116 @@ DRectangle {
         item.y = posY;
     }
 
-    Component.onCompleted: {
+/*
 
+    Component.onCompleted: {
+        demoContainer1.x = (demoContainerRoot.width - demoContainer1.width) * 0.5 - 100;
+        demoContainer1.y = (demoContainerRoot.height - demoContainer1.height) * 0.5 - 100;
+
+        demoContainer2.x = (demoContainerRoot.width - demoContainer2.width) * 0.5 + 100;
+        demoContainer2.y = (demoContainerRoot.height - demoContainer2.height) * 0.5 + 100;
     }
 
+    Item {
+        id: dragItem
+
+        width: 200
+        height: 300
+
+        default property alias contentChildren: contentContainer.children
+
+        Rectangle {
+            anchors.fill: parent
+            color: "#77000000"
+            border.color: "purple"
+        }
+
+        DMouseArea {
+            id: dragMouseArea
+            anchors.fill: parent
+
+            drag.target: dragItem
+            drag.filterChildren: true
+            drag.threshold: 0
+
+            onPressed: {
+                console.log("dragMouseArea.onPressed");
+                demoContainerRoot.bringToFront(dragItem);
+            }
+
+            onReleased: {
+                console.log("dragMouseArea.onReleased");
+            }
+
+            DMouseArea {
+                anchors.fill: parent
+            }
+
+            Item {
+                id: contentContainer
+                anchors.fill: parent
+
+                MouseArea {
+                    id: demoMouseArea
+                    anchors.fill: parent
+                    anchors.margins: 16
+
+                    onPressed: {
+                        console.log("demoMouseArea.onPressed");
+                    }
+
+                    onReleased: {
+                        console.log("demoMouseArea.onReleased");
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "transparent"
+                        border.color: "orange"
+                    }
+                }
+
+                DButton {
+                    id: demoButton
+                    anchors.centerIn: parent
+
+                    onPressed: {
+                        console.log("demoButton.onPressed");
+                    }
+
+                    onReleased: {
+                        console.log("demoButton.onReleased");
+                    }
+
+                    onClicked: {
+
+                    }
+                }
+
+
+
+            }
+
+        }
+        // ...
+    }
+
+    DContainer {
+        id: demoContainer1
+
+        onPressed: {
+            demoContainerRoot.bringToFront(demoContainer1);
+        }
+    }
+
+    DContainer {
+        id: demoContainer2
+
+        onPressed: {
+            demoContainerRoot.bringToFront(demoContainer2);
+        }
+    }
+*/
 /*
     function convertTextToRichText(sourceText) {
         // Get Text Length

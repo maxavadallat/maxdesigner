@@ -39,31 +39,31 @@ void ProjectModel::init()
     // ...
 }
 
-//==============================================================================
-// Create QML Project
-//==============================================================================
-void ProjectModel::createQMLProject()
-{
-    // ...
-}
+////==============================================================================
+//// Create QML Project
+////==============================================================================
+//void ProjectModel::createQMLProject()
+//{
+//    // ...
+//}
 
-//==============================================================================
-// Load QML Project File
-//==============================================================================
-void ProjectModel::loadQMLProject(const QString& aFileName)
-{
-    Q_UNUSED(aFileName);
+////==============================================================================
+//// Load QML Project File
+////==============================================================================
+//void ProjectModel::loadQMLProject(const QString& aFileName)
+//{
+//    Q_UNUSED(aFileName);
 
-    // ...
-}
+//    // ...
+//}
 
-//==============================================================================
-// Save QML Project
-//==============================================================================
-void ProjectModel::saveQMLProject()
-{
-    // ...
-}
+////==============================================================================
+//// Save QML Project
+////==============================================================================
+//void ProjectModel::saveQMLProject()
+//{
+//    // ...
+//}
 
 //==============================================================================
 // Set Project Properties Dirty State
@@ -93,6 +93,9 @@ void ProjectModel::createBaseComponentsModel()
         // Set Base Components Model
         setBaseComponentsModel(newModel);
     }
+
+    // Load Base Components
+    mBaseComponents->loadBaseComponents();
 }
 
 //==============================================================================
@@ -109,6 +112,9 @@ void ProjectModel::createComponentsModel()
         // Set Components Model
         setComponentsModel(newModel);
     }
+
+    // Load Components
+    mComponents->loadComponents();
 }
 
 //==============================================================================
@@ -125,6 +131,9 @@ void ProjectModel::createViewsModel()
         // Set Views Model
         setViewsModel(newModel);
     }
+
+    // Load Views
+    mViews->loadViews();
 }
 
 //==============================================================================
@@ -184,22 +193,7 @@ void ProjectModel::setViewsModel(ViewsModel* aViews)
 }
 
 //==============================================================================
-// Create/Register Base Components
-//==============================================================================
-void ProjectModel::createBaseComponents()
-{
-    // Item
-
-    // Rectangle
-
-    // Image
-
-    // BorderImage
-
-}
-
-//==============================================================================
-// Update Base Components
+// Update Components And Children
 //==============================================================================
 void ProjectModel::updateBaseComponents()
 {
@@ -273,7 +267,7 @@ bool ProjectModel::loadProject(const QString& aFileName)
 
     // Open File For Reading
     if (jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "ProjectModel::loadProject - aFileName: " << aFileName;
+        //qDebug() << "ProjectModel::loadProject - aFileName: " << aFileName;
         // Init JSON Content
         QString jsonContent;
         // Read All
@@ -311,7 +305,7 @@ bool ProjectModel::loadProject(const QString& aFileName)
         // Update Base Components
         updateBaseComponents();
 
-        qDebug() << "ProjectModel::loadProject - aFileName: " << aFileName << " - DONE.";
+        //qDebug() << "ProjectModel::loadProject - aFileName: " << aFileName << " - DONE.";
 
         // Emit Project Loaded Signal
         emit projectLoaded();
@@ -343,7 +337,7 @@ bool ProjectModel::saveProject(const QString& aFileName)
         saveFileName = absoluteProjectFilePath();
     }
 
-    qDebug() << "ProjectModel::saveProject - saveFileName: " << saveFileName;
+    //qDebug() << "ProjectModel::saveProject - saveFileName: " << saveFileName;
 
     // Init Project File Info
     QFileInfo pfInfo(saveFileName);
@@ -389,7 +383,7 @@ bool ProjectModel::saveProject(const QString& aFileName)
 //==============================================================================
 void ProjectModel::closeProject(const bool& aSave)
 {
-    qDebug() << "ProjectModel::closeProject - aSave: " << aSave;
+    //qDebug() << "ProjectModel::closeProject - aSave: " << aSave;
 
     // Check Save
     if (aSave) {
@@ -467,11 +461,11 @@ ComponentInfo* ProjectModel::createBaseComponent(const QString& aName,
     ComponentInfo* cInfo = mBaseComponents->getComponent(aName);
     // Check Component Info
     if (cInfo) {
-        qDebug() << "ProjectModel::createBaseComponent - aName: " << aName << " - COMPONENT ALREADY EXISTS!";
+        //qDebug() << "ProjectModel::createBaseComponent - aName: " << aName << " - COMPONENT ALREADY EXISTS!";
         return cInfo;
     }
 
-    qDebug() << "ProjectModel::createBaseComponent - aName: " << aName << " - aBaseName: " << aBaseName << " - aCategory: " << aCategory;
+    //qDebug() << "ProjectModel::createBaseComponent - aName: " << aName << " - aBaseName: " << aBaseName << " - aCategory: " << aCategory;
 
     // Create New Component
     ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_BASECOMPONENT, aCategory, this, aBaseName, aBuiltIn);
@@ -509,11 +503,11 @@ ComponentInfo* ProjectModel::createComponent(const QString& aName, const QString
     ComponentInfo* cInfo = mComponents->getComponent(aName);
     // Check Component Info
     if (cInfo) {
-        qDebug() << "ProjectModel::createComponent - aName: " << aName << " - COMPONENT ALREADY EXISTS!";
+        //qDebug() << "ProjectModel::createComponent - aName: " << aName << " - COMPONENT ALREADY EXISTS!";
         return cInfo;
     }
 
-    qDebug() << "ProjectModel::createComponent - aName: " << aName << " - aBaseName: " << aBaseName << " - aCategory: " << aCategory;
+    //qDebug() << "ProjectModel::createComponent - aName: " << aName << " - aBaseName: " << aBaseName << " - aCategory: " << aCategory;
 
     // Create New Component
     ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_COMPONENT, aCategory, this, aBaseName);
@@ -551,11 +545,11 @@ ComponentInfo* ProjectModel::createView(const QString& aName, const QString& aBa
     ComponentInfo* cInfo = mViews->getView(aName);
     // Check Component Info
     if (cInfo) {
-        qDebug() << "ProjectModel::createView - aName: " << aName << " - VIEW ALREADY EXISTS!";
+        //qDebug() << "ProjectModel::createView - aName: " << aName << " - VIEW ALREADY EXISTS!";
         return cInfo;
     }
 
-    qDebug() << "ProjectModel::createView - aName: " << aName << " - aBaseName: " << aBaseName;
+    //qDebug() << "ProjectModel::createView - aName: " << aName << " - aBaseName: " << aBaseName;
 
     // Create New Component
     ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_VIEW, COMPONENT_CATEGORY_VISUAL, this, aBaseName);
@@ -591,7 +585,7 @@ void ProjectModel::setProjectName(const QString& aName)
 {
     // Check Name
     if (aName != projectName()) {
-        qDebug() << "ProjectModel::setProjectName - aName: " << aName;
+        //qDebug() << "ProjectModel::setProjectName - aName: " << aName;
         // Set Project Name
         mProperties[JSON_KEY_PROJECT_NAME] = aName;
         // Emit Project Name Changed
@@ -618,7 +612,7 @@ void ProjectModel::setProjectDir(const QString& aDir)
 {
     // Check Dir
     if (aDir != projectDir()) {
-        qDebug() << "ProjectModel::setProjectDir - aDir: " << aDir;
+        //qDebug() << "ProjectModel::setProjectDir - aDir: " << aDir;
         // Set Project Dir
         mProperties[JSON_KEY_PROJECT_DIR] = aDir;
         // Emit Project Dir Changed
@@ -748,7 +742,7 @@ void ProjectModel::setBaseComponentsDir(const QString& aBaseComponentsDir)
 {
     // Check Base Components Dir
     if (aBaseComponentsDir != baseComponentsDir()) {
-        qDebug() << "ProjectModel::setBaseComponentsDir - aBaseComponentsDir: " << aBaseComponentsDir;
+        //qDebug() << "ProjectModel::setBaseComponentsDir - aBaseComponentsDir: " << aBaseComponentsDir;
         // Set Base Components Dir
         mProperties[JSON_KEY_PROJECT_BASECOMPONENTS_DIR] = aBaseComponentsDir;
 
@@ -1031,7 +1025,7 @@ ViewsModel* ProjectModel::viewsModel()
 //==============================================================================
 // Get Component By Name
 //==============================================================================
-ComponentInfo* ProjectModel::getComponentByName(const QString& aName, const QString& aType)
+ComponentInfo* ProjectModel::getComponentByName(const QString& aName, const QString& aType, const bool& aPreload)
 {
     // Check Name
     if (aName.isEmpty()) {
@@ -1043,30 +1037,30 @@ ComponentInfo* ProjectModel::getComponentByName(const QString& aName, const QStr
     // Init Component Info
     ComponentInfo* cInfo = NULL;
 
-    // Check Type
+    // Check Base Components Model & Type
     if (mBaseComponents && ((aType == COMPONENT_TYPE_BASECOMPONENT) || (aType == ""))) {
         // Get Component Info
-        cInfo = mBaseComponents->getComponent(aName);
+        cInfo = mBaseComponents->getComponent(aName, aPreload);
         // Check Component Info
         if (cInfo) {
             return cInfo;
         }
     }
 
-    // Check Type
+    // Check Components Model & Type
     if (mComponents && ((aType == COMPONENT_TYPE_COMPONENT) || (aType == ""))) {
         // Get Component Info
-        cInfo = mComponents->getComponent(aName);
+        cInfo = mComponents->getComponent(aName, aPreload);
         // Check Component Info
         if (cInfo) {
             return cInfo;
         }
     }
 
-    // Check Type
+    // Check Views Model & Type
     if (mViews && ((aType == COMPONENT_TYPE_VIEW) || (aType == ""))) {
         // Get Component Info
-        cInfo = mViews->getView(aName);
+        cInfo = mViews->getView(aName, aPreload);
         // Check Component Info
         if (cInfo) {
             return cInfo;
@@ -1095,7 +1089,7 @@ ComponentInfo* ProjectModel::getComponentByPath(const QString& aFilePath)
         return NULL;
     }
 
-    qDebug() << "ProjectModel::getComponentByPath - aFilePath: " << aFilePath;
+    //qDebug() << "ProjectModel::getComponentByPath - aFilePath: " << aFilePath;
 
     // Init Component Info
     ComponentInfo* cInfo = NULL;
