@@ -78,6 +78,9 @@ public:
     // Launch Confirm Dialog
     Q_INVOKABLE bool launchConfirmDialog(const QString& aText, const QString& aIcon = "");
 
+    // Launch Live Window
+    Q_INVOKABLE void launchLiveWindow();
+
     // Destructor
     ~MainWindow();
 
@@ -129,8 +132,6 @@ private:
     void launchCreateComponent();
     // Launch Create View
     void launchCreateView();
-    // Launch Live Window
-    void launchLiveWindow();
 
     // Toggle Show Tracers
     void toggleShowTracers();

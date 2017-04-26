@@ -91,5 +91,7 @@
         <file>qml/DTag.qml</file>
         <file>qml/DFunctionItemDelegate.qml</file>
         <file>qml/DSlotItemDelegate.qml</file>
+        <file>qml/DLiveLauncher.qml</file>
+        <file>qml/DAnchorTargetEditor.qml</file>
     </qresource>
 </RCC>

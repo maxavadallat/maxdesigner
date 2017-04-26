@@ -45,6 +45,11 @@ var defaultNonVisualComponentHeight             = 200;
 var defaultDiscWidth                            = 56;
 var defaultDiscHeight                           = defaultDiscWidth;
 
+// Default Anchor Target Editor Width
+var defaultAnchorTargetEditorWidth              = 200;
+// Default Anchor Target Editor Height
+var defaultAnchorTargetEditorHeight             = 38;
+
 // Default Properties Name Column Width
 var defaultNamesColumnWidth                     = 96;
 

@@ -9,6 +9,7 @@ class LiveWindow;
 
 class MainWindow;
 class SettingsController;
+class ComponentInfo;
 
 //==============================================================================
 // Live Window Class
@@ -20,6 +21,10 @@ class LiveWindow : public QMainWindow
 public:
     // Constructor
     explicit LiveWindow(QWidget* aParent = NULL);
+
+    // Set Component
+    void setComponent(ComponentInfo* aComponent);
+
     // Destructor
     ~LiveWindow();
 
@@ -29,11 +34,22 @@ protected:
     // Restore UI
     void restoreUI();
 
+    // Setup Live
+    void setupLive();
+    // Shut Down Live
+    void shutDown();
+
+private slots:
+    // Action Close Triggered Slot
+    void on_actionClose_triggered();
+
 private:
     // UI
     Ui::LiveWindow*         ui;
     // Settings Controller
     SettingsController*     mSettings;
+    // Component Info
+    ComponentInfo*          mComponent;
 };
 
 #endif // LIVEWINDOW_H

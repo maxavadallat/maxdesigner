@@ -885,11 +885,24 @@ void MainWindow::launchCreateView()
 //==============================================================================
 void MainWindow::launchLiveWindow()
 {
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    if (!mPropertiesController) {
+        return;
+    }
+
     // Check Live Window
     if (!mLiveWindow) {
         // Create Live Window
         mLiveWindow = new LiveWindow();
     }
+
+    // Set Up Live Window
+
+    // ...
 
     // Show Live Window
     mLiveWindow->show();

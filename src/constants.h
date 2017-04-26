@@ -150,9 +150,11 @@
 #define COMPONENT_CATEGORY_DELEGATE                         "Delegate"
 #define COMPONENT_CATEGORY_ANIMATION                        "Animation"
 
+// Default Component Size
 #define DEFAULT_COMPONENT_WIDTH                             320
 #define DEFAULT_COMPONENT_HEIGHT                            200
 
+// Transition Types
 #define JSON_VALUE_TRANSITION_NODE_TYPE_PARALLEL            "parallel"
 #define JSON_VALUE_TRANSITION_NODE_TYPE_SQUENTIAL           "sequential"
 #define JSON_VALUE_TRANSITION_NODE_TYPE_PAUSE               "pause"
@@ -164,6 +166,7 @@
 #define JSON_KEY_COMPONENT_NAME                             "componentName"
 #define JSON_KEY_COMPONENT_TYPE                             "componentType"
 #define JSON_KEY_COMPONENT_CATEGORY                         "componentCategory"
+#define JSON_KEY_COMPONENT_TAG                              "componentTag"
 #define JSON_KEY_COMPONENT_BUILTIN                          "componentBuiltIn"
 #define JSON_KEY_COMPONENT_BASE                             "componentBase"
 #define JSON_KEY_COMPONENT_OWN_PROPERTIES                   "componentOwnProperties"
@@ -220,7 +223,7 @@
 #define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_DURATION   "componentTransitionPAnimationDuration"
 #define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_ETYPE      "componentTransitionPAnimationEType"
 
-
+// Supported Value Types
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING              "string"
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_BOOL                "bool"
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_INT                 "int"
@@ -229,9 +232,9 @@
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_VAR                 "var"
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_OBJECT              "QtObject"
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_LIST                "list<QtObject>"
+#define JSON_VALUE_PROPERTY_TYPE_PREFIX_ALIAS               "alias"
 
-
-// Default/Basec JSON Keys For Component Properties
+// Default/Basic JSON Keys For Component Properties
 #define JSON_KEY_COMPONENT_PROPERTY_ID                      "id"
 #define JSON_KEY_COMPONENT_PROPERTY_OBJECT_NAME             "objectName"
 #define JSON_KEY_COMPONENT_PROPERTY_X                       "x"
@@ -259,45 +262,6 @@
 
 #define JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER_OFFS    "anchors.horizontalCenterOffset"
 #define JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER_OFFS    "anchors.verticalCenterOffset"
-
-/*
-#define JSON_KEY_COMPONENT_PROPERTY_STATE                   "state"
-
-#define JSON_KEY_COMPONENT_PROPERTY_OPACITY                 "opacity"
-#define JSON_KEY_COMPONENT_PROPERTY_VISIBLE                 "visible"
-
-#define JSON_KEY_COMPONENT_PROPERTY_SCALE                   "scale"
-#define JSON_KEY_COMPONENT_PROPERTY_ROTATION                "rotation"
-
-#define JSON_KEY_COMPONENT_PROPERTY_FOCUS                   "focus"
-#define JSON_KEY_COMPONENT_PROPERTY_CLIP                    "clip"
-
-#define JSON_KEY_COMPONENT_PROPERTY_ENABLED                 "enabled"
-
-#define JSON_KEY_COMPONENT_PROPERTY_STATES                  "states"
-#define JSON_KEY_COMPONENT_PROPERTY_TRANSITIONS             "transitions"
-
-
-#define JSON_KEY_COMPONENT_PROPERTY_RADIUS                  "radius"
-#define JSON_KEY_COMPONENT_PROPERTY_SPACING                 "spacing"
-#define JSON_KEY_COMPONENT_PROPERTY_COLOR                   "color"
-#define JSON_KEY_COMPONENT_PROPERTY_BORDER_COLOR            "border.color"
-#define JSON_KEY_COMPONENT_PROPERTY_BORDER_WIDTH            "border.width"
-
-#define JSON_KEY_COMPONENT_PROPERTY_FONT_COLOR              "font.color"
-#define JSON_KEY_COMPONENT_PROPERTY_FONT_PIXELSIZE          "font.pixelSize"
-
-#define JSON_KEY_COMPONENT_PROPERTY_BORDER_LEFT             "border.left"
-#define JSON_KEY_COMPONENT_PROPERTY_BORDER_RIGHT            "border.right"
-#define JSON_KEY_COMPONENT_PROPERTY_BORDER_TOP              "border.top"
-#define JSON_KEY_COMPONENT_PROPERTY_BORDER_BOTTOM           "border.bottom"
-
-#define JSON_KEY_COMPONENT_PROPERTY_TEXT                    "text"
-#define JSON_KEY_COMPONENT_PROPERTY_TITLE                   "title"
-
-#define JSON_KEY_COMPONENT_PROPERTY_HORIZONTAL_ALIGNMENT    "horizontalAlignment"
-#define JSON_KEY_COMPONENT_PROPERTY_VERTICAL_ALIGNMENT      "verticalAlignment"
-*/
 
 // ...
 

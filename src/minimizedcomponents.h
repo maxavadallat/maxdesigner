@@ -33,7 +33,6 @@ public: // from QAbstractListModel
     virtual QHash<int,QByteArray> roleNames() const;
 
 private:
-
     // Init
     void init();
     // Clear

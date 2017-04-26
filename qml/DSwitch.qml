@@ -68,7 +68,6 @@ DButtonBase {
             Transition {
                 DAnimation { target: buttonSwitch; property: "x" }
             }
-
         ]
     }
 }

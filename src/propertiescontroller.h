@@ -40,6 +40,8 @@ class PropertiesController : public QObject
     Q_PROPERTY(QString cWidth READ cWidth NOTIFY cWidthChanged)
     Q_PROPERTY(QString cHeight READ cHeight NOTIFY cHeightChanged)
 
+    // Anchors
+
     Q_PROPERTY(QStringList filteredProperties READ filteredProperties WRITE setFilteredProperties NOTIFY filteredPropertiesChanged)
 
     Q_PROPERTY(ComponentImportsModel* importsModel READ importsModel WRITE setImportsModel NOTIFY importsModelChanged)
@@ -145,7 +147,6 @@ public:
     // Anchors
 
     // ...
-
 
     // Add Signal
     Q_INVOKABLE void addSignal(const QString& aName, const QStringList& aParameters = QStringList());

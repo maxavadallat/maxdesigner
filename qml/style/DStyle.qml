@@ -172,6 +172,9 @@ QtObject {
     // Default Activity Indicator Interval
     readonly property int activityIndicatorInterval:        32
 
+    // Live Launcher Width
+    readonly property int liveLauncherWidth:                200
+    readonly property int liveLauncherHeight:               200
 
     // ...
 

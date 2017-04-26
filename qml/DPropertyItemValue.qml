@@ -27,6 +27,7 @@ Item {
 
     property real propertyStep: 1
 
+    signal accepted()
     signal valueChanged(var newValue)
 
     onPropertyValueChanged: {

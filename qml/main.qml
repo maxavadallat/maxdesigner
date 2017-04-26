@@ -780,6 +780,11 @@ Item {
 
         // ...
 
+        DLiveLauncher {
+            id: liveLauncher
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+        }
     }
 
     DWelcome {

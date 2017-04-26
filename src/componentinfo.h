@@ -192,12 +192,12 @@ public:
     // Request Close
     Q_INVOKABLE void requestClose();
 
-    // Register Object ID
-    Q_INVOKABLE void registerObjectID(const QString& aID, QObject* aObject);
+    // Set Object ID
+    Q_INVOKABLE void setChildObjectID(QObject* aObject, const QString& aID);
     // Clear Object ID
     Q_INVOKABLE void clearObjectID(const QString& aID);
     // Get Child Object By ID
-    Q_INVOKABLE QObject* getObject(const QString& aID);
+    Q_INVOKABLE QObject* getChildObject(const QString& aID);
 
     // Destructor
     ~ComponentInfo();

@@ -38,6 +38,25 @@ DRectangle {
         item.y = posY;
     }
 
+    DAnchorTargetEditor {
+        id: atEditor
+        anchors.centerIn: parent
+    }
+
+    DButton {
+        id: atEditorTestButton
+        anchors.centerIn: parent
+        anchors.horizontalCenterOffset: 200
+        text: atEditor.showEditor ? "Hide" : "Show"
+        onClicked: {
+            if (atEditor.showEditor) {
+                atEditor.hide();
+            } else {
+                atEditor.show(0, 0);
+            }
+        }
+    }
+
 /*
 
     Component.onCompleted: {

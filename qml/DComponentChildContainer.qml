@@ -16,6 +16,14 @@ DContainer {
     property Connections componentInfoConnections: Connections {
         target: componentInfo
 
+        onComponentIDChanged: {
+            // Check Parent Container
+            if (parentContainer !== null && parentContainer.setChildComponentID !== undefined) {
+                // Set Child Component ID
+                parentContainer.setChildComponentID(cccRoot, aID);
+            }
+        }
+
         onPosXChanged: {
             // Check Pos
             if (cccRoot.x !== aPosX) {

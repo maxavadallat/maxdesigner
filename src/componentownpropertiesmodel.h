@@ -105,7 +105,6 @@ protected:
     // Refresh Property For Inherited Property Set
     void refreshProperty(const QString& aName);
 
-
 public:
     // Item Field Roles
     enum OPMRoles {

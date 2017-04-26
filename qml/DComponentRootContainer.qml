@@ -388,6 +388,12 @@ DPaneBase {
         }
     }
 
+    // Set Child Component ID
+    function setChildComponentID(aChild, aID) {
+        // Store Child Component ID
+        componentRootContainerRoot.componentInfo.setChildObjectID(aChild, aID);
+    }
+
     DMouseArea {
         id: wheelArea
         anchors.fill: parent

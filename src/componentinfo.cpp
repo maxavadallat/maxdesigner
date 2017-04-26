@@ -658,6 +658,8 @@ QStringList ComponentInfo::componentPropertyKeys()
         propertyKeys += mBase->componentPropertyKeys();
     }
 
+    //qDebug() << "ComponentInfo::componentPropertyKeys - mName: " << mName << " - propertyKeys: " << propertyKeys;
+
     return propertyKeys;
 }
 
@@ -860,33 +862,46 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
     setComponentName(aObject[JSON_KEY_COMPONENT_NAME].toString());
     // Set Component Type
     setComponentType(aObject[JSON_KEY_COMPONENT_TYPE].toString());
-    // Set Component Category
-    setComponentCategory(aObject[JSON_KEY_COMPONENT_CATEGORY].toString());
-    // Set Component Base Name
-    setComponentBase(aObject[JSON_KEY_COMPONENT_BASE].toString());
-    // Set Built In
-    setBuiltIn(aObject[JSON_KEY_COMPONENT_BUILTIN].toBool());
+
+    // Check Keys
+    if (aObject.keys().indexOf(JSON_KEY_COMPONENT_CATEGORY) >= 0) {
+        // Set Component Category
+        setComponentCategory(aObject[JSON_KEY_COMPONENT_CATEGORY].toString());
+    }
+
+    // Check Keys - Base
+    if (aObject.keys().indexOf(JSON_KEY_COMPONENT_BASE) >= 0) {
+        // Set Component Base Name
+        setComponentBase(aObject[JSON_KEY_COMPONENT_BASE].toString());
+
+        // Base Components Might Not Be Ready !!!!
+
+        // Set Base Component
+        mBase = mProject ? mProject->getComponentByName(mBaseName) : NULL;
+    }
+
+    // Check Keys - Built In
+    if (aObject.keys().indexOf(JSON_KEY_COMPONENT_BUILTIN) >= 0) {
+        // Set Built In
+        setBuiltIn(aObject[JSON_KEY_COMPONENT_BUILTIN].toBool());
+    }
+
+    // Set Parent Component
+    mParent = mProject ? mProject->getComponentByName(aObject[JSON_KEY_COMPONENT_PARENT].toString()) : NULL;
+
+    // Set ProtoType Component
+    mProtoType = mProject && !mIsProtoType ? mProject->getComponentByName(mName, mType) : NULL;
 
     // ...
 
+    // Set Imports
+    mImports = aObject[JSON_KEY_COMPONENT_IMPORTS].toArray();
     // Set Anchors
     mAnchors = aObject[JSON_KEY_COMPONENT_ANCHORS].toObject();
     // Set Own Properties
     mOwnProperties = aObject[JSON_KEY_COMPONENT_OWN_PROPERTIES].toObject();
     // Set Properties
     mProperties = aObject[JSON_KEY_COMPONENT_PROPERTIES].toObject();
-
-    // Base Components Might Not Be Ready !!!!
-
-    // Set Base Component
-    mBase = mProject ? mProject->getComponentByName(mBaseName) : NULL;
-    // Set Parent Component
-    mParent = mProject ? mProject->getComponentByName(aObject[JSON_KEY_COMPONENT_PARENT].toString()) : NULL;
-    // Set ProtoType Component
-    mProtoType = mProject && mIsProtoType ? mProject->getComponentByName(mName, mType) : NULL;
-
-    // Set Imports
-    mImports = aObject[JSON_KEY_COMPONENT_IMPORTS].toArray();
     // Set Signals
     mSignals = aObject[JSON_KEY_COMPONENT_SIGNALS].toArray();
     // Set Slots
@@ -902,6 +917,7 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
     QJsonArray childrenArray = aObject[JSON_KEY_COMPONENT_CHILDREN].toArray();
     // Get Children Array Count
     int caCount = childrenArray.count();
+
     // Iterate Through Children Array
     for (int i=0; i<caCount; i++) {
         // Get Array Item
@@ -917,6 +933,7 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
 
         // Check Child Component
         if (componentProtoType) {
+            //qDebug() << "ComponentInfo::fromJSONObject - componentProtoType: " << componentProtoType->mName;
             // Clone Component
             ComponentInfo* childComponent = componentProtoType->clone();
             // Set Up/Update Child Component from JSON Object
@@ -925,8 +942,11 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
             childComponent->mIsProtoType = false;
             // Add To Children
             mChildren << childComponent;
+            // Add ID To ID Map
+            setChildObjectID(childComponent, childComponent->componentID());
+
         } else {
-            qWarning() << "ComponentInfo::fromJSON - ccName: " << ccName << " - NO COMPONENT!!";
+            qWarning() << "ComponentInfo::fromJSONObject - ccName: " << ccName << " - NO COMPONENT!!";
         }
     }
 }
@@ -966,30 +986,43 @@ void ComponentInfo::requestClose()
 }
 
 //==============================================================================
-// Register Object ID
+// Set Child Object ID
 //==============================================================================
-void ComponentInfo::registerObjectID(const QString& aID, QObject* aObject)
+void ComponentInfo::setChildObjectID(QObject* aObject, const QString& aID)
 {
-    // Check ID
-    if (aID.isEmpty()) {
-        qWarning() << "ComponentInfo::registerObjectID - aID IS EMPTY!!";
+    // Check Object
+    if (!aObject) {
+        qWarning() << "ComponentInfo::setChildObjectID - aObject IS NULL!!";
         return;
     }
 
-    // Check Object
-    if (!aObject) {
-        qWarning() << "ComponentInfo::registerObjectID - aObject IS NULL!!";
+    // Try To Find Key If ID Is Updated
+    QString cidKey = mIDMap.key(aObject);
+
+    // Check Key
+    if (!cidKey.isEmpty()) {
+        // Remove Key
+        mIDMap.remove(cidKey);
+    }
+
+    // Check ID
+    if (aID.isEmpty()) {
+        qDebug() << "ComponentInfo::setChildObjectID - aObject: " << aObject << " - ID CLEARED.";
         return;
     }
 
     // Check If ID Is Already Registered
     if (mIDMap.keys().indexOf(aID) < 0) {
 
+        //qDebug() << "ComponentInfo::setChildObjectID - aObject: " << aObject << " - aID: " << aID;
+
         // Add Object ID
         mIDMap[aID] = aObject;
 
+        qDebug() << "ComponentInfo::setChildObjectID - mIDMap: " << mIDMap;
+
     } else {
-        qWarning() << "ComponentInfo::registerObjectID - aID: " << aID << " - ID IS ALREADY IN USE!!";
+        qWarning() << "ComponentInfo::setChildObjectID - aID: " << aID << " - ID IS ALREADY IN USE!!";
     }
 }
 
@@ -1010,7 +1043,7 @@ void ComponentInfo::clearObjectID(const QString& aID)
 //==============================================================================
 // Get Child Object By ID
 //==============================================================================
-QObject* ComponentInfo::getObject(const QString& aID)
+QObject* ComponentInfo::getChildObject(const QString& aID)
 {
     return mIDMap.value(aID);
 }
@@ -1539,27 +1572,30 @@ QVariant ComponentInfo::componentProperty(const QString& aName)
         return mProperties.value(aName).toVariant();
     }
 
-    // Check Prototype
-    if (mProtoType) {
-        // Get Property
-        QString protoProperty = mProtoType->componentProperty(aName).toString();
-        // Check Property
-        if (!protoProperty.isNull()) {
-            return protoProperty;
+    // Check Property Name
+    if (aName != "id" && aName != "objectName") {
+        // Check Prototype
+        if (mProtoType) {
+            // Get Property
+            QString protoProperty = mProtoType->componentProperty(aName).toString();
+            // Check Property
+            if (!protoProperty.isNull()) {
+                return protoProperty;
+            }
         }
-    }
 
-    // Check Base Component
-    if (mBase) {
-        // Get Property
-        QString baseProperty = mBase->componentProperty(aName).toString();
-        // Check Base Property
-        if (!baseProperty.isNull()) {
-            return baseProperty;
+        // Check Base Component
+        if (mBase) {
+            // Get Property
+            QString baseProperty = mBase->componentProperty(aName).toString();
+            // Check Base Property
+            if (!baseProperty.isNull()) {
+                return baseProperty;
+            }
         }
-    }
 
-    qWarning() << "ComponentInfo::componentProperty - aName: " << aName << " - NO PROPERTY!";
+        qWarning() << "ComponentInfo::componentProperty - aName: " << aName << " - NO PROPERTY!";
+    }
 
     return QVariant();
 }

@@ -188,6 +188,9 @@ protected:
     // Clear
     void clear();
 
+    // Emit AnchorSignals
+    void emitAnchorSignals();
+
 protected: // Data
     // Component
     ComponentInfo*      mComponent;

@@ -17,6 +17,11 @@ DPane {
         onFocusedComponentChanged: {
             // Check Focused Component
             if (propertiesController.focusedComponent !== null) {
+                // Set ID Editor Text
+                idEditor.text = propertiesController.focusedComponent.componentID;
+                // Set Object Name Editor Text
+                objectNameEditor.text = propertiesController.focusedComponent.componentObjectName;
+
                 // Check Focused Component
                 if (propertiesController.focusedComponent.componentCategory === "NonVisual") {
                     // Hide Size And Pos Section
@@ -438,6 +443,7 @@ DPane {
                 width: 40
                 rightAligned: true
                 text: "fill"
+                checked: propertiesController.anchorsModel ? propertiesController.anchorsModel.anchorsFill.length > 0 : false
                 onClicked: checked = !checked
             }
 

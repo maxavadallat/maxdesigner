@@ -12,7 +12,7 @@ ComponentAnchorsModel::ComponentAnchorsModel(ComponentInfo* aComponent, QObject*
     : QObject(aParent)
     , mComponent(aComponent)
 {
-    //qDebug() << "ComponentAnchorsModel created.";
+    qDebug() << "ComponentAnchorsModel created.";
 
     // Init
     init();
@@ -34,6 +34,48 @@ void ComponentAnchorsModel::clear()
 }
 
 //==============================================================================
+// Emit AnchorSignals
+//==============================================================================
+void ComponentAnchorsModel::emitAnchorSignals()
+{
+    // Check Component
+    if (!mComponent) {
+        return;
+    }
+
+    // Left Anchor Target Changed Signal
+    emit anchorsLeftChanged(anchorsLeft());
+    // Right Anchor Target Changed Signal
+    emit anchorsRightChanged(anchorsRight());
+    // Top Anchor Target Changed Signal
+    emit anchorsTopChanged(anchorsTop());
+    // Bottom Anchor Target Changed Signal
+    emit anchorsBottomChanged(anchorsBottom());
+    // Fill Target Changed Signal
+    emit anchorsFillChanged(anchorsFill());
+    // CenterIn Target Changed Signal
+    emit anchorsCenterInChanged(anchorsCenterIn());
+    // Horizontal Center Target Changed Signal
+    emit anchorsHorizontalCenterChanged(horizontalCenter());
+    // Vertical Center Target Changed Signal
+    emit anchorsVerticalCenterChanged(verticalCenter());
+    // Margins Changed Signal
+    emit anchorsMarginsChanged(anchorsMargins());
+    // Left Margin Changed Signal
+    emit anchorsLeftMarginChanged(anchorsLeftMargin());
+    // Right Margin Changed Signal
+    emit anchorsRightMarginChanged(anchorsRightMargin());
+    // Top Margin Changed Signal
+    emit anchorsTopMarginChanged(anchorsTopMargin());
+    // Bottom Margin Changed Signal
+    emit anchorsBottomMarginChanged(anchorsBottomMargin());
+    // Horizontal Center Offset Changed Signal
+    emit anchorsHorizontalOffsetChanged(anchorsHorizontalOffset());
+    // Vertical Center Offset Changed Signal
+    emit anchorsVerticalOffsetChanged(anchorsVerticalOffset());
+}
+
+//==============================================================================
 // Get Current Component
 //==============================================================================
 ComponentInfo* ComponentAnchorsModel::currentComponent()
@@ -48,10 +90,15 @@ void ComponentAnchorsModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
+        qDebug() << "ComponentAnchorsModel::setCurrentComponent - mComponent: " << (mComponent ? mComponent->mName : "NULL");
+
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Component Changed
         emit currentComponentChanged(mComponent);
+
+        // Emit Anchor signals
+        emitAnchorSignals();
     }
 }
 
@@ -539,5 +586,5 @@ ComponentAnchorsModel::~ComponentAnchorsModel()
 
     // ...
 
-    //qDebug() << "ComponentAnchorsModel deleted.";
+    qDebug() << "ComponentAnchorsModel deleted.";
 }
