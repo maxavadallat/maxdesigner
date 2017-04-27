@@ -3,33 +3,49 @@ import QtGraphicalEffects 1.0
 
 import "style"
 
-DControl {
+DMouseArea {
     id: textInputRoot
 
     width: DStyle.textInputWidth
     height: DStyle.textInputHeight
 
     property alias editor: textInput
-    property alias text: textInput.text
+    property string text: ""
     property alias editorFocus: textInput.focus
     property alias pixelSize: textInput.font.pixelSize
     property alias wrapMode: textInput.wrapMode
     property alias mouseSelection: textInput.selectByMouse
+    property alias horizontalAlignment: textInput.horizontalAlignment
+    property string placeHolderText: ""
 
     property bool showClearButton: true
     property bool fixTextSize: false
 
     property bool invalidValue: false
 
-    clip: true
+    property bool userInput: false
 
     signal keyEvent(var event)
     signal accepted()
+    signal textEdited(var newText)
+
+    onClicked: {
+        // Set Focus
+        textInput.focus = true;
+    }
+
+    onTextChanged: {
+        // Reset User Input
+        textInputRoot.userInput = false;
+        // Set Text Input Text
+        textInput.text = textInputRoot.text;
+    }
 
     // Set Editor Focus
     function setEditorFocus(aFocus, aSelect) {
         //console.log("DTextInput.setEditorFocus - aFocus: " + aFocus + " - aSelect: " + aSelect);
         //textInput.activeFocus = aFocus;
+        // Set Focus
         textInput.focus = aFocus;
         //textInput.forceActiveFocus();
         if (aSelect) {
@@ -79,11 +95,18 @@ DControl {
 
         color: DStyle.colorFontLight
 
-//        Rectangle {
-//            anchors.fill: parent
-//            color: "transparent"
-//            border.color: "purple"
-//        }
+        clip: true
+
+        onTextChanged: {
+            // Check User Input
+            if (!textInputRoot.userInput) {
+                // Set User Input
+                textInputRoot.userInput = true;
+            } else {
+                // Emit Text Edited Signal
+                textInputRoot.textEdited(textInput.text);
+            }
+        }
 
         onAccepted: {
             // Emit Accepted Signal
@@ -113,6 +136,20 @@ DControl {
             // Emit Key Event Signal
             textInputRoot.keyEvent(event);
         }
+
+        DText {
+            id: placeHolderTextLabel
+            anchors.fill: parent
+            horizontalAlignment: textInput.horizontalAlignment
+            verticalAlignment: Text.AlignVCenter
+            font.pixelSize: textInput.font.pixelSize
+            wrapMode: Text.NoWrap
+            elide: Text.ElideRight
+            opacity: textInput.text.length === 0 ? 0.3 : 0.0
+            Behavior on opacity { DFadeAnimation { } }
+            visible: opacity > 0.0
+            text: textInputRoot.placeHolderText
+        }
     }
 
     DButton {
@@ -131,6 +168,8 @@ DControl {
         pixelSize: DStyle.fontSizeS
 
         onClicked: {
+            // Set User Input
+            textInputRoot.userInput = true;
             // Clear Text
             textInput.text = "";
         }

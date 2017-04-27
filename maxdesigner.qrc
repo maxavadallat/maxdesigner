@@ -93,5 +93,15 @@
         <file>qml/DSlotItemDelegate.qml</file>
         <file>qml/DLiveLauncher.qml</file>
         <file>qml/DAnchorTargetEditor.qml</file>
+        <file>qml/DAnchorsSection.qml</file>
+        <file>qml/DOwnPropertiesSection.qml</file>
+        <file>qml/DImportsSection.qml</file>
+        <file>qml/DSignalsSection.qml</file>
+        <file>qml/DSlotsSection.qml</file>
+        <file>qml/DFunctionsSection.qml</file>
+        <file>qml/DStatesSection.qml</file>
+        <file>qml/DTransitionsSection.qml</file>
+        <file>qml/DPropertiesSection.qml</file>
+        <file>qml/DSizeAndPosSection.qml</file>
     </qresource>
 </RCC>

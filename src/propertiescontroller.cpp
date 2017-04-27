@@ -325,17 +325,21 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
 {
     // Check Focused Component
     if (mFocusedComponent != aComponent) {
-
-        // Check Previous Focused Component
-
-
         qDebug() << "PropertiesController::setFocusedComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
 
         // Set Focused Component
         mFocusedComponent = aComponent;
 
-        // Emit Focused Component Changed Signal
-        emit focusedComponentChanged(mFocusedComponent);
+        // Check Inherited Properties Model
+        if (mComponentProperties) {
+            // Set Current Component
+            mComponentProperties->setCurrentComponent(aComponent);
+        } else {
+            // Create New Compoennt Inherited Properties Model
+            ComponentPropertiesModel* newComponentPropertiesModel = new ComponentPropertiesModel(mFocusedComponent, mProject);
+            // Set Component Inherited Properties Model
+            setPropertiesModel(newComponentPropertiesModel);
+        }
 
         // Check Imports Model
         if (mComponentImports) {
@@ -357,17 +361,6 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
             ComponentOwnPropertiesModel* newOwnPropertiesModel = new ComponentOwnPropertiesModel(mFocusedComponent, mProject);
             // Set Component Own Properties Model
             setOwnPropertiesModel(newOwnPropertiesModel);
-        }
-
-        // Check Inherited Properties Model
-        if (mComponentProperties) {
-            // Set Current Component
-            mComponentProperties->setCurrentComponent(aComponent);
-        } else {
-            // Create New Compoennt Inherited Properties Model
-            ComponentPropertiesModel* newComponentPropertiesModel = new ComponentPropertiesModel(mFocusedComponent, mProject);
-            // Set Component Inherited Properties Model
-            setPropertiesModel(newComponentPropertiesModel);
         }
 
         // Check Anchors Model
@@ -437,6 +430,9 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
         }
 
         // ...
+
+        // Emit Focused Component Changed Signal
+        emit focusedComponentChanged(mFocusedComponent);
     }
 }
 
@@ -658,6 +654,30 @@ ComponentPropertiesModel* PropertiesController::propertiesModel()
 ComponentFunctionsModel* PropertiesController::functionsModel()
 {
     return mComponentFunctions;
+}
+
+//==============================================================================
+// Select Component By Name
+//==============================================================================
+void PropertiesController::selectComponent(const QString& aName, const int& aChildIndex)
+{
+    // Check Name
+    if (aName.isEmpty()) {
+        return;
+    }
+
+    // Check Project Model
+    if (!mProject) {
+        return;
+    }
+
+    // Get Component
+    ComponentInfo* componentInfo = mProject->getComponentByName(aName);
+    // Check Component Info
+    if (componentInfo) {
+        // Set Focused Component
+        setFocusedComponent(aChildIndex >= 0 ? componentInfo->childInfo(aChildIndex) : componentInfo);
+    }
 }
 
 //==============================================================================

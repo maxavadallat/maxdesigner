@@ -670,8 +670,16 @@ void ComponentInfo::setDirty(const bool& aDirty)
 {
     // Check Dirty
     if (mDirty != aDirty) {
+        //qDebug() << "ComponentInfo::setDirty - mName: " << mName << " - aDirty: " << aDirty;
+
         // Set Dirty
         mDirty = aDirty;
+
+        // Check Parent
+        if (mParent && mDirty) {
+            // Set Dirty
+            mParent->setDirty(true);
+        }
     }
 }
 
@@ -886,11 +894,11 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
         setBuiltIn(aObject[JSON_KEY_COMPONENT_BUILTIN].toBool());
     }
 
-    // Set Parent Component
-    mParent = mProject ? mProject->getComponentByName(aObject[JSON_KEY_COMPONENT_PARENT].toString()) : NULL;
+//    // Set Parent Component
+//    mParent = mProject ? mProject->getComponentByName(aObject[JSON_KEY_COMPONENT_PARENT].toString()) : NULL;
 
     // Set ProtoType Component
-    mProtoType = mProject && !mIsProtoType ? mProject->getComponentByName(mName, mType) : NULL;
+    mProtoType = (mProject && !mIsProtoType) ? mProject->getComponentByName(mName, mType) : NULL;
 
     // ...
 
@@ -940,10 +948,14 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
             childComponent->fromJSONObject(childObject);
             // Reset ProtoType Flag
             childComponent->mIsProtoType = false;
+            // Set Parent
+            childComponent->mParent = this;
             // Add To Children
             mChildren << childComponent;
             // Add ID To ID Map
             setChildObjectID(childComponent, childComponent->componentID());
+            // Clear Dirty Flag
+            childComponent->mDirty = false;
 
         } else {
             qWarning() << "ComponentInfo::fromJSONObject - ccName: " << ccName << " - NO COMPONENT!!";
@@ -1007,7 +1019,7 @@ void ComponentInfo::setChildObjectID(QObject* aObject, const QString& aID)
 
     // Check ID
     if (aID.isEmpty()) {
-        qDebug() << "ComponentInfo::setChildObjectID - aObject: " << aObject << " - ID CLEARED.";
+        //qDebug() << "ComponentInfo::setChildObjectID - aObject: " << aObject << " - ID CLEARED.";
         return;
     }
 

@@ -127,6 +127,9 @@ public:
     // Get Functions Model
     ComponentFunctionsModel* functionsModel();
 
+    // Select Component By Name
+    Q_INVOKABLE void selectComponent(const QString& aName, const int& aChildIndex = -1);
+
     // Add Import
     Q_INVOKABLE void addComponentImport(const QString& aImport);
     // Remove Import

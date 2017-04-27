@@ -50,8 +50,8 @@ var defaultAnchorTargetEditorWidth              = 200;
 // Default Anchor Target Editor Height
 var defaultAnchorTargetEditorHeight             = 38;
 
-// Default Properties Name Column Width
-var defaultNamesColumnWidth                     = 96;
+// Default Properties Name Column Width Ratio
+var defaultNamesColumnWidth                     = 0.35;
 
 // Default Own Properties Max
 var defaultOwnPropertiesMax                     = 7;

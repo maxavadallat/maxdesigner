@@ -38,7 +38,7 @@ Item {
 
         Column {
             id: contentContainerColumn
-            width: parent.width
+            width: contentContainerFlickable.width
             spacing: DStyle.defaultSpacing
         }
     }

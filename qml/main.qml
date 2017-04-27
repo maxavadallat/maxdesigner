@@ -9,8 +9,7 @@ import "system"
 Item {
     id: mainRoot
 
-    focus: true
-
+    // Open Recent Files When Panes Are Shown
     property bool openRecentFilesOnShowFinished: false
 
     // Array For Root Components
@@ -82,19 +81,6 @@ Item {
     function closeRootComponents() {
     }
 
-    // Keys Handling
-    Keys.onReleased: {
-        switch (event.key) {
-            case Qt.Key_T:
-                settingsController.tracerVisible = !settingsController.tracerVisible;
-            break;
-
-            case Qt.Key_F8:
-                settingsController.slowMotion = !settingsController.slowMotion;
-            break;
-        }
-    }
-
     // Connections - Main Controller
     Connections {
         target: mainController
@@ -122,12 +108,14 @@ Item {
 //                // Close Root Components
 //                closeRootComponents();
 
+
                 // Reset Project Pane
                 projectPane.reset(false);
                 // Reset Properties Pane
                 propertiesPane.reset(false);
                 // Show Welcome Screen
                 welcomScreen.show();
+
             }
         }
     }
@@ -796,6 +784,7 @@ Item {
     DMinimizedComponents {
         id: minimzedComponents
         anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
     }
 
     DDemoContainer {

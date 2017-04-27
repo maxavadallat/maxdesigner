@@ -18,6 +18,7 @@ DControl {
     signal valueIncreased(var newValue)
     signal valueDecreased(var newValue)
     signal valueEntered(var newValue)
+    signal valueEdited(var newValue)
     signal textUpdated(var newValue)
     signal keyEvent(var event)
 
@@ -94,6 +95,8 @@ DControl {
 
             // Check New Value
             if (newValue !== value) {
+                // Emit Value Edited Signal
+                valueEdited(newValue);
                 // Emit Text Updated Signal
                 textUpdated(newValue);
             }
