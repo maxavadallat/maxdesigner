@@ -16,6 +16,7 @@ DMouseArea {
     property alias wrapMode: textInput.wrapMode
     property alias mouseSelection: textInput.selectByMouse
     property alias horizontalAlignment: textInput.horizontalAlignment
+    property alias editedText: textInput.text
     property string placeHolderText: ""
 
     property bool showClearButton: true
@@ -26,7 +27,7 @@ DMouseArea {
     property bool userInput: false
 
     signal keyEvent(var event)
-    signal accepted()
+    signal accepted(var newText)
     signal textEdited(var newText)
 
     onClicked: {
@@ -35,6 +36,7 @@ DMouseArea {
     }
 
     onTextChanged: {
+        //console.log("DTextInput.onTextChanged - text: " + textInputRoot.text)
         // Reset User Input
         textInputRoot.userInput = false;
         // Set Text Input Text
@@ -98,6 +100,7 @@ DMouseArea {
         clip: true
 
         onTextChanged: {
+            //console.log("DTextInput.textInput.onTextChanged - text: " + textInput.text + " - userInput: " + textInputRoot.userInput);
             // Check User Input
             if (!textInputRoot.userInput) {
                 // Set User Input
@@ -110,7 +113,7 @@ DMouseArea {
 
         onAccepted: {
             // Emit Accepted Signal
-            textInputRoot.accepted();
+            textInputRoot.accepted(textInput.text);
         }
 
         Keys.onPressed: {
@@ -127,6 +130,8 @@ DMouseArea {
                 case Qt.Key_Escape:
                     // Reset Focus
                     textInput.focus = false;
+                    // Reset Text
+                    textInput.text = textInputRoot.text;
                 break;
 
                 default:
@@ -145,7 +150,7 @@ DMouseArea {
             font.pixelSize: textInput.font.pixelSize
             wrapMode: Text.NoWrap
             elide: Text.ElideRight
-            opacity: textInput.text.length === 0 ? 0.3 : 0.0
+            opacity: textInput.text.length === 0 ? 0.5 : 0.0
             Behavior on opacity { DFadeAnimation { } }
             visible: opacity > 0.0
             text: textInputRoot.placeHolderText
@@ -172,6 +177,8 @@ DMouseArea {
             textInputRoot.userInput = true;
             // Clear Text
             textInput.text = "";
+            // Emit Accepted Signal
+            textInputRoot.accepted(textInput.text);
         }
     }
 }

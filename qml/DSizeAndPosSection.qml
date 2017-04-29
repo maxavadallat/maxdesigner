@@ -16,11 +16,14 @@ DSection {
     DFlow {
         id: sizeAndPosFlow
         width: sizeAndPosSectionRoot.width
+        move: Transition { }
 
         Row {
             id: posRow
             spacing: DStyle.defaultSpacing
+            height: propertiesController.focusedComponent && !propertiesController.focusedComponent.isRoot ? DStyle.spinnerHeight : 0
             Behavior on height { DAnimation { } }
+            visible: height > 0
             clip: true
 
             DText {

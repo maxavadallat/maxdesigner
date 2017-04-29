@@ -41,30 +41,85 @@ DContainer {
         item.y = posY;
     }
 
+
     Component.onCompleted: {
-        // Open Project
-        //mainController.openProject("/Users/max/Dev/Volvo/myproject/myproject.json");
-
-        // Seelect Component
-        //propertiesController.selectComponent("MainView", 0);
-    }
-    // Component Name
-    DText {
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: anchorsSection.top
-        anchors.bottomMargin: 16
-        font.bold: true
-        font.pixelSize: 32
-        horizontalAlignment: Text.AlignHCenter
-        text: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentName : ""
+//        // Open Project
+//        mainController.openProject("/Users/max/Dev/Volvo/myproject/myproject.json");
+//        // Seelect Component
+//        propertiesController.selectComponent("AppTile", 0);
     }
 
-    // Anchors Section
-    DAnchorsSection {
-        id: anchorsSection
-        width: 400
+    Rectangle {
+        anchors.fill: demoFlow
+        color: "transparent"
+        border.color: "purple"
+    }
+
+    DFlow {
+        id: demoFlow
+        width: parent.width * 0.25
         anchors.centerIn: parent
+
+        move: Transition { }
+
+        DRectangle {
+            width: 128
+            height: 96
+            Behavior on height { DAnimation { } }
+        }
+
+        DRectangle {
+            id: demoRect
+            width: 128
+            height: 96
+            Behavior on height { DAnimation { } }
+        }
+
+        DRectangle {
+            width: 128
+            height: 96
+            Behavior on height { DAnimation { } }
+        }
+
+        DRectangle {
+            width: 128
+            height: 96
+            Behavior on height { DAnimation { } }
+        }
     }
+
+    DButton {
+        anchors.centerIn: parent
+        anchors.horizontalCenterOffset: 200
+        text: "Resize"
+        onClicked: {
+            if (demoRect.height === 10) {
+                demoRect.height = 96;
+            } else {
+                demoRect.height = 10;
+            }
+        }
+    }
+
+
+//    // Component Name
+//    DText {
+//        anchors.horizontalCenter: parent.horizontalCenter
+//        anchors.bottom: anchorsSection.top
+//        anchors.bottomMargin: 16
+//        font.bold: true
+//        font.pixelSize: 32
+//        horizontalAlignment: Text.AlignHCenter
+//        text: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentName : ""
+//    }
+
+//    // Anchors Section
+//    DAnchorsSection {
+//        id: anchorsSection
+//        width: 400
+//        anchors.centerIn: parent
+//        state: stateOpen
+//    }
 
 
 /*

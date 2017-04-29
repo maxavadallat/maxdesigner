@@ -60,6 +60,9 @@ void PropertiesController::clear()
 {
     qDebug() << "PropertiesController::clear";
 
+    // Set Focused Component
+    setFocusedComponent(NULL);
+
     // Check Component Imports Model
     if (mComponentImports) {
         // Delete Component Imports Model
@@ -78,15 +81,6 @@ void PropertiesController::clear()
         setAnchorsModel(NULL);
     }
 
-    // Check Component Own Properties Model
-    if (mComponentOwnProperties) {
-        // Delete Component Own Properties Model
-        delete mComponentOwnProperties;
-        mComponentOwnProperties = NULL;
-        // Set Component Own Properties Model
-        setOwnPropertiesModel(NULL);
-    }
-
     // Check Component Properties Model
     if (mComponentProperties) {
         // Delete Component Properties Model
@@ -94,6 +88,15 @@ void PropertiesController::clear()
         mComponentProperties = NULL;
         // Set Component Properties Model
         setPropertiesModel(NULL);
+    }
+
+    // Check Component Own Properties Model
+    if (mComponentOwnProperties) {
+        // Delete Component Own Properties Model
+        delete mComponentOwnProperties;
+        mComponentOwnProperties = NULL;
+        // Set Component Own Properties Model
+        setOwnPropertiesModel(NULL);
     }
 
     // Check Component Signals Model
@@ -325,6 +328,7 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
 {
     // Check Focused Component
     if (mFocusedComponent != aComponent) {
+
         qDebug() << "PropertiesController::setFocusedComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
 
         // Set Focused Component
@@ -490,7 +494,7 @@ QString PropertiesController::cX()
 void PropertiesController::requestCX(const QString& aX)
 {
     // Check Focused Component
-    if (mFocusedComponent && mFocusedComponent->mCategory != COMPONENT_CATEGORY_NONVISUAL) {
+    if (mFocusedComponent && mFocusedComponent->mCategory != COMPONENT_CATEGORY_NONVISUAL && !mFocusedComponent->mIsRoot) {
         // Set Pos X
         mFocusedComponent->setPosX(aX);
     }
@@ -510,7 +514,7 @@ QString PropertiesController::cY()
 void PropertiesController::requestCY(const QString& aY)
 {
     // Check Focused Component
-    if (mFocusedComponent && mFocusedComponent->mCategory != COMPONENT_CATEGORY_NONVISUAL) {
+    if (mFocusedComponent && mFocusedComponent->mCategory != COMPONENT_CATEGORY_NONVISUAL && !mFocusedComponent->mIsRoot) {
         // Set Pos Y
         mFocusedComponent->setPosY(aY);
     }
@@ -530,7 +534,7 @@ QString PropertiesController::cZ()
 void PropertiesController::requestCZ(const QString& aZ)
 {
     // Check Focused Component
-    if (mFocusedComponent && mFocusedComponent->mCategory != COMPONENT_CATEGORY_NONVISUAL) {
+    if (mFocusedComponent && mFocusedComponent->mCategory != COMPONENT_CATEGORY_NONVISUAL && !mFocusedComponent->mIsRoot) {
         // Set Pos Z
         mFocusedComponent->setPosZ(aZ);
     }

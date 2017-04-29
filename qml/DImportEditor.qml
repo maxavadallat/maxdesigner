@@ -58,10 +58,10 @@ DPaneBase {
     }
 
     // Validate Import
-    function importValid() {
+    function importValid(newText) {
         // Check Import Editor Text
         if (importEditorRoot.importsModel !== null) {
-            return importEditorRoot.importsModel.importValid(importEditor.text);
+            return importEditorRoot.importsModel.importValid(newText);
         }
 
         return false;
@@ -83,9 +83,9 @@ DPaneBase {
 
         onClicked: {
             // Check If Import Valid
-            if (importEditorRoot.importValid()) {
+            if (importEditorRoot.importValid(importEditor.editedText)) {
                 // Set Import Name
-                importEditorRoot.importName = importEditor.text;
+                importEditorRoot.importName = importEditor.editedText;
                 // Emit Accepted Signal
                 importEditorRoot.accepted();
             } else {
@@ -131,9 +131,9 @@ DPaneBase {
 
             onAccepted: {
                 // Check If Import Valid
-                if (importEditorRoot.importValid()) {
+                if (importEditorRoot.importValid(newText)) {
                     // Set Import Name
-                    importEditorRoot.importName = importEditor.text;
+                    importEditorRoot.importName = newText;
                     // Accepted
                     importEditorRoot.accepted();
                 } else {
@@ -142,7 +142,7 @@ DPaneBase {
                 }
             }
 
-            onTextChanged: {
+            onTextEdited: {
                 // Reset Invalid Value
                 importEditor.invalidValue = false;
             }

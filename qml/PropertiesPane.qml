@@ -35,7 +35,7 @@ DPane {
                         anchorsSection.hide();
                     } else {
                         // Open Anchors Section
-                        anchorsSection.open();
+                        anchorsSection.close();
                     }
 
                     // Open Sections

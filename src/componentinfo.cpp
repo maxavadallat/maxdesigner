@@ -526,6 +526,18 @@ void ComponentInfo::setComponentID(const QString& aID)
 {
     // Set Component Property
     setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_ID, aID);
+
+    // Check If Is Root
+    if (mIsRoot) {
+
+        // ...
+
+    } else if (mParent) {
+
+        // ...
+
+    }
+
     // Emit Component ID Changed Signal
     emit componentIDChanged(componentID());
 }
@@ -1626,7 +1638,7 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
 
     // Check Base Key Index
     if (bpkIndex < 0) {
-        qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - OWN";
+        qDebug() << "ComponentInfo::setComponentProperty - component: " << mName << " - aName: " << aName << " - aValue: " << aValue << " - OWN";
 
         // Init Type Prefix
         QString tPrefix = mOwnProperties[aName].toString().split(":")[0];
@@ -1652,7 +1664,7 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
         emit ownPropertyAdded(mOwnProperties.keys().indexOf(aName));
 
     } else {
-        qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - BASE";
+        qDebug() << "ComponentInfo::setComponentProperty - component: " << mName << " - aName: " << aName << " - aValue: " << aValue << " - BASE";
 
         // Set Property
         mProperties[aName] = aValue.toString();

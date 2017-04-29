@@ -1193,17 +1193,17 @@ void MainWindow::closeProject()
         mOpenFiles->closeProject();
     }
 
+    // Check Properties Controller
+    if (mPropertiesController) {
+        // Reset Focused Component
+        mPropertiesController->setFocusedComponent(NULL);
+        // Set Current Project
+        mPropertiesController->setCurrentProject(NULL);
+    }
+
     // Check Project Model
     if (!mProjectModel) {
         return;
-    }
-
-    // Check Properties Controller
-    if (mPropertiesController) {
-        // Set Current Project
-        mPropertiesController->setCurrentProject(NULL);
-        // Reset Focused Component
-        mPropertiesController->setFocusedComponent(NULL);
     }
 
     //qDebug() << "MainWindow::closeProject";
@@ -1925,6 +1925,13 @@ MainWindow::~MainWindow()
         mEventFilter = NULL;
     }
 
+    // Check Properties Controller
+    if (mPropertiesController) {
+        delete mPropertiesController;
+        mPropertiesController = NULL;
+    }
+
+
     if (mProjectTreeModel) {
         delete mProjectTreeModel;
         mProjectTreeModel = NULL;
@@ -1975,11 +1982,6 @@ MainWindow::~MainWindow()
     if (mCreateComponentDialog) {
         delete mCreateComponentDialog;
         mCreateComponentDialog = NULL;
-    }
-
-    if (mPropertiesController) {
-        delete mPropertiesController;
-        mPropertiesController = NULL;
     }
 
     if (mCreateComponentDialog) {

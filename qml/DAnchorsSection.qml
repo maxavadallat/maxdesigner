@@ -18,16 +18,30 @@ DSection {
         height: 48
 
         DTextInput {
+            id: fillTargetEditor
             width: anchorsSectionRoot.editorsWidth
             anchors.horizontalCenter: parent.horizontalCenter
             placeHolderText: "Fill"
             text: propertiesController.anchorsModel ? propertiesController.anchorsModel.anchorsFill : ""
-            onTextChanged: {
-                // Check Fill Target
-                if (propertiesController.anchorsModel.anchorsFill !== text) {
-                    // Set Fill Target
-                    propertiesController.anchorsModel.anchorsFill = text;
+
+            onKeyEvent: {
+                if (event.key === Qt.Key_Tab) {
+                    centerInTargetEditor.setEditorFocus(true, true);
                 }
+            }
+
+            onAccepted: {
+                // Clear Other Anchors
+                propertiesController.anchorsModel.anchorsCenterIn = "";
+                propertiesController.anchorsModel.horizontalCenter = "";
+                propertiesController.anchorsModel.verticalCenter = "";
+                propertiesController.anchorsModel.anchorsLeft = "";
+                propertiesController.anchorsModel.anchorsRight = "";
+                propertiesController.anchorsModel.anchorsTop = "";
+                propertiesController.anchorsModel.anchorsBottom = "";
+
+                // Set Fill Target
+                propertiesController.anchorsModel.anchorsFill = newText;
             }
         }
     }
@@ -37,50 +51,106 @@ DSection {
         height: 210
 
         DTextInput {
+            id: leftTargetEditor
             width: anchorsSectionRoot.editorsWidth
             anchors.left: parent.left
             //anchors.leftMargin: DStyle.defaultMargin
             anchors.verticalCenter: parent.verticalCenter
             placeHolderText: "Left"
             text: propertiesController.anchorsModel ? propertiesController.anchorsModel.anchorsLeft : ""
-            onTextChanged: {
 
+            onKeyEvent: {
+                if (event.key === Qt.Key_Tab) {
+                    topTargetEditor.setEditorFocus(true, true);
+                }
+            }
+
+            onAccepted: {
+                // Clear Other Anchors
+                propertiesController.anchorsModel.anchorsFill = "";
+                propertiesController.anchorsModel.anchorsCenterIn = "";
+                propertiesController.anchorsModel.horizontalCenter = "";
+
+                // Set Left Target
+                propertiesController.anchorsModel.anchorsLeft = newText;
             }
         }
 
         DTextInput {
+            id: rightTargetEditor
             width: anchorsSectionRoot.editorsWidth
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             placeHolderText: "Right"
             horizontalAlignment: TextInput.AlignRight
             text: propertiesController.anchorsModel ? propertiesController.anchorsModel.anchorsRight : ""
-            onTextChanged: {
 
+            onKeyEvent: {
+                if (event.key === Qt.Key_Tab) {
+                    bottomTargetEditor.setEditorFocus(true, true);
+                }
+            }
+
+            onAccepted: {
+                // Clear Other Anchors
+                propertiesController.anchorsModel.anchorsFill = "";
+                propertiesController.anchorsModel.anchorsCenterIn = "";
+                propertiesController.anchorsModel.horizontalCenter = "";
+
+                // Set Right Target
+                propertiesController.anchorsModel.anchorsRight = newText;
             }
         }
 
         DTextInput {
+            id: topTargetEditor
             width: anchorsSectionRoot.editorsWidth
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             placeHolderText: "Top"
             horizontalAlignment: TextInput.AlignHCenter
             text: propertiesController.anchorsModel ? propertiesController.anchorsModel.anchorsTop : ""
-            onTextChanged: {
 
+            onKeyEvent: {
+                if (event.key === Qt.Key_Tab) {
+                    rightTargetEditor.setEditorFocus(true, true);
+                }
+            }
+
+            onAccepted: {
+                // Clear Other Anchors
+                propertiesController.anchorsModel.anchorsFill = "";
+                propertiesController.anchorsModel.anchorsCenterIn = "";
+                propertiesController.anchorsModel.verticalCenter = "";
+
+                // Set Top Target
+                propertiesController.anchorsModel.anchorsTop = newText;
             }
         }
 
         DTextInput {
+            id: bottomTargetEditor
             width: anchorsSectionRoot.editorsWidth
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             placeHolderText: "Bottom"
             horizontalAlignment: TextInput.AlignHCenter
             text: propertiesController.anchorsModel ? propertiesController.anchorsModel.anchorsBottom : ""
-            onTextChanged: {
 
+            onKeyEvent: {
+                if (event.key === Qt.Key_Tab) {
+                    leftTargetEditor.setEditorFocus(true, true);
+                }
+            }
+
+            onAccepted: {
+                // Clear Other Anchors
+                propertiesController.anchorsModel.anchorsFill = "";
+                propertiesController.anchorsModel.anchorsCenterIn = "";
+                propertiesController.anchorsModel.verticalCenter = "";
+
+                // Set Bottom Target
+                propertiesController.anchorsModel.anchorsBottom = newText;
             }
         }
 
@@ -89,39 +159,81 @@ DSection {
             spacing: DStyle.defaultSpacing
 
             DTextInput {
+                id: horizontalCenterTargetEditor
                 width: anchorsSectionRoot.editorsWidth
                 anchors.horizontalCenter: parent.horizontalCenter
                 placeHolderText: "Horizontal Center"
                 horizontalAlignment: TextInput.AlignHCenter
                 text: propertiesController.anchorsModel ? propertiesController.anchorsModel.horizontalCenter : ""
-                onTextChanged: {
-                    // Check Horizontal Center Target
-                    if (propertiesController.anchorsModel.horizontalCenter !== text) {
-                        // Set Horizontal Center Target
-                        propertiesController.anchorsModel.horizontalCenter = text;
+
+                onKeyEvent: {
+                    if (event.key === Qt.Key_Tab) {
+                        verticalCenterTargetEditor.setEditorFocus(true, true);
                     }
+                }
+
+                onAccepted: {
+                    // Clear Other Anchors
+                    propertiesController.anchorsModel.anchorsFill = "";
+                    propertiesController.anchorsModel.anchorsCenterIn = "";
+                    propertiesController.anchorsModel.anchorsLeft = "";
+                    propertiesController.anchorsModel.anchorsRight = "";
+
+                    // Set Horizontal Center Target
+                    propertiesController.anchorsModel.horizontalCenter = newText;
                 }
             }
 
             DTextInput {
+                id: centerInTargetEditor
                 width: anchorsSectionRoot.editorsWidth
                 anchors.horizontalCenter: parent.horizontalCenter
                 placeHolderText: "Center In"
                 horizontalAlignment: TextInput.AlignHCenter
                 text: propertiesController.anchorsModel ? propertiesController.anchorsModel.anchorsCenterIn : ""
-                onTextChanged: {
 
+                onKeyEvent: {
+                    if (event.key === Qt.Key_Tab) {
+                        fillTargetEditor.setEditorFocus(true, true);
+                    }
+                }
+
+                onAccepted: {
+                    // Clear Other Anchors
+                    propertiesController.anchorsModel.anchorsFill = "";
+                    propertiesController.anchorsModel.anchorsLeft = "";
+                    propertiesController.anchorsModel.anchorsRight = "";
+                    propertiesController.anchorsModel.anchorsTop = "";
+                    propertiesController.anchorsModel.anchorsBottom = "";
+
+                    // Set Center In Target
+                    propertiesController.anchorsModel.anchorsCenterIn = newText;
                 }
             }
 
             DTextInput {
+                id: verticalCenterTargetEditor
                 width: anchorsSectionRoot.editorsWidth
                 anchors.horizontalCenter: parent.horizontalCenter
                 placeHolderText: "Vertical Center"
                 horizontalAlignment: TextInput.AlignHCenter
                 text: propertiesController.anchorsModel ? propertiesController.anchorsModel.verticalCenter : ""
-                onTextChanged: {
 
+                onKeyEvent: {
+                    if (event.key === Qt.Key_Tab) {
+                        horizontalCenterTargetEditor.setEditorFocus(true, true);
+                    }
+                }
+
+                onAccepted: {
+                    // Clear Other Anchors
+                    propertiesController.anchorsModel.anchorsFill = "";
+                    propertiesController.anchorsModel.anchorsCenterIn = "";
+                    propertiesController.anchorsModel.anchorsTop = "";
+                    propertiesController.anchorsModel.anchorsBottom = "";
+
+                    // Set Vertical Center Target
+                    propertiesController.anchorsModel.verticalCenter = newText;
                 }
             }
         }

@@ -1,3 +1,4 @@
+#include <QQmlEngine>
 #include <QDebug>
 
 #include "componentpropertiesmodel.h"
@@ -52,7 +53,8 @@ void ComponentPropertiesModel::loadComponentProperties()
         return;
     }
 
-    //qDebug() << "ComponentPropertiesModel::loadComponentProperties - mComponent: " << mComponent->mName;
+    qDebug() << "ComponentPropertiesModel::loadComponentProperties - mComponent: " << mComponent->mName;
+
     // Build Hierarchy
     addComponentToHierarchy(mComponent->mBaseName);
 }
@@ -83,7 +85,7 @@ void ComponentPropertiesModel::clearComponentProperties()
 
                     // Check Component
                     if (bcopModel->mComponent) {
-                        qDebug() << "ComponentPropertiesModel::clearComponentProperties - mComponent: " << bcopModel->mComponent->mName;
+                        //qDebug() << "ComponentPropertiesModel::clearComponentProperties - mComponent: " << bcopModel->mComponent->mName;
                         // ...
                     }
                     // Delete Model
@@ -120,23 +122,30 @@ void ComponentPropertiesModel::addComponentToHierarchy(const QString& aBaseName)
         ComponentInfo* baseComponent = mProject->getComponentByName(aBaseName);
         // Check Base Component
         if (baseComponent) {
-            //qDebug() << "ComponentPropertiesModel::addComponentToHierarchy - aBaseName: " << aBaseName;
+            qDebug() << "ComponentPropertiesModel::addComponentToHierarchy - aBaseName: " << aBaseName;
 
             // Get Filtered Own Property Keys
             QStringList pKeys = baseComponent->mOwnProperties.keys();
+
             // Check Filtered Property Keys
             if (pKeys.count() > 0 && mBaseComponentProperties.keys().indexOf(aBaseName) < 0) {
                 // Begin Insert Rows
                 beginInsertRows(QModelIndex(), rowCount(), rowCount());
+                // Create New Component Own Properties Model
+                ComponentOwnPropertiesModel* newBCOPModel = new ComponentOwnPropertiesModel(baseComponent, mProject, mComponent);
+                // Set Ownership
+                QQmlEngine::setObjectOwnership(newBCOPModel, QQmlEngine::CppOwnership);
                 // Set Base Component Own Properties Model
-                mBaseComponentProperties[aBaseName] = new ComponentOwnPropertiesModel(baseComponent, mProject, mComponent);
+                mBaseComponentProperties[aBaseName] = newBCOPModel;
                 // End Insert Rows
                 endInsertRows();
             } else {
                 //qDebug() << "ComponentPropertiesModel::addComponentToHierarchy - aBaseName: " << aBaseName << " - SKIPPING.";
             }
+
             // Recursively Add Base Component's Base Component
             addComponentToHierarchy(baseComponent->mBaseName);
+
         } else {
             qWarning() << "ComponentPropertiesModel::addComponentToHierarchy - aBaseName: " << aBaseName << " - COMPONENT NOT FOUND!!";
         }
@@ -162,10 +171,10 @@ void ComponentPropertiesModel::setCurrentComponent(ComponentInfo* aComponent)
         clear();
         // Set Current Component
         mComponent = aComponent;
-        // Emit Current Component Changed Signal
-        emit currentComponentChanged(mComponent);
         // Load Component Properties
         loadComponentProperties();
+        // Emit Current Component Changed Signal
+        emit currentComponentChanged(mComponent);
     }
 }
 
@@ -263,7 +272,9 @@ ComponentOwnPropertiesModel* ComponentPropertiesModel::componentPropertyList(con
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
+
         return mBaseComponentProperties.value(mBaseComponentProperties.keys()[aIndex]);
+
     } else {
         //qWarning() << "ComponentPropertiesModel::componentPropertyList - aIndex: " << aIndex << " - OUT OF BOUNDS!!";
     }

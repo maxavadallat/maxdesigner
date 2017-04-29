@@ -14,7 +14,7 @@ DContainer {
     property ComponentInfo componentInfo: null
 
     property Connections componentInfoConnections: Connections {
-        target: componentInfo
+        target: cccRoot.componentInfo
 
         onComponentIDChanged: {
             // Check Parent Container
@@ -263,7 +263,7 @@ DContainer {
 
     onXChanged: {
         // Check If Update Component Info Enabled
-        if (cccRoot.updateComponentInfoEnabled) {
+        if (cccRoot.updateComponentInfoEnabled && propertiesController.focusedComponent === cccRoot.componentInfo) {
             // Request Component Pos X
             propertiesController.requestCX(cccRoot.x);
         }
@@ -271,7 +271,7 @@ DContainer {
 
     onYChanged: {
         // Check If Update Component Info Enabled
-        if (cccRoot.updateComponentInfoEnabled) {
+        if (cccRoot.updateComponentInfoEnabled && propertiesController.focusedComponent === cccRoot.componentInfo) {
             // Request Component Pos Y
             propertiesController.requestCY(cccRoot.y);
         }
@@ -279,7 +279,7 @@ DContainer {
 
     onWidthChanged: {
         // Check If Update Component Info Enabled
-        if (cccRoot.updateComponentInfoEnabled) {
+        if (cccRoot.updateComponentInfoEnabled && propertiesController.focusedComponent === cccRoot.componentInfo) {
             // Request Component Width
             propertiesController.requestCWidth(cccRoot.width);
         }
@@ -287,7 +287,7 @@ DContainer {
 
     onHeightChanged: {
         // Check If Update Component Info Enabled
-        if (cccRoot.updateComponentInfoEnabled) {
+        if (cccRoot.updateComponentInfoEnabled && propertiesController.focusedComponent === cccRoot.componentInfo) {
             // Request Component Height
             propertiesController.requestCHeight(cccRoot.height);
         }

@@ -96,10 +96,10 @@ DPaneBase {
     }
 
     // Check If Signal Valid
-    function signalValid() {
+    function signalValid(newText) {
         // Check Signals Model
         if (signalEditorRoot.signalsModel !== null) {
-            return signalEditorRoot.signalsModel.signalValid(nameEditor.text);
+            return signalEditorRoot.signalsModel.signalValid(newText);
         }
 
         return false;
@@ -121,9 +121,9 @@ DPaneBase {
 
         onClicked: {
             // Check If Signal Valid
-            if (signalEditorRoot.signalValid()) {
+            if (signalEditorRoot.signalValid(nameEditor.editedText)) {
                 // Set Signal Name
-                signalEditorRoot.componentSignal.signalName = nameEditor.text;
+                signalEditorRoot.componentSignal.signalName = nameEditor.editedText;
                 // Emit Accepted Signal
                 signalEditorRoot.accepted();
             } else {
@@ -167,9 +167,9 @@ DPaneBase {
 
             onAccepted: {
                 // Check If Signal Name Valid
-                if (signalEditorRoot.signalValid()) {
+                if (signalEditorRoot.signalValid(newText)) {
                     // Set Signal Name
-                    signalEditorRoot.componentSignal.signalName = nameEditor.text;
+                    signalEditorRoot.componentSignal.signalName = newText;
                     // Emit Accepted Signal
                     signalEditorRoot.accepted();
                 } else {
@@ -178,7 +178,7 @@ DPaneBase {
                 }
             }
 
-            onTextChanged: {
+            onTextEdited: {
                 // Reset Invalid Value
                 nameEditor.invalidValue = false;
             }

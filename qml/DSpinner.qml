@@ -19,7 +19,6 @@ DControl {
     signal valueDecreased(var newValue)
     signal valueEntered(var newValue)
     signal valueEdited(var newValue)
-    signal textUpdated(var newValue)
     signal keyEvent(var event)
 
     Component.onCompleted: {
@@ -77,7 +76,7 @@ DControl {
 
         onAccepted: {
             // Calculate New Value
-            var newValue = Math.min(spinnerRoot.maxValue, Math.max(spinnerRoot.minValue, Number(textInput.text)));
+            var newValue = Math.min(spinnerRoot.maxValue, Math.max(spinnerRoot.minValue, Number(newText)));
             // Check New Value
             if (newValue !== value) {
                 // Emit Value Entered Signal
@@ -85,20 +84,18 @@ DControl {
             }
         }
 
-        onTextChanged: {
-            if (textInput.text === "-") {
+        onTextEdited: {
+            if (newText === "-") {
                 return;
             }
 
             // Calculate New Value
-            var newValue = Math.min(spinnerRoot.maxValue, Math.max(spinnerRoot.minValue, Number(textInput.text)));
+            var newValue = Math.min(spinnerRoot.maxValue, Math.max(spinnerRoot.minValue, Number(newText)));
 
             // Check New Value
             if (newValue !== value) {
                 // Emit Value Edited Signal
                 valueEdited(newValue);
-                // Emit Text Updated Signal
-                textUpdated(newValue);
             }
         }
 

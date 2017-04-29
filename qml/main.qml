@@ -256,15 +256,6 @@ Item {
         }
     }
 
-    Component {
-        id: formulaEditorRootFactory
-
-        DFormulaEditor {
-            id: newFormulaEditorRootContainer
-
-        }
-    }
-
     // Main Grab Area
     MainGrabArea {
         id: mainGrabArea
@@ -765,14 +756,12 @@ Item {
             // ...
 
         }
+    }
 
-        // ...
-
-        DLiveLauncher {
-            id: liveLauncher
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-        }
+    DLiveLauncher {
+        id: liveLauncher
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
     }
 
     DWelcome {

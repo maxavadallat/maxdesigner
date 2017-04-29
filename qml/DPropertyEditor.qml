@@ -69,10 +69,10 @@ DPaneBase {
     }
 
     // Check IF Property Valid
-    function propertyValid() {
+    function propertyValid(newText) {
         // Check Own Properties Model
         if (propertyEditorRoot.ownPropertiesModel !== null) {
-            return propertyEditorRoot.ownPropertiesModel.propertyValid(propertyEditorRoot.propertyName, propertyEditorRoot.newProperty);
+            return propertyEditorRoot.ownPropertiesModel.propertyValid(newText, propertyEditorRoot.newProperty);
         }
 
         return false;
@@ -85,7 +85,9 @@ DPaneBase {
 
         onClicked: {
             // Check If Property Valid
-            if (propertyEditorRoot.propertyValid()) {
+            if (propertyEditorRoot.propertyValid(nameEditor.editedText)) {
+                // Set Property Name
+                propertyEditorRoot.propertyName = nameEditor.editedText;
                 // Emit Accepted Signal
                 propertyEditorRoot.accepted();
             } else {
@@ -139,7 +141,9 @@ DPaneBase {
 
                 onAccepted: {
                     // Check If Property Valid
-                    if (propertyEditorRoot.propertyValid()) {
+                    if (propertyEditorRoot.propertyValid(newText)) {
+                        // Set Property Name
+                        propertyEditorRoot.propertyName = nameEditor.editedText;
                         // Emit Accepted Signal
                         propertyEditorRoot.accepted();
                     } else {
@@ -148,7 +152,7 @@ DPaneBase {
                     }
                 }
 
-                onTextChanged: {
+                onTextEdited: {
                     // Reset Invalid Value
                     nameEditor.invalidValue = false;
                 }
@@ -233,6 +237,7 @@ DPaneBase {
                 id: defaultEditor
                 width: typeOption.width
                 anchors.verticalCenter: parent.verticalCenter
+
                 onKeyEvent: {
                     switch (event.key) {
                         case Qt.Key_Escape:
@@ -245,6 +250,10 @@ DPaneBase {
                             nameEditor.setEditorFocus(true, true);
                         break;
                     }
+                }
+
+                onTextEdited: {
+
                 }
             }
         }

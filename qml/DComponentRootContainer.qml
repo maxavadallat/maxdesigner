@@ -56,8 +56,7 @@ DPaneBase {
     radius: 0
 
     // New Child Component
-    property Component newComponent: Component {
-
+    property Component newChildComponent: Component {
         DComponentChildContainer {
             width: CONSTS.componentItemWidth
             height: CONSTS.componentItemHeight
@@ -249,10 +248,8 @@ DPaneBase {
     }
 
     onWidthChanged: {
-        //baseCanvas.requestPaint();
-
         // Check Update Component Info Enabled
-        if (componentRootContainerRoot.updateComponentInfoEnabled) {
+        if (componentRootContainerRoot.updateComponentInfoEnabled && propertiesController.focusedComponent === componentRootContainerRoot.componentInfo) {
             // Request Width Change
             propertiesController.requestCWidth(componentRootContainerRoot.width);
         }
@@ -261,10 +258,8 @@ DPaneBase {
     }
 
     onHeightChanged: {
-        //baseCanvas.requestPaint();
-
         // Check Update Component Info Enabled
-        if (componentRootContainerRoot.updateComponentInfoEnabled) {
+        if (componentRootContainerRoot.updateComponentInfoEnabled && propertiesController.focusedComponent === componentRootContainerRoot.componentInfo) {
             // Request Height Change
             propertiesController.requestCHeight(componentRootContainerRoot.height);
         }
@@ -275,10 +270,10 @@ DPaneBase {
     onTransitionFinished: {
         // Check State
         if (componentRootContainerRoot.state === componentRootContainerRoot.stateShown) {
-            // Set Focus
-            componentRootContainerRoot.focus = true;
             // Create Child Components
             componentRootContainerRoot.createChildComponents();
+            // Set Focus
+            componentRootContainerRoot.focus = true;
             // Set Update Component Info Enabled
             componentRootContainerRoot.updateComponentInfoEnabled = true;
         } else {
@@ -301,13 +296,14 @@ DPaneBase {
         var cCount = componentRootContainerRoot.componentInfo !== null ? componentRootContainerRoot.componentInfo.childCount : 0;
         // Check Component Info
         if (cCount > 0 && !componentRootContainerRoot.childComponentsCreated) {
-            console.log("DComponentRootContainer.createChildComponents");
+            console.log("DComponentRootContainer.createChildComponents - cCount: " + cCount);
             // Iterate Through Child Components
             for (var i=0; i<cCount; i++) {
                 // Get Child Component Info
                 var ccInfo = componentRootContainerRoot.componentInfo.childInfo(i);
                 // Create Child Container Object
-                var newObject = newComponent.createObject(paneContainer, { "parentContainer": componentRootContainerRoot });
+                var newObject = newChildComponent.createObject(paneContainer, { "parentContainer": componentRootContainerRoot });
+
                 // Check New Object
                 if (newObject) {
                     // Update Child Component Container Object
@@ -355,30 +351,30 @@ DPaneBase {
             // Destroy Child Component Object
             childComponentObject.destroy();
         }
-
     }
 
     // Update Child Component Container Object
-    function updateChildContainerObject(childObject, aComponentInfo, aFocus) {
+    function updateChildContainerObject(aChildObject, aComponentInfo, aFocus) {
         // Check Child Object & Component Info
-        if (childObject && aComponentInfo) {
-            console.log("DComponentRootContainer.updateChildContainerObject");
+        if (aChildObject && aComponentInfo) {
+            console.log("DComponentRootContainer.updateChildContainerObject - componentName: " + aComponentInfo.componentName);
 
             // Set Component Info
-            childObject.componentInfo = aComponentInfo;
+            aChildObject.componentInfo = aComponentInfo;
             // Set Focus
-            childObject.focus = aFocus;
+            aChildObject.focus = aFocus;
             // Enable Component Info Update
-            childObject.updateComponentInfoEnabled = true;
+            aChildObject.updateComponentInfoEnabled = true;
 
             // Set Pos X
-            childObject.x = aComponentInfo.posX;
+            aChildObject.x = aComponentInfo.posX;
             // Set Pos Y
-            childObject.y = aComponentInfo.posY;
+            aChildObject.y = aComponentInfo.posY;
+
             // Set Width
-            childObject.width = aComponentInfo.width;
+            aChildObject.width = aComponentInfo.width;
             // Set Height
-            childObject.height = aComponentInfo.height;
+            aChildObject.height = aComponentInfo.height;
 
             // ...
 
@@ -454,7 +450,7 @@ DPaneBase {
             //hoverX = drag.x;
             //hoverY = drag.y;
 
-            if (drag.keys[0] === CONSTS.newComponentDragKey) {
+            if (drag.keys[0] === CONSTS.newChildComponentDragKey) {
                 //console.log("DComponentRootContainer.dropArea.onEntered - keys: " + drag.keys);
                 // Accept Drag
                 drag.accept();
@@ -492,7 +488,7 @@ DPaneBase {
             componentRootContainerRoot.previousScale = 1.0;
 
             // Create New Object
-            var newObject = newComponent.createObject(paneContainer, { "parentContainer": componentRootContainerRoot });
+            var newObject = newChildComponent.createObject(paneContainer, { "parentContainer": componentRootContainerRoot });
             // Check New Object
             if (newObject) {
                 // Update Child Component Container Object

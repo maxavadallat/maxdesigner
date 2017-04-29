@@ -12,7 +12,7 @@ ComponentAnchorsModel::ComponentAnchorsModel(ComponentInfo* aComponent, QObject*
     : QObject(aParent)
     , mComponent(aComponent)
 {
-    qDebug() << "ComponentAnchorsModel created.";
+    //qDebug() << "ComponentAnchorsModel created.";
 
     // Init
     init();
@@ -90,7 +90,7 @@ void ComponentAnchorsModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
-        qDebug() << "ComponentAnchorsModel::setCurrentComponent - mComponent: " << (mComponent ? mComponent->mName : "NULL");
+        //qDebug() << "ComponentAnchorsModel::setCurrentComponent - mComponent: " << (mComponent ? mComponent->mName : "NULL");
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Component Changed

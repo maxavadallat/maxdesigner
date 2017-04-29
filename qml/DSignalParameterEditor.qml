@@ -41,9 +41,9 @@ DPaneBase {
     }
 
     // Check If Parameter Valid
-    function parameterValid() {
+    function parameterValid(newText) {
         if (signalParameterEditorRoot.componentSignal !== null) {
-            return signalParameterEditorRoot.componentSignal.parameterValid(parameterEditor.text);
+            return signalParameterEditorRoot.componentSignal.parameterValid(newText);
         }
 
         return false;
@@ -64,9 +64,9 @@ DPaneBase {
 
         onClicked: {
             // Check If Parameter Valid
-            if (parameterValid()) {
+            if (parameterValid(parameterEditor.editedText)) {
                 // Set Signal Parameter
-                signalParameterEditorRoot.signalParameter = parameterEditor.text;
+                signalParameterEditorRoot.signalParameter = parameterEditor.editedText;
                 // Emit Accepted Signal
                 signalParameterEditorRoot.accepted();
             } else {
@@ -109,9 +109,9 @@ DPaneBase {
 
             onAccepted: {
                 // Check If Parameter Valid
-                if (parameterValid()) {
+                if (parameterValid(newText)) {
                     // Set Signal Parameter
-                    signalParameterEditorRoot.signalParameter = parameterEditor.text;
+                    signalParameterEditorRoot.signalParameter = newText;
                     // Emit Accepted Signal
                     signalParameterEditorRoot.accepted();
                 } else {
@@ -120,7 +120,7 @@ DPaneBase {
                 }
             }
 
-            onTextChanged: {
+            onTextEdited: {
                 // Reset Invalid Value
                 parameterEditor.invalidValue = false;
             }

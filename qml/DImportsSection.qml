@@ -16,7 +16,7 @@ DSection {
 
     DFlow {
         id: importsFlow
-        width: importsSectionRoot.contentWidth
+        width: importsSectionRoot.width
         spacing: DStyle.defaultSpacing
 
         Repeater {
@@ -34,13 +34,13 @@ DSection {
     }
 
     Item {
-        width: importsSectionRoot.contentWidth
+        width: importsSectionRoot.width
         height: DStyle.defaultMargin
     }
 
     DButton {
         id: addImportButton
-        width: importsSectionRoot.contentWidth
+        width: importsSectionRoot.width
         text: "Add Import"
         enabled: importEditor.state === importEditor.stateCreate
 

@@ -85,7 +85,6 @@
         <file>qml/ProjectPane.qml</file>
         <file>qml/PropertiesPane.qml</file>
         <file>qml/DFunctionEditor.qml</file>
-        <file>qml/DImportsEditor.qml</file>
         <file>qml/DSlotEditor.qml</file>
         <file>qml/DImportEditor.qml</file>
         <file>qml/DTag.qml</file>

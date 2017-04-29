@@ -16,7 +16,8 @@ ComponentOwnPropertiesModel::ComponentOwnPropertiesModel(ComponentInfo* aCompone
     , mProject(aProject)
     , mDerivedComponent(aDerivedComponent)
 {
-    qDebug() << "ComponentOwnPropertiesModel created for " << (mComponent ? mComponent->mName : "NULL");
+    qDebug() << "ComponentOwnPropertiesModel created for " << (mComponent ? mComponent->mName : "NULL")
+             << " - aDerivedComponent: " << (mDerivedComponent ? mDerivedComponent->mName : "NULL");
 
     // Init
     init();
@@ -64,7 +65,7 @@ void ComponentOwnPropertiesModel::loadComponentProperties()
         return;
     }
 
-    //qDebug() << "ComponentOwnPropertiesModel::loadComponentProperties - mComponent: " << mComponent->mName;
+    qDebug() << "ComponentOwnPropertiesModel::loadComponentProperties - mComponent: " << mComponent->mName;
 
     // Begin Reset Model
     beginResetModel();
@@ -86,8 +87,6 @@ void ComponentOwnPropertiesModel::generateOwnPropertyKeys()
         return;
     }
 
-    //qDebug() << "ComponentOwnPropertiesModel::generateOwnPropertyKeys - mName: " << mComponent->mName;
-
     // Set Keys
     mKeys = mComponent->mOwnProperties.keys();
 
@@ -101,7 +100,7 @@ void ComponentOwnPropertiesModel::generateOwnPropertyKeys()
         mKeys.removeDuplicates();
     }
 
-    //qDebug() << "ComponentOwnPropertiesModel::generateOwnPropertyKeys - mComponent: " << mComponent->mName << " - mKeys: " << mKeys;
+    qDebug() << "ComponentOwnPropertiesModel::generateOwnPropertyKeys - mComponent: " << mComponent->mName << " - mKeys: " << mKeys;
 }
 
 //==============================================================================
