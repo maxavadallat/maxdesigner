@@ -43,6 +43,8 @@ class ComponentInfo : public QObject
     Q_PROPERTY(QString componentBase READ componentBase NOTIFY componentBaseChanged)
     // Parent
     Q_PROPERTY(ComponentInfo* componentParent READ componentParent WRITE setComponentParent NOTIFY componentParentChanged)
+    // QML Container
+    Q_PROPERTY(QObject* componentContainer READ componentContainer WRITE setComponentContainer NOTIFY componentContainerChanged)
     // Prototype
     Q_PROPERTY(bool protoType READ protoType NOTIFY protoTypeChanged)
     // Focused
@@ -124,6 +126,11 @@ public:
     ComponentInfo* componentParent();
     // Set Component Parent
     void setComponentParent(ComponentInfo* aParent);
+
+    // Get QML Container
+    QObject* componentContainer();
+    // Set QML Container
+    void setComponentContainer(QObject* aContainer);
 
     // Get Focused State
     bool focused();
@@ -215,6 +222,8 @@ signals:
     void componentBaseChanged(const QString& aBaseName);
     // Component Parent Changed Signal
     void componentParentChanged(ComponentInfo* aParent);
+    // Component Container Changed Signal
+    void componentContainerChanged(QObject* aContainer);
     // Info Path Changed Signal
     void infoPathChanged(const QString& aInfoPath);
     // Focused State Changed Signal
@@ -273,6 +282,9 @@ signals:
     // Bottom Anchor Margin Changed Signal
     void anchorBottomMarginChanged(const QString& aMargin);
 
+    // Anchor Margin Changed Signal
+    void anchorMarginsChanged(const QString& aMargins);
+
     // Fill Anchor Changed Signal
     void anchorFillChanged(const QString& aFill);
     // Fill Anchor Margin Changed Signal
@@ -289,7 +301,7 @@ signals:
     // Horizontal Center Anchor Offset Changed Signal
     void anchorHorizontalCenterOffsetChanged(const QString& aOffset);
     // Vertical Center Anchor Offset Changed Signal
-    void anchorVerticalCenterOfsetChanged(const QString& aOffset);
+    void anchorVerticalCenterOffsetChanged(const QString& aOffset);
 
     // Component Property Changed Signal
     void componentPropertyChanged(const QString& aName, const QVariant& aValue);
@@ -421,6 +433,9 @@ protected:
     // Set Dirty State
     void setDirty(const bool& aDirty);
 
+    // Find Root Component
+    ComponentInfo* findRoot(ComponentInfo* aComponent);
+
     // Generate Live Code
     QString generateLiveCode();
 
@@ -474,6 +489,9 @@ protected: // Data
 
     // Groupped
     bool                    mGroupped;
+
+    // QML Container Object
+    QObject*                mContainer;
 
     // Base Component Info
     ComponentInfo*          mBase;

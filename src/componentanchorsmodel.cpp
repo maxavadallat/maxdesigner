@@ -130,6 +130,8 @@ void ComponentAnchorsModel::setAnchorsLeft(const QString& aAnchorLeft)
         }
         // Set Component Dirty
         mComponent->setDirty(true);
+        // Emit Anchors Left Changed
+        emit mComponent->anchorLeftChanged(aAnchorLeft);
         // Emit Anchors Left Changed Signal
         emit anchorsLeftChanged(aAnchorLeft);
     }
@@ -165,6 +167,8 @@ void ComponentAnchorsModel::setAnchorsRight(const QString& aAnchorRight)
         }
         // Set Component Dirty
         mComponent->setDirty(true);
+        // Emit Anchors Right Changed
+        emit mComponent->anchorRightChanged(aAnchorRight);
         // Emit Anchors Right Changed Signal
         emit anchorsRightChanged(aAnchorRight);
     }
@@ -201,6 +205,8 @@ void ComponentAnchorsModel::setAnchorsTop(const QString& aAnchorTop)
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchors Top Changed Signal
+        emit mComponent->anchorTopChanged(aAnchorTop);
+        // Emit Anchors Top Changed Signal
         emit anchorsTopChanged(aAnchorTop);
     }
 }
@@ -235,6 +241,8 @@ void ComponentAnchorsModel::setAnchorsBottom(const QString& aAnchorBottom)
         }
         // Set Component Dirty
         mComponent->setDirty(true);
+        // Emit Anchor Bottom Changed Signal
+        emit mComponent->anchorBottomChanged(aAnchorBottom);
         // Emit Anchors Bottom Changed Signal
         emit anchorsBottomChanged(aAnchorBottom);
     }
@@ -270,6 +278,8 @@ void ComponentAnchorsModel::setAnchorsFill(const QString& aAnchorFill)
         }
         // Set Component Dirty
         mComponent->setDirty(true);
+        // Emit Anchor Fill Changed Signal
+        emit mComponent->anchorFillChanged(aAnchorFill);
         // Emit Anchors Fill Changed Signal
         emit anchorsFillChanged(aAnchorFill);
     }
@@ -305,6 +315,8 @@ void ComponentAnchorsModel::setAnchorsCenterIn(const QString& aAnchorCenterIn)
         }
         // Set Component Dirty
         mComponent->setDirty(true);
+        // Emit Anchor Center In Changed Signal
+        emit mComponent->anchorCenterInChanged(aAnchorCenterIn);
         // Emit Anchors CenterIn Changed Signal
         emit anchorsCenterInChanged(aAnchorCenterIn);
     }
@@ -340,7 +352,9 @@ void ComponentAnchorsModel::setHorizontalCenter(const QString& aHorizontalCenter
         }
         // Set Component Dirty
         mComponent->setDirty(true);
-        // Emit Anchors Horizontal Changed Signal
+        // Emit Anchor Horizontal Center Changed Signal
+        emit mComponent->anchorHorizontalCenterChanged(aHorizontalCenter);
+        // Emit Anchors Horizontal Centr Changed Signal
         emit anchorsHorizontalCenterChanged(aHorizontalCenter);
     }
 }
@@ -375,6 +389,8 @@ void ComponentAnchorsModel::setVerticalCenter(const QString& aVerticalCenter)
         }
         // Set Component Dirty
         mComponent->setDirty(true);
+        // Emit Anchor Vertical Center Changed Signal
+        emit mComponent->anchorVerticalCenterChanged(aVerticalCenter);
         // Emit Anchors Vertical Changed Signal
         emit anchorsVerticalCenterChanged(aVerticalCenter);
     }
@@ -410,6 +426,8 @@ void ComponentAnchorsModel::setAnchorsMargins(const QString& aAnchorMargins)
         }
         // Set Component Dirty
         mComponent->setDirty(true);
+        // Emit Anchor Margins Changed Signal
+        emit mComponent->anchorMarginsChanged(aAnchorMargins);
         // Emit Anchors Margins Changed Signal
         emit anchorsMarginsChanged(aAnchorMargins);
     }
@@ -445,6 +463,8 @@ void ComponentAnchorsModel::setAnchorsLeftMargin(const QString& aAnchorLeftMargi
         }
         // Set Component Dirty
         mComponent->setDirty(true);
+        // Emit Anchors Left Margin Changed Signal
+        emit mComponent->anchorLeftMarginChanged(aAnchorLeftMargin);
         // Emit Anchors LeftMargin Changed Signal
         emit anchorsLeftMarginChanged(aAnchorLeftMargin);
     }
@@ -481,6 +501,8 @@ void ComponentAnchorsModel::setAnchorsRightMargin(const QString& aAnchorRightMar
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchors RightMargin Changed Signal
+        emit mComponent->anchorRightMarginChanged(aAnchorRightMargin);
+        // Emit Anchors RightMargin Changed Signal
         emit anchorsRightMarginChanged(aAnchorRightMargin);
     }
 }
@@ -515,6 +537,8 @@ void ComponentAnchorsModel::setAnchorsTopMargin(const QString& aAnchorTopMargin)
         }
         // Set Component Dirty
         mComponent->setDirty(true);
+        // Emit Anchors TopMargin Changed Signal
+        emit mComponent->anchorTopMarginChanged(aAnchorTopMargin);
         // Emit Anchors TopMargin Changed Signal
         emit anchorsTopMarginChanged(aAnchorTopMargin);
     }
@@ -551,6 +575,8 @@ void ComponentAnchorsModel::setAnchorsBottomMargin(const QString& aAnchorBottomM
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchors BottomMargin Changed Signal
+        emit mComponent->anchorBottomMarginChanged(aAnchorBottomMargin);
+        // Emit Anchors BottomMargin Changed Signal
         emit anchorsBottomMarginChanged(aAnchorBottomMargin);
     }
 }
@@ -586,6 +612,8 @@ void ComponentAnchorsModel::setAnchorsHorizontalOffset(const QString& aAnchorHor
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchors HorizontalOffset Changed Signal
+        emit mComponent->anchorHorizontalCenterOffsetChanged(aAnchorHorizontalOffset);
+        // Emit Anchors HorizontalOffset Changed Signal
         emit anchorsHorizontalOffsetChanged(aAnchorHorizontalOffset);
     }
 }
@@ -620,6 +648,8 @@ void ComponentAnchorsModel::setAnchorsVerticalOffset(const QString& aAnchorVerti
         }
         // Set Component Dirty
         mComponent->setDirty(true);
+        // Emit Anchors Vertical Offset Changed Signal
+        emit mComponent->anchorVerticalCenterOffsetChanged(aAnchorVerticalOffset);
         // Emit Anchors Vertical Offset Changed Signal
         emit anchorsVerticalOffsetChanged(aAnchorVerticalOffset);
     }

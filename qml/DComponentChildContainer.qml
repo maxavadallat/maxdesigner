@@ -57,102 +57,118 @@ DContainer {
         }
 
         onAnchorLeftChanged: {
-            console.log("DComponentChildContainer.componentInfoConnections.onAnchorLeftChanged - aLeft: " + aLeft);
-
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorLeftChanged - aLeft: " + aLeft);
+            // Set Anchors Left
+            cccRoot.anchors.left = cccRoot.parseAnchors(aLeft, true);
             // ...
         }
 
         // Left Anchor Margin Changed
         onAnchorLeftMarginChanged: {
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorLeftMarginChanged - aMargin: " + aMargin);
             // Set Left Margin
             cccRoot.anchors.leftMargin = aMargin;
         }
 
         // Right Anchor Changed
         onAnchorRightChanged: {
-            console.log("DComponentChildContainer.componentInfoConnections.onAnchorRightChanged - aRight: " + aRight);
-
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorRightChanged - aRight: " + aRight);
+            // Set Anchors Right
+            cccRoot.anchors.right = cccRoot.parseAnchors(aRight, true);
             // ...
         }
 
         // Right Anchor Margin Changed
         onAnchorRightMarginChanged: {
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorRightMarginChanged - aMargin: " + aMargin);
             // Set Right Margin
             cccRoot.anchors.rightMargin = aMargin;
         }
 
         // Top Anchor Changed
         onAnchorTopChanged: {
-            console.log("DComponentChildContainer.componentInfoConnections.onAnchorTopChanged - aTop: " + aTop);
-
-            // ...
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorTopChanged - aTop: " + aTop);
+            // Set Anchors Top
+            cccRoot.anchors.top = cccRoot.parseAnchors(aTop, true);
         }
 
         // Top Anchor Margin Changed
         onAnchorTopMarginChanged: {
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorTopMarginChanged - aMargin: " + aMargin);
             // Set Top Margin
             cccRoot.anchors.topMargin = aMargin;
         }
 
         // Bottom Anchor Changed
         onAnchorBottomChanged: {
-            console.log("DComponentChildContainer.componentInfoConnections.onAnchorBottomChanged - aBottom: " + aBottom);
-
-            // ...
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorBottomChanged - aBottom: " + aBottom);
+            // Set Anchors Botom
+            cccRoot.anchors.bottom = cccRoot.parseAnchors(aBottom, true);
         }
 
         // Bottom Anchor Margin Changed
         onAnchorBottomMarginChanged: {
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorBottomMarginChanged - aMargin: " + aMargin);
             // Set Bottom Margin
             cccRoot.anchors.bottomMargin = aMargin;
         }
 
+        onAnchorMarginsChanged: {
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorMarginsChanged - aMargins: " + aMargins);
+            // Set Margins
+            cccRoot.anchors.margins = aMargins;
+        }
+
         // Fill Anchor Changed
         onAnchorFillChanged: {
-            console.log("DComponentChildContainer.componentInfoConnections.onAnchorFillChanged - aFill: " + aFill);
-
-            // ...
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorFillChanged - aFill: " + aFill);
+            // Set Anchors Fill
+            cccRoot.anchors.fill = cccRoot.parseAnchors(aFill, false);
         }
 
         // Fill Anchor Margin Changed
         onAnchorFillMarginChanged: {
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorFillMarginChanged - aMargin: " + aMargin);
             // Set Anchor Margins
             cccRoot.anchors.margins = aMargin;
         }
 
         // Center Anchor Changed
         onAnchorCenterInChanged: {
-            console.log("DComponentChildContainer.componentInfoConnections.onAnchorCenterInChanged - aCenterIn: " + aCenterIn);
-
-            // ...
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorCenterInChanged - aCenterIn: " + aCenterIn);
+            // Set Anchors Center In
+            cccRoot.anchors.centerIn = cccRoot.parseAnchors(aCenterIn, false);
         }
 
         // Horizontal Center Anchor Changed
         onAnchorHorizontalCenterChanged: {
-            console.log("DComponentChildContainer.componentInfoConnections.onAnchorHorizontalCenterChanged - aHorizontalCenter: " + aHorizontalCenter);
-
-            // ...
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorHorizontalCenterChanged - aHorizontalCenter: " + aHorizontalCenter);
+            // Set Anchors Horizontal Center
+            cccRoot.anchors.horizontalCenter = cccRoot.parseAnchors(aHorizontalCenter, true);
         }
 
         // Vertical Center Anchor Changed
         onAnchorVerticalCenterChanged: {
-            console.log("DComponentChildContainer.componentInfoConnections.onAnchorVerticalCenterChanged - aVerticalCenter: " + aVerticalCenter);
-
-            // ...
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorVerticalCenterChanged - aVerticalCenter: " + aVerticalCenter);
+            // Set Anchors Vertical Center
+            cccRoot.anchors.verticalCenter = cccRoot.parseAnchors(aVerticalCenter, true);
         }
 
         // Horizontal Center Anchor Offset Changed
         onAnchorHorizontalCenterOffsetChanged: {
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorHorizontalCenterOffsetChanged - aOffset: " + aOffset);
             // Set Horizontal Center Offset
             cccRoot.anchors.horizontalCenterOffset = aOffset;
         }
 
         // Vertical Center Anchor Offset Changed
-        onAnchorVerticalCenterOfsetChanged: {
+        onAnchorVerticalCenterOffsetChanged: {
+            //console.log("DComponentChildContainer.componentInfoConnections.onAnchorVerticalCenterOffsetChanged - aOffset: " + aOffset);
             // Set Vertical Center Offset
             cccRoot.anchors.verticalCenterOffset = aOffset;
         }
 
+        // Component Property Changed
         onComponentPropertyChanged: {
             console.log("DComponentChildContainer.componentInfoConnections.onComponentPropertyChanged - aName: " + aName + " - aValue: " + aValue);
 
@@ -192,10 +208,24 @@ DContainer {
     drag.maximumY: parent.height
 
     Component.onDestruction: {
-        // Reset Component Info
-        cccRoot.componentInfo = null;
+        // Check Component Info
+        if (cccRoot.componentInfo !== null) {
+            // Set Container
+            cccRoot.componentInfo.componentContainer = null;
+        }
+
         // Reset Update Component Info Enabled
         cccRoot.updateComponentInfoEnabled = false;
+        // Reset Component Info
+        cccRoot.componentInfo = null;
+    }
+
+    onComponentInfoChanged: {
+        // Check Component Info
+        if (cccRoot.componentInfo !== null) {
+            // Set Container
+            cccRoot.componentInfo.componentContainer = cccRoot;
+        }
     }
 
     Keys.onReleased: {
@@ -293,6 +323,72 @@ DContainer {
         }
     }
 
+    // Parse Anchors
+    function parseAnchors(anchorString, needPoint) {
+        // Get Anchor Elements
+        var anchorElements = anchorString.split(".");
+
+        //console.log("DComponentChildContainer.parseAnchors - anchorElements: " + anchorElements);
+
+        // Get Anchor Target
+        var anchorTarget = anchorElements[0];
+
+        // Check Anchor Target
+        if (anchorTarget === "") {
+            console.log("DComponentChildContainer.parseAnchors - Clearing Anchor");
+            return undefined;
+        }
+
+        // Get Anchoring Point
+        var anchorPoint = anchorElements[1];
+
+        // Check Anchor Target
+        if (anchorTarget === "parent") {
+            // Set Anchor Target - Morph To Object
+            anchorTarget = parentContainer.paneContainer;
+        } else {
+            // Get Component By ID
+            var targetComponent = cccRoot.componentInfo.getChildObject(anchorTarget);
+            // Get Anchor Target
+            anchorTarget = targetComponent !== null ? targetComponent.componentContainer.mainContainerObject : undefined;
+        }
+
+        // Check Anchor Target
+        if (anchorTarget === null || anchorTarget === undefined) {
+            console.warn("DComponentChildContainer.componentInfoConnections.onAnchorRightChanged - NO SUCH TARGET!");
+            return undefined;
+        }
+
+        console.log("DComponentChildContainer.parseAnchors - anchorTarget: " + anchorTarget);
+
+        // Check Anchor Point
+        if (anchorPoint === "" || anchorPoint === undefined) {
+            // Check If Need Anchoring Point
+            if (needPoint) {
+                console.warn("DComponentChildContainer.parseAnchors - NO ANCHOR POINT DEFINED!");
+                return undefined;
+            }
+
+            return anchorTarget;
+        }
+
+        // Switch Anchor Point
+        switch (anchorPoint) {
+            case "left":                anchorPoint = anchorTarget.left;                break;
+            case "right":               anchorPoint = anchorTarget.right;               break;
+            case "top":                 anchorPoint = anchorTarget.top;                 break;
+            case "bottom":              anchorPoint = anchorTarget.bottom;              break;
+            case "horizontalCenter":    anchorPoint = anchorTarget.horizontalCenter;    break;
+            case "verticalCenter":      anchorPoint = anchorTarget.verticalCenter;      break;
+
+            default:
+                console.warn("DComponentChildContainer.parseAnchors - anchorPoint: " + anchorPoint + " - INVALID ANCHOR POINT!");
+            return undefined;
+        }
+
+        return anchorPoint;
+    }
+
     // ...
 
     Loader {
@@ -300,6 +396,8 @@ DContainer {
         anchors.fill: parent
         asynchronous: true
         active: false
+
+
     }
 
     DText {

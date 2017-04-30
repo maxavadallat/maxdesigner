@@ -26,6 +26,8 @@ DMouseArea {
 
     property bool userInput: false
 
+    clip: true
+
     signal keyEvent(var event)
     signal accepted(var newText)
     signal textEdited(var newText)

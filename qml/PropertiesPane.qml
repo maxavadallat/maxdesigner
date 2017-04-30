@@ -16,7 +16,25 @@ DPane {
 
         onFocusedComponentChanged: {
             // Check Focused Component
-            if (propertiesController.focusedComponent !== null) {
+            if (propertiesController.focusedComponent === null) {
+                // Reset Editors
+                idEditor.text = "";
+                objectNameEditor.text = "";
+
+                // Close All Sections
+                importsSection.close();
+                sizeAndPosSection.close();
+                anchorsSection.close();
+                ownPropertiesSection.close();
+                signalsSection.close();
+                slotsSection.close();
+                functionsSection.close();
+                statesSection.close();
+                transitionsSection.close();
+
+                // ...
+
+            } else {
                 // Set ID Editor Text
                 idEditor.text = propertiesController.focusedComponent.componentID;
                 // Set Object Name Editor Text
@@ -29,57 +47,51 @@ DPane {
                     // Hide Anchors Section
                     anchorsSection.hide();
                 } else {
-                    // Check If Root Component
-                    if (propertiesController.focusedComponent.isRoot) {
-                        // Hide Anchors Section
-                        anchorsSection.hide();
-                    } else {
-                        // Open Anchors Section
+                    // Check Section State
+                    if (sizeAndPosSection.state === sizeAndPosSection.stateHidden) {
+                        // Set Closed State
+                        sizeAndPosSection.close();
+                    }
+                }
+
+                // Check If Root
+                if (propertiesController.focusedComponent.isRoot) {
+                    // Hide Anchors Section
+                    anchorsSection.hide();
+                } else {
+                    // Check Section State
+                    if (anchorsSection.state === anchorsSection.stateHidden) {
+                        // Set Closed State
                         anchorsSection.close();
                     }
-
-                    // Open Sections
-                    sizeAndPosSection.open();
                 }
 
                 // Check Focused Component
                 if (!propertiesController.focusedComponent.hasProperty("state")) {
+                    // Hide Section
                     statesSection.hide();
+                    // Hide Section
                     transitionsSection.hide();
                 } else {
-                    statesSection.close();
-                    transitionsSection.close();
+                    // Check Section State
+                    if (statesSection.state === statesSection.stateHidden) {
+                        // Set Section Closed State
+                        statesSection.close();
+                    }
+
+                    // Check Section State
+                    if (transitionsSection.state === transitionsSection.stateHidden) {
+                        // Set Section Closed State
+                        transitionsSection.close();
+                    }
                 }
 
-                // Show Own Properties Section
+                // Set Section Open State
                 ownPropertiesSection.open();
 
-                // Show Properties Section
-
                 // ...
-
-            } else {
-                // Reset Editors
-                idEditor.text = "";
-                objectNameEditor.text = "";
-
-                // ...
-
-                // Close All Sections
-                importsSection.close();
-                sizeAndPosSection.close();
-                anchorsSection.close();
-                ownPropertiesSection.close();
-                signalsSection.close();
-                slotsSection.close();
-                functionsSection.close();
-                statesSection.close();
-                transitionsSection.close();
-                // Properties section
             }
         }
-
-        // ...
     }
 
     property Connections focusedComponentConnection: Connections {
@@ -169,13 +181,13 @@ DPane {
         DTextInput {
             id: idEditor
             width: propertiesPaneRoot.contentWidth - idTitle.width - 2
-            text: ""
+            text: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentID : ""
 
-            onTextChanged: {
+            onAccepted: {
                 // Check Current Component ID
-                if (propertiesController.cID !== idEditor.text) {
+                if (propertiesController.cID !== newText) {
                     // Request New Component ID
-                    propertiesController.requestCID(idEditor.text);
+                    propertiesController.requestCID(newText);
                 }
             }
         }
@@ -197,13 +209,13 @@ DPane {
         DTextInput {
             id: objectNameEditor
             width: propertiesPaneRoot.contentWidth - objectNameTitle.width - 2
-            text: ""
+            text: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentObjectName : ""
 
-            onTextChanged: {
+            onAccepted: {
                 // Check Component Object Name
-                if (propertiesController.cObjectName !== objectNameEditor.text) {
+                if (propertiesController.cObjectName !== newText) {
                     // Request New Object Name
-                    propertiesController.requestCObjectName(objectNameEditor.text);
+                    propertiesController.requestCObjectName(newText);
                 }
             }
         }

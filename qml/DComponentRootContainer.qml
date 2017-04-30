@@ -197,6 +197,27 @@ DPaneBase {
         // ...
     }
 
+    Component.onDestruction: {
+        // Check Component Info
+        if (componentRootContainerRoot.componentInfo !== null) {
+            // Set Container
+            componentRootContainerRoot.componentInfo.componentContainer = null;
+        }
+
+        // Reset Update Component Info Enabled
+        componentRootContainerRoot.updateComponentInfoEnabled = false;
+        // Reset Component Info
+        componentRootContainerRoot.componentInfo = null;
+    }
+
+    onComponentInfoChanged: {
+        // Check Component Info
+        if (componentRootContainerRoot.componentInfo !== null) {
+            // Set Container
+            componentRootContainerRoot.componentInfo.componentContainer = componentRootContainerRoot;
+        }
+    }
+
     onFocusChanged: {
         //console.log("DComponentRootContainer.onFocusChanged - focus: " + focus);
 

@@ -48,28 +48,6 @@ ComponentInfo* ComponentInfo::clone()
     // Set Is Root
     newComponent->mIsRoot = false;
 
-    // Imports
-
-    // Anchors
-
-    // Own Properties
-
-    // Properties
-
-    // Signals
-
-    // Slots
-
-    // Functions
-
-    // Children
-
-    // States
-
-    // Transitions
-
-    // ...
-
     return newComponent;
 }
 
@@ -97,6 +75,8 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mBaseName(aBaseName)
     , mFocused(false)
     , mIsRoot(true)
+    , mGroupped(false)
+    , mContainer(NULL)
     , mBase(mProject ? mProject->getComponentByName(mBaseName) : NULL)
     , mParent(NULL)
     , mProtoType(mIsProtoType ? NULL : mProject ? mProject->getComponentByName(mName, mType) : NULL)
@@ -398,6 +378,29 @@ void ComponentInfo::setComponentParent(ComponentInfo* aParent)
 }
 
 //==============================================================================
+// Get QML Container
+//==============================================================================
+QObject* ComponentInfo::componentContainer()
+{
+    return mContainer;
+}
+
+//==============================================================================
+// Set QML Container
+//==============================================================================
+void ComponentInfo::setComponentContainer(QObject* aContainer)
+{
+    // Check Container
+    if (mContainer != aContainer) {
+        qDebug() << "ComponentInfo::setComponentContainer - aContainer: " << aContainer;
+        // Set QML Container
+        mContainer = aContainer;
+        // Emit QML Container Changed Signal
+        emit componentContainerChanged(mContainer);
+    }
+}
+
+//==============================================================================
 // Get Focused State
 //==============================================================================
 bool ComponentInfo::focused()
@@ -524,22 +527,17 @@ QString ComponentInfo::componentID()
 //==============================================================================
 void ComponentInfo::setComponentID(const QString& aID)
 {
-    // Set Component Property
-    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_ID, aID);
+    // Check Component ID
+    if (componentID() != aID) {
+        // Set Component Property
+        setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_ID, aID);
 
-    // Check If Is Root
-    if (mIsRoot) {
+        // Set Child Object ID
+        setChildObjectID(this, aID);
 
-        // ...
-
-    } else if (mParent) {
-
-        // ...
-
+        // Emit Component ID Changed Signal
+        emit componentIDChanged(componentID());
     }
-
-    // Emit Component ID Changed Signal
-    emit componentIDChanged(componentID());
 }
 
 //==============================================================================
@@ -555,10 +553,14 @@ QString ComponentInfo::componentObjectName()
 //==============================================================================
 void ComponentInfo::setComponentObjectName(const QString& aObjectName)
 {
-    // Set Component Property
-    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_OBJECT_NAME, aObjectName);
-    // Emit Object Name Changed Signal
-    emit componentObjectNameChanged(componentObjectName());
+    // Check Object Name
+    if (componentObjectName() != aObjectName) {
+        // Set Component Property
+        setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_OBJECT_NAME, aObjectName);
+
+        // Emit Object Name Changed Signal
+        emit componentObjectNameChanged(componentObjectName());
+    }
 }
 
 //==============================================================================
@@ -958,16 +960,8 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
             ComponentInfo* childComponent = componentProtoType->clone();
             // Set Up/Update Child Component from JSON Object
             childComponent->fromJSONObject(childObject);
-            // Reset ProtoType Flag
-            childComponent->mIsProtoType = false;
-            // Set Parent
-            childComponent->mParent = this;
-            // Add To Children
-            mChildren << childComponent;
-            // Add ID To ID Map
-            setChildObjectID(childComponent, childComponent->componentID());
-            // Clear Dirty Flag
-            childComponent->mDirty = false;
+            // Add Child
+            addChild(childComponent);
 
         } else {
             qWarning() << "ComponentInfo::fromJSONObject - ccName: " << ccName << " - NO COMPONENT!!";
@@ -1020,13 +1014,16 @@ void ComponentInfo::setChildObjectID(QObject* aObject, const QString& aID)
         return;
     }
 
+    // Init Root Component Info
+    ComponentInfo* rootInfo = findRoot(this);
+
     // Try To Find Key If ID Is Updated
-    QString cidKey = mIDMap.key(aObject);
+    QString cidKey = rootInfo->mIDMap.key(aObject);
 
     // Check Key
     if (!cidKey.isEmpty()) {
         // Remove Key
-        mIDMap.remove(cidKey);
+        rootInfo->mIDMap.remove(cidKey);
     }
 
     // Check ID
@@ -1036,12 +1033,12 @@ void ComponentInfo::setChildObjectID(QObject* aObject, const QString& aID)
     }
 
     // Check If ID Is Already Registered
-    if (mIDMap.keys().indexOf(aID) < 0) {
+    if (rootInfo->mIDMap.keys().indexOf(aID) < 0) {
 
-        //qDebug() << "ComponentInfo::setChildObjectID - aObject: " << aObject << " - aID: " << aID;
+        qDebug() << "ComponentInfo::setChildObjectID - aObject: " << aObject << " - aID: " << aID;
 
         // Add Object ID
-        mIDMap[aID] = aObject;
+        rootInfo->mIDMap[aID] = aObject;
 
         qDebug() << "ComponentInfo::setChildObjectID - mIDMap: " << mIDMap;
 
@@ -1055,10 +1052,13 @@ void ComponentInfo::setChildObjectID(QObject* aObject, const QString& aID)
 //==============================================================================
 void ComponentInfo::clearObjectID(const QString& aID)
 {
+    // Init Root Component Info
+    ComponentInfo* rootInfo = findRoot(this);
+
     // Check If ID Is Already Registered
-    if (mIDMap.keys().indexOf(aID) >= 0) {
+    if (rootInfo->mIDMap.keys().indexOf(aID) >= 0) {
         // Remove Object ID
-        mIDMap.remove(aID);
+        rootInfo->mIDMap.remove(aID);
     } else {
         qWarning() << "ComponentInfo::clearObjectID - aID: " << aID << " - IS NOT REGISTERED!!";
     }
@@ -1069,7 +1069,28 @@ void ComponentInfo::clearObjectID(const QString& aID)
 //==============================================================================
 QObject* ComponentInfo::getChildObject(const QString& aID)
 {
-    return mIDMap.value(aID);
+    // Init Root Component Info
+    ComponentInfo* rootInfo = findRoot(this);
+
+    return rootInfo ? rootInfo->mIDMap.value(aID) : NULL;
+}
+
+//==============================================================================
+// Find Root Component
+//==============================================================================
+ComponentInfo* ComponentInfo::findRoot(ComponentInfo* aComponent)
+{
+    // Check Component Info
+    if (!aComponent) {
+        return NULL;
+    }
+
+    // Check Component Info
+    if (aComponent->mIsRoot) {
+        return aComponent;
+    }
+
+    return findRoot(aComponent->mParent);
 }
 
 //==============================================================================
@@ -1712,10 +1733,16 @@ void ComponentInfo::addChild(ComponentInfo* aChild)
 {
     // Check Child
     if (aChild) {
-        // Set Parent Component
+        // Reset ProtoType Flag
+        aChild->mIsProtoType = false;
+        // Set Parent
         aChild->mParent = this;
+        // Clear Dirty Flag
+        aChild->mDirty = false;
         // Append Child
         mChildren << aChild;
+        // Add ID To ID Map
+        setChildObjectID(aChild, aChild->componentID());
         // Set Dirty
         setDirty(true);
         // Emit Child Count Changed Signal
@@ -1734,7 +1761,14 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
         int cIndex = mChildren.indexOf(aChild);
         // Check Child Index
         if (cIndex >= 0 && cIndex < mChildren.count()) {
-            qDebug() << "ComponentInfo::removeChild - mComponent: " << mChildren[cIndex]->mName;
+            // Get Child Component Info
+            ComponentInfo* childComponent = mChildren[cIndex];
+
+            qDebug() << "ComponentInfo::removeChild - mComponent: " << childComponent->mName;
+
+            // Remove Child Object From ID Map
+            setChildObjectID(childComponent, "");
+
             // Check Delete
             if (aDelete) {
                 // Delete Child
