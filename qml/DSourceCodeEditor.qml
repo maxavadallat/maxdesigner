@@ -74,10 +74,16 @@ DRectangle {
             // Get Char Code
             var charCode = sourceText.charCodeAt(i);
 
-            //console.log("convertTextToRichText - charCode: " + charCode);
+            //console.log("convertTextToRichText - charCode: " + charCode + " - char: " + sourceText.charAt(i));
 
             // Switch Car Code
             switch (charCode) {
+                // < Character
+                case 60: resultText += "&lt;";                      break;
+                // > Character
+                case 62: resultText += "&gt;";                      break;
+                // & Character
+                case 38: resultText += "&amp;";                     break;
                 // New Line
                 case 10: resultText += "<br>";                      break;
                 // Space Character
@@ -106,11 +112,12 @@ DRectangle {
             // Get Char Code
             var charCode = sourceText.charCodeAt(i);
 
-            //console.log("convertUnicodeToPlainText - charCode: " + charCode);
+            //console.log("convertUnicodeToPlainText - charCode: " + charCode + " - char: " + sourceText.charAt(i));
 
             // Switch Car Code
             switch (charCode) {
                 // New Line
+                case 8233:
                 case 8232: resultText += "\n";          break;
                 // Space Character
                 case 160:  resultText += " ";           break;

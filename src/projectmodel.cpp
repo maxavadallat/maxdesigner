@@ -592,6 +592,8 @@ void ProjectModel::setProjectName(const QString& aName)
         emit projectNameChanged(mProperties[JSON_KEY_PROJECT_NAME].toString());
         // Emit Project File Path Changed Signal
         emit projectFilePathChanged(absoluteProjectFilePath());
+        // Emit Live Temp Dir Changed
+        emit liveTempDirChanged(liveTempDir());
         // Set Dirty Properties
         setDirty(true);
     }
@@ -619,6 +621,8 @@ void ProjectModel::setProjectDir(const QString& aDir)
         emit projectDirChanged(mProperties[JSON_KEY_PROJECT_DIR].toString());
         // Emit Project File Path Changed Signal
         emit projectFilePathChanged(absoluteProjectFilePath());
+        // Emit Live Temp Dir Changed
+        emit liveTempDirChanged(liveTempDir());
         // Set Dirty Properties
         setDirty(true);
     }
@@ -819,6 +823,14 @@ void ProjectModel::setViewsDir(const QString& aViewsDir)
         // Set Dirty Properties
         setDirty(true);
     }
+}
+
+//==============================================================================
+// Get Live Temp Dir
+//==============================================================================
+QString ProjectModel::liveTempDir()
+{
+    return QString("%1/%2").arg(mProperties[JSON_KEY_PROJECT_DIR].toString()).arg(DEFAULR_PROJECT_LIVE_TEMP_DIR_NAME);
 }
 
 //==============================================================================
@@ -1127,6 +1139,68 @@ ComponentInfo* ProjectModel::getComponentByPath(const QString& aFilePath)
     // ...
 
     return cInfo;
+}
+
+//==============================================================================
+// Generate Live Code
+//==============================================================================
+QString ProjectModel::generateLiveCode(const QString& aName, const QString& aContent)
+{
+    // Check Content
+    if (aContent.isEmpty() || aName.isEmpty()) {
+        return "";
+    }
+
+    qDebug() << "ProjectModel::generateLiveCode - aName: " << aName;
+
+    // Init Live Code File Name
+    QString fileName = QString("%1/%2Live.%3").arg(liveTempDir()).arg(aName).arg(DEFAULT_QML_SUFFIX);
+
+    // Init Live Code File
+    QFile liveFile(fileName);
+
+    // Open File
+    if (liveFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        // Init Text Stream
+        QTextStream liveStream(&liveFile);
+
+        // Write Content
+        liveStream << aContent;
+
+        // Close File
+        liveFile.close();
+
+        return fileName;
+    }
+
+    // ...
+
+    return "";
+}
+
+//==============================================================================
+// Delete Live Code
+//==============================================================================
+void ProjectModel::removeLiveCode(const QString& aName)
+{
+    // Chekc Name
+    if (aName.isEmpty()) {
+        return;
+    }
+
+    qDebug() << "ProjectModel::removeLiveCode - aName: " << aName;
+
+    // Init Live Code File Name
+    QString fileName = QString("%1/%2Live.%3").arg(liveTempDir()).arg(aName).arg(DEFAULT_QML_SUFFIX);
+
+    // Init Live Code File
+    QFile liveFile(fileName);
+
+    // Check If File Exists
+    if (liveFile.exists()) {
+        // Remove File
+        liveFile.remove();
+    }
 }
 
 //==============================================================================

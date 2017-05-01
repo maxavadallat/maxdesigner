@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QQmlEngine>
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QFile>
@@ -92,6 +93,9 @@ ComponentInfo::ComponentInfo(const QString& aName,
 //==============================================================================
 void ComponentInfo::init()
 {
+    // Set Ownership
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
     // Check Project
     if (mProject) {
         // Init info Path
@@ -120,7 +124,7 @@ void ComponentInfo::init()
         // Set Info Path
         setInfoPath(QString("%1/%2.%3").arg(ipTemp).arg(mName).arg(DEFAULT_JSON_SUFFIX));
 
-        qDebug() << "ComponentInfo::init - mInfoPath: " << mInfoPath;
+        //qDebug() << "ComponentInfo::init - mInfoPath: " << mInfoPath;
 
     } else {
         qWarning() << "ComponentInfo::init - NO PROJECT!!";
@@ -1035,12 +1039,12 @@ void ComponentInfo::setChildObjectID(QObject* aObject, const QString& aID)
     // Check If ID Is Already Registered
     if (rootInfo->mIDMap.keys().indexOf(aID) < 0) {
 
-        qDebug() << "ComponentInfo::setChildObjectID - aObject: " << aObject << " - aID: " << aID;
+        //qDebug() << "ComponentInfo::setChildObjectID - aObject: " << aObject << " - aID: " << aID;
 
         // Add Object ID
         rootInfo->mIDMap[aID] = aObject;
 
-        qDebug() << "ComponentInfo::setChildObjectID - mIDMap: " << mIDMap;
+        //qDebug() << "ComponentInfo::setChildObjectID - mIDMap: " << mIDMap;
 
     } else {
         qWarning() << "ComponentInfo::setChildObjectID - aID: " << aID << " - ID IS ALREADY IN USE!!";
@@ -1096,9 +1100,9 @@ ComponentInfo* ComponentInfo::findRoot(ComponentInfo* aComponent)
 //==============================================================================
 // Generate Live Code for Designer
 //==============================================================================
-QString ComponentInfo::generateLiveCode()
+QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
 {
-    qDebug() << "ComponentInfo::generateLiveCode - name: " << mName;
+    qDebug() << "ComponentInfo::generateLiveCode - mName: " << mName << " - aGenerateChildren: " << aGenerateChildren;
 
     // Init Live Code
     QString liveCode = "";
@@ -1107,10 +1111,17 @@ QString ComponentInfo::generateLiveCode()
 
     // Get Imports Count
     int iCount = mImports.count();
-    // Iterate Through Imports
-    for (int i=0; i<iCount; i++) {
+
+    // Check Imports Count
+    if (iCount > 0) {
+        // Iterate Through Imports
+        for (int i=0; i<iCount; i++) {
+            // Append Imports
+            liveCode += QString("import %1\n").arg(mImports[i].toString());
+        }
+    } else {
         // Append Imports
-        liveCode += QString("import %1\n").arg(mImports[i].toString());
+        liveCode += QString("import QtQuick 2.0\n");
     }
 
     // Add New Line
@@ -1127,7 +1138,7 @@ QString ComponentInfo::generateLiveCode()
     // Check ID
     if (cID.isEmpty() && mIsRoot) {
         // Set ID
-        cID = "root";
+        cID = QString("%1%2").arg(mName.toLower()).arg("Root");
     }
 
     // Check ID
@@ -1200,7 +1211,7 @@ QString ComponentInfo::generateLiveCode()
     // Add Anchors =============================================================
 
     // Check Anchors
-    if (!mAnchors.isEmpty()) {
+    if (!mIsRoot && !mAnchors.isEmpty()) {
         // Add New Line
         liveCode += "\n";
 
@@ -1382,13 +1393,13 @@ QString ComponentInfo::generateLiveCode()
     // Get Own Properties Count
     int opCount = opKeys.count();
 
+    // Get Filtered Property Keys
+    QStringList fpKeys = mProject->propertiesController() ? mProject->propertiesController()->filteredProperties() : QStringList();
+
     // Check Own Prpoerties Key Count
     if (opCount > 0) {
         // Add New Line
         liveCode += "\n";
-
-        // Get Filtered Property Keys
-        QStringList fpKeys = mProject->propertiesController() ? mProject->propertiesController()->filteredProperties() : QStringList();
 
         // Iterate Through Own Properties
         for (int j=0; j<opCount; j++) {
@@ -1405,10 +1416,16 @@ QString ComponentInfo::generateLiveCode()
                     // Set Value
                     pValue = "\"\"";
                 }
-                // Append Live Code
-                liveCode += QString("%1property %2 %3: %4\n").arg(DEFAULT_SOURCE_INDENT).arg(pType).arg(opKeys[j]).arg(pValue);
+                // Check If Built In Component
+                if (mBuiltIn) {
+                    // Append Live Code
+                    liveCode += QString("%1%3: %4\n").arg(DEFAULT_SOURCE_INDENT).arg(opKeys[j]).arg(pValue);
+                } else {
+                    // Append Live Code
+                    liveCode += QString("%1property %2 %3: %4\n").arg(DEFAULT_SOURCE_INDENT).arg(pType).arg(opKeys[j]).arg(pValue);
+                }
                 // Add Value Setting Hook
-                opvHookList << QString("%1%1%1case %2: %3.%2 = value; break;\n").arg(DEFAULT_SOURCE_INDENT).arg(opKeys[j]).arg(cID);
+                opvHookList << QString("%1%1%1case \"%2\": %3.%2 = value; break;\n").arg(DEFAULT_SOURCE_INDENT).arg(opKeys[j]).arg(cID);
             }
         }
     }
@@ -1427,12 +1444,17 @@ QString ComponentInfo::generateLiveCode()
 
         // Iterate Through Properties
         for (int k=0; k<pCount; k++) {
-            // Get Value
-            QString pValue = mProperties.value(pKeys[k]).toString();
-            // Append Live Code
-            liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(pKeys[k]).arg(pValue);
+
+            // Check If Filtered Property
+            if (fpKeys.indexOf(pKeys[k]) == -1) {
+                // Get Value
+                QString pValue = mProperties.value(pKeys[k]).toString();
+                // Append Live Code
+                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(pKeys[k]).arg(pValue);
+            }
+
             // Add Value Setting Hook
-            pvHookList << QString("%1%1%1case %2: %3.%2 = value; break;\n").arg(DEFAULT_SOURCE_INDENT).arg(pKeys[k]).arg(cID);
+            pvHookList << QString("%1%1%1case \"%2\": %3.%2 = value; break;\n").arg(DEFAULT_SOURCE_INDENT).arg(pKeys[k]).arg(cID);
         }
 
         // ...
@@ -1519,7 +1541,8 @@ QString ComponentInfo::generateLiveCode()
     // Check Properties Count
     if (opvhCount > 0 || pvhCount > 0) {
         // Add New Line
-        liveCode += "\n";
+        //liveCode += "\n";
+        liveCode += QString("%1// Property Set Hook\n").arg(DEFAULT_SOURCE_INDENT);
         // Init Property Update Hook Function Code
         QString propertyHooks = QString("%1function __setProperty(key, value) {\n").arg(DEFAULT_SOURCE_INDENT);
         // Add Key Switch
@@ -1555,8 +1578,39 @@ QString ComponentInfo::generateLiveCode()
 
     // Check Functions
     if (!mFunctions.isEmpty()) {
-        // Add New Line
-        liveCode += "\n";
+//        // Add New Line
+//        liveCode += "\n";
+
+        // Get Functions Count
+        int fCount = mFunctions.count();
+
+        // Iterate Through Functions
+        for (int f=0; f<fCount; f++) {
+            // Get Function Object
+            QJsonObject functionObject = mFunctions[f].toObject();
+            // Get Function Name
+            QString functionName = functionObject[JSON_KEY_COMPONENT_FUNCTION_NAME].toString();
+            // Get Function Parameters
+            QString functionParameters = functionObject[JSON_KEY_COMPONENT_FUNCTION_PARAMETERS].toString();
+            // Get Function Source
+            QString functionSource = functionObject[JSON_KEY_COMPONENT_FUNCTION_SOURCE].toString();
+
+            // Append To Live Code
+            liveCode += QString("%1function %2(%3) {").arg(DEFAULT_SOURCE_INDENT).arg(functionName).arg(functionParameters);
+
+            // Get Source Code Lines
+            QStringList sourceLines = functionSource.split("\n", QString::KeepEmptyParts);
+            // Get Lines Count
+            int slCount = sourceLines.count();
+            // Iterate Through Source Lines
+            for (int sl=0; sl<slCount; sl++) {
+                // Append Source
+                liveCode += QString("%1%2\n").arg(DEFAULT_SOURCE_INDENT).arg(sourceLines[sl]);
+            }
+
+            // Add New Line
+            liveCode += QString("%1}\n\n").arg(DEFAULT_SOURCE_INDENT);
+        }
 
         // ...
     }
@@ -1564,7 +1618,7 @@ QString ComponentInfo::generateLiveCode()
     // Add Children ============================================================
 
     // Check Children
-    if (mChildren.count() > 0) {
+    if (aGenerateChildren && mChildren.count() > 0) {
         // Add New Line
         liveCode += "\n";
 
@@ -1597,7 +1651,7 @@ QString ComponentInfo::generateLiveCode()
 
     liveCode += "}\n";
 
-    qDebug() << "ComponentInfo::generateLiveCode - liveCode: " << liveCode;
+    //qDebug() << "ComponentInfo::generateLiveCode - liveCode: " << liveCode;
 
     return liveCode;
 }

@@ -124,7 +124,7 @@ DContainer {
 
     property bool showTitle: true
 
-    property alias topMouseAreaVisible: topMouseArea.visible
+    //property alias topMouseAreaVisible: topMouseArea.visible
 
     property int scaleDuration: 0
     property real previousScale: 1.0
@@ -210,35 +210,6 @@ DContainer {
     signal childTransitionFinished(var newState)
     signal parentTransitionFinished(var newState)
 
-    onXChanged: {
-//        // Check State
-//        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
-//            //console.log("DPaneBase.onXChanged - x: " + x);
-
-//            if (paneBaseRoot.dragActive) {
-//                //console.log("DPaneBase.onXChanged - x: " + x);
-
-//                // Adjust Las Shown X
-//                paneBaseRoot.lastShownX = paneBaseRoot.x;
-//            }
-//        }
-    }
-
-    onYChanged: {
-//        // Check State
-//        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
-
-//            //console.log("DPaneBase.onYChanged - y: " + y);
-
-//            if (paneBaseRoot.dragActive) {
-//                //console.log("DPaneBase.onYChanged - y: " + y);
-
-//                // Adjust Las Shown Y
-//                paneBaseRoot.lastShownY = paneBaseRoot.y;
-//            }
-//        }
-    }
-
     onWidthChanged: {
 //        // Check State
 //        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
@@ -266,8 +237,6 @@ DContainer {
 
     onReleased: {
         //console.log("DPaneBase.onReleased");
-        // Clear Drag Target - ASSUMING Parent is MainGrabArea
-        //parent.clearDragTarget();
     }
 
     onResizePressed: {
@@ -276,10 +245,6 @@ DContainer {
             // Set Drag Target
             paneBaseRoot.parent.bringToFront(paneBaseRoot);
         }
-    }
-
-    onTransitionFinished: {
-        // ...
     }
 
     onAccepted: {
@@ -410,30 +375,30 @@ DContainer {
         anchors.fill: parent
     }
 
-    MouseArea {
-        id: topMouseArea
-        anchors.fill: parent
+//    MouseArea {
+//        id: topMouseArea
+//        anchors.fill: parent
 
-        visible: paneBaseRoot.focus
+//        visible: paneBaseRoot.focus
 
-        onPressed: {
-            //console.log("DPaneBase.topMouseArea.onPressed");
-            // Check Set Drag Target
-            if (paneBaseRoot.parent.bringToFront !== undefined) {
-                // Set Drag Target - ASSUMING Parent is MainGrabArea
-                paneBaseRoot.parent.bringToFront(paneBaseRoot);
-            }
+//        onPressed: {
+//            //console.log("DPaneBase.topMouseArea.onPressed");
+//            // Check Set Drag Target
+//            if (paneBaseRoot.parent.bringToFront !== undefined) {
+//                // Set Drag Target - ASSUMING Parent is MainGrabArea
+//                paneBaseRoot.parent.bringToFront(paneBaseRoot);
+//            }
 
-            // Set Mouse Event Accepted
-            mouse.accepted = false;
-        }
+//            // Set Mouse Event Accepted
+//            mouse.accepted = false;
+//        }
 
-        onReleased: {
-            //console.log("DPaneBase.topMouseArea.onReleased");
-            // Set Mouse Event Accepted
-            mouse.accepted = false;
-        }
-    }
+//        onReleased: {
+//            //console.log("DPaneBase.topMouseArea.onReleased");
+//            // Set Mouse Event Accepted
+//            mouse.accepted = false;
+//        }
+//    }
 
     // Hide Indicator
     DControl {
@@ -827,5 +792,4 @@ DContainer {
             }
         }
     ]
-
 }

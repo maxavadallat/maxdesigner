@@ -74,7 +74,7 @@ DPaneBase {
 
         DTextInput {
             id: nameEditor
-            width: 84
+            width: 128
             anchors.verticalCenter: parent.verticalCenter
             onKeyEvent: {
                 switch (event.key) {
@@ -100,7 +100,7 @@ DPaneBase {
 
         DTextInput {
             id: whenEditor
-            width: 168
+            width: 128
             anchors.verticalCenter: parent.verticalCenter
             onKeyEvent: {
                 switch (event.key) {

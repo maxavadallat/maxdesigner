@@ -2,6 +2,7 @@ import QtQuick 2.0
 
 import "DConstants.js" as CONSTS
 import "style"
+import "system"
 
 Item {
     id: swipeGestureRoot
@@ -42,6 +43,16 @@ Item {
     function hideSwipe() {
         // Start Hide Swipe Animation
         hideSwipeAnimation.start();
+    }
+
+    // System Model Connection
+    Connections {
+        target: DSystemModel
+
+        onCancelMarkForDeletion: {
+            // Hide Swipe
+            hideSwipe();
+        }
     }
 
     // Hide Swipe Area

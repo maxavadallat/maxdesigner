@@ -30,6 +30,7 @@ class ProjectModel : public QObject
     Q_PROPERTY(QString baseComponentsDir READ baseComponentsDir NOTIFY baseComponentsDirChanged)
     Q_PROPERTY(QString componentsDir READ componentsDir NOTIFY componentsDirChanged)
     Q_PROPERTY(QString viewsDir READ viewsDir NOTIFY viewsDirChanged)
+    Q_PROPERTY(QString liveTempDir READ liveTempDir NOTIFY liveTempDirChanged)
     Q_PROPERTY(QStringList importPaths READ importPaths NOTIFY importPathsChanged)
     Q_PROPERTY(QStringList pluginPaths READ pluginPaths NOTIFY pluginPathsChanged)
 
@@ -123,6 +124,9 @@ public:
     // Set Views Dir
     void setViewsDir(const QString& aViewsDir);
 
+    // Get Live Temp Dir
+    QString liveTempDir();
+
     // Get Import Paths
     QStringList importPaths();
     // Add Import Path
@@ -156,6 +160,11 @@ public:
     // Get Component By File Path
     Q_INVOKABLE ComponentInfo* getComponentByPath(const QString& aFilePath);
 
+    // Create Live Code
+    QString generateLiveCode(const QString& aName, const QString& aContent);
+    // Delete Live Code
+    void removeLiveCode(const QString& aName);
+
     // Destructor
     ~ProjectModel();
 
@@ -180,6 +189,8 @@ signals:
     void componentsDirChanged(const QString& aComponentsDir);
     // Views Dir Changed Signal
     void viewsDirChanged(const QString& aViewsDir);
+    // Live Temp Dir Changed Signal
+    void liveTempDirChanged(const QString& aLiveTempDir);
     // Import Paths Changed Signal
     void importPathsChanged(const QStringList& aImportPaths);
     // Import Path Added Signal

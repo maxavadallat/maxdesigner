@@ -116,7 +116,7 @@ DPane {
 
     setFocusOnResize: false
 
-    topMouseAreaVisible: true
+    //topMouseAreaVisible: true
 
     hideToSide: hideToRight
 

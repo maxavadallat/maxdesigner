@@ -247,8 +247,12 @@ DContainer {
 
     onPressed: {
         //console.log("DComponentChildContainer.onPressed");
-        // Set Last Mouse Press Owner
-        DSystemModel.lastMousePressOwner = "cccRoot";
+
+        // Check First Mouse Press Owner
+        if (DSystemModel.firstMousePressOwner === "") {
+            // Set First Mouse Press Owner
+            DSystemModel.firstMousePressOwner = "cccRoot";
+        }
 
         // ...
     }
@@ -256,24 +260,15 @@ DContainer {
     onReleased: {
         //console.log("DComponentChildContainer.onReleased");
 
-        // Check Last Mouse Press Owner
-        if (DSystemModel.lastMousePressOwner === "cccRoot") {
-            // Reset Last Mouse Press Owner
-            DSystemModel.lastMousePressOwner = "";
-
+        // Check First Mouse Press Owner
+        if (DSystemModel.firstMousePressOwner === "cccRoot") {
+            // Set First Mouse Press Owner
+            DSystemModel.firstMousePressOwner = "";
             // Set Focus
             cccRoot.focus = true;
-
-//            // Check Modifier Keys
-//            if (mouse.modifiers | Qt.ShiftModifier) {
-//                // Toggle Selected
-//                cccRoot.selected = !cccRoot.selected;
-
-//            } else {
-//                // Set Focus
-//                cccRoot.focus = true;
-//            }
         }
+
+        // ...
     }
 
     onFocusChanged: {
@@ -389,17 +384,13 @@ DContainer {
         return anchorPoint;
     }
 
-    // ...
-
-    Loader {
+    // Component Loader
+    DLoader {
         id: componentLoader
         anchors.fill: parent
-        asynchronous: true
-        active: false
-
-
     }
 
+    // Component Label
     DText {
         anchors.centerIn: parent
         color: "white"

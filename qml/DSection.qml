@@ -49,7 +49,7 @@ Item {
         width: parent.width
         height: DStyle.headerHeight
 
-        preventStealing: false
+//        preventStealing: false
 
 //        onClicked: {
 //            if (sectionRoot.state === sectionRoot.stateOpen) {

@@ -18,42 +18,8 @@ DPaneBase {
 
     property bool updateComponentInfoEnabled: false
 
+    property bool rootComponentCreated: false
     property bool childComponentsCreated: false
-
-    title: "Component" + (componentInfo ? (" - " + componentInfo.componentName  ) : "")
-
-    hideToSide: hideToBottom
-
-    enablePosOverlay: false
-    enableSizeOverlay: false
-
-    showTitle: false
-    showBackground: false
-
-    clipContent: true
-
-    rootContainer: true
-
-    focusOnShow: true
-
-    enableSizeOverlayOnShow: true
-
-    enableScaling: true
-
-    borderColor: {
-        if (dropArea.hovering) {
-            return DStyle.colorBorder;
-        }
-
-        // Check Focused Component
-        if (propertiesController.focusedComponent === componentInfo) {
-            return DStyle.colorBorder;
-        }
-
-        return DStyle.colorBorderNoFocus;
-    }
-
-    radius: 0
 
     // New Child Component
     property Component newChildComponent: Component {
@@ -191,11 +157,55 @@ DPaneBase {
         onComponentPropertyChanged: {
             console.log("DComponentRootContainer.componentInfoConnection.onComponentPropertyChanged - aName: " + aName + " - aValue: " + aValue);
 
-            // ...
+            // Check Root Component
+            if (componentRootContainerRoot.rootComponent !== null) {
+                // Set Property
+                componentRootContainerRoot.rootComponent.__setProperty(aName, aValue);
+            } else {
+                console.warn("DComponentRootContainer.componentInfoConnection.onComponentPropertyChanged - NO ROOT COMPONENT!!");
+            }
         }
 
         // ...
     }
+
+    // Root Component
+    property QtObject rootComponent: null
+
+    title: "Component" + (componentInfo ? (" - " + componentInfo.componentName  ) : "")
+
+    hideToSide: hideToBottom
+
+    enablePosOverlay: false
+    enableSizeOverlay: false
+
+    showTitle: false
+    showBackground: false
+
+    clipContent: true
+
+    isRootContainer: true
+
+    focusOnShow: true
+
+    enableSizeOverlayOnShow: true
+
+    enableScaling: true
+
+    borderColor: {
+        if (dropArea.hovering) {
+            return DStyle.colorBorder;
+        }
+
+        // Check Focused Component
+        if (propertiesController.focusedComponent === componentInfo && componentInfo !== null) {
+            return DStyle.colorBorder;
+        }
+
+        return DStyle.colorBorderNoFocus;
+    }
+
+    radius: 0
 
     Component.onDestruction: {
         // Check Component Info
@@ -216,6 +226,8 @@ DPaneBase {
             // Set Container
             componentRootContainerRoot.componentInfo.componentContainer = componentRootContainerRoot;
         }
+
+        // ...
     }
 
     onFocusChanged: {
@@ -251,21 +263,28 @@ DPaneBase {
 
     onPressed: {
         //console.log("DComponentRootContainer.onPressed");
-        // Set Last Mouse Press Owner
-        DSystemModel.lastMousePressOwner = "crcRoot";
+
+        // Check First Mouse Press Owner
+        if (DSystemModel.firstMousePressOwner === "") {
+            // Set First Mouse Press Owner
+            DSystemModel.firstMousePressOwner = "crcRoot";
+        }
 
         // ...
     }
 
     onReleased: {
         //console.log("DComponentRootContainer.onReleased");
-        // Check Last Mouse Press Owner
-        if (DSystemModel.lastMousePressOwner === "crcRoot") {
-            // Reset Last Mouse Press Owner
-            DSystemModel.lastMousePressOwner = "";
+
+        // Check First Mouse Press Owner
+        if (DSystemModel.firstMousePressOwner === "crcRoot") {
+            // Set First Mouse Press Owner
+            DSystemModel.firstMousePressOwner = "";
             // Set Focus
             componentRootContainerRoot.focus = true;
         }
+
+        // ...
     }
 
     onWidthChanged: {
@@ -291,6 +310,8 @@ DPaneBase {
     onTransitionFinished: {
         // Check State
         if (componentRootContainerRoot.state === componentRootContainerRoot.stateShown) {
+            // Create Main Component
+            componentRootContainerRoot.createRootComponent();
             // Create Child Components
             componentRootContainerRoot.createChildComponents();
             // Set Focus
@@ -311,12 +332,35 @@ DPaneBase {
         }
     }
 
+    // Create Main Component
+    function createRootComponent() {
+        // Check Component Info
+        if (componentRootContainerRoot.componentInfo !== null && !componentRootContainerRoot.rootComponentCreated) {
+            console.log("DComponentRootContainer.createRootComponent - componentName: " + componentRootContainerRoot.componentInfo.componentName);
+            // Set Root Component Created
+            componentRootContainerRoot.rootComponentCreated = true;
+
+            // Create New Root Object
+            componentRootContainerRoot.rootComponent = Qt.createQmlObject(componentRootContainerRoot.componentInfo.generateLiveCode(false),  componentRootContainerRoot.rootContainer);
+
+            // Check New Root Object
+            if (componentRootContainerRoot.rootComponent === null) {
+                console.warn("#### DComponentRootContainer.createRootComponent - ERROR CREATING ROOT COMPONENT!!");
+            }
+
+            // ...
+
+        }
+    }
+
     // Create Child Components
     function createChildComponents() {
         // Get Number Of Child Components
         var cCount = componentRootContainerRoot.componentInfo !== null ? componentRootContainerRoot.componentInfo.childCount : 0;
         // Check Component Info
         if (cCount > 0 && !componentRootContainerRoot.childComponentsCreated) {
+            // Set Child Components Created
+            componentRootContainerRoot.childComponentsCreated = true;
             console.log("DComponentRootContainer.createChildComponents - cCount: " + cCount);
             // Iterate Through Child Components
             for (var i=0; i<cCount; i++) {
@@ -334,9 +378,6 @@ DPaneBase {
                     console.error("DComponentRootContainer.createChildComponents - ccInfo: " + ccInfo.componentName + " - ERROR CREATING CHILD OBJECT!!");
                 }
             }
-
-            // Set Child Components Created
-            componentRootContainerRoot.childComponentsCreated = true;
         }
     }
 
@@ -411,6 +452,12 @@ DPaneBase {
         componentRootContainerRoot.componentInfo.setChildObjectID(aChild, aID);
     }
 
+    // Component Loader
+    DLoader {
+        id: componentLoader
+    }
+
+    // Zoom Area
     DMouseArea {
         id: wheelArea
         anchors.fill: parent
@@ -444,6 +491,7 @@ DPaneBase {
         }
     }
 
+    // No Content Placeholder
     DNoContent {
         id: baseCanvas
         anchors.fill: parent
@@ -456,6 +504,7 @@ DPaneBase {
         }
     }
 
+    // Drop Area For Child Components
     DropArea {
         id: dropArea
         anchors.fill: parent
@@ -556,6 +605,7 @@ DPaneBase {
         }
     }
 
+    // Component Name Label
     DText {
         anchors.centerIn: parent
         color: "white"

@@ -10,14 +10,6 @@ Flow {
 
     spacing: DStyle.defaultSpacing
 
-//    add: Transition {
-//        SequentialAnimation {
-//            alwaysRunToEnd: true
-//            PauseAnimation { duration: 200 }
-//            DAnimation { properties: "opacity, scale"; from: 0.0; to: 1.0; /*easing.type: Easing.OutBack*/ }
-//        }
-//    }
-
     populate: Transition {
         DAnimation { properties: "height" }
     }

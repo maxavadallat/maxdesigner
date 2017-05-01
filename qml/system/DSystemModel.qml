@@ -5,7 +5,7 @@ import QtQuick 2.0
 QtObject {
     id: systemmModelRoot
 
-    property string lastMousePressOwner: ""
+    property string firstMousePressOwner: ""
 
     property bool systemBusy: false
 

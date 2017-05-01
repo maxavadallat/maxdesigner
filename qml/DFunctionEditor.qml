@@ -101,7 +101,7 @@ DPaneBase {
                 functionEditorRoot.componentFunction.functionParameters = functionEditorRoot.functionParameters.split(",");
             } else {
                 // Set Parameters
-                functionEditorRoot.componentFunction.functionParameters = "";
+                functionEditorRoot.componentFunction.functionParameters = functionEditorRoot.functionParameters;
             }
 
             // Set Source
@@ -163,7 +163,7 @@ DPaneBase {
             functionEditorRoot.functionParameters = "";
         } else {
             // Set Function Parameters
-            functionEditorRoot.functionParameters = sText.substring(obfPos + 1, cbfPos - 1).trim();
+            functionEditorRoot.functionParameters = sText.substring(obfPos + 1, cbfPos).trim();
         }
 
         // Check { } Positions
@@ -172,7 +172,7 @@ DPaneBase {
             functionEditorRoot.functionSource = "";
         } else {
             // Set Function Source
-            functionEditorRoot.functionSource = sText.substring(ocbfPos + 1, ccblPos - 1) + "\n";
+            functionEditorRoot.functionSource = sText.substring(ocbfPos + 1, ccblPos);
         }
 
         // Check Functions Model

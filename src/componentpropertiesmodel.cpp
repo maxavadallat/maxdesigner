@@ -15,7 +15,7 @@ ComponentPropertiesModel::ComponentPropertiesModel(ComponentInfo* aComponent, Pr
     , mComponent(aComponent)
     , mProject(aProject)
 {
-    qDebug() << "ComponentPropertiesModel created for " << (mComponent ? mComponent->mName : "NULL");
+    //qDebug() << "ComponentPropertiesModel created for " << (mComponent ? mComponent->mName : "NULL");
 
     // Init
     init();
@@ -53,7 +53,7 @@ void ComponentPropertiesModel::loadComponentProperties()
         return;
     }
 
-    qDebug() << "ComponentPropertiesModel::loadComponentProperties - mComponent: " << mComponent->mName;
+    //qDebug() << "ComponentPropertiesModel::loadComponentProperties - mComponent: " << mComponent->mName;
 
     // Build Hierarchy
     addComponentToHierarchy(mComponent->mBaseName);
@@ -66,7 +66,7 @@ void ComponentPropertiesModel::clearComponentProperties()
 {
     // Chekc Hierarchy
     if (mBaseComponentProperties.count() > 0) {
-        qDebug() << "ComponentPropertiesModel::clearComponentProperties - keys: " << mBaseComponentProperties.keys();
+        //qDebug() << "ComponentPropertiesModel::clearComponentProperties - keys: " << mBaseComponentProperties.keys();
 
         // Begin Reset Model
         beginResetModel();
@@ -122,7 +122,7 @@ void ComponentPropertiesModel::addComponentToHierarchy(const QString& aBaseName)
         ComponentInfo* baseComponent = mProject->getComponentByName(aBaseName);
         // Check Base Component
         if (baseComponent) {
-            qDebug() << "ComponentPropertiesModel::addComponentToHierarchy - aBaseName: " << aBaseName;
+            //qDebug() << "ComponentPropertiesModel::addComponentToHierarchy - aBaseName: " << aBaseName;
 
             // Get Filtered Own Property Keys
             QStringList pKeys = baseComponent->mOwnProperties.keys();
@@ -206,6 +206,8 @@ bool ComponentPropertiesModel::setComponentProperty(const QString& aName, const 
                 mComponent->mProperties[aName] = aValue.toString();
                 // Set Component Dirty
                 mComponent->setDirty(true);
+                // Emit Component Property Changed Signal
+                emit mComponent->componentPropertyChanged(aName, aValue);
                 // Refresh Base Component Own Properties Model
                 bcopModel->refreshProperty(aName);
 
@@ -334,5 +336,5 @@ ComponentPropertiesModel::~ComponentPropertiesModel()
 
     // ...
 
-    qDebug() << "ComponentPropertiesModel deleted.";
+    //qDebug() << "ComponentPropertiesModel deleted.";
 }

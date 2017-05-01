@@ -48,7 +48,126 @@ DContainer {
 //        // Seelect Component
 //        propertiesController.selectComponent("AppTile", 0);
     }
+/*
+    DComponentRootContainer {
+        id: demoRootContainer
 
+//        width: parent.width * 0.8
+//        height: parent.height * 0.8
+
+        creationWidth: parent.width * 0.8
+        creationHeight: parent.height * 0.8
+
+        anchors.centerIn: parent
+
+        state: stateShown
+
+        DComponentChildContainer {
+            id: demoChildContainer1
+
+            width: 200
+            height: 200
+
+            anchors.left: parent.left
+            anchors.leftMargin: 20
+            anchors.verticalCenter: parent.verticalCenter
+
+        }
+
+        DComponentChildContainer {
+            id: demoChildContainer2
+
+            width: 200
+            height: 200
+
+            anchors.right: parent.right
+            anchors.rightMargin: 20
+            anchors.verticalCenter: parent.verticalCenter
+
+        }
+
+    }
+*/
+/*
+    MouseArea {
+        id: mainDemoArea
+
+        width: parent.width * 0.8
+        height: parent.height * 0.8
+
+        anchors.centerIn: parent
+
+        drag.filterChildren: true
+
+        onPressed: {
+            console.log("mainDemoArea.onPressed");
+        }
+
+        onReleased: {
+            console.log("mainDemoArea.onReleased");
+        }
+
+        Rectangle {
+            anchors.fill: parent
+            color: "transparent"
+            border.color: "teal"
+        }
+
+        MouseArea {
+            id: demoArea1
+            width: 200
+            height: 200
+
+            anchors.right: parent.right
+            anchors.rightMargin: 20
+            anchors.verticalCenter: parent.verticalCenter
+
+            drag.filterChildren: true
+
+            onPressed: {
+                console.log("demoArea1.onPressed");
+            }
+
+            onReleased: {
+                console.log("demoArea1.onReleased");
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                border.color: "orange"
+            }
+        }
+
+        MouseArea {
+            id: demoArea2
+            width: 200
+            height: 200
+
+            anchors.left: parent.left
+            anchors.leftMargin: 20
+            anchors.verticalCenter: parent.verticalCenter
+
+            drag.filterChildren: true
+
+            onPressed: {
+                console.log("demoArea2.onPressed");
+            }
+
+            onReleased: {
+                console.log("demoArea2.onReleased");
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                border.color: "orange"
+            }
+        }
+    }
+*/
+
+/*
     Rectangle {
         anchors.fill: demoFlow
         color: "transparent"
@@ -100,28 +219,27 @@ DContainer {
             }
         }
     }
+*/
+/*
+    // Component Name
+    DText {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: anchorsSection.top
+        anchors.bottomMargin: 16
+        font.bold: true
+        font.pixelSize: 32
+        horizontalAlignment: Text.AlignHCenter
+        text: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentName : ""
+    }
 
-
-//    // Component Name
-//    DText {
-//        anchors.horizontalCenter: parent.horizontalCenter
-//        anchors.bottom: anchorsSection.top
-//        anchors.bottomMargin: 16
-//        font.bold: true
-//        font.pixelSize: 32
-//        horizontalAlignment: Text.AlignHCenter
-//        text: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentName : ""
-//    }
-
-//    // Anchors Section
-//    DAnchorsSection {
-//        id: anchorsSection
-//        width: 400
-//        anchors.centerIn: parent
-//        state: stateOpen
-//    }
-
-
+    // Anchors Section
+    DAnchorsSection {
+        id: anchorsSection
+        width: 400
+        anchors.centerIn: parent
+        state: stateOpen
+    }
+*/
 /*
     DAnchorTargetEditor {
         id: atEditor

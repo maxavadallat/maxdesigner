@@ -22,7 +22,7 @@ DPaneBase {
 
     clipContent: true
 
-    rootContainer: true
+    isRootContainer: true
 
     focusOnShow: true
 

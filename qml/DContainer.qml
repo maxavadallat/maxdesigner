@@ -13,6 +13,8 @@ DMouseArea {
 
     default property alias mainContainer: contentContainer.children
 
+    property alias rootContainer: rootContainer
+
     property int minWidth: 0
     property int minHeight: 0
 
@@ -35,7 +37,8 @@ DMouseArea {
     property bool enablePanByKeys: true
     property bool enableResize: true
     property bool setFocusOnResize: false
-    property bool rootContainer: false
+
+    property bool isRootContainer: false
 
     property QtObject parentContainer: null
 
@@ -51,19 +54,6 @@ DMouseArea {
     drag.filterChildren: true
 
     signal resizePressed()
-
-    onPressed: {
-        // Set Last Mouse Press Owner
-        DSystemModel.lastMousePressOwner = "cRoot";
-    }
-
-    onReleased: {
-        // Check Last Mouse Press Owner
-        if (DSystemModel.lastMousePressOwner === "cRoot") {
-            // Reset Last Mouse Press Owner
-            DSystemModel.lastMousePressOwner = "";
-        }
-    }
 
     Keys.onPressed: {
         //console.log("DContainer.Keys.onPressed - key: " + event.key);
@@ -111,7 +101,7 @@ DMouseArea {
         switch (event.key) {
             case Qt.Key_Escape:
                 // Check If Root Container
-                if (!containerRoot.rootContainer) {
+                if (!containerRoot.isRootContainer) {
                     // Check Parent Container
                     if (containerRoot.parentContainer) {
                         // Set Focus
@@ -170,7 +160,14 @@ DMouseArea {
         anchors.fill: parent
     }
 
-    // Content Container
+    // Root Container
+    Item {
+        id: rootContainer
+        anchors.fill: parent
+        clip: true
+    }
+
+    // Content/Children Container
     Item {
         id: contentContainer
         anchors.fill: parent

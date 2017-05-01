@@ -12,22 +12,30 @@ DSection {
     title: "Imports"
     state: stateClosed
 
-    minHeight: importsFlow.height + addImportButton.height + DStyle.defaultMargin
+    minHeight: importsContainer.height + addImportButton.height + DStyle.defaultMargin
 
-    DFlow {
-        id: importsFlow
+    Item {
+        id: importsContainer
         width: importsSectionRoot.width
-        spacing: DStyle.defaultSpacing
+        height: importsFlow.height
+        Behavior on height { DAnimation { } }
+        clip: true
 
-        Repeater {
-            id: importsRepeater
-            model: propertiesController ? propertiesController.importsModel : undefined
+        DFlow {
+            id: importsFlow
+            width: importsSectionRoot.width
+            spacing: DStyle.defaultSpacing
 
-            delegate: DTag {
-                tagTitle: importName
-                onRemoveClicked: {
-                    // Remove Import
-                    propertiesController.importsModel.removeImport(index);
+            Repeater {
+                id: importsRepeater
+                model: propertiesController ? propertiesController.importsModel : undefined
+
+                delegate: DTag {
+                    tagTitle: importName
+                    onRemoveClicked: {
+                        // Remove Import
+                        propertiesController.importsModel.removeImport(index);
+                    }
                 }
             }
         }

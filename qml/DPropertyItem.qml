@@ -66,6 +66,7 @@ Item {
         back: DPropertyItemFormula {
             width: propertyItemFlipable.width
             height: propertyItemFlipable.height
+            namesColumnWidth: propertyItemRoot.namesColumnWidth
             propertyName: propertyItemRoot.propertyName
             propertyFormula: propertyItemRoot.propertyValue
             onFormulaEditClicked: {

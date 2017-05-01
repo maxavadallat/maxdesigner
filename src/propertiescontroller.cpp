@@ -329,7 +329,7 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
     // Check Focused Component
     if (mFocusedComponent != aComponent) {
 
-        qDebug() << "PropertiesController::setFocusedComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
+        //qDebug() << "PropertiesController::setFocusedComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
 
         // Set Focused Component
         mFocusedComponent = aComponent;

@@ -75,7 +75,7 @@ DMouseArea {
         id: textInput
 
         width: {
-            if (text.length === 0 || !textInputRoot.showClearButton) {
+            if (text.length === 0 || !textInputRoot.showClearButton || !textInput.focus) {
                 return parent.width - DStyle.defaultMargin * 2;
             }
 

@@ -102,5 +102,6 @@
         <file>qml/DTransitionsSection.qml</file>
         <file>qml/DPropertiesSection.qml</file>
         <file>qml/DSizeAndPosSection.qml</file>
+        <file>qml/DLoader.qml</file>
     </qresource>
 </RCC>

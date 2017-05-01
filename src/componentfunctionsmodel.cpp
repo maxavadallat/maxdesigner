@@ -487,6 +487,13 @@ void ComponentFunction::setFunctionParameters(const QStringList& aParameters)
         qDebug() << "ComponentFunction::setFunctionParameters - aParameters: " << aParameters;
         // Set Parameters
         mParameters = aParameters;
+        // Get Parameters Count
+        int pCount = mParameters.count();
+        // Iterate Through Parameters
+        for (int i=0; i<pCount; i++) {
+            // Trim Parameters
+            mParameters[i] = mParameters[i].trimmed();
+        }
         // Emit Parameters Changed Signal
         emit functionParametersChanged(mParameters);
         // Set Model Dirty

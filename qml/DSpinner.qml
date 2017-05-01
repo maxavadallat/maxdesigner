@@ -27,9 +27,9 @@ DControl {
     }
 
     onValueChanged: {
-        if (Number(textInput.text) !== spinnerRoot.value) {
+        if (textInput.text !== spinnerRoot.value) {
             // Set Text
-            textInput.text = String(spinnerRoot.value);
+            textInput.text = spinnerRoot.value;
         }
     }
 
@@ -38,8 +38,8 @@ DControl {
         // Calculate New Value
         var newValue = Math.min(spinnerRoot.value + spinnerRoot.step, spinnerRoot.maxValue);
         // Check New Value
-        if (newValue !== value) {
-            valueIncreased(newValue);
+        if (spinnerRoot.value !== newValue) {
+            spinnerRoot.valueIncreased(newValue);
         }
     }
 
@@ -48,7 +48,7 @@ DControl {
         // Calculate New Value
         var newValue = Math.max(spinnerRoot.value - spinnerRoot.step, spinnerRoot.minValue);
         // Check New Value
-        if (newValue !== value) {
+        if (spinnerRoot.value !== newValue) {
             valueDecreased(newValue);
         }
     }
@@ -78,9 +78,9 @@ DControl {
             // Calculate New Value
             var newValue = Math.min(spinnerRoot.maxValue, Math.max(spinnerRoot.minValue, Number(newText)));
             // Check New Value
-            if (newValue !== value) {
+            if (spinnerRoot.value !== newValue) {
                 // Emit Value Entered Signal
-                valueEntered(newValue);
+                spinnerRoot.valueEntered(newValue);
             }
         }
 
@@ -93,9 +93,9 @@ DControl {
             var newValue = Math.min(spinnerRoot.maxValue, Math.max(spinnerRoot.minValue, Number(newText)));
 
             // Check New Value
-            if (newValue !== value) {
+            if (spinnerRoot.value !== newValue) {
                 // Emit Value Edited Signal
-                valueEdited(newValue);
+                spinnerRoot.valueEdited(newValue);
             }
         }
 

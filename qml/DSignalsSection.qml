@@ -18,7 +18,7 @@ DSection {
     // Signals Container
     Item {
         id: signalsContainer
-        width: propertiesPaneRoot.contentWidth
+        width: signalsSectionRoot.width
         height: CONSTS.defaultPaneItemHeight * Math.min(CONSTS.defaultSignalsMax, signalsListView.count)
         Behavior on height { DAnimation { } }
 
@@ -52,13 +52,13 @@ DSection {
     }
 
     Item {
-        width: propertiesPaneRoot.contentWidth
+        width: signalsSectionRoot.width
         height: DStyle.defaultMargin
     }
 
     DButton {
         id: addSignalButton
-        width: propertiesPaneRoot.contentWidth
+        width: signalsSectionRoot.width
         text: "Add Signal"
         enabled: signalEditor.state === signalEditor.stateCreate
 

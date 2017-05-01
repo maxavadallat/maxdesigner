@@ -9,7 +9,7 @@ Item {
     width: 300
     height: CONSTS.defaultPaneItemHeight
 
-    property int namesColumnWidth: CONSTS.defaultNamesColumnWidth
+    property int namesColumnWidth: 200
 
     property string propertyName: "name"
     property string propertyFormula: "Formula"
@@ -43,7 +43,7 @@ Item {
 
         DButton {
             id: editFormulaButton
-            width: 40
+            width: 48
             anchors.verticalCenter: parent.verticalCenter
             text: "Edit"
             onClicked: propertyItemFormuleRoot.formulaEditClicked();

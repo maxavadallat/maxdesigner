@@ -206,6 +206,9 @@ public:
     // Get Child Object By ID
     Q_INVOKABLE QObject* getChildObject(const QString& aID);
 
+    // Generate Live Code
+    Q_INVOKABLE QString generateLiveCode(const bool& aGenerateChildren = true);
+
     // Destructor
     ~ComponentInfo();
 
@@ -435,9 +438,6 @@ protected:
 
     // Find Root Component
     ComponentInfo* findRoot(ComponentInfo* aComponent);
-
-    // Generate Live Code
-    QString generateLiveCode();
 
 protected slots:
     // Base Components Dir Changed Slot
