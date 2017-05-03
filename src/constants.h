@@ -24,6 +24,8 @@
 #define DEFAULT_MAIN_QML_COMPONENTS_COMPONENTS_MODEL        "ComponentsModel"
 // Custom Compoents Name - Views List Model
 #define DEFAULT_MAIN_QML_COMPONENTS_VIEWS_MODEL             "ViewsModel"
+// Custom Compoents Name - Data Source List Model
+#define DEFAULT_MAIN_QML_COMPONENTS_DATASOURCES_MODEL       "DataSourcesModel"
 
 // File Sort Filter Proxy
 #define DEFAULT_MAIN_QML_COMPONENTS_FILE_SORT_FILTER        "FileSortFilterProxy"
@@ -122,7 +124,8 @@
 #define DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME             "basecomponents"
 #define DEFAULT_PROJECT_COMPONENTS_DIR_NAME                 "components"
 #define DEFAULT_PROJECT_VIEWS_DIR_NAME                      "views"
-#define DEFAULR_PROJECT_LIVE_TEMP_DIR_NAME                  "livetemp"
+#define DEFAULT_PROJECT_DATASOURCES_DIR_NAME                "datasources"
+#define DEFAULT_PROJECT_LIVE_TEMP_DIR_NAME                  "livetemp"
 
 // JSON Keys for Project Info
 #define JSON_KEY_PROJECT_NAME                               "projectName"
@@ -134,6 +137,7 @@
 #define JSON_KEY_PROJECT_BASECOMPONENTS_DIR                 "projectBaseComponentsDir"
 #define JSON_KEY_PROJECT_COMPONENTS_DIR                     "projectComponentsDir"
 #define JSON_KEY_PROJECT_VIEWS_DIR                          "projectViewsDir"
+#define JSON_KEY_PROJECT_DATASOURCES_DIR                    "projectDataSourcesDir"
 #define JSON_KEY_PROJECT_IMPORT_PATHS                       "projectImportPaths"
 #define JSON_KEY_PROJECT_PLUGIN_PATHS                       "projectPluginPaths"
 
@@ -141,6 +145,7 @@
 #define COMPONENT_TYPE_BASECOMPONENT                        "BaseComponent"
 #define COMPONENT_TYPE_COMPONENT                            "Component"
 #define COMPONENT_TYPE_VIEW                                 "View"
+#define COMPONENT_TYPE_DATASOURCE                           "DataSource"
 
 // Component Categories
 #define COMPONENT_CATEGORY_VISUAL                           "Visual"
@@ -232,6 +237,7 @@
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_VAR                 "var"
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_OBJECT              "QtObject"
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_LIST                "list<QtObject>"
+#define JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM                "enum"
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_ALIAS               "alias"
 
 // Default/Basic JSON Keys For Component Properties

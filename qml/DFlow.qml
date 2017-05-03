@@ -11,7 +11,7 @@ Flow {
     spacing: DStyle.defaultSpacing
 
     populate: Transition {
-        DAnimation { properties: "height" }
+        DAnimation { property: "height" }
     }
 
     move: Transition {

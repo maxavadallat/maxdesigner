@@ -290,21 +290,23 @@ DPaneBase {
     onWidthChanged: {
         // Check Update Component Info Enabled
         if (componentRootContainerRoot.updateComponentInfoEnabled && propertiesController.focusedComponent === componentRootContainerRoot.componentInfo) {
-            // Request Width Change
-            propertiesController.requestCWidth(componentRootContainerRoot.width);
+            // Check Width
+            if (propertiesController.cWidth !== componentRootContainerRoot.width) {
+                // Request Width Change
+                propertiesController.requestCWidth(componentRootContainerRoot.width);
+            }
         }
-
-        // ...
     }
 
     onHeightChanged: {
         // Check Update Component Info Enabled
         if (componentRootContainerRoot.updateComponentInfoEnabled && propertiesController.focusedComponent === componentRootContainerRoot.componentInfo) {
-            // Request Height Change
-            propertiesController.requestCHeight(componentRootContainerRoot.height);
+            // Check Height
+            if (propertiesController.cHeight !== componentRootContainerRoot.height) {
+                // Request Height Change
+                propertiesController.requestCHeight(componentRootContainerRoot.height);
+            }
         }
-
-        // ...
     }
 
     onTransitionFinished: {
@@ -345,7 +347,7 @@ DPaneBase {
 
             // Check New Root Object
             if (componentRootContainerRoot.rootComponent === null) {
-                console.warn("#### DComponentRootContainer.createRootComponent - ERROR CREATING ROOT COMPONENT!!");
+                console.warn("DComponentRootContainer.createRootComponent - ERROR CREATING ROOT COMPONENT!!");
             }
 
             // ...
@@ -455,6 +457,7 @@ DPaneBase {
     // Component Loader
     DLoader {
         id: componentLoader
+        anchors.fill: parent
     }
 
     // Zoom Area

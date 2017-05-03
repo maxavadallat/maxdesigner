@@ -68,5 +68,5 @@ var defaultFunctionsMax                         = defaultOwnPropertiesMax;
 var defaultSwipeAreaWidth                       = 16;
 
 // Property Types
-var propertyTypes                               = ["string", "bool", "int", "double", "real", "var", "object", "list"];
+var propertyTypes                               = ["string", "bool", "int", "double", "real", "var", "object", "list", "enum", "alias"];
 

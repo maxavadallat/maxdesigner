@@ -13,6 +13,7 @@ class PropertiesController;
 class BaseComponentsModel;
 class ComponentsModel;
 class ViewsModel;
+class DataSourcesModel;
 class MainWindow;
 class QMLParser;
 
@@ -185,6 +186,9 @@ public:
 
     // Check If Has Property
     Q_INVOKABLE bool hasProperty(const QString& aName);
+
+    // Get Property Type
+    Q_INVOKABLE QString propertyType(const QString& aName);
 
     // Add Child
     Q_INVOKABLE void addChild(ComponentInfo* aChild);
@@ -370,6 +374,7 @@ protected:
     friend class BaseComponentsModel;
     friend class ComponentsModel;
     friend class ViewsModel;
+    friend class DataSourcesModel;
     friend class MainWindow;
     friend class QMLParser;
     friend class PropertiesController;
@@ -418,7 +423,7 @@ protected:
     // Set Object Name
     void setComponentObjectName(const QString& aObjectName);
 
-    // Set Component Property
+    // Set Component Property - SIMPLE!!!
     void setComponentProperty(const QString& aName, const QVariant& aValue);
 
     // Set Pos X
@@ -446,6 +451,8 @@ protected slots:
     void componentsDirChanged(const QString& aComponentsDir);
     // Views Dir Changed Slot
     void viewsDirChanged(const QString& aViewsDir);
+    // Data Sources Dir Changed Slot
+    void dataSourcesDirChanged(const QString& aDataSourcesDir);
 
 protected: // Data
     friend class ComponentImportsModel;

@@ -40,7 +40,8 @@ SOURCES             += src/settingscontroller.cpp \
                     src/componentownpropertiesfilter.cpp \
                     src/componentfunctionsmodel.cpp \
                     src/componentslotsmodel.cpp \
-                    src/componentimportsmodel.cpp
+                    src/componentimportsmodel.cpp \
+                    src/datasourcesmodel.cpp
 
 # Views/Dialog Sources
 SOURCES             += src/mainwindow.cpp \
@@ -53,7 +54,8 @@ SOURCES             += src/mainwindow.cpp \
                     src/createcomponentdialog.cpp \
                     src/createviewdialog.cpp \
                     src/qmleditorwindow.cpp \
-                    src/resourceviewerdialog.cpp
+                    src/resourceviewerdialog.cpp \
+                    src/createdatasourcedialog.cpp
 
 # Headers
 HEADERS             += src/designerapplication.h \
@@ -90,7 +92,8 @@ HEADERS             += src/settingscontroller.h \
                     src/componentownpropertiesfilter.h \
                     src/componentfunctionsmodel.h \
                     src/componentslotsmodel.h \
-                    src/componentimportsmodel.h
+                    src/componentimportsmodel.h \
+                    src/datasourcesmodel.h
 
 # View/Dialog Headers
 HEADERS             += src/mainwindow.h \
@@ -103,7 +106,8 @@ HEADERS             += src/mainwindow.h \
                     src/createcomponentdialog.h \
                     src/createviewdialog.h \
                     src/qmleditorwindow.h \
-                    src/resourceviewerdialog.h
+                    src/resourceviewerdialog.h \
+                    src/createdatasourcedialog.h
 
 # Forms
 FORMS               += ui/mainwindow.ui \
@@ -116,7 +120,8 @@ FORMS               += ui/mainwindow.ui \
                     ui/createcomponentdialog.ui \
                     ui/createviewdialog.ui \
                     ui/resourceviewerdialog.ui \
-                    ui/livewindow.ui
+                    ui/livewindow.ui \
+                    ui/createdatasourcedialog.ui
 
 # Resources
 RESOURCES           += maxdesigner.qrc \

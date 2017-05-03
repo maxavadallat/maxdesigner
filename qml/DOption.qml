@@ -126,6 +126,7 @@ DControl {
 
             Repeater {
                 id: optionRepeater
+
                 model: optionRoot.model
 
                 delegate: DPopupItem {
@@ -133,8 +134,8 @@ DControl {
                     width: optionPopup.width
                     height: checked ? optionRoot.height : optionRoot.unCheckedHeight
                     itemIndex: index
-                    text: model.text
-                    checked: model.checked
+                    text: model.text !== undefined ? model.text : optionRoot.model[index].text
+                    checked: model.checked !== undefined ? model.checked : optionRoot.model[index].checked
                     opacity: checked ? 1.0 : optionRoot.unCheckedOpacity
                     preventStealing: true
 

@@ -289,32 +289,44 @@ DContainer {
     onXChanged: {
         // Check If Update Component Info Enabled
         if (cccRoot.updateComponentInfoEnabled && propertiesController.focusedComponent === cccRoot.componentInfo) {
-            // Request Component Pos X
-            propertiesController.requestCX(cccRoot.x);
+            // Check Position
+            if (propertiesController.cX !== cccRoot.x) {
+                // Request Component Pos X
+                propertiesController.requestCX(cccRoot.x);
+            }
         }
     }
 
     onYChanged: {
         // Check If Update Component Info Enabled
         if (cccRoot.updateComponentInfoEnabled && propertiesController.focusedComponent === cccRoot.componentInfo) {
-            // Request Component Pos Y
-            propertiesController.requestCY(cccRoot.y);
+            // Check Position
+            if (propertiesController.cY !== cccRoot.y) {
+                // Request Component Pos Y
+                propertiesController.requestCY(cccRoot.y);
+            }
         }
     }
 
     onWidthChanged: {
         // Check If Update Component Info Enabled
         if (cccRoot.updateComponentInfoEnabled && propertiesController.focusedComponent === cccRoot.componentInfo) {
-            // Request Component Width
-            propertiesController.requestCWidth(cccRoot.width);
+            // Check Width
+            if (propertiesController.cWidth !== cccRoot.width) {
+                // Request Component Width
+                propertiesController.requestCWidth(cccRoot.width);
+            }
         }
     }
 
     onHeightChanged: {
         // Check If Update Component Info Enabled
         if (cccRoot.updateComponentInfoEnabled && propertiesController.focusedComponent === cccRoot.componentInfo) {
-            // Request Component Height
-            propertiesController.requestCHeight(cccRoot.height);
+            // Check Height
+            if (propertiesController.cHeight !== cccRoot.height) {
+                // Request Component Height
+                propertiesController.requestCHeight(cccRoot.height);
+            }
         }
     }
 

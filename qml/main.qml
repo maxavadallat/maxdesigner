@@ -592,18 +592,6 @@ Item {
 
             parentPane: signalEditor
 
-            onAccepted: {
-                // Check New Parameter
-                if (signalParameterEditor.newParameter) {
-                    // Add Signal Parameter
-                    signalEditor.componentSignal.addSignalParameter(signalParameterEditor.signalParameter);
-                    // Reset New Parameter
-                    signalParameterEditor.newParameter = false;
-                } else {
-                    // Set Parameter
-                    signalEditor.componentSignal.updateSignalParameter(signalEditor.editParameterIndex, signalParameterEditor.signalParameter);
-                }
-            }
         }
 
         // Slot Editor

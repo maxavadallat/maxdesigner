@@ -80,7 +80,7 @@ QtObject {
     // Default Margin
     readonly property int defaultMargin:                    8
     // Default Spacing
-    readonly property int defaultSpacing:                   4
+    readonly property int defaultSpacing:                   8
 
     // Font Sizes
     readonly property int fontSizeXS:                       10

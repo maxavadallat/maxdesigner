@@ -13,6 +13,7 @@ Item {
 
     property string title: "Component"
     property bool builtIn: false
+    property bool visual: true
 
     property QtObject componentInfo: null
 

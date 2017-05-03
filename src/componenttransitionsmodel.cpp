@@ -83,7 +83,7 @@ void ComponentTransitionsModel::saveComponentTransitions()
 void ComponentTransitionsModel::addTransition(const QString& aFrom, const QString& aTo)
 {
     // Create New Transition
-    ComponentTransition* newTransition = new ComponentTransition(aFrom, aTo);
+    ComponentTransition* newTransition = new ComponentTransition(aFrom, aTo, this);
     // Begin Insert Rows
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
     // Append Transition
@@ -513,7 +513,8 @@ ComponentTransition* ComponentTransition::fromJSONObject(ComponentTransitionsMod
 {
     // Init New Compoennt Transition
     ComponentTransition* newTransition = new ComponentTransition(aObject[JSON_KEY_COMPONENT_TRANSITION_FROM].toString(),
-                                                                 aObject[JSON_KEY_COMPONENT_TRANSITION_TO].toString());
+                                                                 aObject[JSON_KEY_COMPONENT_TRANSITION_TO].toString(),
+                                                                 aModel);
 
     // Read Transition Nodes
     newTransition->readNodes(aObject[JSON_KEY_COMPONENT_TRANSITION_NODES].toArray());
@@ -524,9 +525,9 @@ ComponentTransition* ComponentTransition::fromJSONObject(ComponentTransitionsMod
 //==============================================================================
 // Constructor
 //==============================================================================
-ComponentTransition::ComponentTransition(const QString& aFromState, const QString& aToState, QObject* aParent)
+ComponentTransition::ComponentTransition(const QString& aFromState, const QString& aToState, ComponentTransitionsModel* aModel, QObject* aParent)
     : QObject(aParent)
-    , mModel(NULL)
+    , mModel(aModel)
     , mCurrentNode(NULL)
     , mFromState(aFromState)
     , mToState(aToState)
@@ -837,7 +838,9 @@ ComponentTransitionNode* ComponentTransitionNode::fromJSONObject(ComponentTransi
 //==============================================================================
 ComponentTransitionNode::ComponentTransitionNode(const ETransitionType& aType, QObject* aParent)
     : QObject(aParent)
+//    , mModel(NULL)
     , mType(aType)
+    , mParent(NULL)
 {
     // ...
 }

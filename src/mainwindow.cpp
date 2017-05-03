@@ -23,11 +23,13 @@
 #include "projectpropertiesdialog.h"
 #include "createcomponentdialog.h"
 #include "createviewdialog.h"
+#include "createdatasourcedialog.h"
 #include "livewindow.h"
 
 #include "basecomponentsmodel.h"
 #include "componentsmodel.h"
 #include "viewsmodel.h"
+#include "datasourcesmodel.h"
 
 #include "minimizedcomponents.h"
 
@@ -73,6 +75,7 @@ MainWindow::MainWindow(QWidget* aParent)
     , mProjectPropertiesDiaog(NULL)
     , mCreateComponentDialog(NULL)
     , mCreateViewDialog(NULL)
+    , mCreateDataSourceDialog(NULL)
     , mLiveWindow(NULL)
 
     , mPropertiesController(NULL)
@@ -189,6 +192,8 @@ void MainWindow::init()
     qmlRegisterUncreatableType<ComponentsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_COMPONENTS_MODEL, "");
     // Register Views Model
     qmlRegisterUncreatableType<ViewsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_VIEWS_MODEL, "");
+    // Register Data Sources Model
+    qmlRegisterUncreatableType<DataSourcesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_DATASOURCES_MODEL, "");
 
     // Register Project Model
     qmlRegisterUncreatableType<ProjectModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_PROJECT_MODEL, "");
@@ -391,6 +396,14 @@ ViewsModel* MainWindow::viewsModel()
 }
 
 //==============================================================================
+// Get Data Sources Model
+//==============================================================================
+DataSourcesModel* MainWindow::dataSourcesModel()
+{
+    return mProjectModel ? mProjectModel->dataSourcesModel() : NULL;
+}
+
+//==============================================================================
 // Get Screen Shot Mode
 //==============================================================================
 bool MainWindow::screenshotMode()
@@ -420,10 +433,7 @@ void MainWindow::openProject(const QString& aFilePath)
         connect(mProjectModel, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)), this, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)));
         connect(mProjectModel, SIGNAL(componentsModelChanged(ComponentsModel*)), this, SIGNAL(componentsModelChanged(ComponentsModel*)));
         connect(mProjectModel, SIGNAL(viewsModelChanged(ViewsModel*)), this, SIGNAL(viewsModelChanged(ViewsModel*)));
-
-//        connect(mProjectModel, SIGNAL(baseComponentCreated(ComponentInfo*)), this, SLOT(baseComponentCreated(ComponentInfo*)));
-//        connect(mProjectModel, SIGNAL(componentCreated(ComponentInfo*)), this, SLOT(componentCreated(ComponentInfo*)));
-//        connect(mProjectModel, SIGNAL(viewCreated(ComponentInfo*)), this, SLOT(viewCreated(ComponentInfo*)));
+        connect(mProjectModel, SIGNAL(dataSourcesModelChanged(DataSourcesModel*)), this, SIGNAL(dataSourcesModelChanged(DataSourcesModel*)));
     }
 
     // Load Project
@@ -448,6 +458,8 @@ void MainWindow::openProject(const QString& aFilePath)
         ui->actionCreateComponent->setEnabled(true);
         // Set Enable Create View Menu Item
         ui->actionCreateView->setEnabled(true);
+        // Set Enabled Create New Data Source Menu Item
+        ui->actionCreateNewDataSource->setEnabled(true);
         // Set Component Names Visible Menu Item
         ui->actionShowComponentNames->setEnabled(true);
 
@@ -820,7 +832,7 @@ void MainWindow::launchCreateComponent()
 
     // Exec Dialog
     if (mCreateComponentDialog->exec()) {
-        // Create Base Component
+        // Create New Component
         createNewComponent(mCreateComponentDialog->componentName(),
                            COMPONENT_TYPE_COMPONENT,
                            mCreateComponentDialog->componentBaseName(),
@@ -864,7 +876,7 @@ void MainWindow::launchCreateView()
 
     // Exec Create View Dialog
     if (mCreateViewDialog->exec()) {
-        // Create Base Component
+        // Create New View Component
         createNewComponent(mCreateViewDialog->viewName(),
                            COMPONENT_TYPE_VIEW,
                            mCreateViewDialog->viewBaseName(),
@@ -878,6 +890,32 @@ void MainWindow::launchCreateView()
 
     // Grab Keyboard Focus
     //grabKeyboard();
+}
+
+//==============================================================================
+// Launch Create Data Source
+//==============================================================================
+void MainWindow::launchCreateDataSource()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    // Check Create Data Source Dialog
+    if (!mCreateDataSourceDialog) {
+        // Create Data Source Dialog
+        mCreateDataSourceDialog = new CreateDataSourceDialog();
+    }
+
+    // Reset Dialog
+    mCreateDataSourceDialog->reset();
+
+    // Exec Dialog
+    if (mCreateDataSourceDialog->exec()) {
+        // Create New Data Source Component
+        createNewComponent(mCreateDataSourceDialog->dataSourceName(), COMPONENT_TYPE_DATASOURCE, "", COMPONENT_CATEGORY_NONVISUAL, false);
+    }
 }
 
 //==============================================================================
@@ -993,6 +1031,8 @@ void MainWindow::createNewProject()
         ui->actionCreateComponent->setEnabled(true);
         // Set Enable Create View Menu Item
         ui->actionCreateView->setEnabled(true);
+        // Set Enabled Create New Data Source Menu Item
+        ui->actionCreateNewDataSource->setEnabled(true);
         // Set Component Names Visible Menu Item
         ui->actionShowComponentNames->setEnabled(true);
 
@@ -1052,6 +1092,11 @@ void MainWindow::createNewComponent(const QString& aName,
 
             // Create New View
             newComponent = mProjectModel->createView(aName, aBase, aWidth, aHeight);
+
+        } else if (aType == COMPONENT_TYPE_DATASOURCE) {
+
+            // Create New Data Source
+            newComponent = mProjectModel->createDataSource(aName);
 
         } else {
             qWarning() << "MainWindow::createNewComponent - UNSUPPORTED COMPONENT TYPE!";
@@ -1217,10 +1262,7 @@ void MainWindow::closeProject()
     disconnect(mProjectModel, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)), this, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)));
     disconnect(mProjectModel, SIGNAL(componentsModelChanged(ComponentsModel*)), this, SIGNAL(componentsModelChanged(ComponentsModel*)));
     disconnect(mProjectModel, SIGNAL(viewsModelChanged(ViewsModel*)), this, SIGNAL(viewsModelChanged(ViewsModel*)));
-
-//    disconnect(mProjectModel, SIGNAL(baseComponentCreated(ComponentInfo*)), this, SLOT(baseComponentCreated(ComponentInfo*)));
-//    disconnect(mProjectModel, SIGNAL(componentCreated(ComponentInfo*)), this, SLOT(componentCreated(ComponentInfo*)));
-//    disconnect(mProjectModel, SIGNAL(viewCreated(ComponentInfo*)), this, SLOT(viewCreated(ComponentInfo*)));
+    disconnect(mProjectModel, SIGNAL(dataSourcesModelChanged(DataSourcesModel*)), this, SIGNAL(dataSourcesModelChanged(DataSourcesModel*)));
 
     // Check Project Tree Model
     if (mProjectTreeModel) {
@@ -1253,6 +1295,7 @@ void MainWindow::closeProject()
     ui->actionCloseAllComponents->setEnabled(false);
     ui->actionEditComponent->setEnabled(false);
     ui->actionEditView->setEnabled(false);
+    ui->actionCreateNewDataSource->setEnabled(false);
     ui->actionRemoveComponent->setEnabled(false);
     ui->actionRemoveView->setEnabled(false);
     ui->actionRenameComponent->setEnabled(false);
@@ -1558,6 +1601,14 @@ void MainWindow::viewCreated(ComponentInfo* )
 }
 
 //==============================================================================
+// Data Source Created Slot
+//==============================================================================
+void MainWindow::dataSourceCreated(ComponentInfo* )
+{
+    // ...
+}
+
+//==============================================================================
 // File Opened Slot
 //==============================================================================
 void MainWindow::fileOpened(const QString& aFilePath)
@@ -1786,6 +1837,15 @@ void MainWindow::on_actionEditView_triggered()
 }
 
 //==============================================================================
+// Action Create New Data Source Triggered Slot
+//==============================================================================
+void MainWindow::on_actionCreateNewDataSource_triggered()
+{
+    // Launch Create Data Source
+    launchCreateDataSource();
+}
+
+//==============================================================================
 // Action Close Component Triggered Slot
 //==============================================================================
 void MainWindow::on_actionCloseComponent_triggered()
@@ -1994,6 +2054,11 @@ MainWindow::~MainWindow()
         mCreateViewDialog = NULL;
     }
 
+    if (mCreateDataSourceDialog) {
+        delete mCreateDataSourceDialog;
+        mCreateDataSourceDialog = NULL;
+    }
+
     if (mLiveWindow) {
         delete mLiveWindow;
         mLiveWindow = NULL;
@@ -2003,4 +2068,5 @@ MainWindow::~MainWindow()
 
     qDebug() << "MainWindow deleted.";
 }
+
 

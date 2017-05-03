@@ -47,7 +47,49 @@ DContainer {
 //        mainController.openProject("/Users/max/Dev/Volvo/myproject/myproject.json");
 //        // Seelect Component
 //        propertiesController.selectComponent("AppTile", 0);
+
+        propertyEditor.show();
     }
+
+    DButton {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 32
+        text: propertyEditor.state === propertyEditor.stateCreate ? "show" : "hide"
+        onClicked: {
+            if (propertyEditor.state === propertyEditor.stateCreate) {
+                // Show
+                propertyEditor.show();
+            } else {
+                // Reset
+                propertyEditor.reset(false);
+            }
+        }
+    }
+
+    DPropertyEditor {
+        id: propertyEditor
+        childPane: propertyEnumValueEditor
+        onNewEnumValue: {
+            // Set New Enum Value
+            propertyEnumValueEditor.newEnumValue = true;
+            // Show Enum Value Editor
+            propertyEnumValueEditor.show();
+        }
+    }
+
+    DPropertyEnumValueEditor {
+        id: propertyEnumValueEditor
+
+        parentPane: propertyEditor
+
+        initialX: propertyEditor.x + propertyEditor.width * 0.5
+        initialY: propertyEditor.y + propertyEditor.height
+
+        creationX: initialX - propertyEnumValueEditor.width * 0.5
+        creationY: initialY + 32
+    }
+
 /*
     DComponentRootContainer {
         id: demoRootContainer

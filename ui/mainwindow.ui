@@ -140,11 +140,23 @@
     <addaction name="actionRemoveView"/>
     <addaction name="separator"/>
    </widget>
+   <widget class="QMenu" name="menuData_Sources">
+    <property name="title">
+     <string>Data Sources</string>
+    </property>
+    <addaction name="actionCreateNewDataSource"/>
+    <addaction name="separator"/>
+    <addaction name="actionEditDataSource"/>
+    <addaction name="actionRenameDataSource"/>
+    <addaction name="separator"/>
+    <addaction name="actionRemoveDataSource"/>
+   </widget>
    <addaction name="menuMaxDesigner"/>
    <addaction name="menuFile"/>
    <addaction name="menuProject"/>
    <addaction name="menuComponent"/>
    <addaction name="menuViews"/>
+   <addaction name="menuData_Sources"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -422,6 +434,38 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
+   </property>
+  </action>
+  <action name="actionCreateNewDataSource">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Create New Data Source</string>
+   </property>
+  </action>
+  <action name="actionEditDataSource">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Edit Data Source</string>
+   </property>
+  </action>
+  <action name="actionRenameDataSource">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Rename Data Source</string>
+   </property>
+  </action>
+  <action name="actionRemoveDataSource">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Remove Data Source</string>
    </property>
   </action>
  </widget>

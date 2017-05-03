@@ -89,9 +89,9 @@ Item {
 
             onAccepted: {
                 // Check New Value
-                if (propertyValueEditor.text !== propertyItemValueRoot.propertyValue) {
+                if (propertyItemValueRoot.propertyValue !== newText) {
                     // Emit Value Changed Signal
-                    propertyItemValueRoot.valueChanged(propertyValueEditor.text);
+                    propertyItemValueRoot.valueChanged(newText);
                 }
             }
         }
@@ -126,7 +126,7 @@ Item {
 
             onValueEntered: {
                 // Check New Value
-                if (newValue !== propertyItemValueRoot.propertyValue) {
+                if (propertyItemValueRoot.propertyValue !== newValue) {
                     // Emit Value Changed Signal
                     propertyItemValueRoot.valueChanged(newValue);
                 }

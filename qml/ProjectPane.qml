@@ -217,6 +217,53 @@ DPane {
     }
 
     DSection {
+        id: dataSourcesSection
+        width: projectPaneRoot.contentWidth
+        title: "Data Sources"
+        state: stateClosed
+
+        DFlow {
+            id: dataSourcesFlow
+            width: projectPaneRoot.contentWidth
+            spacing: DStyle.defaultSpacing
+            opacity: dataSourcesRepeater.count > 0 ? 1.0 : 0.0
+
+            Repeater {
+                id: dataSourcesRepeater
+                model: mainController.currentProject ? mainController.currentProject.dataSourcesModel : undefined
+
+                delegate: DComponentItem {
+                    id: dataSourceItemDelegateRoot
+                    title: dsName
+                    visual: false
+                    builtIn: false
+                    componentInfo: mainController.currentProject.dataSourcesModel.getDataSourceByIndex(index);
+                    onGrabbedChanged: {
+                        // Bring Section To Top
+                        dataSourcesSection.z = grabbed ? 0.1 : 0.0;
+                        // Disable Content Clip
+                        dataSourcesSection.clipContent = !grabbed;
+                    }
+                }
+            }
+        }
+
+
+        DNoContent {
+            width: projectPaneRoot.contentWidth
+            height: dataSourcesRepeater.count === 0 ? dataSourcesSection.minHeight : 0
+            opacity: dataSourcesRepeater.count === 0 ? 0.2 : 0.0
+
+            DText {
+                id: noDataSourcesLabel
+                anchors.fill: parent
+                horizontalAlignment: Text.AlignHCenter
+                text: "No Data Sources"
+            }
+        }
+    }
+
+    DSection {
         id: projectTreeSection
         width: projectPaneRoot.contentWidth
         title: "Project Tree"

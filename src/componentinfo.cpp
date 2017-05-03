@@ -13,8 +13,6 @@
 #include "mainwindow.h"
 #include "componentinfo.h"
 #include "projectmodel.h"
-#include "qmlparser.h"
-#include "qmlgenerator.h"
 #include "constants.h"
 
 //==============================================================================
@@ -110,6 +108,9 @@ void ComponentInfo::init()
         } else if (mType == COMPONENT_TYPE_VIEW) {
             // Set Info Path
             ipTemp = mProject->viewsDir();
+        } else if (mType == COMPONENT_TYPE_DATASOURCE) {
+            // Set Info Path
+            ipTemp = mProject->dataSourcesDir();
         } else if (mType != "") {
             qWarning() << "ComponentInfo::init - mType: " << mType << " - NOT SUPPORTED TYPE!!";
 
@@ -535,10 +536,8 @@ void ComponentInfo::setComponentID(const QString& aID)
     if (componentID() != aID) {
         // Set Component Property
         setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_ID, aID);
-
         // Set Child Object ID
         setChildObjectID(this, aID);
-
         // Emit Component ID Changed Signal
         emit componentIDChanged(componentID());
     }
@@ -734,6 +733,18 @@ void ComponentInfo::viewsDirChanged(const QString& aViewsDir)
     if (mType == COMPONENT_TYPE_VIEW) {
         // Set Info Path
         setInfoPath(QString("%1/%2.%3").arg(aViewsDir).arg(mName).arg(DEFAULT_JSON_SUFFIX));
+    }
+}
+
+//==============================================================================
+// Data Sources Dir Changed Slot
+//==============================================================================
+void ComponentInfo::dataSourcesDirChanged(const QString& aDataSourcesDir)
+{
+    // Check Type
+    if (mType == COMPONENT_TYPE_DATASOURCE) {
+        // Set Info Path
+        setInfoPath(QString("%1/%2.%3").arg(aDataSourcesDir).arg(mName).arg(DEFAULT_JSON_SUFFIX));
     }
 }
 
@@ -1127,8 +1138,14 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
     // Add New Line
     liveCode += "\n";
 
-    // Add Type
-    liveCode += mName + " {\n";
+    // Check Component Type
+    if (mType == COMPONENT_TYPE_DATASOURCE) {
+        // Add Type
+        liveCode += "QtObject {\n";
+    } else {
+        // Add Type
+        liveCode += mName + " {\n";
+    }
 
     // Add ID ==================================================================
 
@@ -1161,51 +1178,54 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
     // Check ID & Object Name
     if (!cID.isEmpty() || !objectName.isEmpty()) {
         // Add New Line
-        liveCode += "\n";
+        //liveCode += "\n";
     }
 
-    // Add Pos =================================================================
+    // Add Pos & Size =================================================================
 
-    // Get Pos X
-    QString cpX = posX();
-    // Check Pos X
-    if (cpX != "0") {
-        // Add Pos X
-        liveCode += QString("%1x: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cpX);
-    }
+    // Check Component Category
+    if (mCategory != COMPONENT_CATEGORY_NONVISUAL) {
+        // Get Pos X
+        QString cpX = posX();
+        // Check Pos X
+        if (cpX != "0") {
+            // Add Pos X
+            liveCode += QString("%1x: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cpX);
+        }
 
-    // Get Pos Y
-    QString cpY = posY();
-    // Check Pos Y
-    if (cpY != "0") {
-        // Add Pos Y
-        liveCode += QString("%1y: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cpY);
-    }
+        // Get Pos Y
+        QString cpY = posY();
+        // Check Pos Y
+        if (cpY != "0") {
+            // Add Pos Y
+            liveCode += QString("%1y: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cpY);
+        }
 
-    // Get Pos Z
-    QString cpZ = posZ();
-    // Check Pos Z
-    if (cpZ != "0") {
-        // Add Pos Z
-        liveCode += QString("%1z: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cpZ);
-    }
+        // Get Pos Z
+        QString cpZ = posZ();
+        // Check Pos Z
+        if (cpZ != "0") {
+            // Add Pos Z
+            liveCode += QString("%1z: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cpZ);
+        }
 
-    // Add Size ================================================================
+        // Add Size ================================================================
 
-    // Get Width
-    QString cWidth = width();
-    // Check Width
-    if (cWidth != "0") {
-        // Add Width
-        liveCode += QString("%1width: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cWidth);
-    }
+        // Get Width
+        QString cWidth = width();
+        // Check Width
+        if (cWidth != "0") {
+            // Add Width
+            liveCode += QString("%1width: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cWidth);
+        }
 
-    // Get Height
-    QString cHeight = height();
-    // Check Height
-    if (cHeight != "0") {
-        // Add Height
-        liveCode += QString("%1height: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cHeight);
+        // Get Height
+        QString cHeight = height();
+        // Check Height
+        if (cHeight != "0") {
+            // Add Height
+            liveCode += QString("%1height: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cHeight);
+        }
     }
 
     // Add Anchors =============================================================
@@ -1396,7 +1416,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
     // Get Filtered Property Keys
     QStringList fpKeys = mProject->propertiesController() ? mProject->propertiesController()->filteredProperties() : QStringList();
 
-    // Check Own Prpoerties Key Count
+    // Check Own Prpoerties Keys Count
     if (opCount > 0) {
         // Add New Line
         liveCode += "\n";
@@ -1406,15 +1426,19 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
             // Check Filtered Properties
             if (fpKeys.indexOf(opKeys[j]) == -1) {
                 // Get Property Type And Value
-                QStringList typeAndValue = mOwnProperties[opKeys[j]].toString().split(":");
+                //QStringList typeAndValue = mOwnProperties[opKeys[j]].toString().split(":");
+                // Get Type And Value
+                QString typeAndValue = mOwnProperties[opKeys[j]].toString();
+                // Get : Pos
+                int cPos = typeAndValue.indexOf(":");
                 // Get Type
-                QString pType = typeAndValue[0];
+                QString pType = typeAndValue.left(cPos);
                 // Get Value
-                QString pValue = typeAndValue[1];
+                QString pValue = (cPos >= 0) ? typeAndValue.mid(cPos + 1) : typeAndValue;
                 // Check Type
-                if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING && pValue.isEmpty()) {
+                if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING) {
                     // Set Value
-                    pValue = "\"\"";
+                    pValue = QString("\"%1\"").arg(pValue);
                 }
                 // Check If Built In Component
                 if (mBuiltIn) {
@@ -1447,8 +1471,15 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
 
             // Check If Filtered Property
             if (fpKeys.indexOf(pKeys[k]) == -1) {
+                // Get Type
+                QString pType = propertyType(pKeys[k]);
                 // Get Value
                 QString pValue = mProperties.value(pKeys[k]).toString();
+                // Check Type
+                if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING) {
+                    // Set Value
+                    pValue = QString("\"%1\"").arg(pValue);
+                }
                 // Append Live Code
                 liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(pKeys[k]).arg(pValue);
             }
@@ -1541,7 +1572,8 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
     // Check Properties Count
     if (opvhCount > 0 || pvhCount > 0) {
         // Add New Line
-        //liveCode += "\n";
+        liveCode += "\n";
+        // Comment Line
         liveCode += QString("%1// Property Set Hook\n").arg(DEFAULT_SOURCE_INDENT);
         // Init Property Update Hook Function Code
         QString propertyHooks = QString("%1function __setProperty(key, value) {\n").arg(DEFAULT_SOURCE_INDENT);
@@ -1578,9 +1610,6 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
 
     // Check Functions
     if (!mFunctions.isEmpty()) {
-//        // Add New Line
-//        liveCode += "\n";
-
         // Get Functions Count
         int fCount = mFunctions.count();
 
@@ -1594,12 +1623,10 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
             QString functionParameters = functionObject[JSON_KEY_COMPONENT_FUNCTION_PARAMETERS].toString();
             // Get Function Source
             QString functionSource = functionObject[JSON_KEY_COMPONENT_FUNCTION_SOURCE].toString();
-
             // Append To Live Code
-            liveCode += QString("%1function %2(%3) {").arg(DEFAULT_SOURCE_INDENT).arg(functionName).arg(functionParameters);
-
+            liveCode += QString("%1function %2(%3) {\n").arg(DEFAULT_SOURCE_INDENT).arg(functionName).arg(functionParameters);
             // Get Source Code Lines
-            QStringList sourceLines = functionSource.split("\n", QString::KeepEmptyParts);
+            QStringList sourceLines = functionSource.split("\n", QString::SkipEmptyParts);
             // Get Lines Count
             int slCount = sourceLines.count();
             // Iterate Through Source Lines
@@ -1611,8 +1638,6 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
             // Add New Line
             liveCode += QString("%1}\n\n").arg(DEFAULT_SOURCE_INDENT);
         }
-
-        // ...
     }
 
     // Add Children ============================================================
@@ -1700,7 +1725,7 @@ QVariant ComponentInfo::componentProperty(const QString& aName)
 }
 
 //==============================================================================
-// Set Property
+// Set Property - Simple!!!
 //==============================================================================
 void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& aValue)
 {
@@ -1734,19 +1759,19 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
 
         // Set Own Property
         mOwnProperties[aName] = QString("%1:%2").arg(tPrefix).arg(aValue.toString());
-
         // Emit Own Property Added Signal
         emit ownPropertyAdded(mOwnProperties.keys().indexOf(aName));
 
     } else {
         qDebug() << "ComponentInfo::setComponentProperty - component: " << mName << " - aName: " << aName << " - aValue: " << aValue << " - BASE";
-
         // Set Property
         mProperties[aName] = aValue.toString();
-
         // Emit Property Updated Signal
         emit propertyUpdated(aName);
     }
+
+    // Emit Component Property Value Changed
+    emit componentPropertyChanged(aName, aValue);
 
     // Set Dirty
     setDirty(true);
@@ -1778,6 +1803,36 @@ bool ComponentInfo::hasProperty(const QString& aName)
     }
 
     return false;
+}
+
+//==============================================================================
+// Get Property Type
+//==============================================================================
+QString ComponentInfo::propertyType(const QString& aName)
+{
+    // Get Keys
+    QStringList opKeys = mOwnProperties.keys();
+    // Get Property Index
+    int opIndex = opKeys.indexOf(aName);
+
+    // Check Property Index
+    if (opIndex >= 0) {
+        // Get Type And Value
+        QString typeAndValue = mOwnProperties.value(aName).toString();
+        return typeAndValue.left(typeAndValue.indexOf(":"));
+    }
+
+    // Check Prototype
+    if (mProtoType) {
+        // Get Type
+        QString pType = mProtoType->propertyType(aName);
+        // Check Property Type
+        if (!pType.isEmpty()) {
+            return pType;
+        }
+    }
+
+    return mBase ? mBase->propertyType(aName) : "";
 }
 
 //==============================================================================

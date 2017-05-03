@@ -57,7 +57,7 @@
     </sizepolicy>
    </property>
    <property name="text">
-    <string>QML Designer Application</string>
+    <string>UI Designer Application</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>

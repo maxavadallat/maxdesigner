@@ -434,12 +434,10 @@ bool ComponentOwnPropertiesModel::setComponentProperty(const QString& aName, con
     if (mComponent->mIsProtoType) {
         // Get Property Type And Value
         QString cpTypeAndValue = mComponent->mOwnProperties[aName].toString();
-        // Get Type And Value Elements
-        QStringList cpElements = cpTypeAndValue.split(":", QString::KeepEmptyParts);
-        // Update Value
-        cpElements[1] = aValue.toString();
+        // Get Type
+        QString pType = cpTypeAndValue.left(cpTypeAndValue.indexOf(":"));
         // Set Component Own Property
-        mComponent->mOwnProperties[aName] = cpElements.join(":");
+        mComponent->mOwnProperties[aName] = QString("%1:%2").arg(pType).arg(aValue.toString());
 
     } else {
         // Set Component Property Value
@@ -448,6 +446,7 @@ bool ComponentOwnPropertiesModel::setComponentProperty(const QString& aName, con
 
     // Set Component Dirty
     mComponent->setDirty(true);
+
     // Emit Component Property Changed
     emit mComponent->componentPropertyChanged(aName, aValue);
     // Emit Component Property Value Changed
@@ -550,17 +549,23 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
 
         // Check Own Property Type And Value
         if (!opTypeAndValue.isEmpty()) {
-            // Get Type/Value Split
-            QStringList tvElements = opTypeAndValue.split(":");
+            // Get : First Pos
+            int cfPos = opTypeAndValue.indexOf(":");
+
+            // Check : Pos
+            if (cfPos < 0) {
+                qWarning() << "ComponentOwnPropertiesModel::data - opKey: " << opKey << " - NO TYPE SEPARATOR!!";
+            }
+
             // Get Type
-            QString opType = tvElements.count() > 1 ? tvElements[0] : "";
+            QString opType = opTypeAndValue.left(cfPos);
             // Init Property Value
             QString opValue = "";
 
             // Check Own Property Base
             if (opBase) {
                 // Set Own Property Value
-                opValue = tvElements.count() > 1 ? tvElements[1] : tvElements[0];
+                opValue = (cfPos >= 0) ? opTypeAndValue.mid(cfPos + 1) :  opTypeAndValue;
             } else {
                 // Set Own Property Value Value
                 opValue = mDerivedComponent->mProperties.value(opKey).toString();

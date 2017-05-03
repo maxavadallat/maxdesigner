@@ -221,7 +221,7 @@ protected:
     friend class ComponentTransitionsModel;
 
     // Constructor
-    explicit ComponentTransition(const QString& aFromState, const QString& aToState, QObject* aParent = NULL);
+    explicit ComponentTransition(const QString& aFromState, const QString& aToState, ComponentTransitionsModel* aModel, QObject* aParent = NULL);
 
     // Clear
     void clear();
@@ -280,8 +280,6 @@ class ComponentTransitionNode  : public QObject
 public:
     // From JSON Object
     static ComponentTransitionNode* fromJSONObject(ComponentTransitionsModel* aModel, const QJsonObject& aObject);
-    // Constructor
-    explicit ComponentTransitionNode(const ETransitionType& aType, QObject* aParent = NULL);
 
     // Get Count
     int count();
@@ -308,14 +306,20 @@ signals:
     // Count Changed Signal
     void countChanged(const int& aCount);
 
+protected:
+    // Constructor
+    explicit ComponentTransitionNode(const ETransitionType& aType, QObject* aParent = NULL);
+
 protected: // Data
     friend class ComponentTransition;
     friend class ComponentTransitionsModel;
 
     // Transitions Model
-    ComponentTransitionsModel*          mModel;
+//    ComponentTransitionsModel*          mModel;
     // Transition Type
     ETransitionType                     mType;
+    // Parent Node
+    ComponentTransitionNode*            mParent;
     // Children
     QList<ComponentTransitionNode*>     mChildren;
 };

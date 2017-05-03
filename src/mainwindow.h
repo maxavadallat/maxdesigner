@@ -18,6 +18,7 @@ class ProjectModel;
 class BaseComponentsModel;
 class ComponentsModel;
 class ViewsModel;
+class DataSourcesModel;
 class ComponentCategoryModel;
 class ComponentInfo;
 class PropertiesController;
@@ -27,6 +28,7 @@ class RecentProjectsModel;
 class ProjectPropertiesDialog;
 class CreateComponentDialog;
 class CreateViewDialog;
+class CreateDataSourceDialog;
 class LiveWindow;
 class MinimizedComponents;
 
@@ -43,6 +45,7 @@ class MainWindow : public QMainWindow
     Q_PROPERTY(BaseComponentsModel* baseComponentsModel READ baseComponentsModel NOTIFY baseComponentsModelChanged)
     Q_PROPERTY(ComponentsModel* componentsModel READ componentsModel NOTIFY componentsModelChanged)
     Q_PROPERTY(ViewsModel* viewsModel READ viewsModel NOTIFY viewsModelChanged)
+    Q_PROPERTY(DataSourcesModel* dataSourcesModel READ dataSourcesModel NOTIFY dataSourcesModelChanged)
 
     Q_PROPERTY(bool screenshotMode READ screenshotMode NOTIFY screenshotModeChanged)
 
@@ -64,6 +67,8 @@ public:
     ComponentsModel* componentsModel();
     // Get Views Model
     ViewsModel* viewsModel();
+    // Get Data Sources Model
+    DataSourcesModel* dataSourcesModel();
 
     // Get Screen Shot Mode
     bool screenshotMode();
@@ -96,7 +101,8 @@ signals:
     void componentsModelChanged(ComponentsModel* aComponents);
     // Views Model Changed Signal
     void viewsModelChanged(ViewsModel* aViews);
-
+    // Data Sources Model Changed Signal
+    void dataSourcesModelChanged(DataSourcesModel* aDataSources);
     // Screen Shot Mode Changed Signal
     void screenshotModeChanged(const bool& aScreenShotMode);
 
@@ -132,6 +138,8 @@ private:
     void launchCreateComponent();
     // Launch Create View
     void launchCreateView();
+    // Launch Create Data Source
+    void launchCreateDataSource();
 
     // Toggle Show Tracers
     void toggleShowTracers();
@@ -202,8 +210,10 @@ private slots:
     void baseComponentCreated(ComponentInfo* aComponent);
     // Component Created Slot
     void componentCreated(ComponentInfo* aComponent);
-    // View Creaeted Slot
+    // View Created Slot
     void viewCreated(ComponentInfo* aComponent);
+    // Data Source Created Slot
+    void dataSourceCreated(ComponentInfo* aComponent);
 
     // File Opened Slot
     void fileOpened(const QString& aFilePath);
@@ -249,6 +259,8 @@ private slots:
     void on_actionEditComponent_triggered();
     // Action Edit View Triggered Slot
     void on_actionEditView_triggered();
+    // Action Create New Data Source Triggered Slot
+    void on_actionCreateNewDataSource_triggered();
     // Action Close Component Triggered Slot
     void on_actionCloseComponent_triggered();
     // Action Close All Components Triggered Slot
@@ -305,6 +317,8 @@ private:
     CreateComponentDialog*      mCreateComponentDialog;
     // Create View Dialog
     CreateViewDialog*           mCreateViewDialog;
+    // Create Data Source Dialog
+    CreateDataSourceDialog*     mCreateDataSourceDialog;
     // Live Window
     LiveWindow*                 mLiveWindow;
 

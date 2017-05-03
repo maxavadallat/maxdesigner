@@ -66,10 +66,10 @@ DControl {
 
         editor.inputMethodHints: Qt.ImhDigitsOnly
         editor.horizontalAlignment: TextInput.AlignHCenter
-        editor.validator: DoubleValidator {
-            bottom: spinnerRoot.minValue
-            top: spinnerRoot.maxValue
-        }
+//        editor.validator: DoubleValidator {
+//            bottom: spinnerRoot.minValue
+//            top: spinnerRoot.maxValue
+//        }
 
         pixelSize: DStyle.fontSizeM
         showClearButton: false
@@ -89,14 +89,14 @@ DControl {
                 return;
             }
 
-            // Calculate New Value
-            var newValue = Math.min(spinnerRoot.maxValue, Math.max(spinnerRoot.minValue, Number(newText)));
+//            // Calculate New Value
+//            var newValue = Math.min(spinnerRoot.maxValue, Math.max(spinnerRoot.minValue, Number(newText)));
 
-            // Check New Value
-            if (spinnerRoot.value !== newValue) {
-                // Emit Value Edited Signal
-                spinnerRoot.valueEdited(newValue);
-            }
+//            // Check New Value
+//            if (spinnerRoot.value !== newValue) {
+//                // Emit Value Edited Signal
+//                spinnerRoot.valueEdited(newValue);
+//            }
         }
 
         onKeyEvent: {

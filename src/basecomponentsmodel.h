@@ -2,7 +2,6 @@
 #define BASECOMPONENTSMODEL_H
 
 #include <QObject>
-#include <QList>
 #include <QMap>
 #include <QAbstractListModel>
 
@@ -58,10 +57,9 @@ public: // from QAbstractListModel
     // Data
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
     // Get Role Names
-    virtual QHash<int,QByteArray> roleNames() const;
+    virtual QHash<int, QByteArray> roleNames() const;
 
 private: // Data
-
     // Item Field Roles
     enum EBCItemRoles {
         EBCRName = Qt::UserRole + 1,

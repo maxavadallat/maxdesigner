@@ -11,6 +11,7 @@
 #include "componentsmodel.h"
 #include "componentinfo.h"
 #include "viewsmodel.h"
+#include "datasourcesmodel.h"
 #include "constants.h"
 
 //==============================================================================
@@ -24,6 +25,7 @@ ProjectModel::ProjectModel(QObject* parent)
     , mBaseComponents(NULL)
     , mComponents(NULL)
     , mViews(NULL)
+    , mDataSources(NULL)
 {
     qDebug() << "ProjectModel created.";
 
@@ -38,32 +40,6 @@ void ProjectModel::init()
 {
     // ...
 }
-
-////==============================================================================
-//// Create QML Project
-////==============================================================================
-//void ProjectModel::createQMLProject()
-//{
-//    // ...
-//}
-
-////==============================================================================
-//// Load QML Project File
-////==============================================================================
-//void ProjectModel::loadQMLProject(const QString& aFileName)
-//{
-//    Q_UNUSED(aFileName);
-
-//    // ...
-//}
-
-////==============================================================================
-//// Save QML Project
-////==============================================================================
-//void ProjectModel::saveQMLProject()
-//{
-//    // ...
-//}
 
 //==============================================================================
 // Set Project Properties Dirty State
@@ -137,6 +113,24 @@ void ProjectModel::createViewsModel()
 }
 
 //==============================================================================
+// Create Data Sources Model
+//==============================================================================
+void ProjectModel::createDataSourcesModel()
+{
+    // Check Data Sources Model
+    if (!mDataSources) {
+        qDebug() << "ProjectModel::createDataSourcesModel";
+        // Create New Data Sources Model
+        DataSourcesModel* newModel = new DataSourcesModel(this);
+        // Set Data Sources Model
+        setDataSourcesModel(newModel);
+    }
+
+    // Load Data Sources
+    mDataSources->loadDataSources();
+}
+
+//==============================================================================
 // Set Properties Controller
 //==============================================================================
 void ProjectModel::setPropertiesController(PropertiesController* aController)
@@ -193,10 +187,26 @@ void ProjectModel::setViewsModel(ViewsModel* aViews)
 }
 
 //==============================================================================
+// Set Data Sources Model
+//==============================================================================
+void ProjectModel::setDataSourcesModel(DataSourcesModel* aDataSources)
+{
+    // Check Data Sources
+    if (mDataSources != aDataSources) {
+        // Set Data Sources
+        mDataSources = aDataSources;
+        // Emit Data Sources Changed Signal
+        emit dataSourcesModelChanged(mDataSources);
+    }
+}
+
+//==============================================================================
 // Update Components And Children
 //==============================================================================
 void ProjectModel::updateBaseComponents()
 {
+    qDebug() << "ProjectModel::updateBaseComponents";
+
     // Base Components
     if (mBaseComponents) {
         // Update Base Components
@@ -214,6 +224,8 @@ void ProjectModel::updateBaseComponents()
         // Update Base Components
         mViews->updateBaseComponents();
     }
+
+    // ...
 }
 
 //==============================================================================
@@ -223,12 +235,16 @@ bool ProjectModel::initProject(const QString& aName, const QString& aDir)
 {
     // Check Name
     if (!aName.isEmpty() && !aDir.isEmpty()) {
+        qDebug() << "ProjectModel::initProject - aName: " << aName << " - aDir: " << aDir;
+
         // Set Project Name
         setProjectName(aName);
         // Set Project Dir
         setProjectDir(aDir + "/" + aName);
         // Set Base Components Dir
         setBaseComponentsDir(projectDir() + "/" + DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME);
+        // Set Data Sources Dir
+        setDataSourcesDir(projectDir() + "/" + DEFAULT_PROJECT_DATASOURCES_DIR_NAME);
 
         // Init Project Dir
         QString pDirPath(projectDir());
@@ -243,8 +259,8 @@ bool ProjectModel::initProject(const QString& aName, const QString& aDir)
         }
 
         // Create Live Temp Dir
-        if (!tempDir.mkdir(DEFAULR_PROJECT_LIVE_TEMP_DIR_NAME)) {
-            qWarning() << "ProjectModel::initProject - livetemp: " << DEFAULR_PROJECT_LIVE_TEMP_DIR_NAME << " - ERROR CREATING PATH!!";
+        if (!tempDir.mkdir(DEFAULT_PROJECT_LIVE_TEMP_DIR_NAME)) {
+            qWarning() << "ProjectModel::initProject - livetemp: " << DEFAULT_PROJECT_LIVE_TEMP_DIR_NAME << " - ERROR CREATING PATH!!";
 
             return false;
         }
@@ -267,7 +283,7 @@ bool ProjectModel::loadProject(const QString& aFileName)
 
     // Open File For Reading
     if (jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        //qDebug() << "ProjectModel::loadProject - aFileName: " << aFileName;
+        qDebug() << "ProjectModel::loadProject - aFileName: " << aFileName;
         // Init JSON Content
         QString jsonContent;
         // Read All
@@ -290,6 +306,7 @@ bool ProjectModel::loadProject(const QString& aFileName)
         emit baseComponentsDirChanged(baseComponentsDir());
         emit componentsDirChanged(componentsDir());
         emit viewsDirChanged(viewsDir());
+        emit dataSourcesDirChanged(dataSourcesDir());
         emit importPathsChanged(importPaths());
         emit pluginPathsChanged(pluginPaths());
 
@@ -301,6 +318,8 @@ bool ProjectModel::loadProject(const QString& aFileName)
         createComponentsModel();
         // Create Views Model
         createViewsModel();
+        // Create Data Sources Model
+        createDataSourcesModel();
 
         // Update Base Components
         updateBaseComponents();
@@ -417,6 +436,15 @@ void ProjectModel::closeProject(const bool& aSave)
         // Set Views Model
         setViewsModel(mViews);
     }
+
+    // Check Data Sources
+    if (mDataSources) {
+        // Delete Data Sources Model
+        delete mDataSources;
+        mDataSources = NULL;
+        // Set Data Sources
+        setDataSourcesModel(mDataSources);
+    }
 }
 
 //==============================================================================
@@ -477,9 +505,6 @@ ComponentInfo* ProjectModel::createBaseComponent(const QString& aName,
         newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
     }
 
-    // Create Base Components Model
-    createBaseComponentsModel();
-
     // Add To Base Components
     mBaseComponents->addBaseComponent(newComponent);
 
@@ -519,9 +544,6 @@ ComponentInfo* ProjectModel::createComponent(const QString& aName, const QString
         newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
     }
 
-    // Create Components Model
-    createComponentsModel();
-
     // Add To Components
     mComponents->addComponent(newComponent);
 
@@ -558,14 +580,40 @@ ComponentInfo* ProjectModel::createView(const QString& aName, const QString& aBa
     newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
     newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
 
-    // Create Views Model
-    createViewsModel();
-
     // Add To Views
     mViews->addView(newComponent);
 
     // Emit View Created Signal
     emit viewCreated(newComponent, aWidth, aHeight);
+
+    return newComponent;
+}
+
+//==============================================================================
+// Create Data Source
+//==============================================================================
+ComponentInfo* ProjectModel::createDataSource(const QString& aName, const QString& aBaseName)
+{
+    // Check Data Sources Model
+    if (!mDataSources) {
+        return NULL;
+    }
+
+    // Get Data Source
+    ComponentInfo* dataSource = mDataSources->getDataSource(aName);
+    // Check Data Source
+    if (dataSource) {
+        return dataSource;
+    }
+
+    // Create New Data Source Component
+    ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_DATASOURCE, COMPONENT_CATEGORY_NONVISUAL, this, aBaseName);
+
+    // Add Data Source
+    mDataSources->addDataSource(newComponent);
+
+    // Emit Data Source Created Signal
+    emit dataSourceCreated(newComponent);
 
     return newComponent;
 }
@@ -812,7 +860,7 @@ void ProjectModel::setViewsDir(const QString& aViewsDir)
         // Set Views Dir
         mProperties[JSON_KEY_PROJECT_VIEWS_DIR] = aViewsDir;
 
-        //Check Views Model
+        // Check Views Model
         if (mViews) {
             // Set Views Dir
             mViews->setViewsDir(aViewsDir);
@@ -826,11 +874,42 @@ void ProjectModel::setViewsDir(const QString& aViewsDir)
 }
 
 //==============================================================================
+// Get Data Sources Dir
+//==============================================================================
+QString ProjectModel::dataSourcesDir()
+{
+    return mProperties[JSON_KEY_PROJECT_DATASOURCES_DIR].toString();
+}
+
+//==============================================================================
+// Set Data Sources Dir
+//==============================================================================
+void ProjectModel::setDataSourcesDir(const QString& aDataSourcesDir)
+{
+    // Check Views Dir
+    if (aDataSourcesDir != dataSourcesDir()) {
+        // Set Views Dir
+        mProperties[JSON_KEY_PROJECT_DATASOURCES_DIR] = aDataSourcesDir;
+
+        // Check Data Sources Model
+        if (mDataSources) {
+            // Set Set Data Sources Dir
+            mDataSources->setDataSourcesDir(aDataSourcesDir);
+        }
+
+        // Emit Data Sources Dir Changed Signal
+        emit dataSourcesDirChanged(mProperties[JSON_KEY_PROJECT_DATASOURCES_DIR].toString());
+        // Set Dirty Properties
+        setDirty(true);
+    }
+}
+
+//==============================================================================
 // Get Live Temp Dir
 //==============================================================================
 QString ProjectModel::liveTempDir()
 {
-    return QString("%1/%2").arg(mProperties[JSON_KEY_PROJECT_DIR].toString()).arg(DEFAULR_PROJECT_LIVE_TEMP_DIR_NAME);
+    return QString("%1/%2").arg(mProperties[JSON_KEY_PROJECT_DIR].toString()).arg(DEFAULT_PROJECT_LIVE_TEMP_DIR_NAME);
 }
 
 //==============================================================================
@@ -1035,6 +1114,14 @@ ViewsModel* ProjectModel::viewsModel()
 }
 
 //==============================================================================
+// Get Data Sources Model
+//==============================================================================
+DataSourcesModel* ProjectModel::dataSourcesModel()
+{
+    return mDataSources;
+}
+
+//==============================================================================
 // Get Component By Name
 //==============================================================================
 ComponentInfo* ProjectModel::getComponentByName(const QString& aName, const QString& aType, const bool& aPreload)
@@ -1079,6 +1166,16 @@ ComponentInfo* ProjectModel::getComponentByName(const QString& aName, const QStr
         }
     }
 
+    // Check Data Sources
+    if (mDataSources && ((aType == COMPONENT_TYPE_DATASOURCE) || (aType == ""))) {
+        // Get Data Source
+        cInfo = mDataSources->getDataSource(aName, aPreload);
+        // Check Component Info
+        if (cInfo) {
+            return cInfo;
+        }
+    }
+
     return cInfo;
 }
 
@@ -1107,7 +1204,7 @@ ComponentInfo* ProjectModel::getComponentByPath(const QString& aFilePath)
     ComponentInfo* cInfo = NULL;
 
     // Check For Base Compoennts
-    if (cFileInfo.absolutePath() == mProperties[JSON_KEY_PROJECT_BASECOMPONENTS_DIR].toString()) {
+    if (mBaseComponents && cFileInfo.absolutePath() == mProperties[JSON_KEY_PROJECT_BASECOMPONENTS_DIR].toString()) {
         // Get Component Info
         cInfo = mBaseComponents->getComponent(cFileInfo.baseName());
         // Check Component Info
@@ -1117,7 +1214,7 @@ ComponentInfo* ProjectModel::getComponentByPath(const QString& aFilePath)
     }
 
     // Check For Compoennts
-    if (cFileInfo.absolutePath() == mProperties[JSON_KEY_PROJECT_COMPONENTS_DIR].toString()) {
+    if (mComponents && cFileInfo.absolutePath() == mProperties[JSON_KEY_PROJECT_COMPONENTS_DIR].toString()) {
         // Get Component Info
         cInfo = mComponents->getComponent(cFileInfo.baseName());
         // Check Component Info
@@ -1127,9 +1224,19 @@ ComponentInfo* ProjectModel::getComponentByPath(const QString& aFilePath)
     }
 
     // Check For Compoennts
-    if (cFileInfo.absolutePath() == mProperties[JSON_KEY_PROJECT_VIEWS_DIR].toString()) {
+    if (mViews && cFileInfo.absolutePath() == mProperties[JSON_KEY_PROJECT_VIEWS_DIR].toString()) {
         // Get Component Info
         cInfo = mViews->getView(cFileInfo.baseName());
+        // Check Component Info
+        if (cInfo) {
+            return cInfo;
+        }
+    }
+
+    // Check For Compoennts
+    if (mDataSources && cFileInfo.absolutePath() == mProperties[JSON_KEY_PROJECT_DATASOURCES_DIR].toString()) {
+        // Get Component Info
+        cInfo = mDataSources->getDataSource(cFileInfo.baseName());
         // Check Component Info
         if (cInfo) {
             return cInfo;
