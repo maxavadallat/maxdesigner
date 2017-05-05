@@ -292,7 +292,9 @@ QVariant ComponentsModel::data(const QModelIndex& index, int role) const
         switch (role) {
             case Qt::DisplayRole:
             case Qt::UserRole:
-            case ECRName: return component->mName;
+            case ECRName:   return component->mName;
+            case ECRDirty:  return component->mDirty;
+            case ECRVisual: return (component->mCategory != COMPONENT_CATEGORY_NONVISUAL);
         }
     }
 
@@ -308,7 +310,9 @@ QHash<int,QByteArray> ComponentsModel::roleNames() const
     QHash<int,QByteArray> rNames;
 
     // Set Role Names
-    rNames[ECRName] = "cName";
+    rNames[ECRName]     = "cName";
+    rNames[ECRDirty]    = "cDirty";
+    rNames[ECRVisual]   = "cVisual";
 
     return rNames;
 }

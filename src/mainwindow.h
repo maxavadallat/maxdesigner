@@ -237,6 +237,10 @@ private slots:
     void on_actionSaveProject_triggered();
     // Action Save Project As Triggered Slot
     void on_actionSaveProjectAs_triggered();
+    // Action Save Component Triggered Slot
+    void on_actionSaveComponent_triggered();
+    // Action Save All Components Triggered Slot
+    void on_actionSaveAllComponents_triggered();
     // Action Project Properties Triggered Slot
     void on_actionProjectProperties_triggered();
     // Action Close Project Triggered Slot
@@ -279,7 +283,6 @@ private slots:
 protected: // from QMainWindow
     // Key Release Event
     virtual void keyReleaseEvent(QKeyEvent* aEvent);
-
     // Event
     virtual bool event(QEvent* aEvent);
 

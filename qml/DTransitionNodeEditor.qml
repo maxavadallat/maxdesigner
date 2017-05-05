@@ -353,12 +353,12 @@ DPaneBase {
             visible: transitionNodeEditorRoot.nodeType === 3
 
             model: [
-                DPopupItemObject { text: "Easing.Linear" },
-                DPopupItemObject { text: "Easing.InQuad" },
-                DPopupItemObject { text: "Easing.OutQuad" },
-                DPopupItemObject { text: "Easing.InOutQuad" },
-                DPopupItemObject { text: "Easing.OutInQuad" },
-                DPopupItemObject { text: "more" }
+                { text: "Easing.Linear" },
+                { text: "Easing.InQuad" },
+                { text: "Easing.OutQuad" },
+                { text: "Easing.InOutQuad" },
+                { text: "Easing.OutInQuad" },
+                { text: "more" }
             ]
 
             onKeyEvent: {

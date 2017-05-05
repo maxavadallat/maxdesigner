@@ -9,9 +9,10 @@ DControl {
     width: CONSTS.defaultOptionWidth
     height: CONSTS.defaultOptionHeight
 
-    property list<QtObject> model
+    property var model: []
 
     property int currentIndex: -1
+    property int count: 0//optionRoot.model.length
 
     readonly property string stateOpen: "open"
     readonly property string stateClosed: "closed"
@@ -19,19 +20,45 @@ DControl {
     property real unCheckedOpacity: 0.0
     property int unCheckedHeight: 0
 
+    property bool optionInitCompleted: false
+
     state: stateClosed
 
     signal itemSelected(var itemIndex)
     signal keyEvent(var event)
 
+    Component.onCompleted: {
+        //console.log("DOption.onCompleted");
+
+        // Build Item Model
+        buildItemModel();
+
+        // Set Option Init Completed
+        optionRoot.optionInitCompleted = true;
+
+        // Chekc Current Index
+        if (currentIndex === -1) {
+            // Set Current Index
+            optionRoot.currentIndex = (optionRoot.model.length > 0 ? 0 : -1)
+        }
+    }
+
     onModelChanged: {
-        // Set Current Index
-        optionRoot.currentIndex = (optionRoot.model.length > 0 ? 0 : -1)
+        // Check If Init Completed
+        if (optionRoot.optionInitCompleted) {
+            //console.log("DOption.onModelChanged - model: " + optionRoot.model + " - length: " + optionRoot.model.length);
+
+            // Build Item Model
+            buildItemModel();
+        }
     }
 
     onCurrentIndexChanged: {
-        // Set Item Checked
-        setItemChecked(optionRoot.currentIndex);
+        // Check If Init Completed
+        if (optionRoot.optionInitCompleted) {
+            // Set Item Checked
+            setItemChecked(optionRoot.currentIndex);
+        }
     }
 
     onItemSelected: {
@@ -39,8 +66,75 @@ DControl {
         optionRoot.state = optionRoot.stateClosed;
     }
 
+    // Build Item Model
+    function buildItemModel() {
+        //console.log("DOption.buildItemModel - length: " + optionRoot.model.length);
+
+        // Iterate Through Initial Model
+        for (var i=0; i<optionRoot.model.length; i++) {
+            // Get Model Item Data
+            var mData = optionRoot.model[i];
+            //console.log("DOption.buildItemModel - mData[" + i + "]: " + mData)
+            // Get Item Text
+            var itemText = mData.text;
+            // Get Item Checked State
+            var itemChecked = mData.hasOwnProperty("checked") ? mData.checked : false;
+            // Get Item Disabled State
+            var itemDisabled = mData.hasOwnProperty("disabled") ? mData.disabled : false;
+            // Create New Item Object
+            var newObject = newItemComponent.createObject(optionRoot, { "text": itemText, "checked": itemChecked, "disabled": itemDisabled});
+            // Replace Item
+            optionRoot.model.splice(i, 1, newObject);
+        }
+
+        // Set Count
+        optionRoot.count = optionRoot.model.length;
+    }
+
+    // Clear Item Model
+    function clearItemModel() {
+        // Clear Item Model
+        optionRoot.model.splice(0, optionRoot.model.length);
+        // Set Count
+        optionRoot.count = optionRoot.model.length;
+        // Reset Current Index
+        optionRoot.currentIndex = -1;
+    }
+
+    // Append Item
+    function appendItem(newItemText, disabled) {
+        //console.log("DOption.appendItem - newItemText: " + newItemText);
+        // Create New Item Object
+        var newObject = newItemComponent.createObject(optionRoot, { "text": newItemText, "checked": false, "disabled": disabled});
+        // Append To Item Model
+        optionRoot.model.push(newObject);
+        // Set Count
+        optionRoot.count = optionRoot.model.length;
+
+        // Check Current Index
+        if (optionRoot.currentIndex === -1 && optionRoot.count > 0) {
+            // Set Current Index
+            optionRoot.currentIndex = 0;
+        }
+    }
+
+    // Remove Item
+    function removeItem(index) {
+        // Remove Item
+        optionRoot.model.splice(index, 1);
+        // Set Count
+        optionRoot.count = optionRoot.model.length;
+
+        // Check Count
+        if (optionRoot.count === 0) {
+            // Reset Current Index
+            optionRoot.currentIndex = -1;
+        }
+    }
+
     // Set Option Focus
     function setOptionFocus(aFocus) {
+        // Set Focus
         optionPopup.focus = aFocus;
     }
 
@@ -60,20 +154,32 @@ DControl {
 
     // Set Item Checked
     function setItemChecked(checkedIndex) {
-        // Get Count
-        var mCount = optionRoot.model.length;
+        //console.log("DOption.setItemChecked - checkedIndex: " + checkedIndex);
+
         // Iterate Thru Model
-        for (var i=0; i<mCount; i++) {
+        for (var i=0; i<optionRoot.model.length; i++) {
             // Check Checked Index
             optionRoot.model[i].checked = (i === checkedIndex);
         }
+
+//        // Set Count
+//        optionRoot.count = optionRoot.model.length;
     }
 
+    // New Item Component
+    Component {
+        id: newItemComponent
+        DPopupItemObject { }
+    }
+
+    // Option Popup
     DRectangle {
         id: optionPopup
         width: optionRoot.width
         height: optionRoot.height
+
         border.color: focus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
+
         onFocusChanged: {
             if (!optionPopup.focus) {
                 // Set State
@@ -127,16 +233,29 @@ DControl {
             Repeater {
                 id: optionRepeater
 
-                model: optionRoot.model
+                model: optionRoot.count
+
+//                delegate: Rectangle {
+//                    width: optionColumn.width
+//                    height: DStyle.popupItemHeight
+//                    color: "transparent"
+//                    border.color: "orange"
+//                }
 
                 delegate: DPopupItem {
                     id: delegateRoot
-                    width: optionPopup.width
+
+                    width: optionColumn.width
                     height: checked ? optionRoot.height : optionRoot.unCheckedHeight
+
                     itemIndex: index
-                    text: model.text !== undefined ? model.text : optionRoot.model[index].text
-                    checked: model.checked !== undefined ? model.checked : optionRoot.model[index].checked
+
+                    property var itemData: optionRoot.model[index]
+
+                    text: optionRoot.model[index].text
+                    checked: optionRoot.model[index].checked
                     opacity: checked ? 1.0 : optionRoot.unCheckedOpacity
+
                     preventStealing: true
 
                     onClicked: {

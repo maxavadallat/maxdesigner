@@ -63,7 +63,9 @@ private: // Data
     // Item Field Roles
     enum EBCItemRoles {
         EBCRName = Qt::UserRole + 1,
-        EBCRBuiltIn
+        EBCRBuiltIn,
+        EBCRDirty,
+        EBCRVisual
     };
 
     // Project Model

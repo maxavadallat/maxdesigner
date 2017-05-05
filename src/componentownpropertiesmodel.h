@@ -110,6 +110,9 @@ public:
     enum OPMRoles {
         PropertyNameRole = Qt::UserRole + 1,
         PropertyTypeRole,
+        PropertyEnumsRole,
+        PropertyMinRole,
+        PropertyMaxRole,
         PropertyValueRole,
         PropertyIsBind,
         PropertyIsFormula,

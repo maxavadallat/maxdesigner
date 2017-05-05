@@ -12,10 +12,9 @@ QT                  += core gui widgets quickwidgets qml quick
 SOURCES             += src/main.cpp \
                     src/designerapplication.cpp \
                     src/qmlprojectparser.cpp \
-#                    src/qmlparser.cpp \
-#                    src/qmlgenerator.cpp \
                     src/designereventfilter.cpp \
-                    src/designerimageprovider.cpp
+                    src/designerimageprovider.cpp \
+                    src/utils.cpp
 
 # Model Sources
 SOURCES             += src/settingscontroller.cpp \
@@ -63,13 +62,12 @@ HEADERS             += src/designerapplication.h \
                     src/settingskeys.h \
                     src/defaultsettings.h \
                     src/qmlprojectparser.h \
-#                    src/qmlparser.h \
-#                    src/qmlgenerator.h \
                     src/propertiescontroller.h \
                     src/designereventfilter.h \
                     src/designerimageprovider.h \
                     src/designerfilesortproxy.h \
-                    src/uiengineinterface.h
+                    src/uiengineinterface.h \
+                    src/utils.h
 
 # Model Headers
 HEADERS             += src/settingscontroller.h \

@@ -43,13 +43,15 @@ DContainer {
 
 
     Component.onCompleted: {
-//        // Open Project
-//        mainController.openProject("/Users/max/Dev/Volvo/myproject/myproject.json");
-//        // Seelect Component
-//        propertiesController.selectComponent("AppTile", 0);
+        // Open Project
+        //mainController.openProject("/Users/max/Dev/Volvo/myproject/myproject.json");
+        // Seelect Component
+        //propertiesController.selectComponent("AppTile", 0);
 
-        propertyEditor.show();
+        // Show Property Editor
+        //propertyEditor.show();
     }
+
 
     DButton {
         anchors.horizontalCenter: parent.horizontalCenter
@@ -89,6 +91,101 @@ DContainer {
         creationX: initialX - propertyEnumValueEditor.width * 0.5
         creationY: initialY + 32
     }
+
+
+
+/*
+    DOption {
+        id: demoOption
+        anchors.centerIn: parent
+
+        model: [
+            { "text": "Option 1", "checked": false },
+            { "text": "Option 2" },
+            { "text": "Option 3", "disabled": false },
+            { "text": "Option 4" },
+        ]
+    }
+
+    DButton {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 32
+        text: "Add Item"
+        onClicked: {
+            demoOption.appendItem("Item " + demoOption.count);
+        }
+    }
+*/
+
+/*
+    property var demoModel: []
+
+    property int demoCount: demoModel.length
+
+    function appendItem(newIndex) {
+        demoModel.push({ title: ("Option " + newIndex)  });
+        demoCount = demoModel.length;
+    }
+
+    function removeItem(index) {
+        demoModel.splice(index, 1);
+        demoCount = demoModel.length;
+    }
+
+    function clearItems() {
+        demoModel.splice(0, demoModel.length);
+        demoCount = demoModel.length;
+    }
+
+    DFlow {
+        id: demoFlow
+        width: parent.width * 0.4
+
+        anchors.centerIn: parent
+        spacing: DStyle.defaultSpacing
+
+        Repeater {
+            id: demoRepeater
+
+            model: demoCount
+
+            delegate: DTag {
+                width: demoFlow.width
+                //height: 80
+
+                tagTitle: demoModel[index].title
+
+                onRemoveClicked: {
+                    removeItem(index);
+                }
+            }
+        }
+    }
+
+    Row {
+        height: 80
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        spacing: DStyle.defaultSpacing
+
+        DButton {
+            anchors.verticalCenter: parent.verticalCenter
+            text: "Add"
+            onClicked: {
+                appendItem(demoCount + 1);
+            }
+        }
+
+        DButton {
+            anchors.verticalCenter: parent.verticalCenter
+            text: "Clear"
+            onClicked: {
+                clearItems();
+            }
+        }
+    }
+*/
 
 /*
     DComponentRootContainer {

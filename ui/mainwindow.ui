@@ -76,6 +76,8 @@
     <addaction name="separator"/>
     <addaction name="actionOpenFileOrProject"/>
     <addaction name="separator"/>
+    <addaction name="actionSaveComponent"/>
+    <addaction name="actionSaveAllComponents"/>
     <addaction name="actionSaveProject"/>
     <addaction name="actionSaveProjectAs"/>
     <addaction name="separator"/>
@@ -286,9 +288,6 @@
    <property name="text">
     <string>Save Project</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+S</string>
-   </property>
   </action>
   <action name="actionSaveProjectAs">
    <property name="enabled">
@@ -296,9 +295,6 @@
    </property>
    <property name="text">
     <string>Save Project As</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+S</string>
    </property>
   </action>
   <action name="actionGenerateQMLSources">
@@ -466,6 +462,28 @@
    </property>
    <property name="text">
     <string>Remove Data Source</string>
+   </property>
+  </action>
+  <action name="actionSaveComponent">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Save Component</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionSaveAllComponents">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Save All Components</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
  </widget>

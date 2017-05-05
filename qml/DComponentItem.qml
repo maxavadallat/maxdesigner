@@ -14,6 +14,7 @@ Item {
     property string title: "Component"
     property bool builtIn: false
     property bool visual: true
+    property bool dirty: false
 
     property QtObject componentInfo: null
 
@@ -127,6 +128,7 @@ Item {
         DRectangle {
             id: dragContainerBG
             anchors.fill: parent
+            color: componentItemRoot.visual ? DStyle.colorBG : "transparent"
             border.color: dragContainer.focus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
         }
 
@@ -196,5 +198,17 @@ Item {
                 }
             }
         ]
+    }
+
+    Rectangle {
+        width: 4
+        height: 4
+        anchors.right: parent.right
+        anchors.rightMargin: DStyle.defaultMargin
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: DStyle.defaultMargin
+        radius: width * 0.5
+        color: DStyle.colorBorder
+        visible: componentItemRoot.dirty
     }
 }

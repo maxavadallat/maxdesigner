@@ -152,7 +152,7 @@ bool BaseComponentsModel::addBaseComponent(ComponentInfo* aComponent)
         // Get Component Name
         QString cName = aComponent->mName;
 
-        // Check Base Component
+        // Get Base Component
         ComponentInfo* component = mBaseComponents.value(cName);
 
         // Check Component
@@ -299,8 +299,10 @@ QVariant BaseComponentsModel::data(const QModelIndex& index, int role) const
         switch (role) {
             case Qt::DisplayRole:
             case Qt::UserRole:
-            case EBCRName:        return component->mName;
-            case EBCRBuiltIn:     return component->mBuiltIn;
+            case EBCRName:          return component->mName;
+            case EBCRBuiltIn:       return component->mBuiltIn;
+            case EBCRDirty:         return component->mDirty;
+            case EBCRVisual:        return (component->mCategory != COMPONENT_CATEGORY_NONVISUAL);
         }
     }
 
@@ -310,14 +312,16 @@ QVariant BaseComponentsModel::data(const QModelIndex& index, int role) const
 //==============================================================================
 // Get Role Names
 //==============================================================================
-QHash<int,QByteArray> BaseComponentsModel::roleNames() const
+QHash<int, QByteArray> BaseComponentsModel::roleNames() const
 {
     // Init Role Names
-    QHash<int,QByteArray> rNames;
+    QHash<int, QByteArray> rNames;
 
     // Set Role Names
     rNames[EBCRName]    = "cName";
     rNames[EBCRBuiltIn] = "cBuiltIn";
+    rNames[EBCRDirty]   = "cDirty";
+    rNames[EBCRVisual]  = "cVisual";
 
     return rNames;
 }

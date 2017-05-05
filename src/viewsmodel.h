@@ -61,7 +61,8 @@ private: // Data
 
     // Item Field Roles
     enum EVItemRoles {
-        EVRName = Qt::UserRole + 1
+        EVRName = Qt::UserRole + 1,
+        EVRDirty
     };
 
     // Project Model

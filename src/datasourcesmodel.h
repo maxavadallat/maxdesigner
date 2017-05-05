@@ -57,7 +57,8 @@ public: // from QAbstractListModel
 private: // Data
     // Item Field Roles
     enum EDSItemRoles {
-        EDSRName = Qt::UserRole + 1
+        EDSRName = Qt::UserRole + 1,
+        EDSRDirty
     };
 
     // Project Model

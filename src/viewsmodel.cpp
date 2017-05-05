@@ -294,6 +294,7 @@ QVariant ViewsModel::data(const QModelIndex& index, int role) const
             case Qt::DisplayRole:
             case Qt::UserRole:
             case EVRName:  return component->mName;
+            case EVRDirty: return component->mDirty;
         }
     }
 
@@ -309,7 +310,8 @@ QHash<int,QByteArray> ViewsModel::roleNames() const
     QHash<int,QByteArray> rNames;
 
     // Set Role Names
-    rNames[EVRName] = "vName";
+    rNames[EVRName]     = "vName";
+    rNames[EVRDirty]    = "vDirty";
 
     return rNames;
 }

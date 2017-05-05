@@ -20,7 +20,6 @@ DPaneBase {
     property int propertyIndex: -1
 
     property var enumValues: []
-    property var defaultOptionValues: []
 
     property Connections enumValueEditorConnections: Connections {
         target: childPane
@@ -28,6 +27,8 @@ DPaneBase {
         onRejected: {
             // Set Type Options Enabled
             typeOption.enabled = true;
+            // Set Button Enabled State
+            addEnumValueButton.enabled = true;
 //            // Set Option Focus
 //            typeOption.setOptionFocus(true);
             // Set Editor Focus
@@ -37,6 +38,8 @@ DPaneBase {
         onAccepted: {
             // Set Type Options Enabled
             typeOption.enabled = true;
+            // Set Button Enabled State
+            addEnumValueButton.enabled = true;
             // Set Editor Focus
             nameEditor.setEditorFocus(true, true);
             // Add Enum Value
@@ -62,7 +65,7 @@ DPaneBase {
         // Check New State
         if (newState === stateShown) {
             // Reset Property Editor
-            resetPropertyEditor();
+            //resetPropertyEditor();
         }
 
         // Check New State
@@ -79,6 +82,12 @@ DPaneBase {
             nameEditor.setEditorFocus(true, true);
             // Set Clip Content
             propertyEditorRoot.clipContent = false;
+
+            // Reset Creation Height
+            propertyEditorRoot.creationHeight = Qt.binding(function() { return propertyFieldsColumn.height + 48; });
+            // reset Min Height
+            propertyEditorRoot.minHeight = Qt.binding(function() { return propertyFieldsColumn.height + 48; });
+
         } else if (newState === stateCreate) {
             // Reset Property Editor
             resetPropertyEditor();
@@ -87,21 +96,20 @@ DPaneBase {
 
     // Reset Property Editor
     function resetPropertyEditor() {
-        // Check New Property
-        if (propertyEditorRoot.newProperty) {
-            // Reset Property Name
-            propertyEditorRoot.propertyName = "";
-            // Reset Property Type
-            propertyEditorRoot.propertyType = 0;
-            // Clear Enum Values
-            propertyEditorRoot.clearEnumValues();
-            // Reset Default Value
-            propertyEditorRoot.propertyDefault = "";
-            // Reset Child Pane
-            propertyEditorRoot.childPane.resetEnumValueEditor();
-        } else {
+        // Reset Type Option
+        typeOption.currentIndex = 0;
+        // Reset Property Name
+        propertyEditorRoot.propertyName = "";
+        // Reset Property Type
+        propertyEditorRoot.propertyType = 0;
+        // Clear Enum Values
+        propertyEditorRoot.clearEnumValues();
+        // Reset Default Value
+        propertyEditorRoot.propertyDefault = "";
+        // Reset Child Pane
+        propertyEditorRoot.childPane.resetEnumValueEditor();
 
-        }
+        // ...
     }
 
     // Check IF Property Valid
@@ -126,19 +134,8 @@ DPaneBase {
         // Emit Enum Values Changed Signal
         propertyEditorRoot.enumValuesChanged();
 
-        // Push New Item To Default Option Values
-        propertyEditorRoot.defaultOptionValues.push({ text: newValue, checked: true });
-
-        //console.log("addEnumValue - length: " + propertyEditorRoot.defaultOptionValues.length);
-        //console.log("addEnumValue - checked: " + propertyEditorRoot.defaultOptionValues[propertyEditorRoot.defaultOptionValues.length - 1].checked);
-
-        // Set Default Value Options Model
-        //defaultOption.model = propertyEditorRoot.defaultOptionValues;
-
-//        // Add New Default Option Item
-//        defaultOption.model.push({ 'text': newValue });
-
-        // ...
+        // Append Default Value Item
+        defaultOption.appendItem(newValue, false);
     }
 
     // Remove Enum Value
@@ -148,18 +145,8 @@ DPaneBase {
         // Emit Enum Values Changed Signal
         propertyEditorRoot.enumValuesChanged();
 
-        // Remove Default Option Value
-        propertyEditorRoot.defaultOptionValues.splice(index, 1);
-
-        console.log("removeEnumValue - length: " + propertyEditorRoot.defaultOptionValues.length);
-
-        // Set Default Value Options Model
-        //defaultOption.model = propertyEditorRoot.defaultOptionValues;
-
-//        // Remove Default Option Item
-//        defaultOption.model.splice(index, 1);
-
-        // ...
+        // Remove Default Value Item
+        defaultOption.removeItem(index);
     }
 
     // Clear Enum Values
@@ -169,19 +156,8 @@ DPaneBase {
         // Emit Enum Values Changed Signal
         propertyEditorRoot.enumValuesChanged();
 
-        // Clear Items
-        propertyEditorRoot.defaultOptionValues.splice(0, propertyEditorRoot.defaultOptionValues.length);
-        //propertyEditorRoot.defaultOptionValues.clear();
-
-        console.log("clearEnumValues - length: " + propertyEditorRoot.defaultOptionValues.length);
-
-        // Set Default Value Options Model
-        defaultOption.model = propertyEditorRoot.defaultOptionValues;
-
-//        // Remove First Element
-//        defaultOption.model = propertyEditorRoot.defaultOptionValues;
-
-        // ...
+        // Clear Item Model
+        defaultOption.clearItemModel();
     }
 
     DDisc {
@@ -286,16 +262,16 @@ DPaneBase {
                 anchors.verticalCenter: parent.verticalCenter
 
                 model: [
-                    DPopupItemObject { text: CONSTS.propertyTypes[0] },
-                    DPopupItemObject { text: CONSTS.propertyTypes[1] },
-                    DPopupItemObject { text: CONSTS.propertyTypes[2] },
-                    DPopupItemObject { text: CONSTS.propertyTypes[3] },
-                    DPopupItemObject { text: CONSTS.propertyTypes[4] },
-                    DPopupItemObject { text: CONSTS.propertyTypes[5] },
-                    DPopupItemObject { text: CONSTS.propertyTypes[6] },
-                    DPopupItemObject { text: CONSTS.propertyTypes[7] },
-                    DPopupItemObject { text: CONSTS.propertyTypes[8] },
-                    DPopupItemObject { text: CONSTS.propertyTypes[9] }
+                    { text: CONSTS.propertyTypes[0] },
+                    { text: CONSTS.propertyTypes[1] },
+                    { text: CONSTS.propertyTypes[2] },
+                    { text: CONSTS.propertyTypes[3] },
+                    { text: CONSTS.propertyTypes[4] },
+                    { text: CONSTS.propertyTypes[5] },
+                    { text: CONSTS.propertyTypes[6] },
+                    { text: CONSTS.propertyTypes[7] },
+                    { text: CONSTS.propertyTypes[8] },
+                    { text: CONSTS.propertyTypes[9] }
                 ]
 
                 onZChanged: {
@@ -320,16 +296,6 @@ DPaneBase {
                     //console.log("DPropertyEditor.typeOption.onItemSelected - currentIndex: " + typeOption.currentIndex);
                     // Set Focus
                     nameEditor.setEditorFocus(true, true);
-//                    // Switch Selected Index
-//                    switch (itemIndex) {
-//                        default:    defaultEditor.text = "";        break;
-//                        case 1:     defaultEditor.text = "false";   break;
-//                        case 2:     defaultEditor.text = "0";       break;
-//                        case 3:
-//                        case 4:     defaultEditor.text = "0.0";     break;
-//                        case 5:
-//                        case 6:     defaultEditor.text = "null";    break;
-//                    }
                 }
 
                 onKeyEvent: {
@@ -392,6 +358,8 @@ DPaneBase {
             onClicked: {
                 // Set Type Options Enabled
                 typeOption.enabled = false;
+                // Set Button Enabled State
+                addEnumValueButton.enabled = false;
                 // Emit New Enum Value Signal
                 propertyEditorRoot.newEnumValue();
             }

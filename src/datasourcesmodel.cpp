@@ -273,6 +273,7 @@ QVariant DataSourcesModel::data(const QModelIndex& index, int role) const
         switch (role) {
             default:
             case EDSRName:  return dataSource->mName;
+            case EDSRDirty: return dataSource->mDirty;
         }
     }
 
@@ -289,6 +290,7 @@ QHash<int, QByteArray> DataSourcesModel::roleNames() const
 
     // Set Role Names
     rNames[EDSRName]    = "dsName";
+    rNames[EDSRDirty]   = "dsDirty";
 
     return rNames;
 }

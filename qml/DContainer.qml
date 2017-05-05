@@ -42,6 +42,8 @@ DMouseArea {
 
     property QtObject parentContainer: null
 
+    property int borderMargins: 0
+
     drag.target: enableDrag ? containerRoot : undefined
 
     drag.minimumX: 0
@@ -150,6 +152,7 @@ DMouseArea {
     DRectangle {
         id: containerBG
         anchors.fill: parent
+        anchors.margins: containerRoot.borderMargins
         visible: containerRoot.showBackground
         border.color: containerRoot.borderColor
     }

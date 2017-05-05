@@ -196,6 +196,8 @@ DContainer {
         return DStyle.colorBorderNoFocus;
     }
 
+    borderMargins: -1
+
     radius: 0
 
     enablePosOverlay: true

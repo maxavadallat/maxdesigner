@@ -42,7 +42,7 @@ DPane {
             //console.log("ProjectPane.currentProjectConnection.onComponentCreated - aComponent: " + aComponent);
 
             // Open Components Section
-            ownComponentsSection.open();
+            componentsSection.open();
         }
 
         onViewCreated: {
@@ -103,6 +103,8 @@ DPane {
                     id: baseComponentItemDelegateRoot
                     title: cName
                     builtIn: cBuiltIn
+                    dirty: cDirty
+                    visual: cVisual
                     componentInfo: mainController.currentProject.baseComponentsModel.getComponentByIndex(index);
                     onGrabbedChanged: {
                         // Bring Section To Top
@@ -129,7 +131,7 @@ DPane {
     }
 
     DSection {
-        id: ownComponentsSection
+        id: componentsSection
         width: projectPaneRoot.contentWidth
         title: "Components"
         minHeight: componentsRepeater.count > 0 ? componentsFlow.height : 200
@@ -147,12 +149,14 @@ DPane {
                 delegate: DComponentItem {
                     id: componentItemDelegateRoot
                     title: cName
+                    dirty: cDirty
+                    visual: cVisual
                     componentInfo: mainController.currentProject.componentsModel.getComponentByIndex(index);
                     onGrabbedChanged: {
                         // Bring Section To Top
-                        ownComponentsSection.z = grabbed ? 0.1 : 0.0;
+                        componentsSection.z = grabbed ? 0.1 : 0.0;
                         // Disable Content Clip
-                        ownComponentsSection.clipContent = !grabbed;
+                        componentsSection.clipContent = !grabbed;
                     }
                 }
             }
@@ -160,7 +164,7 @@ DPane {
 
         DNoContent {
             width: projectPaneRoot.contentWidth
-            height: componentsRepeater.count === 0 ? ownComponentsSection.minHeight : 0
+            height: componentsRepeater.count === 0 ? componentsSection.minHeight : 0
             opacity: componentsRepeater.count === 0 ? 0.2 : 0.0
 
             DText {
@@ -191,6 +195,7 @@ DPane {
                 delegate: DComponentItem {
                     id: viewItemDelegateRoot
                     title: vName
+                    dirty: vDirty
                     componentInfo: mainController.currentProject.viewsModel.getViewByIndex(index);
                     onGrabbedChanged: {
                         // Bring Section To Top

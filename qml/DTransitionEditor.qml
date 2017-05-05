@@ -84,11 +84,11 @@ DPaneBase {
             anchors.verticalCenter: parent.verticalCenter
 
             model: [
-                DPopupItemObject { text: "Option 1" },
-                DPopupItemObject { text: "Option 2" },
-                DPopupItemObject { text: "Option 3" },
-                DPopupItemObject { text: "Option 4" },
-                DPopupItemObject { text: "Option 5" }
+//                DPopupItemObject { text: "Option 1" },
+//                DPopupItemObject { text: "Option 2" },
+//                DPopupItemObject { text: "Option 3" },
+//                DPopupItemObject { text: "Option 4" },
+//                DPopupItemObject { text: "Option 5" }
             ]
 
             onZChanged: {
@@ -122,11 +122,11 @@ DPaneBase {
             width: fromToRow.optionWidth
             anchors.verticalCenter: parent.verticalCenter
             model: [
-                DPopupItemObject { text: "Option 1" },
-                DPopupItemObject { text: "Option 2" },
-                DPopupItemObject { text: "Option 3" },
-                DPopupItemObject { text: "Option 4" },
-                DPopupItemObject { text: "Option 5" }
+//                DPopupItemObject { text: "Option 1" },
+//                DPopupItemObject { text: "Option 2" },
+//                DPopupItemObject { text: "Option 3" },
+//                DPopupItemObject { text: "Option 4" },
+//                DPopupItemObject { text: "Option 5" }
             ]
 
             onZChanged: {
@@ -161,13 +161,13 @@ DPaneBase {
         anchors.bottomMargin: DStyle.defaultMargin
         currentIndex: 0
         model: [
-            DPopupItemObject { text: "Add New Node" },
-            DPopupItemObject { text: "Add Sequential Animation" },
-            DPopupItemObject { text: "Add Parallel Animation" },
-            DPopupItemObject { text: "Add Property Animation" },
-            DPopupItemObject { text: "Add Property Action" },
-            DPopupItemObject { text: "Add Script Action" },
-            DPopupItemObject { text: "Add Pause Animation" }
+            { text: "Add New Node" },
+            { text: "Add Sequential Animation" },
+            { text: "Add Parallel Animation" },
+            { text: "Add Property Animation" },
+            { text: "Add Property Action" },
+            { text: "Add Script Action" },
+            { text: "Add Pause Animation" }
         ]
 
         onKeyEvent: {

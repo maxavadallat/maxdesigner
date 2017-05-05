@@ -180,7 +180,7 @@ DMouseArea {
             // Clear Text
             textInput.text = "";
             // Emit Accepted Signal
-            textInputRoot.accepted(textInput.text);
+            textInputRoot.textEdited(textInput.text);
         }
     }
 }

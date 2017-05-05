@@ -583,6 +583,7 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
                 default:
                 case PropertyNameRole:      return opKey;
                 case PropertyTypeRole:      return opType;
+                case PropertyEnumsRole:     return QStringList();
                 case PropertyValueRole:     return opValue;
                 case PropertyIsBind:        return opBind;
                 case PropertyIsFormula:     return opFormula;
@@ -605,6 +606,7 @@ QHash<int, QByteArray> ComponentOwnPropertiesModel::roleNames() const
 
     rNames[PropertyNameRole]  = "pName";
     rNames[PropertyTypeRole]  = "pType";
+    rNames[PropertyEnumsRole] = "pEnums";
     rNames[PropertyValueRole] = "pValue";
     rNames[PropertyIsBind]    = "pIsBind";
     rNames[PropertyIsFormula] = "pIsFormula";

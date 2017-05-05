@@ -1734,6 +1734,22 @@ void MainWindow::on_actionSaveProjectAs_triggered()
 }
 
 //==============================================================================
+// Action Save Component Triggered Slot
+//==============================================================================
+void MainWindow::on_actionSaveComponent_triggered()
+{
+    // Save Current Component
+}
+
+//==============================================================================
+// Action Save All Components Triggered Slot
+//==============================================================================
+void MainWindow::on_actionSaveAllComponents_triggered()
+{
+    // Save All Components
+}
+
+//==============================================================================
 // Action Project Properties Triggered Slot
 //==============================================================================
 void MainWindow::on_actionProjectProperties_triggered()
