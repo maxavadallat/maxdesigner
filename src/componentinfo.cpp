@@ -14,6 +14,7 @@
 #include "componentinfo.h"
 #include "projectmodel.h"
 #include "constants.h"
+#include "utils.h"
 
 //==============================================================================
 // Create Component From Component Info File
@@ -70,6 +71,7 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mQMLPath("")
     , mName(aName)
     , mType(aType)
+    , mTag("")
     , mCategory(aCategory)
     , mBaseName(aBaseName)
     , mFocused(false)
@@ -273,6 +275,14 @@ bool ComponentInfo::protoType()
 }
 
 //==============================================================================
+// Get Dirty
+//==============================================================================
+bool ComponentInfo::getDirty()
+{
+    return mDirty;
+}
+
+//==============================================================================
 // Get Component Name
 //==============================================================================
 QString ComponentInfo::componentName()
@@ -313,6 +323,28 @@ void ComponentInfo::setComponentType(const QString& aType)
         mType = aType;
         // Emit Component Type Changed Signal
         emit componentTypeChanged(mType);
+    }
+}
+
+//==============================================================================
+// Component Tag
+//==============================================================================
+QString ComponentInfo::componentTag()
+{
+    return mTag;
+}
+
+//==============================================================================
+// Set Component Tag
+//==============================================================================
+void ComponentInfo::setComponentTag(const QString& aTag)
+{
+    // Check Component Tag
+    if (mTag != aTag) {
+        // Set Component Tag
+        mTag = aTag;
+        // Emit Compoennt Tag Changed Signal
+        emit componentTagChanged(mTag);
     }
 }
 
@@ -790,6 +822,9 @@ QJsonObject ComponentInfo::toJSONObject(const bool& aChild)
     // Set Component Type
     ciObject[JSON_KEY_COMPONENT_TYPE] = QJsonValue(mType);
 
+    // Set Component Tag
+    ciObject[JSON_KEY_COMPONENT_TAG] = QJsonValue(mTag);
+
     // Check If Child Component
     if (!aChild) {
         // Set Category
@@ -899,7 +934,8 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
     setComponentName(aObject[JSON_KEY_COMPONENT_NAME].toString());
     // Set Component Type
     setComponentType(aObject[JSON_KEY_COMPONENT_TYPE].toString());
-
+    // Set Component Tag
+    setComponentTag(aObject[JSON_KEY_COMPONENT_TAG].toString());
     // Check Keys
     if (aObject.keys().indexOf(JSON_KEY_COMPONENT_CATEGORY) >= 0) {
         // Set Component Category
@@ -1178,7 +1214,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
     // Check ID & Object Name
     if (!cID.isEmpty() || !objectName.isEmpty()) {
         // Add New Line
-        //liveCode += "\n";
+        liveCode += "\n";
     }
 
     // Add Pos & Size =================================================================
@@ -1188,7 +1224,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         // Get Pos X
         QString cpX = posX();
         // Check Pos X
-        if (cpX != "0") {
+        if (!cpX.isEmpty() && cpX != "0") {
             // Add Pos X
             liveCode += QString("%1x: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cpX);
         }
@@ -1196,7 +1232,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         // Get Pos Y
         QString cpY = posY();
         // Check Pos Y
-        if (cpY != "0") {
+        if (!cpY.isEmpty() && cpY != "0") {
             // Add Pos Y
             liveCode += QString("%1y: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cpY);
         }
@@ -1204,7 +1240,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         // Get Pos Z
         QString cpZ = posZ();
         // Check Pos Z
-        if (cpZ != "0") {
+        if (!cpZ.isEmpty() && cpZ != "0") {
             // Add Pos Z
             liveCode += QString("%1z: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cpZ);
         }
@@ -1214,7 +1250,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         // Get Width
         QString cWidth = width();
         // Check Width
-        if (cWidth != "0") {
+        if (!cWidth.isEmpty() && cWidth != "0") {
             // Add Width
             liveCode += QString("%1width: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cWidth);
         }
@@ -1222,7 +1258,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         // Get Height
         QString cHeight = height();
         // Check Height
-        if (cHeight != "0") {
+        if (!cHeight.isEmpty() && cHeight != "0") {
             // Add Height
             liveCode += QString("%1height: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cHeight);
         }
@@ -1425,16 +1461,15 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         for (int j=0; j<opCount; j++) {
             // Check Filtered Properties
             if (fpKeys.indexOf(opKeys[j]) == -1) {
-                // Get Property Type And Value
-                //QStringList typeAndValue = mOwnProperties[opKeys[j]].toString().split(":");
                 // Get Type And Value
                 QString typeAndValue = mOwnProperties[opKeys[j]].toString();
-                // Get : Pos
-                int cPos = typeAndValue.indexOf(":");
                 // Get Type
-                QString pType = typeAndValue.left(cPos);
+                QString pType = Utils::parseType(typeAndValue);
                 // Get Value
-                QString pValue = (cPos >= 0) ? typeAndValue.mid(cPos + 1) : typeAndValue;
+                QString pValue = Utils::parseValue(typeAndValue);
+
+                // TODO: Handle Formulas And Bindigs!!!
+
                 // Check Type
                 if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING) {
                     // Set Value
@@ -1688,7 +1723,8 @@ QVariant ComponentInfo::componentProperty(const QString& aName)
 {
     // Check Own Properties First
     if (mOwnProperties.keys().indexOf(aName) >= 0) {
-        return mOwnProperties.value(aName).toString().split(":")[1];
+        //return mOwnProperties.value(aName).toString().split(":")[1];
+        return Utils::parseValue(mOwnProperties.value(aName).toString());
     }
 
     // Check Property Keys
@@ -1718,7 +1754,7 @@ QVariant ComponentInfo::componentProperty(const QString& aName)
             }
         }
 
-        qWarning() << "ComponentInfo::componentProperty - aName: " << aName << " - NO PROPERTY!";
+        //qWarning() << "ComponentInfo::componentProperty - aName: " << aName << " - NO PROPERTY!";
     }
 
     return QVariant();
@@ -1741,7 +1777,7 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
         qDebug() << "ComponentInfo::setComponentProperty - component: " << mName << " - aName: " << aName << " - aValue: " << aValue << " - OWN";
 
         // Init Type Prefix
-        QString tPrefix = mOwnProperties[aName].toString().split(":")[0];
+        QString tPrefix = Utils::parseType(mOwnProperties[aName].toString());
 
         // Check Prefix
         if (tPrefix.isEmpty()) {
@@ -1758,9 +1794,9 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
         }
 
         // Set Own Property
-        mOwnProperties[aName] = QString("%1:%2").arg(tPrefix).arg(aValue.toString());
+        mOwnProperties[aName] = Utils::composeTypeAndValue(tPrefix, aValue.toString());
         // Emit Own Property Added Signal
-        emit ownPropertyAdded(mOwnProperties.keys().indexOf(aName));
+        emit ownPropertyAdded(aName);
 
     } else {
         qDebug() << "ComponentInfo::setComponentProperty - component: " << mName << " - aName: " << aName << " - aValue: " << aValue << " - BASE";

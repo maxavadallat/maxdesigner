@@ -64,8 +64,6 @@ void ProjectModel::createBaseComponentsModel()
     if (!mBaseComponents) {
         // Create Base Compoennts Model
         BaseComponentsModel* newModel = new BaseComponentsModel(this);
-//        // Set Bae Components Dir
-//        newModel->setBaseComponentsDir(baseComponentsDir());
         // Set Base Components Model
         setBaseComponentsModel(newModel);
     }
@@ -83,8 +81,6 @@ void ProjectModel::createComponentsModel()
     if (!mComponents) {
         // Create New Components Model
         ComponentsModel* newModel = new ComponentsModel(this);
-//        // Set Components Dir
-//        newModel->setComponentsDir(componentsDir());
         // Set Components Model
         setComponentsModel(newModel);
     }
@@ -102,8 +98,6 @@ void ProjectModel::createViewsModel()
     if (!mViews) {
         // Create New Views Model
         ViewsModel* newModel = new ViewsModel(this);
-//        // Set Views Dir
-//        newModel->setViewsDir(viewsDir());
         // Set Views Model
         setViewsModel(newModel);
     }
@@ -119,7 +113,6 @@ void ProjectModel::createDataSourcesModel()
 {
     // Check Data Sources Model
     if (!mDataSources) {
-        qDebug() << "ProjectModel::createDataSourcesModel";
         // Create New Data Sources Model
         DataSourcesModel* newModel = new DataSourcesModel(this);
         // Set Data Sources Model
@@ -241,29 +234,45 @@ bool ProjectModel::initProject(const QString& aName, const QString& aDir)
         setProjectName(aName);
         // Set Project Dir
         setProjectDir(aDir + "/" + aName);
+
         // Set Base Components Dir
         setBaseComponentsDir(projectDir() + "/" + DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME);
+        // Set Components Dir
+        setComponentsDir(projectDir() + "/" + DEFAULT_PROJECT_COMPONENTS_DIR_NAME);
+        // Set Views Dir
+        setViewsDir(projectDir() + "/" + DEFAULT_PROJECT_VIEWS_DIR_NAME);
         // Set Data Sources Dir
         setDataSourcesDir(projectDir() + "/" + DEFAULT_PROJECT_DATASOURCES_DIR_NAME);
+        // Set Assets Dir
+        setAssetsDir(projectDir() + "/" + DEFAULT_PROJECT_ASSETS_DIR_NAME);
 
         // Init Project Dir
         QString pDirPath(projectDir());
-        // Init Temp Dir
-        QDir tempDir(pDirPath);
+        // Init Project Dir
+        QDir pDir(pDirPath);
 
         // Check If Dir Exists and Create
-        if (!tempDir.exists() && !tempDir.mkpath(pDirPath)) {
+        if (!pDir.exists() && !pDir.mkpath(pDirPath)) {
             qWarning() << "ProjectModel::initProject - path: " << pDirPath << " - ERROR CREATING PATH!!";
 
             return false;
         }
 
         // Create Live Temp Dir
-        if (!tempDir.mkdir(DEFAULT_PROJECT_LIVE_TEMP_DIR_NAME)) {
+        if (!pDir.exists(DEFAULT_PROJECT_LIVE_TEMP_DIR_NAME) && !pDir.mkdir(DEFAULT_PROJECT_LIVE_TEMP_DIR_NAME)) {
             qWarning() << "ProjectModel::initProject - livetemp: " << DEFAULT_PROJECT_LIVE_TEMP_DIR_NAME << " - ERROR CREATING PATH!!";
 
             return false;
         }
+
+        // Create Base Components Model
+        createBaseComponentsModel();
+        // Create Components Model
+        createComponentsModel();
+        // Create Views Model
+        createViewsModel();
+        // Create Data Sources Model
+        createDataSourcesModel();
 
         // ...
 
@@ -299,10 +308,7 @@ bool ProjectModel::loadProject(const QString& aFileName)
         // Emit Changes
         emit projectNameChanged(projectName());
         emit projectDirChanged(projectDir());
-        emit mainQMLFileChanged(mainQMLFile());
-        emit qmlDirChanged(qmlDir());
-        emit jsDirChanged(jsDir());
-        emit imagesDirChanged(imagesDir());
+        emit assetsDirChanged(assetsDir());
         emit baseComponentsDirChanged(baseComponentsDir());
         emit componentsDirChanged(componentsDir());
         emit viewsDirChanged(viewsDir());
@@ -356,7 +362,7 @@ bool ProjectModel::saveProject(const QString& aFileName)
         saveFileName = absoluteProjectFilePath();
     }
 
-    //qDebug() << "ProjectModel::saveProject - saveFileName: " << saveFileName;
+    qDebug() << "ProjectModel::saveProject - saveFileName: " << saveFileName;
 
     // Init Project File Info
     QFileInfo pfInfo(saveFileName);
@@ -677,103 +683,24 @@ void ProjectModel::setProjectDir(const QString& aDir)
 }
 
 //==============================================================================
-// Get Main QML File
+// Get Assets Dir
 //==============================================================================
-QString ProjectModel::mainQMLFile()
+QString ProjectModel::assetsDir()
 {
-    return mProperties[JSON_KEY_PROJECT_MAIN_QML].toString();
-}
-
-//==============================================================================
-// Set Main QML File
-//==============================================================================
-void ProjectModel::setMainQMLFile(const QString& aQMLFile)
-{
-    // Check QML File
-    if (aQMLFile != mainQMLFile()) {
-        // Set Main QML File
-        mProperties[JSON_KEY_PROJECT_MAIN_QML] = aQMLFile;
-        // Emit Main QML File Changed Signal
-        emit mainQMLFileChanged(mProperties[JSON_KEY_PROJECT_MAIN_QML].toString());
-        // Set Dirty Properties
-        setDirty(true);
-    }
-}
-
-//==============================================================================
-// Get QML Dir
-//==============================================================================
-QString ProjectModel::qmlDir()
-{
-    return mProperties[JSON_KEY_PROJECT_QML_DIR].toString();
-}
-
-//==============================================================================
-// Set QML Dir
-//==============================================================================
-void ProjectModel::setQmlDir(const QString& aQMLDir)
-{
-    // Check QML Dir
-    if (aQMLDir != qmlDir()) {
-        // Set QML Dir
-        mProperties[JSON_KEY_PROJECT_QML_DIR] = aQMLDir;
-        // Emit QML Dir Changed Signal
-        emit qmlDirChanged(mProperties[JSON_KEY_PROJECT_QML_DIR].toString());
-
-        // Check Previous Links
-
-        // Check QML Dir
-
-        // Create Link To QML Dir
-
-        // Set Dirty Properties
-        setDirty(true);
-    }
-}
-
-//==============================================================================
-// Get JS Dir
-//==============================================================================
-QString ProjectModel::jsDir()
-{
-    return mProperties[JSON_KEY_PROJECT_JS_DIR].toString();
-}
-
-//==============================================================================
-// Set JS Dir
-//==============================================================================
-void ProjectModel::setJsDir(const QString& aJSDir)
-{
-    // Check JS Dir
-    if (aJSDir != jsDir()) {
-        // Set JS Dir
-        mProperties[JSON_KEY_PROJECT_JS_DIR] = aJSDir;
-        // Emit JS Dir Changed Signal
-        emit jsDirChanged(mProperties[JSON_KEY_PROJECT_JS_DIR].toString());
-        // Set Dirty Properties
-        setDirty(true);
-    }
-}
-
-//==============================================================================
-// Get Images Dir
-//==============================================================================
-QString ProjectModel::imagesDir()
-{
-    return mProperties[JSON_KEY_PROJECT_IMAGES_DIR].toString();
+    return mProperties[JSON_KEY_PROJECT_ASSETS_DIR].toString();
 }
 
 //==============================================================================
 // Set Images Dir
 //==============================================================================
-void ProjectModel::setImagesDir(const QString& aImagesDir)
+void ProjectModel::setAssetsDir(const QString& aImagesDir)
 {
     // Check Images Dir
-    if (aImagesDir != imagesDir()) {
+    if (aImagesDir != assetsDir()) {
         // Set Images Dir
-        mProperties[JSON_KEY_PROJECT_IMAGES_DIR] = aImagesDir;
+        mProperties[JSON_KEY_PROJECT_ASSETS_DIR] = aImagesDir;
         // Emit Images Dir Changed Signal
-        emit imagesDirChanged(mProperties[JSON_KEY_PROJECT_IMAGES_DIR].toString());
+        emit assetsDirChanged(mProperties[JSON_KEY_PROJECT_ASSETS_DIR].toString());
         // Set Dirty Properties
         setDirty(true);
     }

@@ -10,10 +10,12 @@ DPaneBase {
 
     property ComponentOwnPropertiesModel ownPropertiesModel: propertiesController.ownPropertiesModel
 
-    property alias propertyName: nameEditor.text
-    property alias propertyType: typeOption.currentIndex
-    property alias propertyDefault: defaultEditor.text
-    property string propertyValue: ""
+    property string propertyName: ""
+    property int propertyType: 0
+    property string propertyMin: ""
+    property string propertyMax: ""
+    property string propertyEnums: ""
+    property string propertyDefault: ""
 
     property bool newProperty: true
 
@@ -29,8 +31,6 @@ DPaneBase {
             typeOption.enabled = true;
             // Set Button Enabled State
             addEnumValueButton.enabled = true;
-//            // Set Option Focus
-//            typeOption.setOptionFocus(true);
             // Set Editor Focus
             nameEditor.setEditorFocus(true, true);
         }
@@ -51,10 +51,10 @@ DPaneBase {
 
     hideToSide: hideToRight
 
-    creationWidth: 332
+    creationWidth: 360
     creationHeight: propertyFieldsColumn.height + 48//148
 
-    minWidth: 332
+    minWidth: 360
     minHeight: propertyFieldsColumn.height + 48//148
 
     enableResize: false
@@ -96,16 +96,23 @@ DPaneBase {
 
     // Reset Property Editor
     function resetPropertyEditor() {
+        console.log("DPropertyEditor.resetPropertyEditor");
         // Reset Type Option
         typeOption.currentIndex = 0;
         // Reset Property Name
         propertyEditorRoot.propertyName = "";
-        // Reset Property Type
-        propertyEditorRoot.propertyType = 0;
-        // Clear Enum Values
-        propertyEditorRoot.clearEnumValues();
+        // Set Property Type
+        propertyEditorRoot.propertyType = typeOption.currentIndex;
+        // Set Min Value
+        propertyEditorRoot.propertyMin = "";
+        // Set Max Value
+        propertyEditorRoot.propertyMax = "";
+        // Set Enum Values
+        propertyEditorRoot.propertyEnums = "";
         // Reset Default Value
         propertyEditorRoot.propertyDefault = "";
+        // Clear Enum Values
+        propertyEditorRoot.clearEnumValues();
         // Reset Child Pane
         propertyEditorRoot.childPane.resetEnumValueEditor();
 
@@ -113,11 +120,25 @@ DPaneBase {
     }
 
     // Check IF Property Valid
-    function propertyValid(newText) {
+    function propertyValid(newText, newDefaultText) {
+        // Check Type Option
+        if (typeOption.currentIndex === 9) {
+            // Check If Defaullt Value Is Empty
+            if (defaultEditor.editedText.length === 0) {
+                // Set Default Value Invalid
+                defaultEditor.invalidValue = true;
+
+                return false;
+            }
+        }
+
         // Check Own Properties Model
         if (propertyEditorRoot.ownPropertiesModel !== null) {
             return propertyEditorRoot.ownPropertiesModel.propertyValid(newText, propertyEditorRoot.newProperty);
         }
+
+        // Set Invalid Value
+        nameEditor.invalidValue = true;
 
         return false;
     }
@@ -160,6 +181,29 @@ DPaneBase {
         defaultOption.clearItemModel();
     }
 
+    // Update Property Values
+    function updatePropertyValues() {
+        // Set Property Name
+        propertyEditorRoot.propertyName = nameEditor.editedText;
+        // Set Property Type
+        propertyEditorRoot.propertyType = typeOption.currentIndex;
+        // Set Min Value
+        propertyEditorRoot.propertyMin = valueMinEditor.editedText;
+        // Set Max Value
+        propertyEditorRoot.propertyMax = valueMaxEditor.editedText;
+        // Set Enum Values
+        propertyEditorRoot.propertyEnums = defaultOption.exportItems();
+
+        // Switch Type Option Current Index
+        switch (typeOption.currentIndex) {
+            default: propertyEditorRoot.propertyDefault = defaultEditor.editedText;                 break;
+            case 1: propertyEditorRoot.propertyDefault = defaultSwitch.checked ? "true" : "false";  break;
+            case 8: propertyEditorRoot.propertyDefault = defaultOption.currentIndex;                break;
+        }
+
+        // ...
+    }
+
     DDisc {
         id: discButton
         anchors.right: parent.right
@@ -168,9 +212,11 @@ DPaneBase {
 
         onClicked: {
             // Check If Property Valid
-            if (propertyEditorRoot.propertyValid(nameEditor.editedText)) {
+            if (propertyEditorRoot.propertyValid(nameEditor.editedText, defaultEditor.editedText)) {
+                // Update Property Values
+                propertyEditorRoot.updatePropertyValues();
                 // Set Property Name
-                propertyEditorRoot.propertyName = nameEditor.editedText;
+                //propertyEditorRoot.propertyName = nameEditor.editedText;
                 // Emit Accepted Signal
                 propertyEditorRoot.accepted();
             } else {
@@ -207,7 +253,7 @@ DPaneBase {
 
             DTextInput {
                 id: nameEditor
-                width: typeOption.width
+                width: propertyFieldsColumn.width - nameLabel.width - DStyle.defaultSpacing //typeOption.width
                 anchors.verticalCenter: parent.verticalCenter
 
                 onKeyEvent: {
@@ -226,14 +272,13 @@ DPaneBase {
 
                 onAccepted: {
                     // Check If Property Valid
-                    if (propertyEditorRoot.propertyValid(newText)) {
+                    if (propertyEditorRoot.propertyValid(newText, defaultEditor.editedText)) {
+                        // Update Property Values
+                        propertyEditorRoot.updatePropertyValues();
                         // Set Property Name
-                        propertyEditorRoot.propertyName = newText;
+                        //propertyEditorRoot.propertyName = newText;
                         // Emit Accepted Signal
                         propertyEditorRoot.accepted();
-                    } else {
-                        // Set Invalid Value
-                        nameEditor.invalidValue = true;
                     }
                 }
 
@@ -258,7 +303,7 @@ DPaneBase {
 
             DOption {
                 id: typeOption
-                //width: propertyEditorRoot.width - 64
+                width: nameEditor.width
                 anchors.verticalCenter: parent.verticalCenter
 
                 model: [
@@ -306,14 +351,109 @@ DPaneBase {
                         break;
 
                         case Qt.Key_Tab:
-                            if (typeOption.currentIndex === 8) {
-                                // Set Focus
-                                defaultOption.setOptionFocus(true);
-                            } else {
-                                // Set Focus
-                                defaultEditor.setEditorFocus(true, true);
+                            // Switch Type Selector Option Current Index
+                            switch (typeOption.currentIndex) {
+                                case 2:
+                                case 3:
+                                case 4:
+                                    // Set Focus
+                                    valueMinEditor.setEditorFocus(true, true);
+                                break;
+
+                                case 8:
+                                    // Set Focus
+                                    defaultOption.setOptionFocus(true);
+                                break;
+
+                                default:
+                                    // Set Focus
+                                    defaultEditor.setEditorFocus(true, true);
+                                break;
                             }
                         break;
+                    }
+                }
+            }
+        }
+
+        Item {
+            id: valueMinMaxContainer
+            width: propertyFieldsColumn.width
+
+            height: {
+                // Switch Property Type Ooption Current Index
+                switch (typeOption.currentIndex) {
+                    case 2:
+                    case 3:
+                    case 4: return DStyle.textInputHeight;
+                }
+
+                return 0;
+            }
+
+            Behavior on height { DAnimation { } }
+            visible: height > 0
+            clip: true
+
+            Row {
+                spacing: DStyle.defaultSpacing
+
+                DText {
+                    id: valueMinLabel
+                    width: 58
+                    anchors.verticalCenter: parent.verticalCenter
+                    horizontalAlignment: Text.AlignRight
+                    text: "Min:"
+                }
+
+                DTextInput {
+                    id: valueMinEditor
+                    width: (nameEditor.width - valueMaxLabel.width - DStyle.defaultSpacing * 2) * 0.5
+
+                    onAccepted: {
+
+                    }
+
+                    onKeyEvent: {
+                        switch (event.key) {
+                            case Qt.Key_Escape:
+                                // Reset
+                                propertyEditorRoot.dismissPane(true);
+                            break;
+
+                            case Qt.Key_Tab:
+                                valueMaxEditor.setEditorFocus(true, true);
+                            break;
+                        }
+                    }
+                }
+
+                DText {
+                    id: valueMaxLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    horizontalAlignment: Text.AlignRight
+                    text: "Max:"
+                }
+
+                DTextInput {
+                    id: valueMaxEditor
+                    width: valueMinEditor.width
+
+                    onAccepted: {
+
+                    }
+
+                    onKeyEvent: {
+                        switch (event.key) {
+                            case Qt.Key_Escape:
+                                // Reset
+                                propertyEditorRoot.dismissPane(true);
+                            break;
+
+                            case Qt.Key_Tab:
+                                 defaultEditor.setEditorFocus(true, true);
+                            break;
+                        }
                     }
                 }
             }
@@ -324,11 +464,13 @@ DPaneBase {
             width: propertyFieldsColumn.width
             height: typeOption.currentIndex === 8 ? enumValuesFlow.height : 0
             Behavior on height { DAnimation { } }
+            visible: height > 0
             clip: true
 
             DFlow {
                 id: enumValuesFlow
-                width: parent.width
+                width: nameEditor.width
+                anchors.right: parent.right
                 spacing: DStyle.defaultSpacing
 
                 Repeater {
@@ -350,8 +492,9 @@ DPaneBase {
 
         DButton {
             id: addEnumValueButton
-            width: enumValuesFlow.width
+            width: nameEditor.width//enumValuesFlow.width
             height: typeOption.currentIndex === 8 ? CONSTS.defaultButtonHeight : 0
+            anchors.right: parent.right
             Behavior on height { DAnimation { } }
             visible: height > 0
             text: "Add Enum Value"
@@ -379,9 +522,10 @@ DPaneBase {
 
             DTextInput {
                 id: defaultEditor
-                width: typeOption.width
+                width: nameEditor.width
                 anchors.verticalCenter: parent.verticalCenter
-                visible: typeOption.currentIndex !== 8
+                visible: typeOption.currentIndex !== 8 && typeOption.currentIndex !== 1
+                text: propertyEditorRoot.propertyDefault
 
                 onKeyEvent: {
                     switch (event.key) {
@@ -398,30 +542,30 @@ DPaneBase {
                 }
 
                 onAccepted: {
-                    if (propertyValid(nameEditor.editedText)) {
-                        // Set Text
-                        defaultEditor.text = newText;
-                        // Set Property Name
-                        propertyEditorRoot.propertyName = nameEditor.editedText;
+                    // Check If Property Valid
+                    if (propertyValid(nameEditor.editedText, newText)) {
+                        // Update Property Values
+                        propertyEditorRoot.updatePropertyValues();
+//                        // Set Text
+//                        defaultEditor.text = newText;
+//                        // Set Property Name
+//                        propertyEditorRoot.propertyName = nameEditor.editedText;
                         // Emit Accepted Signal
                         propertyEditorRoot.accepted();
-                    } else {
-                        // Set Invalid Value
-                        nameEditor.invalidValue = true;
                     }
                 }
 
                 onTextEdited: {
-                    // ...
+                    // Reset Invalid Value
+                    defaultEditor.invalidValue = false;
                 }
             }
 
             DOption {
                 id: defaultOption
-                //width: propertyEditorRoot.width - 64
+                width: nameEditor.width
                 anchors.verticalCenter: parent.verticalCenter
                 visible: typeOption.currentIndex === 8
-                //model: []
 
                 onZChanged: {
                     parent.z = typeOption.z;
@@ -444,6 +588,15 @@ DPaneBase {
                         break;
                     }
                 }
+            }
+
+            DSwitch {
+                id: defaultSwitch
+                width: nameEditor.width
+                anchors.verticalCenter: parent.verticalCenter
+                text: ""
+                visible: typeOption.currentIndex === 1
+                onClicked: checked = !checked
             }
         }
     }

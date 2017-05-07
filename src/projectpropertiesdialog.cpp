@@ -19,12 +19,11 @@ ProjectPropertiesDialog::ProjectPropertiesDialog(QWidget* aParent)
     , mIPLCurrentIndex(-1)
     , mNewProject(false)
     , mProjectDirEdited(false)
-    , mMainQMLFileEdited(false)
-    , mQMLDirEdited(false)
-    , mJSDirEdited(false)
-    , mImagesDirEdited(false)
+    , mBaseComponentsDirEdited(false)
+    , mDataSourcesDirEdited(false)
     , mComponentsDirEdited(false)
     , mViewsDirEdited(false)
+    , mAssetsDirEdited(false)
 {
     // Setup UI
     ui->setupUi(this);
@@ -76,12 +75,12 @@ void ProjectPropertiesDialog::reset()
     // Reset All Imputs
     ui->projectNameEdit->setText("");
     ui->projectDirEdit->setText("");
-    ui->mainQmlFileEdit->setText("");
-    ui->qmlDirEdit->setText("");
-    ui->jsDirEdit->setText("");
-    ui->imagesDirEdit->setText("");
+
+    ui->baseComponentsDirEdit->setText("");
+    ui->dataSourcesDirEdit->setText("");
     ui->componentsDirEdit->setText("");
     ui->viewsDirEdit->setText("");
+    ui->assetsDirEdit->setText("");
 
     if (mImportPathsModel) {
         mImportPathsModel->clear();
@@ -112,18 +111,22 @@ void ProjectPropertiesDialog::setNewProject(const bool& aNewProject)
         ui->projectDirLabel->setVisible(true);
         ui->projectDirEdit->setVisible(true);
         ui->projectDirBrowseButton->setVisible(true);
+
         // Reset Edit Markers
         mProjectDirEdited = false;
-        mMainQMLFileEdited = false;
-        mQMLDirEdited = false;
-        mJSDirEdited = false;
-        mImagesDirEdited = false;
+        mBaseComponentsDirEdited = false;
+        mDataSourcesDirEdited = false;
         mComponentsDirEdited = false;
         mViewsDirEdited = false;
+        mAssetsDirEdited = false;
+
     } else {
+
         ui->projectDirLabel->setVisible(false);
         ui->projectDirEdit->setVisible(false);
         ui->projectDirBrowseButton->setVisible(false);
+
+        // ...
     }
 }
 
@@ -162,65 +165,49 @@ void ProjectPropertiesDialog::setProjectDir(const QString& aDir)
 //==============================================================================
 // Get Main QML File
 //==============================================================================
-QString ProjectPropertiesDialog::mainQMLFile()
+QString ProjectPropertiesDialog::baseComponentsDir()
 {
-    return ui->mainQmlFileEdit->text();
+    return ui->baseComponentsDirEdit->text();
 }
 
 //==============================================================================
 // Set Main QML File
 //==============================================================================
-void ProjectPropertiesDialog::setMainQMLFile(const QString& aQMLFile)
+void ProjectPropertiesDialog::setBaseComponentsDir(const QString& aQMLFile)
 {
-    ui->mainQmlFileEdit->setText(aQMLFile);
+    ui->baseComponentsDirEdit->setText(aQMLFile);
 }
 
 //==============================================================================
 // Get QML Directory
 //==============================================================================
-QString ProjectPropertiesDialog::qmlDir()
+QString ProjectPropertiesDialog::dataSourcesDir()
 {
-    return ui->qmlDirEdit->text();
+    return ui->dataSourcesDirEdit->text();
 }
 
 //==============================================================================
 // Set QML Directory
 //==============================================================================
-void ProjectPropertiesDialog::setQMLDir(const QString& aQMLDir)
+void ProjectPropertiesDialog::setDataSourcesDir(const QString& aQMLDir)
 {
-    ui->qmlDirEdit->setText(aQMLDir);
-}
-
-//==============================================================================
-// Get JS Directory
-//==============================================================================
-QString ProjectPropertiesDialog::jsDir()
-{
-    return ui->jsDirEdit->text();
-}
-
-//==============================================================================
-// Set JS Directory
-//==============================================================================
-void ProjectPropertiesDialog::setJSDir(const QString& aJSDir)
-{
-    ui->jsDirEdit->setText(aJSDir);
+    ui->dataSourcesDirEdit->setText(aQMLDir);
 }
 
 //==============================================================================
 // Get Images Directory
 //==============================================================================
-QString ProjectPropertiesDialog::imagesDir()
+QString ProjectPropertiesDialog::assetsDir()
 {
-    return ui->imagesDirEdit->text();
+    return ui->assetsDirEdit->text();
 }
 
 //==============================================================================
 // Set Images Directory
 //==============================================================================
-void ProjectPropertiesDialog::setImagesDir(const QString& aImagesDir)
+void ProjectPropertiesDialog::setAssetsDir(const QString& aImagesDir)
 {
-    ui->imagesDirEdit->setText(aImagesDir);
+    ui->assetsDirEdit->setText(aImagesDir);
 }
 
 //==============================================================================
@@ -420,54 +407,18 @@ void ProjectPropertiesDialog::on_projectDirBrowseButton_clicked()
 }
 
 //==============================================================================
-// On Main QML File Browse Button Clicked Slot
+// Base Componens Dir Browse Button Clicked
 //==============================================================================
-void ProjectPropertiesDialog::on_qmlFileBrowseButton_clicked()
+void ProjectPropertiesDialog::on_baseComponentsBrowseDirButton_clicked()
 {
-    // Init QML File Select Dialog
-    QFileDialog sDialog(NULL, "Select Main QML File");
-
-    // Set Name Filter
-    sDialog.setNameFilter(QString("*.%1").arg(DEFAULT_QML_SUFFIX));
-
-    // Set File Mode
-    sDialog.setFileMode(QFileDialog::ExistingFiles);
-
-    // Init Selection File Info
-    QFileInfo sFileInfo(ui->mainQmlFileEdit->text());
-
-    // Init Selection Directory
-    QString sDirectory = sFileInfo.absolutePath();
-
-    // Check Directory
-    if (!QFile::exists(sDirectory)) {
-        // Adjust Selection Directory
-        sDirectory = QDir::homePath();
-    }
-
-    // Set Directory
-    sDialog.setDirectory(sDirectory);
-
-    // Exec Project Dir Select Dialog
-    if (sDialog.exec()) {
-        // Set Text
-        ui->mainQmlFileEdit->setText(sDialog.selectedFiles()[0]);
-    }
-}
-
-//==============================================================================
-// On QML Dir Browse Button Clicked Slot
-//==============================================================================
-void ProjectPropertiesDialog::on_qmlDirBrowseButton_clicked()
-{
-    // Init Dir Select Dialog
-    QFileDialog sDialog(NULL, "Select QML Directory");
+    // Init Project Dir Select Dialog
+    QFileDialog sDialog(NULL, "Select Base Components Directory");
 
     // Set File Mode
     sDialog.setFileMode(QFileDialog::Directory);
 
     // Init Selection Directory
-    QString sDirectory = ui->qmlDirEdit->text();
+    QString sDirectory = ui->baseComponentsDirEdit->text();
 
     // Check Directory
     if (!QFile::exists(sDirectory)) {
@@ -481,23 +432,23 @@ void ProjectPropertiesDialog::on_qmlDirBrowseButton_clicked()
     // Exec Project Dir Select Dialog
     if (sDialog.exec()) {
         // Set Text
-        ui->qmlDirEdit->setText(sDialog.selectedFiles()[0]);
+        ui->baseComponentsDirEdit->setText(sDialog.selectedFiles()[0]);
     }
 }
 
 //==============================================================================
-// On JS Dir Browse Button Clicked Slot
+// Data Sources Dir Browse Button Clicked
 //==============================================================================
-void ProjectPropertiesDialog::on_jsDirBrowseButton_clicked()
+void ProjectPropertiesDialog::on_dataSourcesDirBrowseButton_clicked()
 {
-    // Init Dir Select Dialog
-    QFileDialog sDialog(NULL, "Select JS Directory");
+    // Init Project Dir Select Dialog
+    QFileDialog sDialog(NULL, "Select Data Sources Directory");
 
     // Set File Mode
     sDialog.setFileMode(QFileDialog::Directory);
 
     // Init Selection Directory
-    QString sDirectory = ui->jsDirEdit->text();
+    QString sDirectory = ui->dataSourcesDirEdit->text();
 
     // Check Directory
     if (!QFile::exists(sDirectory)) {
@@ -511,23 +462,23 @@ void ProjectPropertiesDialog::on_jsDirBrowseButton_clicked()
     // Exec Project Dir Select Dialog
     if (sDialog.exec()) {
         // Set Text
-        ui->jsDirEdit->setText(sDialog.selectedFiles()[0]);
+        ui->dataSourcesDirEdit->setText(sDialog.selectedFiles()[0]);
     }
 }
 
 //==============================================================================
-// On Images Dir Browse Button Clicked Slot
+// Assets Dir Browse Button Clicked
 //==============================================================================
-void ProjectPropertiesDialog::on_imagesDirBrowseButton_clicked()
+void ProjectPropertiesDialog::on_assetsDirBrowseButton_clicked()
 {
-    // Init Dir Select Dialog
-    QFileDialog sDialog(NULL, "Select Images Directory");
+    // Init Project Dir Select Dialog
+    QFileDialog sDialog(NULL, "Select Assets Directory");
 
     // Set File Mode
     sDialog.setFileMode(QFileDialog::Directory);
 
     // Init Selection Directory
-    QString sDirectory = ui->imagesDirEdit->text();
+    QString sDirectory = ui->assetsDirEdit->text();
 
     // Check Directory
     if (!QFile::exists(sDirectory)) {
@@ -541,7 +492,7 @@ void ProjectPropertiesDialog::on_imagesDirBrowseButton_clicked()
     // Exec Project Dir Select Dialog
     if (sDialog.exec()) {
         // Set Text
-        ui->imagesDirEdit->setText(sDialog.selectedFiles()[0]);
+        ui->assetsDirEdit->setText(sDialog.selectedFiles()[0]);
     }
 }
 
@@ -614,7 +565,7 @@ void ProjectPropertiesDialog::on_addImportDirButton_clicked()
     QFileDialog aipDialog(NULL, "Add Import Path");
 
     // Get QML Dir Temp
-    QString qmlDirTemp = qmlDir();
+    QString qmlDirTemp = dataSourcesDir();
 
     // Check If Dir Exists
     if (!QFile::exists(qmlDirTemp)) {
@@ -657,12 +608,16 @@ void ProjectPropertiesDialog::on_projectNameEdit_textChanged(const QString& arg1
 {
     // Check If New Project
     if (mNewProject) {
-        // Set QML Dir Editor Text
-        ui->qmlDirEdit->setText(ui->projectDirEdit->text() + "/" + arg1 + "/" + DEFAULT_PROJECT_QML_DIR_NAME);
+        // Set Base components Dir
+        ui->baseComponentsDirEdit->setText(ui->projectDirEdit->text() + "/" + arg1 + "/" + DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME);
+        // Set Data Sources Dir Edit
+        ui->dataSourcesDirEdit->setText(ui->projectDirEdit->text() + "/" + arg1 + "/" + DEFAULT_PROJECT_DATASOURCES_DIR_NAME);
         // Set Components Dir Edit Text
         ui->componentsDirEdit->setText(ui->projectDirEdit->text() + "/" + arg1 + "/" + DEFAULT_PROJECT_COMPONENTS_DIR_NAME);
         // Set Views Dir Edit Text
         ui->viewsDirEdit->setText(ui->projectDirEdit->text() + "/" + arg1 + "/" + DEFAULT_PROJECT_VIEWS_DIR_NAME);
+        // Set Assets Dir
+        ui->assetsDirEdit->setText(ui->projectDirEdit->text() + "/" + arg1 + "/" + DEFAULT_PROJECT_ASSETS_DIR_NAME);
     }
 }
 
@@ -673,107 +628,52 @@ void ProjectPropertiesDialog::on_projectDirEdit_textChanged(const QString& arg1)
 {
     // Check If New Project
     if (mNewProject) {
-        // Set QML Dir Editor Text
-        ui->qmlDirEdit->setText(arg1 + "/" + ui->projectNameEdit->text() + "/" + DEFAULT_PROJECT_QML_DIR_NAME);
+        // Set Base Components Dir
+        ui->baseComponentsDirEdit->setText(arg1 + "/" + ui->projectNameEdit->text() + "/" + DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME);
+        // Set Data Sources Dir
+        ui->dataSourcesDirEdit->setText(arg1 + "/" + ui->projectNameEdit->text() + "/" + DEFAULT_PROJECT_DATASOURCES_DIR_NAME);
         // Set Components Dir Edit Text
         ui->componentsDirEdit->setText(arg1 + "/" + ui->projectNameEdit->text() + "/" + DEFAULT_PROJECT_COMPONENTS_DIR_NAME);
         // Set Views Dir Edit Text
         ui->viewsDirEdit->setText(arg1 + "/" + ui->projectNameEdit->text() + "/" + DEFAULT_PROJECT_VIEWS_DIR_NAME);
+        // Set Assets Dir Edit Text
+        ui->assetsDirEdit->setText(arg1 + "/" + ui->projectNameEdit->text() + "/" + DEFAULT_PROJECT_ASSETS_DIR_NAME);
     }
 }
 
 //==============================================================================
 // On Project Dir Edit Text Edited Slot
 //==============================================================================
-void ProjectPropertiesDialog::on_projectDirEdit_textEdited(const QString&)
+void ProjectPropertiesDialog::on_projectDirEdit_textEdited(const QString& )
 {
     // Set Project Dir Edited
     mProjectDirEdited = true;
 }
 
+
 //==============================================================================
-// On Main QML File Edit Text Edited Slot
+// Base Components Dir Edit Text Edited Slot
 //==============================================================================
-void ProjectPropertiesDialog::on_mainQmlFileEdit_textEdited(const QString&)
+void ProjectPropertiesDialog::on_baseComponentsDirEdit_textEdited(const QString& )
 {
-    // Set Main QML File Edited
-    mMainQMLFileEdited = true;
+    // Set Base Components Dir Edited
+    mBaseComponentsDirEdited = true;
 }
 
 //==============================================================================
-// On QML Dir Edit Text Changed Slot
+// Data Sources Dir Edit Text Edited Slot
 //==============================================================================
-void ProjectPropertiesDialog::on_qmlDirEdit_textChanged(const QString& arg1)
+void ProjectPropertiesDialog::on_dataSourcesDirEdit_textEdited(const QString& )
 {
-    // Check If New Project
-    if (mNewProject) {
-        // Set Main QML File Name
-        ui->mainQmlFileEdit->setText(arg1 + "/" + DEFAULT_PROJECT_MAIN_QML_FILE_NAME);
-        // Set JS Dir Editor Text
-        ui->jsDirEdit->setText(arg1);
-        // Set Images Dir Editor Text
-        ui->imagesDirEdit->setText(arg1);
-    }
+    mDataSourcesDirEdited = true;
 }
 
 //==============================================================================
-// On QML Dir Edit Text Edited Slot
+// Assets Dir Edit Text Edited Slot
 //==============================================================================
-void ProjectPropertiesDialog::on_qmlDirEdit_textEdited(const QString&)
+void ProjectPropertiesDialog::on_assetsDirEdit_textEdited(const QString& )
 {
-    // Set QML Dir Edited
-    mQMLDirEdited = true;
-}
-
-//==============================================================================
-// On JS Dir Edit Text Changed Slot
-//==============================================================================
-void ProjectPropertiesDialog::on_jsDirEdit_textChanged(const QString& arg1)
-{
-    Q_UNUSED(arg1);
-
-    // Check If Dir Valid
-}
-
-//==============================================================================
-// On JS Dir Edit Text Edited Slot
-//==============================================================================
-void ProjectPropertiesDialog::on_jsDirEdit_textEdited(const QString&)
-{
-    // Set JS Dir Edited
-    mJSDirEdited = true;
-}
-
-//==============================================================================
-// On Images Dir Edit Text Changed Slot
-//==============================================================================
-void ProjectPropertiesDialog::on_imagesDirEdit_textChanged(const QString& arg1)
-{
-    Q_UNUSED(arg1);
-
-    // Check If Dir Valid
-}
-
-//==============================================================================
-// On Images Dir Edit Text Edited Slot
-//==============================================================================
-void ProjectPropertiesDialog::on_imagesDirEdit_textEdited(const QString&)
-{
-    // Set Images Dir Edited
-    mImagesDirEdited = true;
-}
-
-//==============================================================================
-// On Components Dir Edit Text Changed Slot
-//==============================================================================
-void ProjectPropertiesDialog::on_componentsDirEdit_textChanged(const QString& arg1)
-{
-    // Check If Dir Valid
-
-    QFileInfo dirInfo(arg1);
-
-    //if (dirInfo.)
-
+    mAssetsDirEdited = true;
 }
 
 //==============================================================================
@@ -786,19 +686,9 @@ void ProjectPropertiesDialog::on_componentsDirEdit_textEdited(const QString&)
 }
 
 //==============================================================================
-// On Views Dir Edit Text Changed Slot
-//==============================================================================
-void ProjectPropertiesDialog::on_viewsDirEdit_textChanged(const QString& arg1)
-{
-    Q_UNUSED(arg1);
-
-    // ...
-}
-
-//==============================================================================
 // On Views Dir Edit Text Edited Slot
 //==============================================================================
-void ProjectPropertiesDialog::on_viewsDirEdit_textEdited(const QString&)
+void ProjectPropertiesDialog::on_viewsDirEdit_textEdited(const QString& )
 {
     // Set Views Dir Edited
     mViewsDirEdited = true;
@@ -845,7 +735,7 @@ void ProjectPropertiesDialog::on_addPluginDirButton_clicked()
     QFileDialog aupDialog(NULL, "Add Plugin Path");
 
     // Get QML Dir Temp
-    QString qmlDirTemp = qmlDir();
+    QString qmlDirTemp = dataSourcesDir();
 
     // Check If Dir Exists
     if (!QFile::exists(qmlDirTemp)) {
@@ -1321,3 +1211,4 @@ PluginPathsModel::~PluginPathsModel()
     // Clear
     clear();
 }
+

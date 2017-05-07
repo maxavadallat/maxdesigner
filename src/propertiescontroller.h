@@ -127,6 +127,9 @@ public:
     // Get Functions Model
     ComponentFunctionsModel* functionsModel();
 
+    // Set Component Tag
+    Q_INVOKABLE void setComponentTag(const QString& aTag);
+
     // Select Component By Name
     Q_INVOKABLE void selectComponent(const QString& aName, const int& aChildIndex = -1);
 
@@ -143,7 +146,12 @@ public:
     Q_INVOKABLE void clearComponentProperty(const QString& aName);
 
     // Add Own Property
-    Q_INVOKABLE void addOwnComponentProperty(const QString& aName, const int& aType, const QVariant& aDefaultValue = QVariant());
+    Q_INVOKABLE void addOwnComponentProperty(const QString& aName,
+                                             const int& aType,
+                                             const QString& aMin = "",
+                                             const QString& aMax = "",
+                                             const QString& aEnumValues = "",
+                                             const QVariant& aDefaultValue = QVariant());
     // Remove Own Property
     Q_INVOKABLE void removeComponentProperty(const QString& aName);
 

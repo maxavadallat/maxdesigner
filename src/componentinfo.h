@@ -38,6 +38,8 @@ class ComponentInfo : public QObject
     Q_PROPERTY(QString componentName READ componentName NOTIFY componentNameChanged)
     // Type
     Q_PROPERTY(QString componentType READ componentType NOTIFY componentTypeChanged)
+    // Component Tag
+    Q_PROPERTY(QString componentTag READ componentTag WRITE setComponentTag NOTIFY componentTagChanged)
     // Category
     Q_PROPERTY(QString componentCategory READ componentCategory NOTIFY componentCategoryChanged)
     // Base
@@ -88,7 +90,9 @@ public:
         EPTReal,
         EPTVar,
         EPTQtObject,
-        EPTQtObjectList
+        EPTQtObjectList,
+        EPTEnum,
+        EPTAlias
     };
 
     Q_ENUM(EPropertyType)
@@ -103,6 +107,9 @@ public:
     // Get Prototype
     bool protoType();
 
+    // Get Dirty
+    bool getDirty();
+
     // Get Component Name
     QString componentName();
     // Set Component Name
@@ -112,6 +119,11 @@ public:
     QString componentType();
     // Set Component Type
     void setComponentType(const QString& aType);
+
+    // Component Tag
+    QString componentTag();
+    // Set Component Tag
+    void setComponentTag(const QString& aTag);
 
     // Get Component Category
     QString componentCategory();
@@ -223,6 +235,8 @@ signals:
     void componentNameChanged(const QString& aName);
     // Component Type Changed Signal
     void componentTypeChanged(const QString& aType);
+    // Component Tag Changed Signal
+    void componentTagChanged(const QString& aTag);
     // Component Category Changed Signal
     void componentCategoryChanged(const QString& aCategory);
     // Component Base Name Changed
@@ -314,12 +328,12 @@ signals:
     void componentPropertyChanged(const QString& aName, const QVariant& aValue);
 
     // Own Property Added Signal
-    void ownPropertyAdded(const int& aIndex);
+    void ownPropertyAdded(const QString& aName);
     // Own Property Removed Signal
-    void ownPropertyRemoved(const int& aIndex);
+    void ownPropertyRemoved(const QString& aName);
 
     // Property Updated Signal
-    void propertyUpdated(const QString& aKey);
+    void propertyUpdated(const QString& aName);
 
     // Own Properties Updated Signal
     void ownPropertiesUpdated();
@@ -484,6 +498,8 @@ protected: // Data
     QString                 mName;
     // Type
     QString                 mType;
+    // Tag
+    QString                 mTag;
     // Category
     QString                 mCategory;
     // Base Component Name

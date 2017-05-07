@@ -78,8 +78,6 @@
     <addaction name="separator"/>
     <addaction name="actionSaveComponent"/>
     <addaction name="actionSaveAllComponents"/>
-    <addaction name="actionSaveProject"/>
-    <addaction name="actionSaveProjectAs"/>
     <addaction name="separator"/>
     <addaction name="actionCloseComponent"/>
     <addaction name="actionCloseAllComponents"/>
@@ -281,22 +279,6 @@
     <string>Remove View</string>
    </property>
   </action>
-  <action name="actionSaveProject">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Save Project</string>
-   </property>
-  </action>
-  <action name="actionSaveProjectAs">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Save Project As</string>
-   </property>
-  </action>
   <action name="actionGenerateQMLSources">
    <property name="enabled">
     <bool>false</bool>
@@ -341,14 +323,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+W</string>
-   </property>
-  </action>
-  <action name="actionSaveView">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Save View</string>
    </property>
   </action>
   <action name="actionEditComponent">

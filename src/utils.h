@@ -27,6 +27,8 @@ public:
     static QString parseType(const QString& aTypeAndValue);
     // Parse Component Property Enum Values
     static QStringList parseEnumValues(const QString& aTypeAndValue);
+    // Parse Component Property Enum Values
+    static QString parseEnumValuesToString(const QString& aTypeAndValue);
     // Parse Component Property Min Value
     static QString parseMinValue(const QString& aTypeAndValue);
     // Parse Component Property Max Value

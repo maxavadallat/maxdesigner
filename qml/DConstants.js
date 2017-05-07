@@ -18,6 +18,10 @@ var defaultButtonHeight                         = 32;
 var defaultOptionWidth                          = 168;
 var defaultOptionHeight                         = 32;
 
+// Default Slider Size
+var defaultSliderWidth                          = 168;
+var defaultSliderHeight                         = 32;
+
 // Default Button Group Width
 var defaultButtonGroupWidth                     = 128;
 

@@ -49,6 +49,22 @@ QStringList Utils::parseEnumValues(const QString& aTypeAndValue)
 }
 
 //==============================================================================
+// Parse Component Property Enum Values
+//==============================================================================
+QString Utils::parseEnumValuesToString(const QString& aTypeAndValue)
+{
+    // Get Value Elements
+    QStringList valueElements = aTypeAndValue.split(":");
+
+    // Check Type
+    if (valueElements.count() >= 5 && valueElements[0] == JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM && valueElements[3].length() > 0) {
+        return valueElements[3];
+    }
+
+    return "";
+}
+
+//==============================================================================
 // Parse Component Property Min Value
 //==============================================================================
 QString Utils::parseMinValue(const QString& aTypeAndValue)

@@ -166,6 +166,24 @@ DPaneBase {
             }
         }
 
+        onOwnPropertyAdded: {
+            // Remove Root Component
+            removeRootComponent();
+            // Create Root Component
+            createRootComponent();
+        }
+
+        onOwnPropertyRemoved: {
+            // Remove Root Component
+            removeRootComponent();
+            // Create Root Component
+            createRootComponent();
+        }
+
+        onPropertyUpdated: {
+
+        }
+
         // ...
     }
 
@@ -354,6 +372,19 @@ DPaneBase {
 
             // ...
 
+        }
+    }
+
+    // Remove Root Component
+    function removeRootComponent() {
+        // Check New Root Object
+        if (componentRootContainerRoot.rootComponent !== null) {
+            // Destroy Root Component
+            componentRootContainerRoot.rootComponent.destroy();
+            // Reset Root Component
+            componentRootContainerRoot.rootComponent = null;
+            // Reset Root Component Created Flag
+            componentRootContainerRoot.rootComponentCreated = false;
         }
     }
 

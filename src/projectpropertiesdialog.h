@@ -40,25 +40,20 @@ public:
     // Set Project Dir
     void setProjectDir(const QString& aDir);
 
-    // Get Main QML File
-    QString mainQMLFile();
-    // Set Main QML File
-    void setMainQMLFile(const QString& aQMLFile);
+    // Get Assets Directory
+    QString assetsDir();
+    // Set Assets Directory
+    void setAssetsDir(const QString& aImagesDir);
 
-    // Get QML Directory
-    QString qmlDir();
-    // Set QML Directory
-    void setQMLDir(const QString& aQMLDir);
+    // Get Base Components Dir
+    QString baseComponentsDir();
+    // Set Base Components Dir
+    void setBaseComponentsDir(const QString& aQMLFile);
 
-    // Get JS Directory
-    QString jsDir();
-    // Set JS Directory
-    void setJSDir(const QString& aJSDir);
-
-    // Get Images Directory
-    QString imagesDir();
-    // Set Images Directory
-    void setImagesDir(const QString& aImagesDir);
+    // Get Data Sources Directory
+    QString dataSourcesDir();
+    // Set Data Sources Directory
+    void setDataSourcesDir(const QString& aQMLDir);
 
     // Get Components Directory
     QString componentsDir();
@@ -104,17 +99,14 @@ private:
     void restoreUI();
 
 private slots:
-
     // On Project Dir Browse Button Clicked Slot
     void on_projectDirBrowseButton_clicked();
-    // On Main QML File Browse Button Clicked Slot
-    void on_qmlFileBrowseButton_clicked();
-    // On QML Dir Browse Button Clicked Slot
-    void on_qmlDirBrowseButton_clicked();
-    // On JS Dir Browse Button Clicked Slot
-    void on_jsDirBrowseButton_clicked();
-    // On Images Dir Browse Button Clicked Slot
-    void on_imagesDirBrowseButton_clicked();
+    // Base Componens Dir Browse Button Clicked
+    void on_baseComponentsBrowseDirButton_clicked();
+    // Data Sources Dir Browse Button Clicked
+    void on_dataSourcesDirBrowseButton_clicked();
+    // Assets Dir Browse Button Clicked
+    void on_assetsDirBrowseButton_clicked();
     // On Components Dir Browse Button Clicked Slot
     void on_componentsDirBrowseButton_clicked();
     // On Views Dir Browse Button Clicked Slot
@@ -132,31 +124,15 @@ private slots:
     // On Project Dir Edit Text Edited Slot
     void on_projectDirEdit_textEdited(const QString& arg1);
 
-    // On QML Dir Edit Text Edited Slot
-    void on_mainQmlFileEdit_textEdited(const QString& arg1);
 
-    // On QML Dir Edit Text Changed Slot
-    void on_qmlDirEdit_textChanged(const QString& arg1);
-    // On QML Dir Edit Text Edited Slot
-    void on_qmlDirEdit_textEdited(const QString& arg1);
-
-    // On JS Dir Edit Text Changed Slot
-    void on_jsDirEdit_textChanged(const QString& arg1);
-    // On JS Dir Edit Text Edited Slot
-    void on_jsDirEdit_textEdited(const QString& arg1);
-
-    // On Images Dir Edit Text Changed Slot
-    void on_imagesDirEdit_textChanged(const QString& arg1);
-    // On Images Dir Edit Text Edited Slot
-    void on_imagesDirEdit_textEdited(const QString& arg1);
-
-    // On Components Dir Edit Text Changed Slot
-    void on_componentsDirEdit_textChanged(const QString& arg1);
+    // Base Components Dir Edit Text Edited Slot
+    void on_baseComponentsDirEdit_textEdited(const QString &arg1);
+    // Data Sources Dir Edit Text Edited Slot
+    void on_dataSourcesDirEdit_textEdited(const QString &arg1);
+    // Assets Dir Edit Text Edited Slot
+    void on_assetsDirEdit_textEdited(const QString &arg1);
     // On Components Dir Edit Text Edited Slot
     void on_componentsDirEdit_textEdited(const QString& arg1);
-
-    // On Views Dir Edit Text Changed Slot
-    void on_viewsDirEdit_textChanged(const QString& arg1);
     // On Views Dir Edit Text Edited Slot
     void on_viewsDirEdit_textEdited(const QString& arg1);
 
@@ -176,11 +152,10 @@ private slots:
     void on_pluginPathsList_doubleClicked(const QModelIndex &index);
 
 private: // Data
-
     // UI
     Ui::ProjectPropertiesDialog*    ui;
     // Settings Controller
-    SettingsController*              mSettings;
+    SettingsController*             mSettings;
     // Import Paths Model
     ImportPathsModel*               mImportPathsModel;
     // Plugin Paths Model
@@ -196,18 +171,17 @@ private: // Data
 
     // Project Dir Edited
     bool                            mProjectDirEdited;
-    // Main QML File Edited
-    bool                            mMainQMLFileEdited;
-    // QML Dir Edited
-    bool                            mQMLDirEdited;
-    // JS Dir Edited
-    bool                            mJSDirEdited;
-    // Images Dir Edited
-    bool                            mImagesDirEdited;
+
+    // Base Components Dir Edited
+    bool                            mBaseComponentsDirEdited;
+    // Data Sources Dir Edited
+    bool                            mDataSourcesDirEdited;
     // Components Dir Edited
     bool                            mComponentsDirEdited;
     // Views Dir Edited
     bool                            mViewsDirEdited;
+    // Assets Dir Edited
+    bool                            mAssetsDirEdited;
 };
 
 

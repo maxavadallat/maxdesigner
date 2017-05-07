@@ -104,5 +104,6 @@
         <file>qml/DSizeAndPosSection.qml</file>
         <file>qml/DLoader.qml</file>
         <file>qml/DPropertyEnumValueEditor.qml</file>
+        <file>qml/DSlider.qml</file>
     </qresource>
 </RCC>

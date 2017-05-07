@@ -58,7 +58,7 @@ void PropertiesController::init()
 //==============================================================================
 void PropertiesController::clear()
 {
-    qDebug() << "PropertiesController::clear";
+    //qDebug() << "PropertiesController::clear";
 
     // Set Focused Component
     setFocusedComponent(NULL);
@@ -661,6 +661,18 @@ ComponentFunctionsModel* PropertiesController::functionsModel()
 }
 
 //==============================================================================
+// Set Component Tag
+//==============================================================================
+void PropertiesController::setComponentTag(const QString& aTag)
+{
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Set Component Tag
+        mFocusedComponent->setComponentTag(aTag);
+    }
+}
+
+//==============================================================================
 // Select Component By Name
 //==============================================================================
 void PropertiesController::selectComponent(const QString& aName, const int& aChildIndex)
@@ -796,12 +808,17 @@ void PropertiesController::clearComponentProperty(const QString& aName)
 //==============================================================================
 // Add Own Property
 //==============================================================================
-void PropertiesController::addOwnComponentProperty(const QString& aName, const int& aType, const QVariant& aDefaultValue)
+void PropertiesController::addOwnComponentProperty(const QString& aName,
+                                                   const int& aType,
+                                                   const QString& aMin,
+                                                   const QString& aMax,
+                                                   const QString& aEnumValues,
+                                                   const QVariant& aDefaultValue)
 {
     // Check Component Own Properties Model
     if (mComponentOwnProperties) {
         // Add Property
-        mComponentOwnProperties->addComponentProperty(aName, aType, aDefaultValue);
+        mComponentOwnProperties->addComponentProperty(aName, aType, aMin, aMax, aEnumValues, aDefaultValue);
     }
 }
 

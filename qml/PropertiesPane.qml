@@ -20,6 +20,12 @@ DPane {
                 // Reset Editors
                 idEditor.text = "";
                 objectNameEditor.text = "";
+                componentTagEditor.text = "";
+
+                // Set Heights
+                idRow.height = 0;
+                objectNameRow.height = 0;
+                componentTagRow.height = 0;
 
                 // Close All Sections
                 importsSection.close();
@@ -35,10 +41,24 @@ DPane {
                 // ...
 
             } else {
-                // Set ID Editor Text
-                idEditor.text = propertiesController.focusedComponent.componentID;
-                // Set Object Name Editor Text
-                objectNameEditor.text = propertiesController.focusedComponent.componentObjectName;
+                // Check If Has ID
+                if (propertiesController.focusedComponent.hasProperty("id")) {
+                    // Set ID Editor Text
+                    idEditor.text = propertiesController.focusedComponent.componentID;
+                    // Set ID Row height
+                    idRow.height = idEditor.height;
+                }
+
+                // Check If Has Object Name
+                if (propertiesController.focusedComponent.hasProperty("objectName")) {
+                    // Set Object Name Editor Text
+                    objectNameEditor.text = propertiesController.focusedComponent.componentObjectName;
+                    // Set Object Name Row Height
+                    objectNameRow.height = objectNameEditor.height;
+                }
+
+                // Set Tag Row Height
+                componentTagRow.height = componentTagEditor.height;
 
                 // Check Focused Component
                 if (propertiesController.focusedComponent.componentCategory === "NonVisual") {
@@ -168,7 +188,11 @@ DPane {
     // ID Row
     Row {
         id: idRow
-        spacing: 2
+        height: 0
+        Behavior on height { DAnimation { } }
+        visible: height > 0
+        clip: true
+        spacing: DStyle.defaultSpacing
 
         DText {
             id: idTitle
@@ -180,15 +204,12 @@ DPane {
 
         DTextInput {
             id: idEditor
-            width: propertiesPaneRoot.contentWidth - idTitle.width - 2
+            width: propertiesPaneRoot.contentWidth - idTitle.width - DStyle.defaultSpacing
             text: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentID : ""
 
             onAccepted: {
-                // Check Current Component ID
-                if (propertiesController.cID !== newText) {
-                    // Request New Component ID
-                    propertiesController.requestCID(newText);
-                }
+                // Request New Component ID
+                propertiesController.requestCID(newText);
             }
         }
     }
@@ -196,7 +217,11 @@ DPane {
     // Object Name Row
     Row {
         id: objectNameRow
-        spacing: 2
+        height: 0
+        Behavior on height { DAnimation { } }
+        visible: height > 0
+        clip: true
+        spacing: DStyle.defaultSpacing
 
         DText {
             id: objectNameTitle
@@ -208,15 +233,41 @@ DPane {
 
         DTextInput {
             id: objectNameEditor
-            width: propertiesPaneRoot.contentWidth - objectNameTitle.width - 2
+            width: propertiesPaneRoot.contentWidth - objectNameTitle.width - DStyle.defaultSpacing
             text: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentObjectName : ""
 
             onAccepted: {
-                // Check Component Object Name
-                if (propertiesController.cObjectName !== newText) {
-                    // Request New Object Name
-                    propertiesController.requestCObjectName(newText);
-                }
+                // Request New Object Name
+                propertiesController.requestCObjectName(newText);
+            }
+        }
+    }
+
+    // Tag Row
+    Row {
+        id: componentTagRow
+        height: 0
+        Behavior on height { DAnimation { } }
+        visible: height > 0
+        clip: true
+        spacing: DStyle.defaultSpacing
+
+        DText {
+            id: tagTitle
+            width: objectNameTitle.width
+            anchors.verticalCenter: parent.verticalCenter
+            horizontalAlignment: Text.AlignRight
+            text: "tags:"
+        }
+
+        DTextInput {
+            id: componentTagEditor
+            width: propertiesPaneRoot.contentWidth - tagTitle.width - DStyle.defaultSpacing
+            text: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentTag : ""
+
+            onAccepted: {
+                // Set Component Tag
+                propertiesController.setComponentTag(newText);
             }
         }
     }
@@ -224,7 +275,7 @@ DPane {
     // Spacer
     Item {
         width: propertiesPaneRoot.contentWidth
-        height: DStyle.defaultSpacing
+        height: DStyle.defaultSpacing * 0.5
     }
 
     // Imports Section

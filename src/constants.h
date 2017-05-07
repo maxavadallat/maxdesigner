@@ -88,8 +88,6 @@
 
 // JSON File Extension
 #define DEFAULT_JSON_SUFFIX                                 "json"
-// AML File Extension
-#define DEFAULT_QML_PROJECT_SUFFIX                          "qmlproject"
 // IMAGE File Extensions
 #define DEFAULT_IMAGE_SUFFIXES                              "jpg jpeg png bmp gif tiff"
 // QML File Extension
@@ -117,23 +115,17 @@
 
 // Default Dirs & File Names
 #define DEFAULT_PROJECT_NAME                                "myproject"
-#define DEFAULT_PROJECT_MAIN_QML_FILE_NAME                  "main.qml"
-#define DEFAULT_PROJECT_QML_DIR_NAME                        "qml"
-#define DEFAULT_PROJECT_JS_DIR_NAME                         "qml"
-#define DEFAULT_PROJECT_IMAGES_DIR_NAME                     "qml"
 #define DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME             "basecomponents"
 #define DEFAULT_PROJECT_COMPONENTS_DIR_NAME                 "components"
 #define DEFAULT_PROJECT_VIEWS_DIR_NAME                      "views"
 #define DEFAULT_PROJECT_DATASOURCES_DIR_NAME                "datasources"
+#define DEFAULT_PROJECT_ASSETS_DIR_NAME                     "assets"
 #define DEFAULT_PROJECT_LIVE_TEMP_DIR_NAME                  "livetemp"
 
 // JSON Keys for Project Info
 #define JSON_KEY_PROJECT_NAME                               "projectName"
 #define JSON_KEY_PROJECT_DIR                                "projectDir"
-#define JSON_KEY_PROJECT_MAIN_QML                           "projectMainQML"
-#define JSON_KEY_PROJECT_QML_DIR                            "projectQMLDir"
-#define JSON_KEY_PROJECT_JS_DIR                             "projectJSDir"
-#define JSON_KEY_PROJECT_IMAGES_DIR                         "projectImagesDir"
+#define JSON_KEY_PROJECT_ASSETS_DIR                         "projectAssetsDir"
 #define JSON_KEY_PROJECT_BASECOMPONENTS_DIR                 "projectBaseComponentsDir"
 #define JSON_KEY_PROJECT_COMPONENTS_DIR                     "projectComponentsDir"
 #define JSON_KEY_PROJECT_VIEWS_DIR                          "projectViewsDir"

@@ -179,6 +179,11 @@ void MainWindow::init()
     if (!mPropertiesController) {
         // Create Properties Controller
         mPropertiesController = new PropertiesController();
+
+        // Connect Signals
+        connect(mPropertiesController, SIGNAL(focusedComponentChanged(ComponentInfo*)), this, SLOT(setCurrentComponent(ComponentInfo*)));
+
+        // ...
     }
 
     // Set Context Properties - Properties Controller
@@ -364,10 +369,36 @@ void MainWindow::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mCurrentComponent != aComponent) {
+
+        // Check Current Component
+        if (mCurrentComponent) {
+            // Disconnect Signals
+
+            // ...
+        }
+
         // Set Current Component
         mCurrentComponent = aComponent;
-        // Emit Current Component Changed Signal
-        emit currentComponentChanged(mCurrentComponent);
+
+        // Check Current Component
+        if (mCurrentComponent && mCurrentComponent->getDirty()) {
+            // Set Save Component Action Enabled
+            ui->actionSaveComponent->setEnabled(true);
+            // Set Save All Components Action Enabled
+            ui->actionSaveAllComponents->setEnabled(true);
+        } else {
+            // Set Save Component Action Enabled
+            ui->actionSaveComponent->setEnabled(false);
+            // Set Save All Components Action Enabled
+            ui->actionSaveAllComponents->setEnabled(false);
+        }
+
+        // Check Current Component
+        if (mCurrentComponent) {
+            // Connect Signals
+
+            // ...
+        }
     }
 }
 
@@ -444,10 +475,6 @@ void MainWindow::openProject(const QString& aFilePath)
         // Set Window Title
         setWindowTitle(QString("Max Designer - %1").arg(mProjectModel->projectName()));
 
-        // Enable Save Project Menu Item
-        ui->actionSaveProject->setEnabled(true);
-        // Enable Save As Project Menu Item
-        ui->actionSaveProjectAs->setEnabled(true);
         // Enable Project Properties Menu Item
         ui->actionProjectProperties->setEnabled(true);
         // Enable Close Project Menu Item
@@ -713,16 +740,15 @@ void MainWindow::launchProjectProperties()
 
     // Set Project Name
     mProjectPropertiesDiaog->setProjectName(mProjectModel->projectName());
-    // Set Project Dir
-    //mProjectPropertiesDiaog->setProjectDir(mProjectModel->projectDir());
+
     // Set QML Directory
-    mProjectPropertiesDiaog->setQMLDir(mProjectModel->qmlDir());
+    mProjectPropertiesDiaog->setDataSourcesDir(mProjectModel->dataSourcesDir());
     // Set Main QML File
-    mProjectPropertiesDiaog->setMainQMLFile(mProjectModel->mainQMLFile());
-    // Set JS Directory
-    mProjectPropertiesDiaog->setJSDir(mProjectModel->jsDir());
-    // Set Images Directory
-    mProjectPropertiesDiaog->setImagesDir(mProjectModel->imagesDir());
+    mProjectPropertiesDiaog->setBaseComponentsDir(mProjectModel->baseComponentsDir());
+
+    // Set Assets Directory
+    mProjectPropertiesDiaog->setAssetsDir(mProjectModel->assetsDir());
+
     // Set Components Directory
     mProjectPropertiesDiaog->setComponentsDir(mProjectModel->componentsDir());
     // Set Views Directory
@@ -1017,10 +1043,6 @@ void MainWindow::createNewProject()
         // Set Window Title
         setWindowTitle(QString("Max Designer - %1").arg(mProjectModel->projectName()));
 
-        // Enable Save Project Menu Item
-        ui->actionSaveProject->setEnabled(true);
-        // Enable Save As Project Menu Item
-        ui->actionSaveProjectAs->setEnabled(true);
         // Enable Project Properties Menu Item
         ui->actionProjectProperties->setEnabled(true);
         // Enable Close Project Menu Item
@@ -1072,7 +1094,7 @@ void MainWindow::createNewComponent(const QString& aName,
 
     // Check Name
     if (!aName.isEmpty()) {
-        //qDebug() << "MainWindow::createNewComponent - aName: " << aName << " - aType: " << aType << " - aBase: " << aBase << " - aCategory: " << aCategory;
+        qDebug() << "MainWindow::createNewComponent - aName: " << aName << " - aType: " << aType << " - aBase: " << aBase << " - aCategory: " << aCategory;
 
         // Init New Component
         ComponentInfo* newComponent = NULL;
@@ -1100,6 +1122,12 @@ void MainWindow::createNewComponent(const QString& aName,
 
         } else {
             qWarning() << "MainWindow::createNewComponent - UNSUPPORTED COMPONENT TYPE!";
+            return;
+        }
+
+        // Check New Component
+        if (!newComponent) {
+            qWarning() << "MainWindow::createNewComponent - NULL NEW COMPONENT!";
             return;
         }
 
@@ -1181,32 +1209,16 @@ void MainWindow::updateProject()
     // Set Properties Controller
     mProjectModel->setPropertiesController(mPropertiesController);
 
-    // Set QML Dir
-    mProjectModel->setQmlDir(mProjectPropertiesDiaog->qmlDir());
-    // Set Main QML File
-    mProjectModel->setMainQMLFile(mProjectPropertiesDiaog->mainQMLFile());
-
-    // Get QML Dir Path
-    QString qmlDir = mProjectModel->qmlDir();
-    // Get Project Dir Path
-    QString projectDir = mProjectModel->projectDir();
-
-    // Check QML Dir
-    if (!qmlDir.startsWith(projectDir)) {
-        // Init File Info For QML Dir
-        QFileInfo qmlDirInfo(qmlDir);
-        // Create Link
-        system(QString("ln -s \"%1\" \"%2\"").arg(qmlDir).arg(qmlDirInfo.fileName()).toLocal8Bit());
-    }
-
-    // Set JS Dir
-    mProjectModel->setJsDir(mProjectPropertiesDiaog->jsDir());
-    // Set Images Dir
-    mProjectModel->setImagesDir(mProjectPropertiesDiaog->imagesDir());
+    // Set Base Components Dir
+    mProjectModel->setBaseComponentsDir(mProjectPropertiesDiaog->baseComponentsDir());
+    // Set Data Sources Dir
+    mProjectModel->setDataSourcesDir(mProjectPropertiesDiaog->dataSourcesDir());
     // Set Components Dir
     mProjectModel->setComponentsDir(mProjectPropertiesDiaog->componentsDir());
     // Set Views Dir
     mProjectModel->setViewsDir(mProjectPropertiesDiaog->viewsDir());
+    // Set Images Dir
+    mProjectModel->setAssetsDir(mProjectPropertiesDiaog->assetsDir());
 
     // Set Import Paths
     mProjectModel->setImportPaths(mProjectPropertiesDiaog->importPaths());
@@ -1283,8 +1295,6 @@ void MainWindow::closeProject()
     setWindowTitle(QString("Max Designer"));
 
     // Set Menu Items Enabled State
-    ui->actionSaveProject->setEnabled(false);
-    ui->actionSaveProjectAs->setEnabled(false);
     ui->actionProjectProperties->setEnabled(false);
     ui->actionCloseProject->setEnabled(false);
     ui->actionDefineBaseComponent->setEnabled(false);
@@ -1716,29 +1726,14 @@ void MainWindow::on_actionOpenFileOrProject_triggered()
 }
 
 //==============================================================================
-// Action Save Project Triggered Slot
-//==============================================================================
-void MainWindow::on_actionSaveProject_triggered()
-{
-    // Save Project
-    saveProject();
-}
-
-//==============================================================================
-// Action Save Project As Triggered Slot
-//==============================================================================
-void MainWindow::on_actionSaveProjectAs_triggered()
-{
-    // Launch Save Project As
-    launchSaveProjectAs();
-}
-
-//==============================================================================
 // Action Save Component Triggered Slot
 //==============================================================================
 void MainWindow::on_actionSaveComponent_triggered()
 {
-    // Save Current Component
+    // Check Properties Controller
+    if (mPropertiesController) {
+
+    }
 }
 
 //==============================================================================

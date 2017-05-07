@@ -31,7 +31,12 @@ public:
     Q_INVOKABLE QString componentPropertyName(const int& aIndex);
 
     // Add Own Property
-    Q_INVOKABLE bool addComponentProperty(const QString& aName, const int& aType = 0, const QVariant& aDefault = QVariant());
+    Q_INVOKABLE bool addComponentProperty(const QString& aName,
+                                          const int& aType = 0,
+                                          const QString& aMin = "",
+                                          const QString& aMax = "",
+                                          const QString& aEnumValues = "",
+                                          const QVariant& aDefaultValue = QVariant());
 
     // Set Component Property Value
     Q_INVOKABLE void setComponentProperty(const int& aIndex, const QVariant& aValue);
@@ -39,7 +44,13 @@ public:
     Q_INVOKABLE QVariant componentPropertyValue(const QString& aName);
 
     // Update Own Property
-    Q_INVOKABLE void updateComponentProperty(const int& aIndex, const QString& aName, const int& aType = 0, const QVariant& aDefault = QVariant());
+    Q_INVOKABLE void updateComponentProperty(const int& aIndex,
+                                             const QString& aName,
+                                             const int& aType = 0,
+                                             const QString& aMin = "",
+                                             const QString& aMax = "",
+                                             const QString& aEnumValues = "",
+                                             const QVariant& aDefault = QVariant());
 
     // Clear Component Property, Reset To Default/Base Component Value
     Q_INVOKABLE void clearComponentProperty(const int& aIndex);

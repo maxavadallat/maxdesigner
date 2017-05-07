@@ -24,15 +24,13 @@ class ProjectModel : public QObject
     Q_PROPERTY(QString projectName READ projectName NOTIFY projectNameChanged)
     Q_PROPERTY(QString projectDir READ projectDir NOTIFY projectDirChanged)
     Q_PROPERTY(QString projectFilePath READ absoluteProjectFilePath NOTIFY projectFilePathChanged)
-    Q_PROPERTY(QString mainQMLFile READ mainQMLFile NOTIFY mainQMLFileChanged)
 
-    Q_PROPERTY(QString qmlDir READ qmlDir NOTIFY qmlDirChanged)
-    Q_PROPERTY(QString jsDir READ jsDir NOTIFY jsDirChanged)
-    Q_PROPERTY(QString imagesDir READ imagesDir NOTIFY imagesDirChanged)
+    Q_PROPERTY(QString assetsDir READ assetsDir NOTIFY assetsDirChanged)
     Q_PROPERTY(QString baseComponentsDir READ baseComponentsDir NOTIFY baseComponentsDirChanged)
     Q_PROPERTY(QString componentsDir READ componentsDir NOTIFY componentsDirChanged)
     Q_PROPERTY(QString viewsDir READ viewsDir NOTIFY viewsDirChanged)
     Q_PROPERTY(QString dataSourcesDir READ dataSourcesDir NOTIFY dataSourcesDirChanged)
+
     Q_PROPERTY(QString liveTempDir READ liveTempDir NOTIFY liveTempDirChanged)
 
     Q_PROPERTY(QStringList importPaths READ importPaths NOTIFY importPathsChanged)
@@ -97,25 +95,10 @@ public:
     // Set Project Dir
     void setProjectDir(const QString& aDir);
 
-    // Get Main QML File
-    QString mainQMLFile();
-    // Set Main QML File
-    void setMainQMLFile(const QString& aQMLFile);
-
-    // Get QML Dir
-    QString qmlDir();
-    // Set QML Dir
-    void setQmlDir(const QString& aQMLDir);
-
-    // Get JS Dir
-    QString jsDir();
-    // Set JS Dir
-    void setJsDir(const QString& aJSDir);
-
-    // Get Images Dir
-    QString imagesDir();
-    // Set Images Dir
-    void setImagesDir(const QString& aImagesDir);
+    // Get Assets Dir
+    QString assetsDir();
+    // Set Assets Dir
+    void setAssetsDir(const QString& aImagesDir);
 
     // Get Base Components Dir
     QString baseComponentsDir();
@@ -190,14 +173,8 @@ signals:
     void projectDirChanged(const QString& aDir);
     // Project File Path Changed
     void projectFilePathChanged(const QString& aFilePath);
-    // Main QML File Changed Signal
-    void mainQMLFileChanged(const QString& aQMLFile);
-    // QML Dir Changed Signal
-    void qmlDirChanged(const QString& aQMLDir);
-    // JS Dir Changed Signal
-    void jsDirChanged(const QString& aJSDir);
-    // Images Dir Changed Signal
-    void imagesDirChanged(const QString& aImagesDir);
+    // Assets Dir Changed Signal
+    void assetsDirChanged(const QString& aImagesDir);
     // Base Components Dir Changed Signal
     void baseComponentsDirChanged(const QString& aBaseComponentsDir);
     // Components Dir Changed Signal

@@ -40,7 +40,6 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
     Q_PROPERTY(ProjectModel* currentProject READ currentProject NOTIFY currentProjectChanged)
-    //Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent WRITE setCurrentComponent NOTIFY currentComponentChanged)
 
     Q_PROPERTY(BaseComponentsModel* baseComponentsModel READ baseComponentsModel NOTIFY baseComponentsModelChanged)
     Q_PROPERTY(ComponentsModel* componentsModel READ componentsModel NOTIFY componentsModelChanged)
@@ -58,8 +57,6 @@ public:
 
     // Get Current Component
     ComponentInfo* currentComponent();
-    // Set Current Component
-    void setCurrentComponent(ComponentInfo* aComponent);
 
     // Get Base Components Model
     BaseComponentsModel* baseComponentsModel();
@@ -92,8 +89,6 @@ public:
 signals:
     // Current Project Changed Signal
     void currentProjectChanged(ProjectModel* aProject);
-    // Current Component Changed Signal
-    void currentComponentChanged(ComponentInfo* aCOmponent);
 
     // Base Components Model Changed Signal
     void baseComponentsModelChanged(BaseComponentsModel* aBaseComponents);
@@ -224,6 +219,8 @@ private slots:
     // Component Opened Slot
     void componentOpened(ComponentInfo* aComponent);
 
+    // Set Current Component
+    void setCurrentComponent(ComponentInfo* aComponent);
 
     // Action About Triggered Slot
     void on_actionAbout_triggered();
@@ -233,10 +230,6 @@ private slots:
     void on_actionCreateNewProject_triggered();
     // Action Open Project Triggered Slot
     void on_actionOpenFileOrProject_triggered();
-    // Action Save Project Triggered Slot
-    void on_actionSaveProject_triggered();
-    // Action Save Project As Triggered Slot
-    void on_actionSaveProjectAs_triggered();
     // Action Save Component Triggered Slot
     void on_actionSaveComponent_triggered();
     // Action Save All Components Triggered Slot

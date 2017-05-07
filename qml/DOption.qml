@@ -129,6 +129,9 @@ DControl {
         if (optionRoot.count === 0) {
             // Reset Current Index
             optionRoot.currentIndex = -1;
+        } else if (optionRoot.currentIndex >= (optionRoot.count - 1)) {
+            // Set Current Index
+            optionRoot.currentIndex = optionRoot.count - 1;
         }
     }
 
@@ -155,15 +158,29 @@ DControl {
     // Set Item Checked
     function setItemChecked(checkedIndex) {
         //console.log("DOption.setItemChecked - checkedIndex: " + checkedIndex);
-
         // Iterate Thru Model
         for (var i=0; i<optionRoot.model.length; i++) {
             // Check Checked Index
             optionRoot.model[i].checked = (i === checkedIndex);
         }
+    }
 
-//        // Set Count
-//        optionRoot.count = optionRoot.model.length;
+    // Export Items
+    function exportItems() {
+        // Init Item Values
+        var itemValues = [];
+        // Iterate Thru Model
+        for (var i=0; i<optionRoot.model.length; i++) {
+            // Append Item Text Value
+            itemValues.push(optionRoot.model[i].text);
+        }
+
+        // Check Item Values
+        if (itemValues.length > 0) {
+            return itemValues.join(",");
+        }
+
+        return "";
     }
 
     // New Item Component

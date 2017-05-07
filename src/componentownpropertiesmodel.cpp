@@ -6,6 +6,7 @@
 #include "componentinfo.h"
 #include "constants.h"
 #include "projectmodel.h"
+#include "utils.h"
 
 //==============================================================================
 // Constructor
@@ -171,7 +172,12 @@ QString ComponentOwnPropertiesModel::componentPropertyName(const int& aIndex)
 //==============================================================================
 // Add Own Property
 //==============================================================================
-bool ComponentOwnPropertiesModel::addComponentProperty(const QString& aName, const int& aType, const QVariant& aDefault)
+bool ComponentOwnPropertiesModel::addComponentProperty(const QString& aName,
+                                                       const int& aType,
+                                                       const QString& aMin,
+                                                       const QString& aMax,
+                                                       const QString& aEnumValues,
+                                                       const QVariant& aDefault)
 {
     // Check Component
     if (!mComponent) {
@@ -188,24 +194,50 @@ bool ComponentOwnPropertiesModel::addComponentProperty(const QString& aName, con
         // Switch Type
         switch ((ComponentInfo::EPropertyType)aType) {
             default:
-            case ComponentInfo::EPropertyType::EPTString:          mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING).arg(aDefault.toString()); break;
-            case ComponentInfo::EPropertyType::EPTBool:            mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_BOOL).arg(aDefault.toString()); break;
-            case ComponentInfo::EPropertyType::EPTInt:             mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_INT).arg(aDefault.toString()); break;
-            case ComponentInfo::EPropertyType::EPTDouble:          mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_DOUBLE).arg(aDefault.toString()); break;
-            case ComponentInfo::EPropertyType::EPTReal:            mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_REAL).arg(aDefault.toString()); break;
-            case ComponentInfo::EPropertyType::EPTVar:             mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_VAR).arg(aDefault.toString()); break;
-            case ComponentInfo::EPropertyType::EPTQtObject:        mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_OBJECT).arg(aDefault.toString()); break;
-            case ComponentInfo::EPropertyType::EPTQtObjectList:    mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_LIST).arg(aDefault.toString()); break;
+            case ComponentInfo::EPropertyType::EPTString:
+                mComponent->mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING, aDefault.toString());
+            break;
+            case ComponentInfo::EPropertyType::EPTBool:
+                mComponent->mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_BOOL, aDefault.toString());
+            break;
+            case ComponentInfo::EPropertyType::EPTInt:
+                mComponent->mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_INT, aDefault.toString(), aMin, aMax);
+            break;
+            case ComponentInfo::EPropertyType::EPTDouble:
+                mComponent->mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_DOUBLE, aDefault.toString(), aMin, aMax);
+            break;
+            case ComponentInfo::EPropertyType::EPTReal:
+                mComponent->mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_REAL, aDefault.toString(), aMin, aMax);
+            break;
+            case ComponentInfo::EPropertyType::EPTVar:
+                mComponent->mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_VAR, aDefault.toString());
+            break;
+            case ComponentInfo::EPropertyType::EPTQtObject:
+                mComponent->mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_OBJECT, aDefault.toString());
+            break;
+            case ComponentInfo::EPropertyType::EPTQtObjectList:
+                mComponent->mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_LIST, aDefault.toString());
+            break;
+            case ComponentInfo::EPropertyType::EPTEnum:
+                mComponent->mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM, aDefault.toString(), "", "", aEnumValues);
+            break;
+            case ComponentInfo::EPropertyType::EPTAlias:
+                mComponent->mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_ALIAS, aDefault.toString());
             break;
         }
 
         // Set Dirty
         mComponent->setDirty(true);
+
+        // Emit Component's Own Property Added Signal
+        emit mComponent->ownPropertyAdded(aName);
+
         // Emit Own Proerty Added Signal
         emit ownPropertyAdded(aName);
 
         // Generate Merged Keys
         generateOwnPropertyKeys();
+
         // Get Key Index
         kIndex = mKeys.indexOf(aName);
         // Begin Insert Rows
@@ -267,44 +299,20 @@ QVariant ComponentOwnPropertiesModel::componentPropertyValue(const QString& aNam
 //==============================================================================
 // Update Own Property
 //==============================================================================
-void ComponentOwnPropertiesModel::updateComponentProperty(const int& aIndex, const QString& aName, const int& aType, const QVariant& aDefault)
+void ComponentOwnPropertiesModel::updateComponentProperty(const int& aIndex,
+                                                          const QString& aName,
+                                                          const int& aType,
+                                                          const QString& aMin,
+                                                          const QString& aMax,
+                                                          const QString& aEnumValues,
+                                                          const QVariant& aDefault)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
-        // Get Component Property Key
-        QString cpKey = mKeys[aIndex];
-
-        // Check Key
-        if (cpKey == aName) {
-            // Switch Type
-            switch ((ComponentInfo::EPropertyType)aType) {
-                default:
-                case ComponentInfo::EPropertyType::EPTString:          mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING).arg(aDefault.toString()); break;
-                case ComponentInfo::EPropertyType::EPTBool:            mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_BOOL).arg(aDefault.toString()); break;
-                case ComponentInfo::EPropertyType::EPTInt:             mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_INT).arg(aDefault.toString()); break;
-                case ComponentInfo::EPropertyType::EPTDouble:          mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_DOUBLE).arg(aDefault.toString()); break;
-                case ComponentInfo::EPropertyType::EPTReal:            mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_REAL).arg(aDefault.toString()); break;
-                case ComponentInfo::EPropertyType::EPTVar:             mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_VAR).arg(aDefault.toString()); break;
-                case ComponentInfo::EPropertyType::EPTQtObject:        mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_OBJECT).arg(aDefault.toString()); break;
-                case ComponentInfo::EPropertyType::EPTQtObjectList:    mComponent->mOwnProperties[aName] = QString("%1:%2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_LIST).arg(aDefault.toString()); break;
-                break;
-            }
-
-            // Set Dirty
-            mComponent->setDirty(true);
-            // Emit Property Updated
-            emit ownPropertyUpdated(aName, aType, aDefault);
-            // Emit Data Changed
-            emit dataChanged(index(aIndex), index(aIndex));
-
-            // ...
-
-        } else {
-            // Remove Component Property
-            removeComponentProperty(cpKey);
-            // Add Component Property
-            addComponentProperty(aName, aType, aDefault);
-        }
+        // Remove Component Property
+        removeComponentProperty(aName);
+        // Add Component Property
+        addComponentProperty(aName, aType, aMin, aMax, aEnumValues, aDefault);
     }
 }
 
@@ -393,6 +401,8 @@ bool ComponentOwnPropertiesModel::removeComponentProperty(const QString& aName)
         mComponent->mOwnProperties.remove(aName);
         // Set Component Dirty
         mComponent->setDirty(true);
+        // Emit Component's Property Removed Signal
+        emit mComponent->ownPropertyRemoved(aName);
         // Emit Property Removed Signal
         emit ownPropertyRemoved(aName);
         // Get Key Index
@@ -434,10 +444,18 @@ bool ComponentOwnPropertiesModel::setComponentProperty(const QString& aName, con
     if (mComponent->mIsProtoType) {
         // Get Property Type And Value
         QString cpTypeAndValue = mComponent->mOwnProperties[aName].toString();
+
         // Get Type
-        QString pType = cpTypeAndValue.left(cpTypeAndValue.indexOf(":"));
+        QString pType = Utils::parseType(cpTypeAndValue);
+        // Get Min
+        QString pMin = Utils::parseMinValue(cpTypeAndValue);
+        // Get Max
+        QString pMax = Utils::parseMaxValue(cpTypeAndValue);
+        // Get Enum Values
+        QString pEnums = Utils::parseEnumValuesToString(cpTypeAndValue);
+
         // Set Component Own Property
-        mComponent->mOwnProperties[aName] = QString("%1:%2").arg(pType).arg(aValue.toString());
+        mComponent->mOwnProperties[aName] = Utils::composeTypeAndValue(pType, aValue.toString(), pMin, pMax, pEnums);
 
     } else {
         // Set Component Property Value
@@ -549,32 +567,26 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
 
         // Check Own Property Type And Value
         if (!opTypeAndValue.isEmpty()) {
-            // Get : First Pos
-            int cfPos = opTypeAndValue.indexOf(":");
-
-            // Check : Pos
-            if (cfPos < 0) {
-                qWarning() << "ComponentOwnPropertiesModel::data - opKey: " << opKey << " - NO TYPE SEPARATOR!!";
-            }
-
             // Get Type
-            QString opType = opTypeAndValue.left(cfPos);
+            QString opType = Utils::parseType(opTypeAndValue);
             // Init Property Value
             QString opValue = "";
 
             // Check Own Property Base
             if (opBase) {
                 // Set Own Property Value
-                opValue = (cfPos >= 0) ? opTypeAndValue.mid(cfPos + 1) :  opTypeAndValue;
+                opValue = Utils::parseValue(opTypeAndValue);
             } else {
                 // Set Own Property Value Value
                 opValue = mDerivedComponent->mProperties.value(opKey).toString();
             }
 
             // Get Formula
-            bool opFormula = (opValue.indexOf("{") >= 0 && opValue.indexOf("}") >= 1);
+            bool opFormula = Utils::hasFormula(opTypeAndValue) > 0;
             // Get Property Bind
-            bool opBind = false;
+            bool opBind = Utils::hasBinding(opTypeAndValue) > 0;
+            // Get Enum Values
+            QStringList opEnumValues = Utils::parseEnumValues(opTypeAndValue);
 
             //qDebug() << "ComponentOwnPropertiesModel::data - opKey: " << opKey << " - opValue: " << opValue << " - opBase: " << opBase;
 
@@ -583,7 +595,7 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
                 default:
                 case PropertyNameRole:      return opKey;
                 case PropertyTypeRole:      return opType;
-                case PropertyEnumsRole:     return QStringList();
+                case PropertyEnumsRole:     return opEnumValues;
                 case PropertyValueRole:     return opValue;
                 case PropertyIsBind:        return opBind;
                 case PropertyIsFormula:     return opFormula;

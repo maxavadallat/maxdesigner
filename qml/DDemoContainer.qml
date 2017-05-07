@@ -53,6 +53,32 @@ DContainer {
     }
 
 
+    DSlider {
+        id: demoSlider
+        //width: parent.width * 0.6
+        anchors.centerIn: parent
+
+        //vertical: true
+
+        value: 50.0
+
+        onNewValueChanged: {
+//            if (value !== newValue) {
+//                // Set Value
+//                value = newValue;
+//            }
+        }
+    }
+
+    DText {
+        anchors.right: parent.right
+        anchors.rightMargin: 32
+        anchors.verticalCenter: parent.verticalCenter
+
+        text: demoSlider.newValue
+    }
+
+/*
     DButton {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
@@ -71,7 +97,9 @@ DContainer {
 
     DPropertyEditor {
         id: propertyEditor
+
         childPane: propertyEnumValueEditor
+
         onNewEnumValue: {
             // Set New Enum Value
             propertyEnumValueEditor.newEnumValue = true;
@@ -85,13 +113,13 @@ DContainer {
 
         parentPane: propertyEditor
 
-        initialX: propertyEditor.x + propertyEditor.width * 0.5
-        initialY: propertyEditor.y + propertyEditor.height
+        initialX: parentPane.x + parentPane.width * 0.5
+        initialY: parentPane.y + parentPane.height
 
         creationX: initialX - propertyEnumValueEditor.width * 0.5
         creationY: initialY + 32
     }
-
+*/
 
 
 /*
