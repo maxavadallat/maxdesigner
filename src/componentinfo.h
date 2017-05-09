@@ -75,6 +75,8 @@ class ComponentInfo : public QObject
     Q_PROPERTY(QString width READ width NOTIFY widthChanged)
     Q_PROPERTY(QString height READ height NOTIFY heightChanged)
 
+    Q_PROPERTY(bool dirty READ getDirty NOTIFY dirtyChanged)
+
     // Anchors
 
     // ...
@@ -184,8 +186,11 @@ public:
     // Get Height
     QString height();
 
-    // Get Property Keys
+    // Get Own Property Keys
     Q_INVOKABLE QStringList componentPropertyKeys();
+
+    // Get All Inherited Property Keys
+    Q_INVOKABLE QStringList inheritedPropertyKeys();
 
     // Get Component Hierarchy
     Q_INVOKABLE QStringList hierarchy();
@@ -201,6 +206,9 @@ public:
 
     // Get Property Type
     Q_INVOKABLE QString propertyType(const QString& aName);
+
+    // Get Property Enum Values
+    Q_INVOKABLE QStringList propertyEnums(const QString& aName);
 
     // Add Child
     Q_INVOKABLE void addChild(ComponentInfo* aChild);
@@ -223,7 +231,7 @@ public:
     Q_INVOKABLE QObject* getChildObject(const QString& aID);
 
     // Generate Live Code
-    Q_INVOKABLE QString generateLiveCode(const bool& aGenerateChildren = true);
+    Q_INVOKABLE QString generateLiveCode(const bool& aLiveRoot = true, const bool& aGenerateChildren = true);
 
     // Destructor
     ~ComponentInfo();
@@ -273,6 +281,9 @@ signals:
     void widthChanged(const QString& aWidth);
     // Height Changed Signal
     void heightChanged(const QString& aHeight);
+
+    // Dirty Changed Signal
+    void dirtyChanged(const bool& aDirty);
 
     // Imports
 
@@ -458,6 +469,41 @@ protected:
     // Find Root Component
     ComponentInfo* findRoot(ComponentInfo* aComponent);
 
+    // Generate Component ID
+    QString liveCodeGenerateID();
+    // Format Imports
+    QString liveCodeFormatImports(const bool& aLiveRoot = true);
+    // Format Component Name
+    QString liveCodeFormatName(const QString& aIndent = "");
+    // Format ID
+    QString liveCodeFormatID(const QString& aCID, const QString& aIndent = "");
+    // Fromat Object Name
+    QString liveCodeFormatObjectName(const QString& aIndent = "");
+    // Format Positions
+    QString liveCodeFormatPosition(const QString& aIndent = "");
+    // Format Size
+    QString liveCodeFormatSize(const QString& aIndent = "");
+    // Format Anchors
+    QString liveCodeFormatAnchors(const QString& aIndent = "");
+    // Format Own Properties
+    QString liveCodeFormatOwnProperties(QStringList& aOPHooks, QStringList& aEnumHooks, const QString& aID, const QStringList& aFPKeys, const QString& aIndent = "");
+    // Format Properties
+    QString liveCodeFormatInheritedProperties(QStringList& aPHooks, QStringList& aEnumHooks, const QString& aID, const QStringList& aFPKeys, const QString& aIndent = "");
+    // Format Signals
+    QString liveCodeFormatSignals(const QStringList& aOPKeys, const QStringList& pKeys, const QString& aIndent = "");
+    // Format Slots
+    QString liveCodeFormatSlots(const QString& aIndent = "");
+    // Format Functions
+    QString liveCodeFormatFunctions(const QStringList& aOPHooks, const QStringList& aPHooks, const QStringList& aEnumHooks, const QString& aIndent = "");
+    // Format Children
+    QString liveCodeFormatChildren(const bool& aGenerateChildren, const QString& aIndent = "");
+    // Format States
+    QString liveCodeFormatStates(const QString& aIndent = "");
+    // Format Transitions
+    QString liveCodeFormatTransitions(const QString& aIndent = "");
+    // Generate Enum Value Live Code Cases
+    QStringList liveCodeGenerateEnumValuecases(const QStringList& aEnumValues);
+
 protected slots:
     // Base Components Dir Changed Slot
     void baseComponentsDirChanged(const QString& aBaseComponentsDir);
@@ -504,6 +550,9 @@ protected: // Data
     QString                 mCategory;
     // Base Component Name
     QString                 mBaseName;
+
+    // Use Implicit Size
+    bool                    mImplicitSize;
 
     // Focused State
     bool                    mFocused;

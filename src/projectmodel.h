@@ -58,6 +58,9 @@ public:
     // Close Project
     void closeProject(const bool& aSave = true);
 
+    // Save All Components
+    void saveAllComponents();
+
     // Get Absolute Project Path
     QString absoluteProjectPath();
     // Get Absolute Project File Path

@@ -41,22 +41,6 @@ DPane {
                 // ...
 
             } else {
-                // Check If Has ID
-                if (propertiesController.focusedComponent.hasProperty("id")) {
-                    // Set ID Editor Text
-                    idEditor.text = propertiesController.focusedComponent.componentID;
-                    // Set ID Row height
-                    idRow.height = idEditor.height;
-                }
-
-                // Check If Has Object Name
-                if (propertiesController.focusedComponent.hasProperty("objectName")) {
-                    // Set Object Name Editor Text
-                    objectNameEditor.text = propertiesController.focusedComponent.componentObjectName;
-                    // Set Object Name Row Height
-                    objectNameRow.height = objectNameEditor.height;
-                }
-
                 // Set Tag Row Height
                 componentTagRow.height = componentTagEditor.height;
 
@@ -87,24 +71,7 @@ DPane {
                 }
 
                 // Check Focused Component
-                if (!propertiesController.focusedComponent.hasProperty("state")) {
-                    // Hide Section
-                    statesSection.hide();
-                    // Hide Section
-                    transitionsSection.hide();
-                } else {
-                    // Check Section State
-                    if (statesSection.state === statesSection.stateHidden) {
-                        // Set Section Closed State
-                        statesSection.close();
-                    }
-
-                    // Check Section State
-                    if (transitionsSection.state === transitionsSection.stateHidden) {
-                        // Set Section Closed State
-                        transitionsSection.close();
-                    }
-                }
+                checkFocusedComponent();
 
                 // Set Section Open State
                 ownPropertiesSection.open();
@@ -117,6 +84,15 @@ DPane {
     property Connections focusedComponentConnection: Connections {
         target: propertiesController.focusedComponent
 
+        onOwnPropertyAdded: {
+            // Check Focused Component
+            checkFocusedComponent();
+        }
+
+        onOwnPropertyRemoved: {
+            // Check Focused Component
+            checkFocusedComponent();
+        }
     }
 
     property int namesColumnWidth: propertiesPaneRoot.width * CONSTS.defaultNamesColumnWidth
@@ -182,6 +158,44 @@ DPane {
         if (propertiesPaneRoot.state === propertiesPaneRoot.stateShown) {
             // Store Properties Pane Height
             settingsController.propertiesPaneHeight = propertiesPaneRoot.height;
+        }
+    }
+
+    function checkFocusedComponent() {
+        // Check If Has ID
+        if (propertiesController.focusedComponent.hasProperty("id")) {
+            // Set ID Editor Text
+            idEditor.text = propertiesController.focusedComponent.componentID;
+            // Set ID Row height
+            idRow.height = idEditor.height;
+        }
+
+        // Check If Has Object Name
+        if (propertiesController.focusedComponent.hasProperty("objectName")) {
+            // Set Object Name Editor Text
+            objectNameEditor.text = propertiesController.focusedComponent.componentObjectName;
+            // Set Object Name Row Height
+            objectNameRow.height = objectNameEditor.height;
+        }
+
+        // Check Focused Component
+        if (!propertiesController.focusedComponent.hasProperty("state")) {
+            // Hide Section
+            statesSection.hide();
+            // Hide Section
+            transitionsSection.hide();
+        } else {
+            // Check Section State
+            if (statesSection.state === statesSection.stateHidden) {
+                // Set Section Closed State
+                statesSection.close();
+            }
+
+            // Check Section State
+            if (transitionsSection.state === transitionsSection.stateHidden) {
+                // Set Section Closed State
+                transitionsSection.close();
+            }
         }
     }
 

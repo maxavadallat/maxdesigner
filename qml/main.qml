@@ -481,25 +481,40 @@ Item {
             initialX: propertiesPane.x
             initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
 
+            childPane: propertyEnumValueEditor
+
             onAccepted: {
-                // Check Own Properties Model
-                if (propertiesController.ownPropertiesModel !== null) {
-                    // Check New Property
-                    if (propertyEditor.newProperty) {
-                        // Add Property
-                        propertiesController.ownPropertiesModel.addComponentProperty(propertyEditor.propertyName,
-                                                                                     propertyEditor.propertyType,
-                                                                                     propertyEditor.propertyDefault);
-                        // Reset New Property
-                        propertyEditor.newProperty = false;
-                    } else {
-                        // Update Property
-                        propertiesController.ownPropertiesModel.updateComponentProperty(propertyEditor.propertyName,
-                                                                                        propertyEditor.propertyType,
-                                                                                        propertyEditor.propertyDefault);
-                    }
+                // Check New Property
+                if (propertyEditor.newProperty) {
+                    // Add Property
+                    propertiesController.addOwnComponentProperty(propertyEditor.propertyName,
+                                                                 propertyEditor.propertyType,
+                                                                 propertyEditor.propertyMin,
+                                                                 propertyEditor.propertyMax,
+                                                                 propertyEditor.propertyEnums,
+                                                                 propertyEditor.propertyDefault);
+                    // Reset New Property
+                    propertyEditor.newProperty = false;
+                } else {
+//                    // Update Property
+//                    propertiesController.ownPropertiesModel.updateComponentProperty(propertyEditor.propertyName,
+//                                                                                    propertyEditor.propertyType,
+//                                                                                    propertyEditor.propertyDefault);
                 }
             }
+        }
+
+        DPropertyEnumValueEditor {
+            id: propertyEnumValueEditor
+
+            parentPane: propertyEditor
+
+            initialX: propertyEditor.x + propertyEditor.width * 0.5
+            initialY: propertyEditor.y + propertyEditor.height
+
+            creationX: initialX - propertyEnumValueEditor.width * 0.5
+            creationY: initialY + 32
+
         }
 
         // Formula Editor
@@ -584,14 +599,13 @@ Item {
         DSignalParameterEditor {
             id: signalParameterEditor
 
+            parentPane: signalEditor
+
             initialX: signalEditor.x + signalEditor.width * 0.5
             initialY: signalEditor.y + signalEditor.height
 
             creationX: initialX - signalParameterEditor.width * 0.5
             creationY: initialY + 32
-
-            parentPane: signalEditor
-
         }
 
         // Slot Editor
@@ -689,24 +703,13 @@ Item {
         DPropertyChangesEditor {
             id: propertyChangesEditor
 
+            parentPane: stateEditor
+
             initialX: stateEditor.x + stateEditor.width * 0.5
             initialY: stateEditor.y + stateEditor.height
 
             creationX: initialX - propertyChangesEditor.width * 0.5
             creationY: initialY + 32
-
-            parentPane: stateEditor
-
-            // ...
-
-        }
-
-        // State Selector
-        DStateSelector {
-            id: stateSelector
-
-            initialX: propertiesPane.x
-            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
 
             // ...
 

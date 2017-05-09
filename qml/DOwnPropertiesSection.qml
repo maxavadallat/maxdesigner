@@ -21,7 +21,22 @@ DSection {
     Item {
         id: ownPropertiesContainer
         width: ownPropertiesSectionRoot.width
-        height: CONSTS.defaultPaneItemHeight * Math.min(CONSTS.defaultOwnPropertiesMax, ownPropertiesListView.count)
+
+        height: {
+            // Get Default Height
+            var defaultHeight = CONSTS.defaultPaneItemHeight * Math.min(CONSTS.defaultOwnPropertiesMax, ownPropertiesListView.count);
+            // Check If Item Expanded
+            if (itemExpanded) {
+                return Math.max(itemExpandedPosY + itemExpandedHeight, defaultHeight);
+            }
+
+            return defaultHeight;
+        }
+
+        property bool itemExpanded: false
+        property int itemExpandedHeight: CONSTS.defaultPaneItemHeight
+        property int itemExpandedPosY: 0
+
         Behavior on height { DAnimation { } }
 
         DListView {
@@ -36,7 +51,7 @@ DSection {
             model: opFilter
 
             delegate: DPropertyItem {
-                id: opiDelegateRoot
+                id: propertyItemDelegate
                 width: ownPropertiesListView.width
 
                 namesColumnWidth: ownPropertiesSectionRoot.namesColumnWidth
@@ -46,7 +61,8 @@ DSection {
                 propertyName: model.pName
                 propertyType: model.pType
                 propertyValue: model.pValue
-                showFormula: model.pIsFormula
+                propertyEnums: model.pEnums
+                showFormula: model.pIsFormula || model.pIsBind
 
                 property int sourceIndex: ownPropertiesListView.opFilter.getSourceIndex(itemIndex)
 
@@ -72,6 +88,16 @@ DSection {
                 onItemValueChanged: {
                     // Set Own Property Value
                     propertiesController.setComponentProperty(propertyName, newValue);
+                }
+
+                onItemExpandedChanged: {
+                    //console.log("#### posY: " + propertyItemDelegate.y);
+                    // Set Expanded Item Pos Y
+                    ownPropertiesContainer.itemExpandedPosY = propertyItemDelegate.y;
+                    // Set Item Expanded Height
+                    ownPropertiesContainer.itemExpandedHeight = expandedHeight;
+                    // Set Item Expanded
+                    ownPropertiesContainer.itemExpanded = itemExpanded;
                 }
             }
         }

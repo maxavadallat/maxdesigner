@@ -9,6 +9,8 @@
 
 // Main Window QML Widget QML File
 #define DEFAULT_MAIN_QMLFILE_URL                            "qrc:/qml/main.qml"
+// Live Window QML Widget QML File
+#define DEFAULT_LIVE_QMLFILE_URL                            "qrc:/qml/liveMain.qml"
 
 // Main Window QML Widget Custom Components Import URI
 #define DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS       "enginecomponents"
@@ -66,6 +68,8 @@
 
 // Main Controller Name
 #define DEFAULT_MAIN_CONTROLLER_NAME                        "mainController"
+// Live Window Controller Name
+#define DEFAULT_LIVE_CONTROLLER_NAME                        "liveController"
 // Settings Controller Name
 #define DEFAULT_GLOBAL_SETTINGS_CONTROLLER                  "settingsController"
 // Properties Controller Name
@@ -106,6 +110,9 @@
 #define DEFAULT_RECENTPROJECTS_MAX                          10
 // Default Recent File List
 #define DEFAULT_RECENTFILESLIST_FILE_NAME                   ".recentfiles.list"
+
+// Default File URL Prefix
+#define DEFAULT_FILE_URL_PREFIX                             "file://"
 
 // Image Provider ID
 #define DEFAULT_IMAGE_PROVIDER_ID                           "fileIcon"
@@ -165,6 +172,7 @@
 #define JSON_KEY_COMPONENT_CATEGORY                         "componentCategory"
 #define JSON_KEY_COMPONENT_TAG                              "componentTag"
 #define JSON_KEY_COMPONENT_BUILTIN                          "componentBuiltIn"
+#define JSON_KEY_COMPONENT_USE_IMPLICIT_SIZE                "componentImplicitSize"
 #define JSON_KEY_COMPONENT_BASE                             "componentBase"
 #define JSON_KEY_COMPONENT_OWN_PROPERTIES                   "componentOwnProperties"
 #define JSON_KEY_COMPONENT_PROPERTIES                       "componentProperties"

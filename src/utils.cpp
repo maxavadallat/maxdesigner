@@ -108,7 +108,20 @@ QString Utils::parseValue(const QString& aTypeAndValue)
         return "";
     }
 
-    return aTypeAndValue.mid(aTypeAndValue.lastIndexOf(":") + 1);
+    // Init Value Section Pos
+    int vsPos = 0;
+
+    // Get To Values Section
+    for (int i=0; i<4; i++) {
+        // Get New : pos
+        vsPos = aTypeAndValue.indexOf(":", vsPos + 1);
+        // Check : Pos
+        if (vsPos == -1) {
+            return "";
+        }
+    }
+
+    return aTypeAndValue.mid(vsPos + 1);
 }
 
 //==============================================================================

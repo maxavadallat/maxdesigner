@@ -125,6 +125,42 @@ void ViewsModel::updateBaseComponents()
 }
 
 //==============================================================================
+// Save All Components
+//==============================================================================
+void ViewsModel::saveAllComponents()
+{
+    // Get Components Count
+    int vCount = rowCount();
+    // Iterate Through Base Components
+    for (int i=0; i<vCount; i++) {
+        // Get Component
+        ComponentInfo* view = mViews.value(mViews.keys()[i]);
+        // Save
+        view->save();
+    }
+}
+
+//==============================================================================
+// Component Dirty State Changed Slot
+//==============================================================================
+void ViewsModel::componentDirtyChanged(const bool& aDirty)
+{
+    // Get Sender Component
+    ComponentInfo* senderComponent = static_cast<ComponentInfo*>(sender());
+    // Check Sender Component
+    if (senderComponent) {
+        qDebug() << "ViewsModel::componentDirtyChanged - mName: " << senderComponent->mName << " - aDirty: " << aDirty;
+        // Get Component Index
+        int vIndex = mViews.keys().indexOf(senderComponent->mName);
+        // Check Component Index
+        if (vIndex >= 0) {
+            // Emit Data Changed Signal
+            emit dataChanged(index(vIndex), index(vIndex));
+        }
+    }
+}
+
+//==============================================================================
 // Set Views Dir
 //==============================================================================
 void ViewsModel::setViewsDir(const QString& aDirPath)
@@ -163,6 +199,10 @@ bool ViewsModel::addView(ComponentInfo* aView)
 
         // Add Base Component To Base Component Map
         mViews[cName] = aView;
+
+        // Connect Dirty Changed Signal
+        connect(aView, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
+
         // Get New Key Index
         int newIndex = mViews.keys().indexOf(cName);
 
@@ -192,11 +232,13 @@ bool ViewsModel::removeView(const int& aIndex)
         // Get Info File
         QFile ciFile(component->mInfoPath);
         // Get Key
-        QString bcKey = mViews.keys()[aIndex];
+        QString vKey = mViews.keys()[aIndex];
         // Begin Remove Rows
         beginRemoveRows(QModelIndex(), aIndex, aIndex);
         // Remove Key
-        mViews.remove(bcKey);
+        mViews.remove(vKey);
+        // Disonnect Dirty Changed Signal
+        disconnect(component, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
         // Delete Component
         delete component;
         // Delete Component Info File

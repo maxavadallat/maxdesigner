@@ -53,7 +53,8 @@ Repeater {
                     propertyName: model.pName
                     propertyType: model.pType
                     propertyValue: model.pValue
-                    showFormula: model.pIsFormula
+                    propertyEnums: model.pEnums
+                    showFormula: model.pIsFormula || model.pIsBind
                     enableSwipe: !model.pIsBase
                     opacity: !model.pIsBase ? 1.0 : 0.6
                     actionButtonText: "Clear"

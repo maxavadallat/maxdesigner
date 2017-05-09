@@ -271,6 +271,9 @@ signals:
     // Functions Model Changed Signal
     void functionsModelChanged(ComponentFunctionsModel* aFunctionsModel);
 
+    // Component Updated Signal
+    void componentUpdated();
+
     // ...
 
 private:

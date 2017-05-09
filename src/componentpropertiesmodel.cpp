@@ -122,7 +122,7 @@ void ComponentPropertiesModel::addComponentToHierarchy(const QString& aBaseName)
         ComponentInfo* baseComponent = mProject->getComponentByName(aBaseName);
         // Check Base Component
         if (baseComponent) {
-            //qDebug() << "ComponentPropertiesModel::addComponentToHierarchy - aBaseName: " << aBaseName;
+            qDebug() << "ComponentPropertiesModel::addComponentToHierarchy - aBaseName: " << aBaseName;
 
             // Get Filtered Own Property Keys
             QStringList pKeys = baseComponent->mOwnProperties.keys();

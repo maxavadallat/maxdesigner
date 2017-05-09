@@ -242,6 +242,7 @@ DPane {
                     title: dsName
                     visual: false
                     builtIn: false
+                    dirty: dsDirty
                     componentInfo: mainController.currentProject.dataSourcesModel.getDataSourceByIndex(index);
                     onGrabbedChanged: {
                         // Bring Section To Top

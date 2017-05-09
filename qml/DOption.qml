@@ -22,6 +22,12 @@ DControl {
 
     property bool optionInitCompleted: false
 
+    property string newValueTemp: ""
+
+    property alias popupHeight: optionPopup.height
+
+    property int optionOffset: currentIndex * (DStyle.popupItemHeight + 1) + DStyle.defaultMargin
+
     state: stateClosed
 
     signal itemSelected(var itemIndex)
@@ -29,18 +35,29 @@ DControl {
 
     Component.onCompleted: {
         //console.log("DOption.onCompleted");
-
         // Build Item Model
-        buildItemModel();
-
+        optionRoot.buildItemModel();
         // Set Option Init Completed
         optionRoot.optionInitCompleted = true;
 
-        // Chekc Current Index
-        if (currentIndex === -1) {
-            // Set Current Index
-            optionRoot.currentIndex = (optionRoot.model.length > 0 ? 0 : -1)
+        // Check If New Value Temp Is Empty
+        if (optionRoot.newValueTemp.length > 0) {
+            // Set Value
+            optionRoot.setValue(optionRoot.newValueTemp);
+            // Reset New Value Temp
+            optionRoot.newValueTemp = "";
+        } else {
+            // Chekc Current Index
+            if (optionRoot.currentIndex === -1) {
+                // Set Current Index
+                optionRoot.currentIndex = (optionRoot.model.length > 0 ? 0 : -1);
+            }
         }
+
+        // Reset Count For Proper Checked State Update
+        optionRoot.count = 0;
+        // Set Count
+        optionRoot.count = optionRoot.model.length;
     }
 
     onModelChanged: {
@@ -54,6 +71,8 @@ DControl {
     }
 
     onCurrentIndexChanged: {
+        //console.log("DOption.onCurrentIndexChanged - currentIndex: " + currentIndex + " - optionInitCompleted: " + optionRoot.optionInitCompleted);
+
         // Check If Init Completed
         if (optionRoot.optionInitCompleted) {
             // Set Item Checked
@@ -112,7 +131,7 @@ DControl {
         optionRoot.count = optionRoot.model.length;
 
         // Check Current Index
-        if (optionRoot.currentIndex === -1 && optionRoot.count > 0) {
+        if (optionRoot.optionInitCompleted && optionRoot.currentIndex === -1 && optionRoot.count > 0) {
             // Set Current Index
             optionRoot.currentIndex = 0;
         }
@@ -157,11 +176,12 @@ DControl {
 
     // Set Item Checked
     function setItemChecked(checkedIndex) {
-        //console.log("DOption.setItemChecked - checkedIndex: " + checkedIndex);
+        //console.log("DOption.setItemChecked - checkedIndex: " + checkedIndex + " - length: " + optionRoot.model.length);
         // Iterate Thru Model
         for (var i=0; i<optionRoot.model.length; i++) {
             // Check Checked Index
             optionRoot.model[i].checked = (i === checkedIndex);
+            //console.log("DOption.setItemChecked checked: " + optionRoot.model[i].checked);
         }
     }
 
@@ -181,6 +201,32 @@ DControl {
         }
 
         return "";
+    }
+
+    // Get Item Text
+    function getItemText(index) {
+        return optionRoot.model[index].text;
+    }
+
+    // Set Value
+    function setValue(value) {
+        //console.log("DOption.setValue - value: " + value);
+        // Check If Option Init Completed
+        if (optionRoot.optionInitCompleted) {
+            // Iterate Through Model Items
+            for (var i=0; i<optionRoot.model.length; i++) {
+                // Check Model Item Text
+                if (optionRoot.model[i].text === value) {
+                    // Set Current Index
+                    optionRoot.currentIndex = i;
+
+                    return;
+                }
+            }
+        } else {
+            // Set New Value Temp
+            optionRoot.newValueTemp = value;
+        }
     }
 
     // New Item Component
@@ -252,26 +298,25 @@ DControl {
 
                 model: optionRoot.count
 
-//                delegate: Rectangle {
-//                    width: optionColumn.width
-//                    height: DStyle.popupItemHeight
-//                    color: "transparent"
-//                    border.color: "orange"
-//                }
-
                 delegate: DPopupItem {
                     id: delegateRoot
 
                     width: optionColumn.width
-                    height: checked ? optionRoot.height : optionRoot.unCheckedHeight
+                    height: delegateRoot.checked ? optionRoot.height : optionRoot.unCheckedHeight
 
                     itemIndex: index
 
-                    property var itemData: optionRoot.model[index]
+                    text: {
+                        //console.log("DOption.delegateRoot.text: " + optionRoot.model[index].text);
+                        return optionRoot.model[index].text;
+                    }
 
-                    text: optionRoot.model[index].text
-                    checked: optionRoot.model[index].checked
-                    opacity: checked ? 1.0 : optionRoot.unCheckedOpacity
+                    checked: {
+                        //console.log("DOption.delegateRoot.checked: " + optionRoot.model[index].checked);
+                        return optionRoot.model[index].checked;
+                    }
+
+                    opacity: delegateRoot.checked ? 1.0 : optionRoot.unCheckedOpacity
 
                     preventStealing: true
 

@@ -25,8 +25,6 @@ Item {
 
     property alias clipContent: contentFlickable.clip
 
-    clip: false
-
     visible: opacity > 0.0
 
     function open() {
@@ -109,7 +107,6 @@ Item {
         anchors.topMargin: DStyle.defaultMargin
         anchors.bottom: parent.bottom
         anchors.bottomMargin: DStyle.defaultMargin
-        clip: true
     }
 
     states: [

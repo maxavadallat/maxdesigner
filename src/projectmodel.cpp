@@ -454,6 +454,38 @@ void ProjectModel::closeProject(const bool& aSave)
 }
 
 //==============================================================================
+// Save All Components
+//==============================================================================
+void ProjectModel::saveAllComponents()
+{
+    qDebug() << "ProjectModel::saveAllComponents" ;
+
+    // Check Base Components Model
+    if (mBaseComponents) {
+        // Save All Components
+        mBaseComponents->saveAllComponents();
+    }
+
+    // Check Components Model
+    if (mComponents) {
+        // Save All Components
+        mComponents->saveAllComponents();
+    }
+
+    // Check Views Model
+    if (mViews) {
+        // Save All Components
+        mViews->saveAllComponents();
+    }
+
+    // Check Data Sources
+    if (mDataSources) {
+        // Save All Components
+        mDataSources->saveAllComponents();
+    }
+}
+
+//==============================================================================
 // Get Absolute Project Path
 //==============================================================================
 QString ProjectModel::absoluteProjectPath()

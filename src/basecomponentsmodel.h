@@ -23,6 +23,8 @@ public:
     bool addBaseComponent(ComponentInfo* aComponent);
     // Remove Base Component
     bool removeBaseComponent(const int& aIndex);
+    // Remove Base Component
+    bool removeBaseComponent(const QString& aName);
 
     // Get Component Index By Name
     int getComponentIndex(const QString& aName);
@@ -44,12 +46,17 @@ protected:
     // Clear
     void clear();
 
+    // Load Base Components
+    void loadBaseComponents();
     // Update Base Components
     void updateBaseComponents();
 
+    // Save All Components
+    void saveAllComponents();
+
 protected slots:
-    // Load Base Components
-    void loadBaseComponents();
+    // Component Dirty State Changed Slot
+    void componentDirtyChanged(const bool& aDirty);
 
 public: // from QAbstractListModel
     // Row Count

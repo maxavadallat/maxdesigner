@@ -123,6 +123,42 @@ void ComponentsModel::updateBaseComponents()
 }
 
 //==============================================================================
+// Save All Components
+//==============================================================================
+void ComponentsModel::saveAllComponents()
+{
+    // Get Components Count
+    int cCount = rowCount();
+    // Iterate Through Base Components
+    for (int i=0; i<cCount; i++) {
+        // Get Component
+        ComponentInfo* component = mComponents.value(mComponents.keys()[i]);
+        // Save
+        component->save();
+    }
+}
+
+//==============================================================================
+// Component Dirty State Changed Slot
+//==============================================================================
+void ComponentsModel::componentDirtyChanged(const bool& aDirty)
+{
+    // Get Sender Component
+    ComponentInfo* senderComponent = static_cast<ComponentInfo*>(sender());
+    // Check Sender Component
+    if (senderComponent) {
+        qDebug() << "ComponentsModel::componentDirtyChanged - mName: " << senderComponent->mName << " - aDirty: " << aDirty;
+        // Get Component Index
+        int cIndex = mComponents.keys().indexOf(senderComponent->mName);
+        // Check Component Index
+        if (cIndex >= 0) {
+            // Emit Data Changed Signal
+            emit dataChanged(index(cIndex), index(cIndex));
+        }
+    }
+}
+
+//==============================================================================
 // Set Components Dir
 //==============================================================================
 void ComponentsModel::setComponentsDir(const QString& aDirPath)
@@ -161,6 +197,10 @@ bool ComponentsModel::addComponent(ComponentInfo* aComponent)
 
         // Add Base Component To Base Component Map
         mComponents[cName] = aComponent;
+
+        // Connect Dirty Changed Signal
+        connect(aComponent, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
+
         // Get New Key Index
         int newIndex = mComponents.keys().indexOf(cName);
 
@@ -195,6 +235,8 @@ bool ComponentsModel::removeComponent(const int& aIndex)
         beginRemoveRows(QModelIndex(), aIndex, aIndex);
         // Remove Key
         mComponents.remove(bcKey);
+        // Disonnect Dirty Changed Signal
+        connect(component, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
         // Delete Component
         delete component;
         // Delete Component Info File

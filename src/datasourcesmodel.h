@@ -46,6 +46,13 @@ protected:
     // Load Data Sources
     void loadDataSources();
 
+    // Save All Components
+    void saveAllComponents();
+
+protected slots:
+    // Component Dirty State Changed Slot
+    void componentDirtyChanged(const bool& aDirty);
+
 public: // from QAbstractListModel
     // Row Count
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;

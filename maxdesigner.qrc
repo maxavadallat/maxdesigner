@@ -105,5 +105,6 @@
         <file>qml/DLoader.qml</file>
         <file>qml/DPropertyEnumValueEditor.qml</file>
         <file>qml/DSlider.qml</file>
+        <file>qml/liveMain.qml</file>
     </qresource>
 </RCC>

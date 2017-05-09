@@ -9,9 +9,12 @@ Item {
     width: 300
     height: CONSTS.defaultPaneItemHeight
 
+    Behavior on height { DAnimation { } }
+
     property string propertyName: "property"
     property string propertyType: "type"
     property string propertyValue: "value"
+    property string propertyEnums: ""
 
     property bool showFormula: false
 
@@ -24,6 +27,9 @@ Item {
     property bool enableSwipe: true
 
     property alias actionButtonText: swipeGesture.actionButtonText
+
+    property bool itemExpanded: false
+    property int expandedHeight: CONSTS.defaultPaneItemHeight
 
     property real propertyStep: {
         // Check Property Type
@@ -39,6 +45,9 @@ Item {
     signal formulaEditClicked(var itemIndex)
     signal itemValueChanged(var itemIndex, var newValue)
 
+    signal valueOptionShown()
+    signal valueOptionClosed()
+
     onMarkFordeletionChanged: {
         propertyItemFlipable.front.setEditorFocus(!markFordeletion);
     }
@@ -46,13 +55,21 @@ Item {
     // Value Flipable
     DFlipable {
         id: propertyItemFlipable
-        anchors.fill: parent
-        anchors.rightMargin: CONSTS.defaultSwipeAreaWidth
+        width: parent.width - CONSTS.defaultSwipeAreaWidth
+        height: CONSTS.defaultPaneItemHeight
+
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.topMargin: propertyItemRoot.itemExpanded ? frontDelegate.valueOptionOffset : 0
+
+        Behavior on anchors.topMargin { DAnimation { } }
+
         enabled: !propertyItemRoot.markFordeletion
 
         flipped: propertyItemRoot.showFormula
 
         front: DPropertyItemValue {
+            id: frontDelegate
             width: propertyItemFlipable.width
             height: propertyItemFlipable.height
             namesColumnWidth: propertyItemRoot.namesColumnWidth
@@ -60,7 +77,34 @@ Item {
             propertyType: propertyItemRoot.propertyType
             propertyValue: propertyItemRoot.propertyValue
             propertyStep: propertyItemRoot.propertyStep
+            propertyEnums: propertyItemRoot.propertyEnums
             onValueChanged: propertyItemRoot.itemValueChanged(itemIndex, newValue);
+            onValueOptionZChanged: propertyItemRoot.z = valueOptionZ;
+
+            onValueOptionStateChanged: {
+                //console.log("DPropertyItem.onValueOptionStateChanged - valueOptionState: " + valueOptionState);
+                // Check State
+                if (valueOptionState === "open") {
+
+                    // Set Expanded Height
+                    propertyItemRoot.expandedHeight = frontDelegate.valueOptionPopupHeight;
+
+                    //console.log("#### expandedHeight: " + propertyItemRoot.expandedHeight);
+
+                    // Set Item Expanded
+                    propertyItemRoot.itemExpanded = true;
+                    // Set Root Height
+                    propertyItemRoot.height = propertyItemRoot.expandedHeight;
+
+                } else {
+
+                    // Reset Item Expanded
+                    propertyItemRoot.itemExpanded = false;
+                    // Reset Root Height
+                    propertyItemRoot.height = CONSTS.defaultPaneItemHeight;
+
+                }
+            }
         }
 
         back: DPropertyItemFormula {

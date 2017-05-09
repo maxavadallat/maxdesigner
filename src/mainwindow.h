@@ -158,6 +158,8 @@ private:
     void saveProject(const QString& aFilePath = "");
     // Save Component
     void saveComponent(const QString& aFilePath = "");
+    // Save All Component
+    void saveAllComponents();
 
     // ...
 
@@ -221,6 +223,9 @@ private slots:
 
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
+
+    // Component Dirty State Changed Slot
+    void componentDirtyChanged(const bool& aDirty);
 
     // Action About Triggered Slot
     void on_actionAbout_triggered();

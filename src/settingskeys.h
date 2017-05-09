@@ -24,9 +24,12 @@
 #define SETTINGS_KEY_PROPERTIES_PANE_WIDTH                  "propertiesPaneWidth"
 #define SETTINGS_KEY_PROPERTIES_PANE_HEIGHT                 "propertiesPaneHeight"
 
-#define SETTINGS_KEY_QML_EDITOR_SYNTAX_HIGHLIGHT            "qmlEditor.syntaxHighlight"
-#define SETTINGS_KEY_QML_EDITOR_SHOW_LINE_NUMBERS           "qmlEditor.showLineNumbers"
-#define SETTINGS_KEY_QML_EDITOR_FONT_SIZE                   "qmlEditor.fontSize"
+#define SETTINGS_KEY_SOURCE_EDITOR_SYNTAX_HIGHLIGHT         "sourceEditor.syntaxHighlight"
+#define SETTINGS_KEY_SOURCE_EDITOR_SHOW_LINE_NUMBERS        "sourceEditor.showLineNumbers"
+#define SETTINGS_KEY_SOURCE_EDITOR_FONT_SIZE                "sourceEditor.fontSize"
+
+#define SETTINGS_KEY_LIVE_WINDOW_WIDTH                      "liveWindow.width"
+#define SETTINGS_KEY_LIVE_WINDOW_HEIGHT                     "liveWindow.height"
 
 // ...
 

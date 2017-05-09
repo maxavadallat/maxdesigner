@@ -41,10 +41,14 @@ PropertiesController::PropertiesController(ProjectModel* aProjectModel, QObject*
 //==============================================================================
 void PropertiesController::init()
 {
+    //qDebug() << "PropertiesController::init";
+
     // Check Project Model
     if (mProject) {
         // Set Properties Controller
         mProject->setPropertiesController(this);
+        // Update Base Components
+        mProject->updateBaseComponents();
     }
 
     // Set Filtered Properties

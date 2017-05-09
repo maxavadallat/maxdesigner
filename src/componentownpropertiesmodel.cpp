@@ -184,6 +184,11 @@ bool ComponentOwnPropertiesModel::addComponentProperty(const QString& aName,
         return false;
     }
 
+    // Check If Has Property
+    if (mComponent->hasProperty(aName)) {
+        return false;
+    }
+
     // Get Key Index
     int kIndex = mKeys.indexOf(aName);
 
@@ -586,7 +591,7 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
             // Get Property Bind
             bool opBind = Utils::hasBinding(opTypeAndValue) > 0;
             // Get Enum Values
-            QStringList opEnumValues = Utils::parseEnumValues(opTypeAndValue);
+            QString opEnumValues = Utils::parseEnumValuesToString(opTypeAndValue);
 
             //qDebug() << "ComponentOwnPropertiesModel::data - opKey: " << opKey << " - opValue: " << opValue << " - opBase: " << opBase;
 

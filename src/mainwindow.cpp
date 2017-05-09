@@ -374,6 +374,9 @@ void MainWindow::setCurrentComponent(ComponentInfo* aComponent)
         if (mCurrentComponent) {
             // Disconnect Signals
 
+            // Disonnect Dirty Changed Signal
+            disconnect(mCurrentComponent, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
+
             // ...
         }
 
@@ -390,14 +393,43 @@ void MainWindow::setCurrentComponent(ComponentInfo* aComponent)
             // Set Save Component Action Enabled
             ui->actionSaveComponent->setEnabled(false);
             // Set Save All Components Action Enabled
-            ui->actionSaveAllComponents->setEnabled(false);
+            //ui->actionSaveAllComponents->setEnabled(false);
         }
 
         // Check Current Component
         if (mCurrentComponent) {
             // Connect Signals
 
+            // Connect Dirty Changed Signal
+            connect(mCurrentComponent, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
+
             // ...
+        }
+    }
+}
+
+//==============================================================================
+// Component Dirty State Changed Slot
+//==============================================================================
+void MainWindow::componentDirtyChanged(const bool& aDirty)
+{
+    // Get Sender Component
+    ComponentInfo* senderComponent = static_cast<ComponentInfo*>(sender());
+    // Check Sender Component
+    if (senderComponent) {
+        qDebug() << "MainWindow::componentDirtyChanged - mName: " << senderComponent->mName << " - aDirty: " << aDirty;
+
+        // Check Current Component
+        if (senderComponent->getDirty()) {
+            // Set Save Component Action Enabled
+            ui->actionSaveComponent->setEnabled(true);
+            // Set Save All Components Action Enabled
+            ui->actionSaveAllComponents->setEnabled(true);
+        } else {
+            // Set Save Component Action Enabled
+            ui->actionSaveComponent->setEnabled(false);
+            // Set Save All Components Action Enabled
+            //ui->actionSaveAllComponents->setEnabled(false);
         }
     }
 }
@@ -961,10 +993,16 @@ void MainWindow::launchLiveWindow()
     // Check Live Window
     if (!mLiveWindow) {
         // Create Live Window
-        mLiveWindow = new LiveWindow();
-    }
+        mLiveWindow = new LiveWindow(mProjectModel);
 
-    // Set Up Live Window
+        // Check Properties Controller
+        if (mPropertiesController) {
+            // Set Component
+            mLiveWindow->setComponent(mPropertiesController->focusedComponent());
+            // Connect Signals
+            connect(mPropertiesController, SIGNAL(focusedComponentChanged(ComponentInfo*)), mLiveWindow, SLOT(setComponent(ComponentInfo*)));
+        }
+    }
 
     // ...
 
@@ -1190,6 +1228,26 @@ void MainWindow::saveComponent(const QString& aFilePath)
 
     // Save Current Component
     mCurrentComponent->save(aFilePath);
+}
+
+//==============================================================================
+// Save All Component
+//==============================================================================
+void MainWindow::saveAllComponents()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        qWarning() << "MainWindow::saveComponent - NO PROJECT MODEL!";
+        return;
+    }
+
+    // Save All Components
+    mProjectModel->saveAllComponents();
+
+    // Set Action Save Component Enabled State
+    ui->actionSaveComponent->setEnabled(false);
+    // Set Action Save All Components Enabled State
+    ui->actionSaveAllComponents->setEnabled(false);
 }
 
 // ...
@@ -1730,10 +1788,8 @@ void MainWindow::on_actionOpenFileOrProject_triggered()
 //==============================================================================
 void MainWindow::on_actionSaveComponent_triggered()
 {
-    // Check Properties Controller
-    if (mPropertiesController) {
-
-    }
+    // Save Component
+    saveComponent();
 }
 
 //==============================================================================
@@ -1742,6 +1798,7 @@ void MainWindow::on_actionSaveComponent_triggered()
 void MainWindow::on_actionSaveAllComponents_triggered()
 {
     // Save All Components
+    saveAllComponents();
 }
 
 //==============================================================================

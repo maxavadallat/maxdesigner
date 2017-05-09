@@ -52,7 +52,20 @@ DContainer {
         //propertyEditor.show();
     }
 
+//    DPropertyItemValue {
+//        anchors.centerIn: parent
+//        propertyEnums: "Image.Stretch,Image.PreserveAspectFit,Image.PreserveAspectCrop,Image.Tile,Image.TileVertically,Image.TileHorizontally,Image.Pad"
+//        propertyType: CONSTS.propertyTypes[8];
+//    }
 
+
+//    Image {
+//        anchors.centerIn: parent
+//        source: "file:///Users/max/Dev/Volvo/vcc-spa-ui-master/mid/assets/images/S1/Core/core_justincase.png"
+//        fillMode: Image.Pad
+//    }
+
+/*
     DSlider {
         id: demoSlider
         //width: parent.width * 0.6
@@ -77,7 +90,7 @@ DContainer {
 
         text: demoSlider.newValue
     }
-
+*/
 /*
     DButton {
         anchors.horizontalCenter: parent.horizontalCenter
@@ -121,18 +134,17 @@ DContainer {
     }
 */
 
-
 /*
     DOption {
         id: demoOption
         anchors.centerIn: parent
 
-        model: [
-            { "text": "Option 1", "checked": false },
-            { "text": "Option 2" },
-            { "text": "Option 3", "disabled": false },
-            { "text": "Option 4" },
-        ]
+//        model: [
+//            { "text": "Option 1", "checked": false },
+//            { "text": "Option 2" },
+//            { "text": "Option 3", "disabled": false },
+//            { "text": "Option 4" },
+//        ]
     }
 
     DButton {

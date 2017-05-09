@@ -4,6 +4,7 @@
 
 #include "designerapplication.h"
 #include "mainwindow.h"
+#include "utils.h"
 #include "constants.h"
 
 //==============================================================================
@@ -11,6 +12,10 @@
 //==============================================================================
 int main(int argc, char* argv[])
 {
+
+    // Disable QML Disk Cache
+    qputenv("QML_DISABLE_DISK_CACHE", "1");
+
     // Main Application
     DesignerApplication app(argc, argv);
 

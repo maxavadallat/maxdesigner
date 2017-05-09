@@ -59,10 +59,14 @@ DMouseArea {
 
     DText {
         id: itemTextLabel
+        width: popupItemRoot.width - (checkedIndicator.visible ? height : DStyle.defaultMargin * 2)
+        height: popupItemRoot.height
         anchors.left: parent.left
         anchors.leftMargin: DStyle.defaultMargin
         anchors.verticalCenter: parent.verticalCenter
         visible: text !== "-"
+        elide: Text.ElideMiddle
+        wrapMode: Text.NoWrap
     }
 
     DText {

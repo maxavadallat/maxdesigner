@@ -9,14 +9,18 @@
 #include "settingskeys.h"
 #include "constants.h"
 #include "componentinfo.h"
+#include "projectmodel.h"
 
 //==============================================================================
 // Constructor
 //==============================================================================
-LiveWindow::LiveWindow(QWidget* aParent)
+LiveWindow::LiveWindow(ProjectModel* aProject, QWidget* aParent)
     : QMainWindow(aParent)
     , ui(new Ui::LiveWindow)
     , mSettings(SettingsController::getInstance())
+    , mProjectModel(aProject)
+    , mComponent(NULL)
+    , mLiveFileName("")
 {
     qDebug() << "LiveWindow created.";
 
@@ -34,6 +38,32 @@ LiveWindow::LiveWindow(QWidget* aParent)
 //==============================================================================
 void LiveWindow::init()
 {
+    // Set Context Properties
+    QQmlContext* ctx = ui->quickLiveWidget->rootContext();
+
+    // Set Context Properties - Live Controller
+    ctx->setContextProperty(DEFAULT_LIVE_CONTROLLER_NAME, this);
+
+    // Set Context Properties - Settings
+    ctx->setContextProperty(DEFAULT_GLOBAL_SETTINGS_CONTROLLER, mSettings);
+
+    // Set QML Source
+    ui->quickLiveWidget->setSource(QUrl(DEFAULT_LIVE_QMLFILE_URL));
+
+    // Set Resize Mode
+    ui->quickLiveWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+
+    // Check Project Model
+    if (mProjectModel) {
+        // Set Imports Path
+
+        // ...
+
+        // Set Plugins Path
+
+        // ...
+    }
+
     // ...
 
     // Restore UI
@@ -45,6 +75,11 @@ void LiveWindow::init()
 //==============================================================================
 void LiveWindow::restoreUI()
 {
+    // Set Size
+
+    // Set Focuse Policy
+    ui->quickLiveWidget->setFocusPolicy(Qt::StrongFocus);
+
     // ...
 }
 
@@ -53,12 +88,19 @@ void LiveWindow::restoreUI()
 //==============================================================================
 void LiveWindow::setupLive()
 {
-    // Generate Live Code
+    // Check Current Component
+    if (mProjectModel && mComponent) {
 
-    // Set Up QML Context
+        qDebug() << "LiveWindow::setupLive";
 
-    // Set QML Source
+        // Generate Live Code For Base Components
+        mLiveFileName = mProjectModel->generateLiveCode(mComponent->componentName(), mComponent->generateLiveCode());
 
+        // Generate Live Code For Base Components
+        generateLiveCodeForBaseComponents();
+
+        // ...
+    }
 }
 
 //==============================================================================
@@ -66,7 +108,43 @@ void LiveWindow::setupLive()
 //==============================================================================
 void LiveWindow::shutDown()
 {
-    // Clear QML Context
+    qDebug() << "LiveWindow::shutDown";
+
+    // Emit Clear Content Signal
+    emit clearContent();
+
+    // ...
+
+}
+
+//==============================================================================
+// Set Content
+//==============================================================================
+void LiveWindow::setLiveContent()
+{
+    // Check Live File Name
+    if (!mLiveFileName.isEmpty()) {
+        qDebug() << "LiveWindow::setLiveContent";
+
+        // Emit Load Content Signal
+        emit loadContent(QString("%1%2").arg(DEFAULT_FILE_URL_PREFIX).arg(mLiveFileName));
+
+        // ...
+    }
+}
+
+//==============================================================================
+// Generate Live Code For Base Components
+//==============================================================================
+void LiveWindow::generateLiveCodeForBaseComponents()
+{
+    // Check Currnt Component
+    if (mComponent) {
+        qDebug() << "LiveWindow::generateLiveCodeForBaseComponents";
+
+        // ...
+
+    }
 }
 
 //==============================================================================
@@ -82,7 +160,56 @@ void LiveWindow::setComponent(ComponentInfo* aComponent)
         mComponent = aComponent;
         // Setup Live
         setupLive();
+
+        // Check If Window Shown
+        if (isVisible()) {
+            // Set Live Content
+            setLiveContent();
+        }
     }
+}
+
+//==============================================================================
+// Show Event
+//==============================================================================
+void LiveWindow::showEvent(QShowEvent* aShowEvent)
+{
+    QMainWindow::showEvent(aShowEvent);
+
+    // Set Live Content
+    setLiveContent();
+}
+
+//==============================================================================
+// Close Event
+//==============================================================================
+void LiveWindow::closeEvent(QCloseEvent* aCloseEvent)
+{
+    QMainWindow::closeEvent(aCloseEvent);
+
+    // Shut Down
+    shutDown();
+
+    qDebug() << "LiveWindow::closeEvent - windowSize: " << size();
+
+    // Save Size
+
+    // ...
+}
+
+//==============================================================================
+// Component Updated Slot
+//==============================================================================
+void LiveWindow::componentUpdated()
+{
+    qDebug() << "LiveWindow::componentUpdated";
+
+    // Shut Down
+    shutDown();
+    // Set up Live
+    setupLive();
+    // Set Live Content
+    setLiveContent();
 }
 
 //==============================================================================
@@ -90,8 +217,8 @@ void LiveWindow::setComponent(ComponentInfo* aComponent)
 //==============================================================================
 void LiveWindow::on_actionClose_triggered()
 {
-    // Shut Down
-    shutDown();
+
+    // ...
 
     // Close
     close();

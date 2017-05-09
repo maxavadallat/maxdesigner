@@ -14,7 +14,10 @@ Item {
     property string propertyName: "name"
     property string propertyType: "type"
     property string propertyValue: "value"
+    property string propertyEnums: ""
+
     property bool propertyIsFormula: false
+    property bool propertyIsBinding: false
 
     property alias propertyValueMin: propertyValueSpinner.minValue
     property alias propertyValueMax: propertyValueSpinner.maxValue
@@ -27,14 +30,63 @@ Item {
 
     property real propertyStep: 1
 
+    property bool propertyItemValueInit: false
+
+    property alias valueOptionState: propertyValueOption.state
+    property alias valueOptionZ: propertyValueOption.z
+    property int valueOptionPopupHeight: (propertyValueOption.count * DStyle.popupItemHeight + DStyle.defaultMargin * 4)
+    property int valueOptionOffset: propertyValueOption.optionOffset
+
     signal accepted()
     signal valueChanged(var newValue)
 
+    Component.onCompleted: {
+        //console.log("DPropertyItemValue.onCompleted - propertyName: " + propertyName + " - propertyType: " + propertyType + " - propertyValue: " + propertyValue);
+
+        // Set Up Property Value Options
+        setupPropertyValueOptions();
+        // Set Property Item Value Init
+        propertyItemValueRoot.propertyItemValueInit = true;
+    }
+
     onPropertyValueChanged: {
-        // Check Property Value Editor Text
-        if (propertyValueEditor.text !== propertyItemValueRoot.propertyValue) {
-            // Set Property Value Editor Text
-            propertyValueEditor.text = propertyItemValueRoot.propertyValue;
+        // Check If Formula Or binding
+        if (propertyItemValueRoot.propertyIsFormula || propertyItemValueRoot.propertyIsBinding) {
+            return;
+        }
+
+        // Switch Property Type
+        switch (propertyType) {
+            default:
+                // Check Property Value Editor Text
+                if (propertyValueEditor.text !== propertyItemValueRoot.propertyValue) {
+                    // Set Property Value Editor Text
+                    propertyValueEditor.text = propertyItemValueRoot.propertyValue;
+                }
+            break;
+
+            case CONSTS.propertyTypes[2]:
+            case CONSTS.propertyTypes[3]:
+            case CONSTS.propertyTypes[4]:
+                // Set Spinner Value
+                propertyValueSpinner.value = Number(propertyItemValueRoot.propertyValue);
+            break;
+
+            case CONSTS.propertyTypes[4]:
+                // Check Value
+                if (propertyValueOption.getItemText(propertyValueOption.currentIndex) !== propertyItemValueRoot.propertyValue) {
+                    // Set Option Value
+                    propertyValueOption.setValue(propertyItemValueRoot.propertyValue);
+                }
+            break;
+        }
+    }
+
+    onPropertyEnumsChanged: {
+        // Check Property Item Value Init
+        if (propertyItemValueRoot.propertyItemValueInit) {
+            // Set Up Property Value Options
+            setupPropertyValueOptions();
         }
     }
 
@@ -50,6 +102,26 @@ Item {
         //console.log("DPropertyItemValue.enableMouseSelection - aEnable: " + aEnable);
         // Set Mouse Selection
         propertyValueEditor.mouseSelection = aEnable;
+    }
+
+    // Set Up Property Value Options
+    function setupPropertyValueOptions() {
+        // Clear Items
+        propertyValueOption.clearItemModel();
+
+        // Check Property Enums
+        if (propertyItemValueRoot.propertyEnums.length > 0) {
+            // Get Enum Elements
+            var enumElements = propertyItemValueRoot.propertyEnums.split(",");
+            // Iterate Through Elements
+            for (var i=0; i<enumElements.length; i++) {
+                // Append Item
+                propertyValueOption.appendItem(enumElements[i]);
+            }
+
+            // Set Value
+            propertyValueOption.setValue(propertyItemValueRoot.propertyValue);
+        }
     }
 
     Row {
@@ -81,7 +153,8 @@ Item {
                     case CONSTS.propertyTypes[1]:
                     case CONSTS.propertyTypes[2]:
                     case CONSTS.propertyTypes[3]:
-                    case CONSTS.propertyTypes[4]:   return false;
+                    case CONSTS.propertyTypes[4]:
+                    case CONSTS.propertyTypes[8]: return false;
                 }
 
                 return true;
@@ -112,7 +185,7 @@ Item {
 
             step: propertyItemValueRoot.propertyStep
 
-            value: !propertyItemValueRoot.propertyIsFormula ? Number(propertyItemValueRoot.propertyValue) : Number(0);
+            //value: !propertyItemValueRoot.propertyIsFormula ? Number(propertyItemValueRoot.propertyValue) : Number(0);
 
             onValueIncreased: {
                 // Emit Value Changed Signal
@@ -134,6 +207,7 @@ Item {
         }
 
         Item {
+            id: propertyValueSwitchContaniner
             width: propertyItemValueRoot.valueEditorWidth
             height: CONSTS.defaultButtonHeight
 
@@ -155,6 +229,34 @@ Item {
                 onClicked: {
                     // Emit Value Changed Signal
                     propertyItemValueRoot.valueChanged(!checked);
+                }
+            }
+        }
+
+        Item {
+            id: propertyValueOptionContainer
+            width: propertyItemValueRoot.valueEditorWidth
+            height: CONSTS.defaultButtonHeight
+
+            visible: {
+                // Check Property Type
+                if (propertyItemValueRoot.propertyType === CONSTS.propertyTypes[8]) {
+                    return true;
+                }
+
+                return false;
+            }
+
+            DOption {
+                id: propertyValueOption
+                width: parent.width
+
+                onCurrentIndexChanged: {
+                    // Get New Option Value
+                    var newValue = propertyValueOption.getItemText(propertyValueOption.currentIndex);
+                    //console.log("#### DPropertyItemValue.propertyValueOption.onCurrentIndexChanged - currentIndex: " + propertyValueOption.currentIndex + " - newValue: " + newValue);
+                    // Emit Value Changed Signal
+                    propertyItemValueRoot.valueChanged(newValue);
                 }
             }
         }

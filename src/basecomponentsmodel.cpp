@@ -80,6 +80,44 @@ void BaseComponentsModel::updateBaseComponents()
             //qDebug() << "BaseComponentsModel::updateBaseComponents - name: " << component->mName;
             // Set Base Component
             component->mBase = mProjectModel->getComponentByName(component->mBaseName);
+
+            //qDebug() << "BaseComponentsModel::updateBaseComponents - mName: " << component->mName << " -> " << (component->mBase ? component->mBase->mName : "NULL");
+        }
+    }
+}
+
+//==============================================================================
+// Save All Components
+//==============================================================================
+void BaseComponentsModel::saveAllComponents()
+{
+    // Get Base Components Count
+    int bcCount = rowCount();
+    // Iterate Through Base Components
+    for (int i=0; i<bcCount; i++) {
+        // Get Component
+        ComponentInfo* baseComponent = mBaseComponents.value(mBaseComponents.keys()[i]);
+        // Save
+        baseComponent->save();
+    }
+}
+
+//==============================================================================
+// Component Dirty State Changed Slot
+//==============================================================================
+void BaseComponentsModel::componentDirtyChanged(const bool& aDirty)
+{
+    // Get Sender Component
+    ComponentInfo* senderComponent = static_cast<ComponentInfo*>(sender());
+    // Check Sender Component
+    if (senderComponent) {
+        qDebug() << "BaseComponentsModel::componentDirtyChanged - mName: " << senderComponent->mName << " - aDirty: " << aDirty;
+        // Get Component Index
+        int bcIndex = mBaseComponents.keys().indexOf(senderComponent->mName);
+        // Check Component Index
+        if (bcIndex >= 0) {
+            // Emit Data Changed Signal
+            emit dataChanged(index(bcIndex), index(bcIndex));
         }
     }
 }
@@ -120,6 +158,7 @@ void BaseComponentsModel::loadBaseComponents()
             ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
             // Add Base Component
             addBaseComponent(newComponent);
+
         } else {
             qDebug() << "BaseComponentsModel::loadBaseComponents - itemName: " << itemName << " - Component Already Added.";
         }
@@ -166,6 +205,9 @@ bool BaseComponentsModel::addBaseComponent(ComponentInfo* aComponent)
         // Add Base Component To Base Component Map
         mBaseComponents[cName] = aComponent;
 
+        // Connect Dirty Changed Signal
+        connect(aComponent, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
+
         // Get New Key Index
         int newIndex = mBaseComponents.keys().indexOf(cName);
 
@@ -200,6 +242,8 @@ bool BaseComponentsModel::removeBaseComponent(const int& aIndex)
         beginRemoveRows(QModelIndex(), aIndex, aIndex);
         // Remove Key
         mBaseComponents.remove(bcKey);
+        // Disconnect Dirty Changed Signal
+        connect(component, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
         // Delete Component
         delete component;
         // Delete Component Info File
@@ -211,6 +255,21 @@ bool BaseComponentsModel::removeBaseComponent(const int& aIndex)
 
         return true;
     }
+
+    return false;
+}
+
+//==============================================================================
+// Remove Base Component
+//==============================================================================
+bool BaseComponentsModel::removeBaseComponent(const QString& aName)
+{
+    // Check Component Name
+    if (aName.isEmpty()) {
+        return false;
+    }
+
+    // ...
 
     return false;
 }

@@ -196,9 +196,9 @@ DPaneBase {
 
         // Switch Type Option Current Index
         switch (typeOption.currentIndex) {
-            default: propertyEditorRoot.propertyDefault = defaultEditor.editedText;                 break;
-            case 1: propertyEditorRoot.propertyDefault = defaultSwitch.checked ? "true" : "false";  break;
-            case 8: propertyEditorRoot.propertyDefault = defaultOption.currentIndex;                break;
+            default: propertyEditorRoot.propertyDefault = defaultEditor.editedText;                             break;
+            case 1: propertyEditorRoot.propertyDefault = defaultSwitch.checked ? "true" : "false";              break;
+            case 8: propertyEditorRoot.propertyDefault = defaultOption.getItemText(defaultOption.currentIndex); break;
         }
 
         // ...
@@ -255,6 +255,7 @@ DPaneBase {
                 id: nameEditor
                 width: propertyFieldsColumn.width - nameLabel.width - DStyle.defaultSpacing //typeOption.width
                 anchors.verticalCenter: parent.verticalCenter
+                text: propertyEditorRoot.propertyName
 
                 onKeyEvent: {
                     switch (event.key) {
@@ -499,12 +500,17 @@ DPaneBase {
             visible: height > 0
             text: "Add Enum Value"
             onClicked: {
-                // Set Type Options Enabled
-                typeOption.enabled = false;
-                // Set Button Enabled State
-                addEnumValueButton.enabled = false;
-                // Emit New Enum Value Signal
-                propertyEditorRoot.newEnumValue();
+                // Check Child Pane
+                if (propertyEditorRoot.childPane !== null) {
+                    // Set Type Options Enabled
+                    typeOption.enabled = false;
+                    // Set Button Enabled State
+                    addEnumValueButton.enabled = false;
+                    // Set New Enum Value
+                    propertyEditorRoot.childPane.newEnumValue = true;
+                    // Show Enum Value Editor
+                    propertyEditorRoot.childPane.show();
+                }
             }
         }
 

@@ -89,9 +89,9 @@ void SettingsController::loadSettings()
     setPropertiesPaneWidth(mSettings.value(SETTINGS_KEY_PROPERTIES_PANE_WIDTH, DEFAULT_SETTINGS_VALUE_PROPERTIES_PANE_WIDTH).toInt());
     setPropertiesPaneHeight(mSettings.value(SETTINGS_KEY_PROPERTIES_PANE_HEIGHT, DEFAULT_SETTINGS_VALUE_PROPERTIES_PANE_HEIGHT).toInt());
 
-    setEditorSyntaxHighlight(mSettings.value(SETTINGS_KEY_QML_EDITOR_SYNTAX_HIGHLIGHT, DEFAULT_SETTINGS_VALUE_EDITOR_SYNTAX_HIGHLIGHT).toBool());
-    setEditorLineNumbers(mSettings.value(SETTINGS_KEY_QML_EDITOR_SHOW_LINE_NUMBERS, DEFAULT_SETTINGS_VALUE_EDITOR_SHOW_LINE_NUMBERS).toBool());
-    setEditorFontSize(mSettings.value(SETTINGS_KEY_QML_EDITOR_FONT_SIZE, DEFAULT_SETTINGS_VALUE_EDITOR_FONT_SIZE).toInt());
+    setEditorSyntaxHighlight(mSettings.value(SETTINGS_KEY_SOURCE_EDITOR_SYNTAX_HIGHLIGHT, DEFAULT_SETTINGS_VALUE_EDITOR_SYNTAX_HIGHLIGHT).toBool());
+    setEditorLineNumbers(mSettings.value(SETTINGS_KEY_SOURCE_EDITOR_SHOW_LINE_NUMBERS, DEFAULT_SETTINGS_VALUE_EDITOR_SHOW_LINE_NUMBERS).toBool());
+    setEditorFontSize(mSettings.value(SETTINGS_KEY_SOURCE_EDITOR_FONT_SIZE, DEFAULT_SETTINGS_VALUE_EDITOR_FONT_SIZE).toInt());
 
     // ...
 
@@ -131,9 +131,9 @@ void SettingsController::saveSettings()
     mSettings.setValue(SETTINGS_KEY_PROPERTIES_PANE_WIDTH, mProjectPaneWidth);
     mSettings.setValue(SETTINGS_KEY_PROPERTIES_PANE_HEIGHT, mPropertiesPaneHeight);
 
-    mSettings.setValue(SETTINGS_KEY_QML_EDITOR_SYNTAX_HIGHLIGHT, mEditorSyntaxHighlight);
-    mSettings.setValue(SETTINGS_KEY_QML_EDITOR_SHOW_LINE_NUMBERS, mEditorLineNumbers);
-    mSettings.setValue(SETTINGS_KEY_QML_EDITOR_FONT_SIZE, mEditorFontSize);
+    mSettings.setValue(SETTINGS_KEY_SOURCE_EDITOR_SYNTAX_HIGHLIGHT, mEditorSyntaxHighlight);
+    mSettings.setValue(SETTINGS_KEY_SOURCE_EDITOR_SHOW_LINE_NUMBERS, mEditorLineNumbers);
+    mSettings.setValue(SETTINGS_KEY_SOURCE_EDITOR_FONT_SIZE, mEditorFontSize);
 
     // ...
 

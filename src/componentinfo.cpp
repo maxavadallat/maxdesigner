@@ -713,16 +713,45 @@ QStringList ComponentInfo::componentPropertyKeys()
 }
 
 //==============================================================================
+// Get All Inherited Property Keys
+//==============================================================================
+QStringList ComponentInfo::inheritedPropertyKeys()
+{
+    // Init Property Keys
+    QStringList propertyKeys = mProperties.keys();
+
+    // Check Bse Name
+    if (!mBaseName.isEmpty() && !mBase && mProject) {
+        // Get Base Component
+        mBase = mProject->getComponentByName(mBaseName, "", true);
+    }
+
+    // Check Base
+    if (mBase) {
+        // Add Properties
+        propertyKeys += mBase->componentPropertyKeys();
+    }
+
+    // Remove Duplicates
+    propertyKeys.removeDuplicates();
+
+    return propertyKeys;
+}
+
+//==============================================================================
 // Set Dirty State
 //==============================================================================
 void ComponentInfo::setDirty(const bool& aDirty)
 {
     // Check Dirty
     if (mDirty != aDirty) {
-        //qDebug() << "ComponentInfo::setDirty - mName: " << mName << " - aDirty: " << aDirty;
+        qDebug() << "ComponentInfo::setDirty - mName: " << mName << " - aDirty: " << aDirty;
 
         // Set Dirty
         mDirty = aDirty;
+
+        // Emit Dirty Changed Signal
+        emit dirtyChanged(mDirty);
 
         // Check Parent
         if (mParent && mDirty) {
@@ -1145,16 +1174,34 @@ ComponentInfo* ComponentInfo::findRoot(ComponentInfo* aComponent)
 }
 
 //==============================================================================
-// Generate Live Code for Designer
+// Generate Component ID
 //==============================================================================
-QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
+QString ComponentInfo::liveCodeGenerateID()
 {
-    qDebug() << "ComponentInfo::generateLiveCode - mName: " << mName << " - aGenerateChildren: " << aGenerateChildren;
+    // Get Component ID
+    QString cID = componentProperty(JSON_KEY_COMPONENT_PROPERTY_ID).toString();
+
+    // Check ID
+    if (cID.isEmpty() && mIsRoot) {
+        // Set ID
+        cID = QString("%1%2").arg(mName.toLower()).arg("Root");
+    }
+
+    return cID;
+}
+
+//==============================================================================
+// Format Imports
+//==============================================================================
+QString ComponentInfo::liveCodeFormatImports(const bool& aLiveRoot)
+{
+    // Check Live Root
+    if (!aLiveRoot) {
+        return "";
+    }
 
     // Init Live Code
     QString liveCode = "";
-
-    // Add Imports =============================================================
 
     // Get Imports Count
     int iCount = mImports.count();
@@ -1174,33 +1221,66 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
     // Add New Line
     liveCode += "\n";
 
+    return liveCode;
+}
+
+//==============================================================================
+// Format Component Name
+//==============================================================================
+QString ComponentInfo::liveCodeFormatName(const QString& aIndent)
+{
+    // Init Live Code
+    QString liveCode = "";
+
     // Check Component Type
     if (mType == COMPONENT_TYPE_DATASOURCE) {
         // Add Type
-        liveCode += "QtObject {\n";
+        liveCode += QString("%1%2").arg(aIndent).arg("QtObject {\n");
     } else {
-        // Add Type
-        liveCode += mName + " {\n";
+        // Check If build In
+        if (mBuiltIn) {
+            // Add Name
+            liveCode += QString("%1%2 {\n").arg(aIndent).arg(mName);
+        } else {
+
+            // Check Base Component
+            if (!mBase) {
+                qCritical() << "ComponentInfo::liveCodeFormatName - NO BASE COMPONENT!!";
+                return "";
+            }
+
+            // Add Type
+            liveCode += QString("%1%2 {\n").arg(aIndent).arg(mBase->mName);
+        }
     }
 
-    // Add ID ==================================================================
+    return liveCode;
+}
 
-    // Get Component ID
-    QString cID = componentProperty(JSON_KEY_COMPONENT_PROPERTY_ID).toString();
+//==============================================================================
+// Format ID
+//==============================================================================
+QString ComponentInfo::liveCodeFormatID(const QString& aCID, const QString& aIndent)
+{
+    // Init Live Code
+    QString liveCode = "";
 
     // Check ID
-    if (cID.isEmpty() && mIsRoot) {
-        // Set ID
-        cID = QString("%1%2").arg(mName.toLower()).arg("Root");
-    }
-
-    // Check ID
-    if (!cID.isEmpty()) {
+    if (!aCID.isEmpty()) {
         // Add ID
-        liveCode += QString("%1id: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cID);
+        liveCode += QString("%1id: %2\n").arg(aIndent).arg(aCID);
     }
 
-    // Add Object Name =========================================================
+    return liveCode;
+}
+
+//==============================================================================
+// Fromat Object Name
+//==============================================================================
+QString ComponentInfo::liveCodeFormatObjectName(const QString& aIndent)
+{
+    // Init Live Code
+    QString liveCode = "";
 
     // Get Object Name
     QString objectName = componentProperty(JSON_KEY_COMPONENT_PROPERTY_OBJECT_NAME).toString();
@@ -1208,16 +1288,19 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
     // Check Object Name
     if (!objectName.isEmpty()) {
         // Add Object Name
-        liveCode += QString("%1objectName: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(objectName);
+        liveCode += QString("%1objectName: %2\n").arg(aIndent).arg(objectName);
     }
 
-    // Check ID & Object Name
-    if (!cID.isEmpty() || !objectName.isEmpty()) {
-        // Add New Line
-        liveCode += "\n";
-    }
+    return liveCode;
+}
 
-    // Add Pos & Size =================================================================
+//==============================================================================
+// Format Positions
+//==============================================================================
+QString ComponentInfo::liveCodeFormatPosition(const QString& aIndent)
+{
+    // Init Live Code
+    QString liveCode = "";
 
     // Check Component Category
     if (mCategory != COMPONENT_CATEGORY_NONVISUAL) {
@@ -1226,7 +1309,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         // Check Pos X
         if (!cpX.isEmpty() && cpX != "0") {
             // Add Pos X
-            liveCode += QString("%1x: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cpX);
+            liveCode += QString("%1x: %2\n").arg(aIndent).arg(cpX);
         }
 
         // Get Pos Y
@@ -1234,7 +1317,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         // Check Pos Y
         if (!cpY.isEmpty() && cpY != "0") {
             // Add Pos Y
-            liveCode += QString("%1y: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cpY);
+            liveCode += QString("%1y: %2\n").arg(aIndent).arg(cpY);
         }
 
         // Get Pos Z
@@ -1242,17 +1325,29 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         // Check Pos Z
         if (!cpZ.isEmpty() && cpZ != "0") {
             // Add Pos Z
-            liveCode += QString("%1z: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cpZ);
+            liveCode += QString("%1z: %2\n").arg(aIndent).arg(cpZ);
         }
+    }
 
-        // Add Size ================================================================
+    return liveCode;
+}
 
+//==============================================================================
+// Format Size
+//==============================================================================
+QString ComponentInfo::liveCodeFormatSize(const QString& aIndent)
+{
+    // Init Live Code
+    QString liveCode = "";
+
+    // Check Component Category
+    if (mCategory != COMPONENT_CATEGORY_NONVISUAL) {
         // Get Width
         QString cWidth = width();
         // Check Width
         if (!cWidth.isEmpty() && cWidth != "0") {
             // Add Width
-            liveCode += QString("%1width: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cWidth);
+            liveCode += QString("%1width: %2\n").arg(aIndent).arg(cWidth);
         }
 
         // Get Height
@@ -1260,11 +1355,20 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         // Check Height
         if (!cHeight.isEmpty() && cHeight != "0") {
             // Add Height
-            liveCode += QString("%1height: %2\n").arg(DEFAULT_SOURCE_INDENT).arg(cHeight);
+            liveCode += QString("%1height: %2\n").arg(aIndent).arg(cHeight);
         }
     }
 
-    // Add Anchors =============================================================
+    return liveCode;
+}
+
+//==============================================================================
+// Format Anchors
+//==============================================================================
+QString ComponentInfo::liveCodeFormatAnchors(const QString& aIndent)
+{
+    // Init Live Code
+    QString liveCode = "";
 
     // Check Anchors
     if (!mIsRoot && !mAnchors.isEmpty()) {
@@ -1288,11 +1392,11 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         // Check Fill Target
         if (!afTarget.isEmpty()) {
             // Add Fill Target
-            liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_FILL).arg(afTarget);
+            liveCode += QString("%1%2: %3\n").arg(aIndent).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_FILL).arg(afTarget);
         // Check Center In Target
         } else if (!acTarget.isEmpty()) {
             // Add Center In Target
-            liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_CENTERIN).arg(acTarget);
+            liveCode += QString("%1%2: %3\n").arg(aIndent).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_CENTERIN).arg(acTarget);
             // Set Horizontal & Vertical Center Used Flag
             hCenter = true;
             vCenter = true;
@@ -1300,7 +1404,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
             // Check Horizontal Center Target
             if (!ahcTarget.isEmpty()) {
                 // Add Horizontal Center Target
-                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER).arg(ahcTarget);
+                liveCode += QString("%1%2: %3\n").arg(aIndent).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER).arg(ahcTarget);
                 // Set Horizontal Center Used Flag
                 hCenter = true;
             } else {
@@ -1312,20 +1416,20 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
                 // Check Left Anchor Target
                 if (!alTarget.isEmpty()) {
                     // Add Left Anchor Target
-                    liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFT).arg(alTarget);
+                    liveCode += QString("%1%2: %3\n").arg(aIndent).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFT).arg(alTarget);
                 }
 
                 // Check Right Anchor Target
                 if (!arTarget.isEmpty()) {
                     // Add Right Anchor Target
-                    liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHT).arg(arTarget);
+                    liveCode += QString("%1%2: %3\n").arg(aIndent).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHT).arg(arTarget);
                 }
             }
 
             // Check Vertical Center Target
             if (!avcTarget.isEmpty()) {
                 // Add Vertical Center Target
-                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER).arg(avcTarget);
+                liveCode += QString("%1%2: %3\n").arg(aIndent).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER).arg(avcTarget);
                 // Set Vertical Center Used Flag
                 vCenter = true;
             } else {
@@ -1337,13 +1441,13 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
                 // Check Top Anchor Target
                 if (!atTarget.isEmpty()) {
                     // Add Top Anchor Target
-                    liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOP).arg(atTarget);
+                    liveCode += QString("%1%2: %3\n").arg(aIndent).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOP).arg(atTarget);
                 }
 
                 // Check Bottom Anchor Target
                 if (!abTarget.isEmpty()) {
                     // Add Bottom Anchor Target
-                    liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOM).arg(abTarget);
+                    liveCode += QString("%1%2: %3\n").arg(aIndent).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOM).arg(abTarget);
                 }
             }
         }
@@ -1355,7 +1459,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
             // Check Horizontal Center Offset
             if (!hcOffset.isEmpty()) {
                 // Add Horiontal Center Offset
-                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER_OFFS).arg(hcOffset);
+                liveCode += QString("%1%2: %3\n").arg(aIndent).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER_OFFS).arg(hcOffset);
                 // Set Horizontal Center Used Flag
                 hCenter = true;
             }
@@ -1368,7 +1472,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
             // Check Vertical Center Offset
             if (!vcOffset.isEmpty()) {
                 // Add Horiontal Center Offset
-                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER_OFFS).arg(vcOffset);
+                liveCode += QString("%1%2: %3\n").arg(aIndent).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER_OFFS).arg(vcOffset);
                 // Set Vertical Center Used Flag
                 vCenter = true;
             }
@@ -1387,7 +1491,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
             // Check Left Margin
             if (!alMargin.isEmpty()) {
                 // Add Left Margin
-                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFTMARGIN).arg(alMargin);
+                liveCode += QString("%1%2: %3\n").arg(aIndent).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFTMARGIN).arg(alMargin);
                 // Set Single Margin Used
                 sMargin = true;
             }
@@ -1395,7 +1499,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
             // Check Right Margin
             if (!arMargin.isEmpty()) {
                 // Add Right Margin
-                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHTMARGIN).arg(arMargin);
+                liveCode += QString("%1%2: %3\n").arg(aIndent).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHTMARGIN).arg(arMargin);
                 // Set Single Margin Used
                 sMargin = true;
             }
@@ -1411,7 +1515,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
             // Check Top Margin
             if (!atMargin.isEmpty()) {
                 // Add Top Margin
-                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOPMARGIN).arg(atMargin);
+                liveCode += QString("%1%2: %3\n").arg(aIndent).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOPMARGIN).arg(atMargin);
                 // Set Single Margin Used
                 sMargin = true;
             }
@@ -1419,7 +1523,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
             // Check Bottom Margin
             if (!abMargin.isEmpty()) {
                 // Add Bottom Margin
-                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOMMARGIN).arg(abMargin);
+                liveCode += QString("%1%2: %3\n").arg(aIndent).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOMMARGIN).arg(abMargin);
                 // Set Single Margin Used
                 sMargin = true;
             }
@@ -1432,25 +1536,26 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
             // Check Margins
             if (!aMargins.isEmpty()) {
                 // Add Bottom Margin
-                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_MARGINS).arg(aMargins);
+                liveCode += QString("%1%2: %3\n").arg(aIndent).arg(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_MARGINS).arg(aMargins);
             }
         }
     }
 
-    // Add Own Properties ======================================================
+    return liveCode;
+}
 
-    // Init Own Property Value Hook List
-    QStringList opvHookList = QStringList();
-    // Init Inherited Properties Value Hook List
-    QStringList pvHookList = QStringList();
+//==============================================================================
+// Format Own Properties
+//==============================================================================
+QString ComponentInfo::liveCodeFormatOwnProperties(QStringList& aOPHooks, QStringList& aEnumHooks, const QString& aID, const QStringList& aFPKeys, const QString& aIndent)
+{
+    // Init Live Code
+    QString liveCode = "";
 
     // Get Own Properties Keys
     QStringList opKeys = mOwnProperties.keys();
     // Get Own Properties Count
     int opCount = opKeys.count();
-
-    // Get Filtered Property Keys
-    QStringList fpKeys = mProject->propertiesController() ? mProject->propertiesController()->filteredProperties() : QStringList();
 
     // Check Own Prpoerties Keys Count
     if (opCount > 0) {
@@ -1458,11 +1563,11 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         liveCode += "\n";
 
         // Iterate Through Own Properties
-        for (int j=0; j<opCount; j++) {
+        for (int i=0; i<opCount; i++) {
             // Check Filtered Properties
-            if (fpKeys.indexOf(opKeys[j]) == -1) {
+            if (aFPKeys.indexOf(opKeys[i]) == -1) {
                 // Get Type And Value
-                QString typeAndValue = mOwnProperties[opKeys[j]].toString();
+                QString typeAndValue = mOwnProperties[opKeys[i]].toString();
                 // Get Type
                 QString pType = Utils::parseType(typeAndValue);
                 // Get Value
@@ -1478,18 +1583,38 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
                 // Check If Built In Component
                 if (mBuiltIn) {
                     // Append Live Code
-                    liveCode += QString("%1%3: %4\n").arg(DEFAULT_SOURCE_INDENT).arg(opKeys[j]).arg(pValue);
+                    liveCode += QString("%1%3: %4\n").arg(aIndent).arg(opKeys[i]).arg(pValue);
                 } else {
                     // Append Live Code
-                    liveCode += QString("%1property %2 %3: %4\n").arg(DEFAULT_SOURCE_INDENT).arg(pType).arg(opKeys[j]).arg(pValue);
+                    liveCode += QString("%1property %2 %3: %4\n").arg(aIndent).arg(pType).arg(opKeys[i]).arg(pValue);
                 }
-                // Add Value Setting Hook
-                opvHookList << QString("%1%1%1case \"%2\": %3.%2 = value; break;\n").arg(DEFAULT_SOURCE_INDENT).arg(opKeys[j]).arg(cID);
+
+                // Check Property Type
+                if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM) {
+                    // Add Enum Values to Enum Hooks
+                    aEnumHooks << liveCodeGenerateEnumValuecases(propertyEnums(opKeys[i]));
+
+                    // Value Setting Hook
+                    aOPHooks << QString("%1%1%1case \"%2\": %3.%2 = __string2enum(value); break;\n").arg(aIndent).arg(opKeys[i]).arg(aID);
+
+                } else {
+                    // Add Value Setting Hook
+                    aOPHooks << QString("%1%1%1case \"%2\": %3.%2 = value; break;\n").arg(aIndent).arg(opKeys[i]).arg(aID);
+                }
             }
         }
     }
 
-    // Add Inherited Properties ================================================
+    return liveCode;
+}
+
+//==============================================================================
+// Format Properties
+//==============================================================================
+QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks, QStringList& aEnumHooks, const QString& aID, const QStringList& aFPKeys, const QString& aIndent)
+{
+    // Init Live Code
+    QString liveCode = "";
 
     // Get Properties Keys
     QStringList pKeys = mProperties.keys();
@@ -1505,7 +1630,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         for (int k=0; k<pCount; k++) {
 
             // Check If Filtered Property
-            if (fpKeys.indexOf(pKeys[k]) == -1) {
+            if (aFPKeys.indexOf(pKeys[k]) == -1) {
                 // Get Type
                 QString pType = propertyType(pKeys[k]);
                 // Get Value
@@ -1516,17 +1641,57 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
                     pValue = QString("\"%1\"").arg(pValue);
                 }
                 // Append Live Code
-                liveCode += QString("%1%2: %3\n").arg(DEFAULT_SOURCE_INDENT).arg(pKeys[k]).arg(pValue);
+                liveCode += QString("%1%2: %3\n").arg(aIndent).arg(pKeys[k]).arg(pValue);
             }
 
-            // Add Value Setting Hook
-            pvHookList << QString("%1%1%1case \"%2\": %3.%2 = value; break;\n").arg(DEFAULT_SOURCE_INDENT).arg(pKeys[k]).arg(cID);
         }
-
-        // ...
     }
 
-    // Add Signals =============================================================
+    // Get All Inherited Property Keys
+    pKeys = inheritedPropertyKeys();
+
+    //qDebug() << "ComponentInfo::liveCodeFormatInheritedProperties - pKeys: " << pKeys;
+
+    // Get Inherited Properties Count
+    pCount = pKeys.count();
+
+    // Iterate Through Inherited Property Keys
+    for (int l=0; l<pCount; l++) {
+        // Check For ID
+        if (pKeys[l] != JSON_KEY_COMPONENT_PROPERTY_ID) {
+            // Get Property Type
+            QString pType = propertyType(pKeys[l]);
+
+            // Check Property Type
+            if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM) {
+
+                // Add Enum Values To Enum Hooks
+                aEnumHooks << liveCodeGenerateEnumValuecases(propertyEnums(pKeys[l]));
+
+                // Add Value Setting Hook
+                aPHooks << QString("%1%1%1case \"%2\": %3.%2 = __string2enum(value); break;\n").arg(aIndent).arg(pKeys[l]).arg(aID);
+
+            } else {
+                // Add Value Setting Hook
+                aPHooks << QString("%1%1%1case \"%2\": %3.%2 = value; break;\n").arg(aIndent).arg(pKeys[l]).arg(aID);
+            }
+        }
+    }
+
+    // TODO: Add Inherited Property Hooks
+
+    // ...
+
+    return liveCode;
+}
+
+//==============================================================================
+// Format Signals
+//==============================================================================
+QString ComponentInfo::liveCodeFormatSignals(const QStringList& aOPKeys, const QStringList& pKeys, const QString& aIndent)
+{
+    // Init Live Code
+    QString liveCode = "";
 
     // Check Signals
     if (!mSignals.isEmpty()) {
@@ -1570,11 +1735,22 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
             signalDef += ")\n";
 
             // Append To Live Code
-            liveCode += QString("%1%2\n").arg(DEFAULT_SOURCE_INDENT).arg(signalDef);
+            liveCode += QString("%1%2\n").arg(aIndent).arg(signalDef);
         }
     }
 
-    // Add Slots ===============================================================
+    // TODO: Add Property Value Changed Signals
+
+    return liveCode;
+}
+
+//==============================================================================
+// Format Slots
+//==============================================================================
+QString ComponentInfo::liveCodeFormatSlots(const QString& aIndent)
+{
+    // Init Live Code
+    QString liveCode = "";
 
     // Check Slots
     if (!mSlots.isEmpty()) {
@@ -1593,46 +1769,94 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
             // Get Source
             QString slotSource = slotObject.value(JSON_KEY_COMPONENT_SLOT_SOURCE).toString();
             // Append To Live Code
-            liveCode += QString("%1%2: %3\n\n").arg(DEFAULT_SOURCE_INDENT).arg(slotName).arg(slotSource);
+            liveCode += QString("%1%2: %3\n\n").arg(aIndent).arg(slotName).arg(slotSource);
         }
     }
 
-    // Add Hooks for Property Getters And Setters !!! ==============================
+    return liveCode;
+}
 
-    // Get Own Property Value Hookss Count
-    int opvhCount = opvHookList.count();
+//==============================================================================
+// Format Functions
+//==============================================================================
+QString ComponentInfo::liveCodeFormatFunctions(const QStringList& aOPHooks, const QStringList& aPHooks, const QStringList& aEnumHooks, const QString& aIndent)
+{
+    // Init Live Code
+    QString liveCode = "";
+
+    // Add Enum Value Hooks ====================================================
+
+    // Get Enum Value Hooks Count
+    int evhCount = aEnumHooks.count();
+
+    // Check Count
+    if (evhCount > 0) {
+        // Add New Line
+        liveCode += "\n";
+
+        // Comment Line
+        liveCode += QString("%1// Convert Strings to Enum Values\n").arg(aIndent);
+
+        // Init String To Enum Function Code
+        QString enumValueFunction = QString("%1function __string2enum(value) {\n").arg(aIndent);
+        // Add Value Switch
+        enumValueFunction += QString("%1%1switch (value) {\n").arg(aIndent);
+        // Add Default Value Case
+        enumValueFunction += QString("%1%1%1default: console.log(\"__string2enum value:\" + value + \" IS NOT DEFINED!\"); break;\n").arg(aIndent);
+
+        // Iterate Through Enum Value Hooks
+        for (int eh=0; eh<evhCount; eh++) {
+            // Add Enum Value Case Line
+            enumValueFunction += aEnumHooks[eh];
+        }
+
+        // Add Switch Closing Bracket
+        enumValueFunction += QString("%1%1}\n").arg(aIndent);
+        // Add Final Bracket
+        enumValueFunction += QString("%1}\n").arg(aIndent);
+
+        liveCode += enumValueFunction;
+
+        // Add New Line
+        liveCode += "\n";
+    }
+
+    // Add Value Setting Hooks =================================================
+
+    // Get Own Property Value Hook's Count
+    int opvhCount = aOPHooks.count();
     // Get Inherited Properties Value Hook's Count
-    int pvhCount = pvHookList.count();
+    int pvhCount = aPHooks.count();
 
     // Check Properties Count
     if (opvhCount > 0 || pvhCount > 0) {
         // Add New Line
         liveCode += "\n";
         // Comment Line
-        liveCode += QString("%1// Property Set Hook\n").arg(DEFAULT_SOURCE_INDENT);
+        liveCode += QString("%1// Property Set Hook\n").arg(aIndent);
         // Init Property Update Hook Function Code
-        QString propertyHooks = QString("%1function __setProperty(key, value) {\n").arg(DEFAULT_SOURCE_INDENT);
+        QString propertyHooks = QString("%1function __setProperty(key, value) {\n").arg(aIndent);
         // Add Key Switch
-        propertyHooks += QString("%1%1switch (key) {\n").arg(DEFAULT_SOURCE_INDENT);
+        propertyHooks += QString("%1%1switch (key) {\n").arg(aIndent);
         // Add Default Hook
-        propertyHooks += QString("%1%1%1default: console.log(\"__setProperty property:\" + key + \" IS NOT DEFINED!\"); break;\n").arg(DEFAULT_SOURCE_INDENT);
+        propertyHooks += QString("%1%1%1default: console.log(\"__setProperty property:\" + key + \" IS NOT DEFINED!\"); break;\n").arg(aIndent);
 
         // Iterate Through Own Property Value Hooks
         for (int i=0; i<opvhCount; i++) {
             // Append Own Property Vlaue Hook
-            propertyHooks += opvHookList[i];
+            propertyHooks += aOPHooks[i];
         }
 
         // Iterate Through Inherited Property Value Hooks
         for (int j=0; j<pvhCount; j++) {
             // Append Inherited Property Value Hook
-            propertyHooks += pvHookList[j];
+            propertyHooks += aPHooks[j];
         }
 
         // Add Switch Closing Bracket
-        propertyHooks += QString("%1%1}\n").arg(DEFAULT_SOURCE_INDENT);
+        propertyHooks += QString("%1%1}\n").arg(aIndent);
         // Add Final Bracket
-        propertyHooks += QString("%1}\n").arg(DEFAULT_SOURCE_INDENT);
+        propertyHooks += QString("%1}\n").arg(aIndent);
 
         // Append Property Hooks To Live Code
         liveCode += propertyHooks;
@@ -1659,7 +1883,7 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
             // Get Function Source
             QString functionSource = functionObject[JSON_KEY_COMPONENT_FUNCTION_SOURCE].toString();
             // Append To Live Code
-            liveCode += QString("%1function %2(%3) {\n").arg(DEFAULT_SOURCE_INDENT).arg(functionName).arg(functionParameters);
+            liveCode += QString("%1function %2(%3) {\n").arg(aIndent).arg(functionName).arg(functionParameters);
             // Get Source Code Lines
             QStringList sourceLines = functionSource.split("\n", QString::SkipEmptyParts);
             // Get Lines Count
@@ -1667,15 +1891,24 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
             // Iterate Through Source Lines
             for (int sl=0; sl<slCount; sl++) {
                 // Append Source
-                liveCode += QString("%1%2\n").arg(DEFAULT_SOURCE_INDENT).arg(sourceLines[sl]);
+                liveCode += QString("%1%2\n").arg(aIndent).arg(sourceLines[sl]);
             }
 
             // Add New Line
-            liveCode += QString("%1}\n\n").arg(DEFAULT_SOURCE_INDENT);
+            liveCode += QString("%1}\n\n").arg(aIndent);
         }
     }
 
-    // Add Children ============================================================
+    return liveCode;
+}
+
+//==============================================================================
+// Format Children
+//==============================================================================
+QString ComponentInfo::liveCodeFormatChildren(const bool& aGenerateChildren, const QString& aIndent)
+{
+    // Init Live Code
+    QString liveCode = "";
 
     // Check Children
     if (aGenerateChildren && mChildren.count() > 0) {
@@ -1685,7 +1918,16 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         // ...
     }
 
-    // Add States ==============================================================
+    return liveCode;
+}
+
+//==============================================================================
+// Format States
+//==============================================================================
+QString ComponentInfo::liveCodeFormatStates(const QString& aIndent)
+{
+    // Init Live Code
+    QString liveCode = "";
 
     // Check States
     if (!mStates.isEmpty()) {
@@ -1695,7 +1937,16 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         // ...
     }
 
-    // Add Transitions =========================================================
+    return liveCode;
+}
+
+//==============================================================================
+// Format Transitions
+//==============================================================================
+QString ComponentInfo::liveCodeFormatTransitions(const QString& aIndent)
+{
+    // Init Live Code
+    QString liveCode = "";
 
     // Check Transitions
     if (!mTransitions.isEmpty()) {
@@ -1705,9 +1956,156 @@ QString ComponentInfo::generateLiveCode(const bool& aGenerateChildren)
         // ...
     }
 
+    return liveCode;
+}
+
+//==============================================================================
+// Generate Enum Value Live Code Cases
+//==============================================================================
+QStringList ComponentInfo::liveCodeGenerateEnumValuecases(const QStringList& aEnumValues)
+{
+    // Init Live Enum Cases
+    QStringList enumLiveCases = QStringList();
+
+    // Get Enum Values Count
+    int evCount = aEnumValues.count();
+    // Iterate Through Enum Values
+    for (int i=0; i<evCount; i++) {
+        // Init Enum Value Case Line
+        QString evLine = QString("%1%1%1case \"%2\": return %2;\n").arg(DEFAULT_SOURCE_INDENT).arg(aEnumValues[i]);
+
+        //qDebug() << "ComponentInfo::liveCodeGenerateEnumValuecases - aEnumValues[" << i << "]: " << aEnumValues[i] <<  " -> " << evLine;
+
+        // Append To live Enum Cases
+        enumLiveCases << evLine;
+    }
+
+    return enumLiveCases;
+}
+
+//==============================================================================
+// Generate Live Code for Designer
+//==============================================================================
+QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGenerateChildren)
+{
+    qDebug() << "ComponentInfo::generateLiveCode - mName: " << mName << " - aLiveRoot: " << aLiveRoot << " - aGenerateChildren: " << aGenerateChildren;
+
+    // Check If Built In
+    if (mBuiltIn && !aLiveRoot) {
+        // No Need to Generate
+        return "";
+    }
+
+    // Init Live Code
+    QString liveCode = "";
+    // Init Indent Level
+    int indentLevel = 0;
+    // Init Current Indent
+    QString indent = "";
+    // Fill
+    indent.fill(' ', indentLevel * 4);
+
+    // Add Imports =============================================================
+
+    liveCode += liveCodeFormatImports(aLiveRoot);
+
+    // Get Component Name
+    QString clName = liveCodeFormatName(indent);
+
+    // Check Component Name Line
+    if (clName.isEmpty()) {
+        qCritical() << "ComponentInfo::generateLiveCode - INVALID COMPONENT NAME!!!";
+    }
+
+    // Add Name ================================================================
+
+    liveCode += clName;
+
+    // Inc Indent Level
+    indentLevel++;
+    // Increase Indent
+    indent.fill(' ', indentLevel * 4);
+
+    // Init Component ID
+    QString cID = liveCodeGenerateID();
+
+    // Get Component ID
+    QString lccID = liveCodeFormatID(cID, indent);
+
+    // Add ID ==================================================================
+
+    liveCode += lccID;
+
+    // Get Object Name
+    QString objectName = liveCodeFormatObjectName(indent);
+
+    // Add Object Name =========================================================
+
+    liveCode += objectName;
+
+    // Check ID & Object Name
+    if (!lccID.isEmpty() || !objectName.isEmpty()) {
+        // Add New Line
+        liveCode += "\n";
+    }
+
+    // Add Pos =================================================================
+
+    liveCode += liveCodeFormatPosition(indent);
+
+    // Add Size ================================================================
+
+    liveCode += liveCodeFormatSize(indent);
+
+    // Add Anchors =============================================================
+
+    liveCode += liveCodeFormatAnchors(indent);
+
+    // Init Own Property Value Hook List
+    QStringList opvHookList = QStringList();
+    // Init Inherited Properties Value Hook List
+    QStringList pvHookList = QStringList();
+    // Init Enum Hook List
+    QStringList enumHookList = QStringList();
+
+    // Get Filtered Property Keys
+    QStringList fpKeys = mProject->propertiesController() ? mProject->propertiesController()->filteredProperties() : QStringList();
+
+    // Add Own Properties ======================================================
+
+    liveCode += liveCodeFormatOwnProperties(opvHookList, enumHookList, cID, fpKeys, indent);
+
+    // Add Inherited Properties ================================================
+
+    liveCode += liveCodeFormatInheritedProperties(pvHookList, enumHookList, cID, fpKeys, indent);
+
+    // Add Signals =============================================================
+
+    liveCode += liveCodeFormatSignals(mOwnProperties.keys(), mProperties.keys(), indent);
+
+    // Add Slots ===============================================================
+
+    liveCode += liveCodeFormatSlots(indent);
+
+    // Add Hooks for Property Getters And Setters and Functions ================
+
+    liveCode += liveCodeFormatFunctions(opvHookList, pvHookList, enumHookList, indent);
+
+    // Add Children ============================================================
+
+    liveCode += liveCodeFormatChildren(aGenerateChildren, indent);
+
+    // Add States ==============================================================
+
+    liveCode += liveCodeFormatStates(indent);
+
+    // Add Transitions =========================================================
+
+    liveCode += liveCodeFormatTransitions(indent);
+
     //==========================================================================
 
-    liveCode += QString("%1//...\n\n").arg(DEFAULT_SOURCE_INDENT);
+    liveCode += QString("%1//...\n\n").arg(indent);
 
     liveCode += "}\n";
 
@@ -1767,10 +2165,13 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
 {
     //qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue;
 
-    // Get Property Keys
+    // Get All Property Keys
     QStringList baseProperties = mBase ? mBase->componentPropertyKeys() : QStringList();
     // Get Base Key Index
     int bpkIndex = baseProperties.indexOf(aName);
+
+    // Init Property Changed Flag
+    bool valueChanged = false;
 
     // Check Base Key Index
     if (bpkIndex < 0) {
@@ -1798,19 +2199,29 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
         // Emit Own Property Added Signal
         emit ownPropertyAdded(aName);
 
+        // Set Value Changed
+        valueChanged = true;
+
     } else {
-        qDebug() << "ComponentInfo::setComponentProperty - component: " << mName << " - aName: " << aName << " - aValue: " << aValue << " - BASE";
-        // Set Property
-        mProperties[aName] = aValue.toString();
-        // Emit Property Updated Signal
-        emit propertyUpdated(aName);
+        // Check Value
+        if (mProperties.value(aName).toString() != aValue.toString()) {
+            qDebug() << "ComponentInfo::setComponentProperty - component: " << mName << " - aName: " << aName << " - aValue: " << aValue << " - BASE";
+            // Set Property
+            mProperties[aName] = aValue.toString();
+            // Emit Property Updated Signal
+            emit propertyUpdated(aName);
+            // Set Value Changed
+            valueChanged = true;
+        }
     }
 
-    // Emit Component Property Value Changed
-    emit componentPropertyChanged(aName, aValue);
-
-    // Set Dirty
-    setDirty(true);
+    // Check Value Changed
+    if (valueChanged) {
+        // Emit Component Property Value Changed
+        emit componentPropertyChanged(aName, aValue);
+        // Set Dirty
+        setDirty(true);
+    }
 }
 
 //==============================================================================
@@ -1853,9 +2264,8 @@ QString ComponentInfo::propertyType(const QString& aName)
 
     // Check Property Index
     if (opIndex >= 0) {
-        // Get Type And Value
-        QString typeAndValue = mOwnProperties.value(aName).toString();
-        return typeAndValue.left(typeAndValue.indexOf(":"));
+        // Get Type
+        return Utils::parseType(mOwnProperties.value(aName).toString());
     }
 
     // Check Prototype
@@ -1869,6 +2279,35 @@ QString ComponentInfo::propertyType(const QString& aName)
     }
 
     return mBase ? mBase->propertyType(aName) : "";
+}
+
+//==============================================================================
+// Get Property Enum Values
+//==============================================================================
+QStringList ComponentInfo::propertyEnums(const QString& aName)
+{
+    // Get Keys
+    QStringList opKeys = mOwnProperties.keys();
+    // Get Property Index
+    int opIndex = opKeys.indexOf(aName);
+
+    // Check Property Index
+    if (opIndex >= 0) {
+        // Get Enum Values
+        return Utils::parseEnumValues(mOwnProperties.value(aName).toString());
+    }
+
+    // Check Prototype
+    if (mProtoType) {
+        // Get Type
+        QStringList pEnums = mProtoType->propertyEnums(aName);
+        // Check Property Type
+        if (!pEnums.isEmpty()) {
+            return pEnums;
+        }
+    }
+
+    return mBase ? mBase->propertyEnums(aName) : QStringList();
 }
 
 //==============================================================================

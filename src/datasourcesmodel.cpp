@@ -89,13 +89,49 @@ void DataSourcesModel::loadDataSources()
         if (mDataSources.keys().indexOf(itemName) < 0) {
             // Get Item Path
             QString itemPath = dsIterator.filePath();
-            //qDebug() << "BaseComponentsModel::loadBaseComponents - itemPath: " << itemPath;
+            //qDebug() << "DataSourcesModel::loadDataSources - itemPath: " << itemPath;
             // Create Data Source
             ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
             // Add Data Source
             addDataSource(newComponent);
         } else {
-            qDebug() << "BaseComponentsModel::loadBaseComponents - itemName: " << itemName << " - Component Already Added.";
+            qDebug() << "DataSourcesModel::loadDataSources - itemName: " << itemName << " - Component Already Added.";
+        }
+    }
+}
+
+//==============================================================================
+// Save All Components
+//==============================================================================
+void DataSourcesModel::saveAllComponents()
+{
+    // Get Components Count
+    int dsCount = rowCount();
+    // Iterate Through Base Components
+    for (int i=0; i<dsCount; i++) {
+        // Get Component
+        ComponentInfo* dataSource = mDataSources.value(mDataSources.keys()[i]);
+        // Save
+        dataSource->save();
+    }
+}
+
+//==============================================================================
+// Component Dirty State Changed Slot
+//==============================================================================
+void DataSourcesModel::componentDirtyChanged(const bool& aDirty)
+{
+    // Get Sender Component
+    ComponentInfo* senderComponent = static_cast<ComponentInfo*>(sender());
+    // Check Sender Component
+    if (senderComponent) {
+        qDebug() << "DataSourcesModel::componentDirtyChanged - mName: " << senderComponent->mName << " - aDirty: " << aDirty;
+        // Get Component Index
+        int dsIndex = mDataSources.keys().indexOf(senderComponent->mName);
+        // Check Component Index
+        if (dsIndex >= 0) {
+            // Emit Data Changed Signal
+            emit dataChanged(index(dsIndex), index(dsIndex));
         }
     }
 }
@@ -140,6 +176,9 @@ bool DataSourcesModel::addDataSource(ComponentInfo* aDataSource)
         // Add Data Source To Data Source Map
         mDataSources[dsName] = aDataSource;
 
+        // Connect Dirty Changed Signal
+        connect(aDataSource, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
+
         // Get New Key Index
         int newIndex = mDataSources.keys().indexOf(dsName);
 
@@ -175,6 +214,8 @@ bool DataSourcesModel::removeDataSource(const int& aIndex)
         beginRemoveRows(QModelIndex(), aIndex, aIndex);
         // Remove Key
         mDataSources.remove(dsKey);
+        // Disonnect Dirty Changed Signal
+        connect(component, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
         // Delete Component
         delete component;
         // Delete Data Source Info File

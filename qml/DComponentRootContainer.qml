@@ -363,7 +363,7 @@ DPaneBase {
             componentRootContainerRoot.rootComponentCreated = true;
 
             // Create New Root Object
-            componentRootContainerRoot.rootComponent = Qt.createQmlObject(componentRootContainerRoot.componentInfo.generateLiveCode(false),  componentRootContainerRoot.rootContainer);
+            componentRootContainerRoot.rootComponent = Qt.createQmlObject(componentRootContainerRoot.componentInfo.generateLiveCode(true, false),  componentRootContainerRoot.rootContainer);
 
             // Check New Root Object
             if (componentRootContainerRoot.rootComponent === null) {

@@ -97,7 +97,7 @@ DMouseArea {
 
         selectByMouse: true
 
-        color: DStyle.colorFontLight
+        color: focus ? DStyle.colorFontLight : DStyle.colorFontDark
 
         clip: true
 
