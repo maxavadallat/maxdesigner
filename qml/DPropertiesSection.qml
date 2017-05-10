@@ -30,7 +30,22 @@ Repeater {
         Item {
             id: basePropertiesContainer
             width: basePropertiesRepeaterRoot.width
-            height: CONSTS.defaultPaneItemHeight * Math.min(CONSTS.defaultPropertiesMax, basePropertiesListView.count)
+            height: {
+                // Get Default Height
+                var defaultHeight = CONSTS.defaultPaneItemHeight * Math.min(CONSTS.defaultPropertiesMax, basePropertiesListView.count);
+
+                // Check If Item Expanded
+                if (itemExpanded) {
+                    return Math.max(itemExpandedPosY + itemExpandedHeight, defaultHeight);
+                }
+
+                return defaultHeight;
+            }
+
+            property bool itemExpanded: false
+            property int itemExpandedHeight: CONSTS.defaultPaneItemHeight
+            property int itemExpandedPosY: 0
+
             Behavior on height { DAnimation { } }
 
             // Base Properties List View
@@ -47,9 +62,7 @@ Repeater {
                     id: propertyItemDelegate
                     width: basePropertiesRepeaterRoot.width
                     namesColumnWidth: basePropertiesRepeaterRoot.namesColumnWidth
-
                     itemIndex: index
-
                     propertyName: model.pName
                     propertyType: model.pType
                     propertyValue: model.pValue
@@ -57,22 +70,20 @@ Repeater {
                     showFormula: model.pIsFormula || model.pIsBind
                     enableSwipe: !model.pIsBase
                     opacity: !model.pIsBase ? 1.0 : 0.6
+
                     actionButtonText: "Clear"
 
-                    onItemActionClicked: {
-                        // Clear Component Property
-                        propertiesController.clearComponentProperty(propertyName);
-                    }
+                    onItemActionClicked: propertiesController.clearComponentProperty(propertyName);
+                    onFormulaEditClicked: propertiesPaneRoot.editFormulaLaunch(propertyName, false);
+                    onItemValueChanged: propertiesController.setComponentProperty(propertyName, newValue);
 
-                    onFormulaEditClicked: {
-                        // Emit Edit Formula Launch Signal
-                        propertiesPaneRoot.editFormulaLaunch(propertyName, false);
-                    }
-
-                    onItemValueChanged: {
-                        console.log("PropertiesPane.propertyItemDelegate.onItemValueChanged - propertyName: " + propertyName + " - newValue: " + newValue);
-                        // Set Property Value
-                        propertiesController.setComponentProperty(propertyName, newValue);
+                    onItemExpandedChanged: {
+                        // Set Expanded Item Pos Y
+                        basePropertiesContainer.itemExpandedPosY = propertyItemDelegate.y;
+                        // Set Item Expanded Height
+                        basePropertiesContainer.itemExpandedHeight = expandedHeight;
+                        // Set Item Expanded
+                        basePropertiesContainer.itemExpanded = itemExpanded;
                     }
                 }
             }

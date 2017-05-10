@@ -82,6 +82,8 @@ protected: // Data
     ComponentInfo*                              mComponent;
     // Project Model
     ProjectModel*                               mProject;
+    // Hierarchy
+    QStringList                                 mHierarchy;
     // Base Components Own Properties Model Map
     QMap<QString, ComponentOwnPropertiesModel*> mBaseComponentProperties;
 };

@@ -384,26 +384,35 @@ void MainWindow::setCurrentComponent(ComponentInfo* aComponent)
         mCurrentComponent = aComponent;
 
         // Check Current Component
-        if (mCurrentComponent && mCurrentComponent->getDirty()) {
-            // Set Save Component Action Enabled
-            ui->actionSaveComponent->setEnabled(true);
-            // Set Save All Components Action Enabled
-            ui->actionSaveAllComponents->setEnabled(true);
-        } else {
-            // Set Save Component Action Enabled
-            ui->actionSaveComponent->setEnabled(false);
-            // Set Save All Components Action Enabled
-            //ui->actionSaveAllComponents->setEnabled(false);
-        }
-
-        // Check Current Component
         if (mCurrentComponent) {
-            // Connect Signals
 
+            // Connect Signals
             // Connect Dirty Changed Signal
             connect(mCurrentComponent, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
 
             // ...
+
+            // Check If Is Root
+            if (mCurrentComponent->isRoot()) {
+                // Set Go Live Enabled State
+                ui->actionGoLive->setEnabled(true);
+            }
+
+            // Check Current Component
+            if (mCurrentComponent->getDirty()) {
+                // Set Save Component Action Enabled
+                ui->actionSaveComponent->setEnabled(true);
+                // Set Save All Components Action Enabled
+                ui->actionSaveAllComponents->setEnabled(true);
+            }
+
+            // ...
+
+        } else {
+            // Set Save Component Action Enabled
+            ui->actionSaveComponent->setEnabled(false);
+            // Set Go Live Enabled State
+            ui->actionGoLive->setEnabled(false);
         }
     }
 }
@@ -1359,6 +1368,8 @@ void MainWindow::closeProject()
     ui->actionCreateComponent->setEnabled(false);
     ui->actionCreateView->setEnabled(false);
     ui->actionShowComponentNames->setEnabled(false);
+    ui->actionSaveComponent->setEnabled(false);
+    ui->actionSaveAllComponents->setEnabled(false);
     ui->actionCloseComponent->setEnabled(false);
     ui->actionCloseAllComponents->setEnabled(false);
     ui->actionEditComponent->setEnabled(false);
@@ -1379,6 +1390,9 @@ void MainWindow::closeProject()
 void MainWindow::closeComponent()
 {
     //qDebug() << "MainWindow::closeComponent";
+
+    // Save Component
+    saveComponent();
 
     // Check Properties Controller
     if (mPropertiesController) {
@@ -1402,6 +1416,9 @@ void MainWindow::closeComponent()
 void MainWindow::closeAllComponents()
 {
     //qDebug() << "MainWindow::closeAllComponents";
+
+    // Save All Components
+    saveAllComponents();
 
     // Check Properties Controller
     if (mPropertiesController) {

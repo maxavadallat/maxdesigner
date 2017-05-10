@@ -205,7 +205,12 @@ DControl {
 
     // Get Item Text
     function getItemText(index) {
-        return optionRoot.model[index].text;
+        // Check Index
+        if (index >= 0 && index < optionRoot.model.length) {
+            return optionRoot.model[index].text;
+        }
+
+        return "";
     }
 
     // Set Value

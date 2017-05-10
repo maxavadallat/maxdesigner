@@ -53,11 +53,8 @@ DSection {
             delegate: DPropertyItem {
                 id: propertyItemDelegate
                 width: ownPropertiesListView.width
-
                 namesColumnWidth: ownPropertiesSectionRoot.namesColumnWidth
-
                 itemIndex: index
-
                 propertyName: model.pName
                 propertyType: model.pType
                 propertyValue: model.pValue
@@ -66,32 +63,12 @@ DSection {
 
                 property int sourceIndex: ownPropertiesListView.opFilter.getSourceIndex(itemIndex)
 
-                onItemActionClicked: {
-                    // Check Own Properties Model
-                    if (propertiesController.ownPropertiesModel !== null) {
-                        //console.log("ownPropertiesListView.delegate.onDeleteItemClicked - sourceIndex: " + ownPropertiesListView.opFilter.getSourceIndex(itemIndex));
-                        // Remove Own Property
-                        propertiesController.ownPropertiesModel.removeComponentProperty(sourceIndex);
-                    }
-                }
-
-                onItemEditClicked: {
-                    // Emit Edit Property Launch Signal
-                    propertiesPaneRoot.editPropertyLaunch(sourceIndex);
-                }
-
-                onFormulaEditClicked: {
-                    // Emit Edit Formula Launch Signal
-                    propertiesPaneRoot.editFormulaLaunch(propertyName, true);
-                }
-
-                onItemValueChanged: {
-                    // Set Own Property Value
-                    propertiesController.setComponentProperty(propertyName, newValue);
-                }
+                onItemActionClicked: propertiesController.removeComponentProperty(propertyName);
+                onItemEditClicked: propertiesPaneRoot.editPropertyLaunch(sourceIndex);
+                onFormulaEditClicked: propertiesPaneRoot.editFormulaLaunch(propertyName, true);
+                onItemValueChanged: propertiesController.setComponentProperty(propertyName, newValue);
 
                 onItemExpandedChanged: {
-                    //console.log("#### posY: " + propertyItemDelegate.y);
                     // Set Expanded Item Pos Y
                     ownPropertiesContainer.itemExpandedPosY = propertyItemDelegate.y;
                     // Set Item Expanded Height

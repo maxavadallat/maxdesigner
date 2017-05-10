@@ -745,7 +745,7 @@ void ComponentInfo::setDirty(const bool& aDirty)
 {
     // Check Dirty
     if (mDirty != aDirty) {
-        qDebug() << "ComponentInfo::setDirty - mName: " << mName << " - aDirty: " << aDirty;
+        //qDebug() << "ComponentInfo::setDirty - mName: " << mName << " - aDirty: " << aDirty;
 
         // Set Dirty
         mDirty = aDirty;
@@ -1616,8 +1616,8 @@ QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks, Q
     // Init Live Code
     QString liveCode = "";
 
-    // Get Properties Keys
-    QStringList pKeys = mProperties.keys();
+    // Get All Inherited Properties Keys
+    QStringList pKeys = inheritedPropertyKeys();
     // Get Properties Count
     int pCount = pKeys.count();
 
@@ -1626,61 +1626,44 @@ QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks, Q
         // Add New Line
         liveCode += "\n";
 
-        // Iterate Through Properties
+        // Iterate Through Property Keys
         for (int k=0; k<pCount; k++) {
+            // Get Type
+            QString pType = propertyType(pKeys[k]);
+            // Get Value
+            QString pValue = componentProperty(pKeys[k]).toString();
 
-            // Check If Filtered Property
+            // Check Key
             if (aFPKeys.indexOf(pKeys[k]) == -1) {
-                // Get Type
-                QString pType = propertyType(pKeys[k]);
-                // Get Value
-                QString pValue = mProperties.value(pKeys[k]).toString();
+
                 // Check Type
                 if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING) {
                     // Set Value
                     pValue = QString("\"%1\"").arg(pValue);
                 }
+
                 // Append Live Code
                 liveCode += QString("%1%2: %3\n").arg(aIndent).arg(pKeys[k]).arg(pValue);
             }
 
-        }
-    }
+            // Check Property Key
+            if (pKeys[k] != JSON_KEY_COMPONENT_PROPERTY_ID) {
+                // Check Property Type
+                if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM) {
 
-    // Get All Inherited Property Keys
-    pKeys = inheritedPropertyKeys();
+                    // Add Enum Values To Enum Hooks
+                    aEnumHooks << liveCodeGenerateEnumValuecases(propertyEnums(pKeys[k]));
 
-    //qDebug() << "ComponentInfo::liveCodeFormatInheritedProperties - pKeys: " << pKeys;
+                    // Add Value Setting Hook
+                    aPHooks << QString("%1%1%1case \"%2\": %3.%2 = __string2enum(value); break;\n").arg(aIndent).arg(pKeys[k]).arg(aID);
 
-    // Get Inherited Properties Count
-    pCount = pKeys.count();
-
-    // Iterate Through Inherited Property Keys
-    for (int l=0; l<pCount; l++) {
-        // Check For ID
-        if (pKeys[l] != JSON_KEY_COMPONENT_PROPERTY_ID) {
-            // Get Property Type
-            QString pType = propertyType(pKeys[l]);
-
-            // Check Property Type
-            if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM) {
-
-                // Add Enum Values To Enum Hooks
-                aEnumHooks << liveCodeGenerateEnumValuecases(propertyEnums(pKeys[l]));
-
-                // Add Value Setting Hook
-                aPHooks << QString("%1%1%1case \"%2\": %3.%2 = __string2enum(value); break;\n").arg(aIndent).arg(pKeys[l]).arg(aID);
-
-            } else {
-                // Add Value Setting Hook
-                aPHooks << QString("%1%1%1case \"%2\": %3.%2 = value; break;\n").arg(aIndent).arg(pKeys[l]).arg(aID);
+                } else {
+                    // Add Value Setting Hook
+                    aPHooks << QString("%1%1%1case \"%2\": %3.%2 = value; break;\n").arg(aIndent).arg(pKeys[k]).arg(aID);
+                }
             }
         }
     }
-
-    // TODO: Add Inherited Property Hooks
-
-    // ...
 
     return liveCode;
 }
@@ -2131,7 +2114,7 @@ QVariant ComponentInfo::componentProperty(const QString& aName)
     }
 
     // Check Property Name
-    if (aName != "id" && aName != "objectName") {
+    if (aName != JSON_KEY_COMPONENT_PROPERTY_ID && aName != JSON_KEY_COMPONENT_PROPERTY_OBJECT_NAME) {
         // Check Prototype
         if (mProtoType) {
             // Get Property

@@ -65,7 +65,7 @@ void ComponentPropertiesModel::loadComponentProperties()
 void ComponentPropertiesModel::clearComponentProperties()
 {
     // Chekc Hierarchy
-    if (mBaseComponentProperties.count() > 0) {
+    if (rowCount() > 0) {
         //qDebug() << "ComponentPropertiesModel::clearComponentProperties - keys: " << mBaseComponentProperties.keys();
 
         // Begin Reset Model
@@ -100,6 +100,9 @@ void ComponentPropertiesModel::clearComponentProperties()
         // Clear Keys
         mBaseComponentProperties.clear();
 
+        // Clear Hierarchy
+        mHierarchy.clear();
+
         // End Reset Model
         endResetModel();
     }
@@ -123,14 +126,14 @@ void ComponentPropertiesModel::addComponentToHierarchy(const QString& aBaseName)
         // Check Base Component
         if (baseComponent) {
             qDebug() << "ComponentPropertiesModel::addComponentToHierarchy - aBaseName: " << aBaseName;
-
             // Get Filtered Own Property Keys
             QStringList pKeys = baseComponent->mOwnProperties.keys();
-
             // Check Filtered Property Keys
-            if (pKeys.count() > 0 && mBaseComponentProperties.keys().indexOf(aBaseName) < 0) {
+            if (pKeys.count() > 0 && mHierarchy.indexOf(aBaseName) < 0) {
                 // Begin Insert Rows
                 beginInsertRows(QModelIndex(), rowCount(), rowCount());
+                // Add Base Component Name To Hierarchy
+                mHierarchy << aBaseName;
                 // Create New Component Own Properties Model
                 ComponentOwnPropertiesModel* newBCOPModel = new ComponentOwnPropertiesModel(baseComponent, mProject, mComponent);
                 // Set Ownership
@@ -275,7 +278,7 @@ ComponentOwnPropertiesModel* ComponentPropertiesModel::componentPropertyList(con
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
 
-        return mBaseComponentProperties.value(mBaseComponentProperties.keys()[aIndex]);
+        return mBaseComponentProperties.value(mHierarchy[aIndex]);
 
     } else {
         //qWarning() << "ComponentPropertiesModel::componentPropertyList - aIndex: " << aIndex << " - OUT OF BOUNDS!!";
@@ -289,7 +292,7 @@ ComponentOwnPropertiesModel* ComponentPropertiesModel::componentPropertyList(con
 //==============================================================================
 int ComponentPropertiesModel::rowCount(const QModelIndex& ) const
 {
-    return mBaseComponentProperties.keys().count();
+    return mHierarchy.count();
 }
 
 //==============================================================================
@@ -305,7 +308,7 @@ QVariant ComponentPropertiesModel::data(const QModelIndex& index, int role) cons
         // Switch Role
         switch (role) {
             default:
-            case ESMRBaseName:  return mBaseComponentProperties.keys()[pmRow];
+            case ESMRBaseName:  return mHierarchy[pmRow];
         }
     }
 

@@ -788,6 +788,11 @@ void PropertiesController::clearComponentProperty(const QString& aName)
         return;
     }
 
+    // Check Focused Component
+    if (!mFocusedComponent) {
+        return;
+    }
+
     // Check Component Own Properties Model
     if (mComponentOwnProperties) {
         // Set Component Own Property Value
@@ -802,6 +807,10 @@ void PropertiesController::clearComponentProperty(const QString& aName)
         // Set Component Property Value
         if (mComponentProperties->clearComponentProperty(aName)) {
             qDebug() << "PropertiesController::clearComponentProperty - aName: " << aName << " - BASE";
+            // Get Base Component Property
+            QVariant baseValue = componentProperty(aName);
+            // Emit Component Property Changed Signal
+            emit mFocusedComponent->componentPropertyChanged(aName, baseValue);
             return;
         }
     }

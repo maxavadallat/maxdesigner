@@ -50,23 +50,27 @@ DPane {
                     sizeAndPosSection.hide();
                     // Hide Anchors Section
                     anchorsSection.hide();
-                } else {
-                    // Check Section State
-                    if (sizeAndPosSection.state === sizeAndPosSection.stateHidden) {
-                        // Set Closed State
-                        sizeAndPosSection.close();
-                    }
-                }
 
-                // Check If Root
-                if (propertiesController.focusedComponent.isRoot) {
-                    // Hide Anchors Section
-                    anchorsSection.hide();
                 } else {
-                    // Check Section State
-                    if (anchorsSection.state === anchorsSection.stateHidden) {
-                        // Set Closed State
-                        anchorsSection.close();
+                    // Show Size And Pos Section
+                    sizeAndPosSection.open();
+
+//                    // Check Section State
+//                    if (sizeAndPosSection.state === sizeAndPosSection.stateHidden) {
+//                        // Set Closed State
+//                        sizeAndPosSection.close();
+//                    }
+
+                    // Check If Root
+                    if (propertiesController.focusedComponent.isRoot) {
+                        // Hide Anchors Section
+                        anchorsSection.hide();
+                    } else {
+                        // Check Section State
+                        if (anchorsSection.state === anchorsSection.stateHidden) {
+                            // Set Closed State
+                            anchorsSection.close();
+                        }
                     }
                 }
 
@@ -161,6 +165,7 @@ DPane {
         }
     }
 
+    // Check Focused Component Properties
     function checkFocusedComponent() {
         // Check If Has ID
         if (propertiesController.focusedComponent.hasProperty("id")) {

@@ -72,7 +72,7 @@ Item {
                 propertyValueSpinner.value = Number(propertyItemValueRoot.propertyValue);
             break;
 
-            case CONSTS.propertyTypes[4]:
+            case CONSTS.propertyTypes[8]:
                 // Check Value
                 if (propertyValueOption.getItemText(propertyValueOption.currentIndex) !== propertyItemValueRoot.propertyValue) {
                     // Set Option Value
@@ -254,9 +254,12 @@ Item {
                 onCurrentIndexChanged: {
                     // Get New Option Value
                     var newValue = propertyValueOption.getItemText(propertyValueOption.currentIndex);
-                    //console.log("#### DPropertyItemValue.propertyValueOption.onCurrentIndexChanged - currentIndex: " + propertyValueOption.currentIndex + " - newValue: " + newValue);
-                    // Emit Value Changed Signal
-                    propertyItemValueRoot.valueChanged(newValue);
+                    // Check New Value
+                    if (propertyItemValueRoot.propertyValue !== newValue) {
+                        //console.log("DPropertyItemValue.propertyValueOption.onCurrentIndexChanged - currentIndex: " + propertyValueOption.currentIndex + " - newValue: " + newValue);
+                        // Emit Value Changed Signal
+                        propertyItemValueRoot.valueChanged(newValue);
+                    }
                 }
             }
         }
