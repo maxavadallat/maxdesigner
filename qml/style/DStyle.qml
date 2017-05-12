@@ -95,6 +95,9 @@ QtObject {
     // Disabled Opacity
     readonly property real disabledOpacity:                 0.7
 
+    // Pressed Scale
+    readonly property real pressedScale:                    0.9
+
     // Default Scroll Indicator Width
     readonly property int scrollIndicatorWidth:             4
 

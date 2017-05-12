@@ -77,10 +77,6 @@ Item {
 
     }
 
-    // Close All Root Components
-    function closeRootComponents() {
-    }
-
     // Connections - Main Controller
     Connections {
         target: mainController
@@ -104,11 +100,6 @@ Item {
             } else {
                 // Set Open Recent Files On Show Finished
                 openRecentFilesOnShowFinished = false;
-
-//                // Close Root Components
-//                closeRootComponents();
-
-
                 // Reset Project Pane
                 projectPane.reset(false);
                 // Reset Properties Pane

@@ -74,3 +74,7 @@ var defaultSwipeAreaWidth                       = 16;
 // Property Types
 var propertyTypes                               = ["string", "bool", "int", "double", "real", "var", "object", "list", "enum", "alias"];
 
+// Default Node Tree Item Height
+var defaultNodeTreeItemHeight                   = 48;
+// Default Node Scale Ratio
+var defaultNodeScaleRatio                       = 0.95;

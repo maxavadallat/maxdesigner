@@ -12,29 +12,39 @@ Item {
 
     property bool enableSwipe: true
 
-    property bool swipeOn: (actionButtonContainer.x === actionButtonContainer.swipeMinX)
+    property bool swipeOn: (actionButtonContainer.x === swipeGestureRoot.swipeMinX)
+
+    property int swipeMinX: swipeGestureRoot.width - actionButtonContainer.width
+    property int swipeMaxX: swipeGestureRoot.width - CONSTS.defaultSwipeAreaWidth
+    property int swipeRange: swipeGestureRoot.swipeMaxX - swipeGestureRoot.swipeMinX
 
     property string actionButtonText: "Delete"
     property string actionButtonColor: DStyle.colorCancel
     property string actionButtonHiglightColor: DStyle.colorCancelHighLight
 
+    readonly property int handleWidth: 16
+
     clip: true
 
     signal actionButtonClicked()
 
-    Component.onCompleted: {
-        // Reset Action Button Container X Position
-        actionButtonContainer.x = Qt.binding(function() { return swipeGestureRoot.width - 16; });
+    onWidthChanged: {
+        // Set Action Button Container Position
+        actionButtonContainer.x = swipeGestureRoot.width - 16;
     }
 
     onSwipeOnChanged: {
+        // Check Swipe On
         if (swipeOn) {
+            // Set Focus
             focus = true;
         }
     }
 
     Keys.onReleased: {
+        // Check Key Event
         if (event.key === Qt.Key_Escape) {
+            // Hide Swipe
             hideSwipe();
         }
     }
@@ -60,6 +70,7 @@ Item {
         anchors.fill: parent
         visible: swipeOn
         onClicked: {
+            // Hide Swipe
             hideSwipe();
         }
     }
@@ -69,7 +80,7 @@ Item {
         id: contentfade
         anchors.fill: parent
         color: "#AA000000"
-        opacity: (actionButtonContainer.swipeMaxX - actionButtonContainer.x) / actionButtonContainer.swipeRange
+        opacity: (swipeGestureRoot.swipeMaxX - actionButtonContainer.x) / swipeGestureRoot.swipeRange
         visible: opacity > 0.0
     }
 
@@ -77,14 +88,11 @@ Item {
     DMouseArea {
         id: actionButtonContainer
 
-        x: swipeGestureRoot.width - 16
-
         width: CONSTS.defaultButtonWidth + 64
         height: parent.height
 
-        readonly property int swipeMinX: swipeGestureRoot.width - actionButtonContainer.width
-        readonly property int swipeMaxX: swipeGestureRoot.width - CONSTS.defaultSwipeAreaWidth
-        readonly property int swipeRange: swipeMaxX - swipeMinX
+        anchors.right: parent.right
+        anchors.rightMargin: swipeGestureRoot.handleWidth - width
 
         property real minimumVelocity: 200//1000
 
@@ -107,6 +115,8 @@ Item {
         }
 
         onPressed:  {
+            // Reset Right Anchoring
+            actionButtonContainer.anchors.right = undefined;
             // Stop Easing Animation
             easingAnimation.stop();
             // Set Last X
@@ -167,7 +177,7 @@ Item {
             }
 
             // Set Easing Curve End Position
-            easingAnimation.to = newEndPos;
+            easingAnimation.to = Math.round(newEndPos);
             // Start Easing
             easingAnimation.start();
         }
@@ -179,11 +189,11 @@ Item {
         DText {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
-            text: "---"
-            opacity: (actionButtonContainer.x === actionButtonContainer.swipeMaxX) ? 0.5 : 0.0
+            opacity: actionButtonContainer.x < swipeGestureRoot.swipeMaxX ? 0.0 : 0.5
             Behavior on opacity { DFadeAnimation { } }
             visible: swipeGestureRoot.enableSwipe && opacity > 0.0
             rotation: 90
+            text: "---"
         }
 
         DButton {
@@ -202,7 +212,7 @@ Item {
 
         NumberAnimation on x {
             id: hideSwipeAnimation
-            to: actionButtonContainer.swipeMaxX
+            to: swipeGestureRoot.swipeMaxX
             duration: DStyle.animDuration
             easing.type: Easing.OutBack
         }
@@ -211,11 +221,11 @@ Item {
             id: easingAnimation
             to: {
                 // Check Position
-                if (actionButtonContainer.x > actionButtonContainer.swipeMinX + actionButtonContainer.swipeRange * 0.5) {
-                    return actionButtonContainer.swipeMaxX;
+                if (actionButtonContainer.x > swipeGestureRoot.swipeMinX + swipeGestureRoot.swipeRange * 0.5) {
+                    return swipeGestureRoot.swipeMaxX;
                 }
 
-                return actionButtonContainer.swipeMinX;
+                return swipeGestureRoot.swipeMinX;
             }
             duration: DStyle.animDuration
             easing.type: Easing.OutBack

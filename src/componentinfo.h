@@ -46,6 +46,8 @@ class ComponentInfo : public QObject
     Q_PROPERTY(QString componentBase READ componentBase NOTIFY componentBaseChanged)
     // Parent
     Q_PROPERTY(ComponentInfo* componentParent READ componentParent WRITE setComponentParent NOTIFY componentParentChanged)
+    // Component Path
+    Q_PROPERTY(QString componentPath READ componentPath NOTIFY componentPathChanged)
     // QML Container
     Q_PROPERTY(QObject* componentContainer READ componentContainer WRITE setComponentContainer NOTIFY componentContainerChanged)
     // Prototype
@@ -142,6 +144,9 @@ public:
     // Set Component Parent
     void setComponentParent(ComponentInfo* aParent);
 
+    // Component Path
+    QString componentPath();
+
     // Get QML Container
     QObject* componentContainer();
     // Set QML Container
@@ -210,15 +215,20 @@ public:
     // Get Property Enum Values
     Q_INVOKABLE QStringList propertyEnums(const QString& aName);
 
-    // Add Child
-    Q_INVOKABLE void addChild(ComponentInfo* aChild);
-    // Remove Child
-    Q_INVOKABLE void removeChild(ComponentInfo* aChild, const bool& aDelete = true);
-
     // Get Child Count
     int childCount();
-    // Get Child
+
+    // Get Child Info
     Q_INVOKABLE ComponentInfo* childInfo(const int& aIndex);
+
+    // Add Child
+    Q_INVOKABLE void addChild(ComponentInfo* aChild);
+    // Insert Child
+    Q_INVOKABLE void insertChild(const int& aIndex, ComponentInfo* aChild);
+    // Take Child Info
+    Q_INVOKABLE ComponentInfo* takeChild(const int& aIndex);
+    // Remove Child
+    Q_INVOKABLE void removeChild(ComponentInfo* aChild, const bool& aDelete = true);
 
     // Request Close
     Q_INVOKABLE void requestClose();
@@ -251,6 +261,8 @@ signals:
     void componentBaseChanged(const QString& aBaseName);
     // Component Parent Changed Signal
     void componentParentChanged(ComponentInfo* aParent);
+    // Component Path Changed Signal
+    void componentPathChanged(const QString& aPath);
     // Component Container Changed Signal
     void componentContainerChanged(QObject* aContainer);
     // Info Path Changed Signal
@@ -261,8 +273,17 @@ signals:
     void isRootChanged(const bool& aRoot);
     // Built In Changed Signal
     void builtInChanged(const bool& aBuiltIn);
+
     // Child Count Changed Signal
     void childCountChanged(const int& aCount);
+
+    // Child Added Signal
+    void childAdded(const int& aIndex);
+    // Child Moved Signal
+    void childMoved(const int& aSource, const int& aTarget);
+    // Child Removed Signal
+    void childRemoved(const int& aIndex);
+
     // Source Path Changed Signal
     void sourcePathChanged(const QString& aPath);
 

@@ -415,6 +415,19 @@ void ComponentInfo::setComponentParent(ComponentInfo* aParent)
 }
 
 //==============================================================================
+// Get Component Path
+//==============================================================================
+QString ComponentInfo::componentPath()
+{
+    // Check Parent
+    if (mParent) {
+        return QString("%1.%2").arg(mParent->componentPath()).arg(mName);
+    }
+
+    return mName;
+}
+
+//==============================================================================
 // Get QML Container
 //==============================================================================
 QObject* ComponentInfo::componentContainer()
@@ -1038,6 +1051,8 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
             //qDebug() << "ComponentInfo::fromJSONObject - componentProtoType: " << componentProtoType->mName;
             // Clone Component
             ComponentInfo* childComponent = componentProtoType->clone();
+            // Set Parent FIRST!!! Needed for the Recursive call of fromJSONObject
+            childComponent->mParent = this;
             // Set Up/Update Child Component from JSON Object
             childComponent->fromJSONObject(childObject);
             // Add Child
@@ -1096,6 +1111,12 @@ void ComponentInfo::setChildObjectID(QObject* aObject, const QString& aID)
 
     // Init Root Component Info
     ComponentInfo* rootInfo = findRoot(this);
+
+    // Check Root Info
+    if (!rootInfo) {
+        qWarning() << "ComponentInfo::setChildObjectID - NULL Root Info!!!";
+        return;
+    }
 
     // Try To Find Key If ID Is Updated
     QString cidKey = rootInfo->mIDMap.key(aObject);
@@ -1167,8 +1188,13 @@ ComponentInfo* ComponentInfo::findRoot(ComponentInfo* aComponent)
 
     // Check Component Info
     if (aComponent->mIsRoot) {
+        //qDebug() << "ComponentInfo::findRoot - mName: " << aComponent->mName << " - mIsRoot: " << aComponent->mIsRoot << " - FOUND!";
+
         return aComponent;
     }
+
+    //qDebug() << "ComponentInfo::findRoot - mName: " << aComponent->mName << " - mIsRoot: " << aComponent->mIsRoot;
+
 
     return findRoot(aComponent->mParent);
 }
@@ -2294,16 +2320,24 @@ QStringList ComponentInfo::propertyEnums(const QString& aName)
 }
 
 //==============================================================================
+// Get Child Count
+//==============================================================================
+int ComponentInfo::childCount()
+{
+    return mChildren.count();
+}
+
+//==============================================================================
 // Add Child
 //==============================================================================
 void ComponentInfo::addChild(ComponentInfo* aChild)
 {
     // Check Child
     if (aChild) {
+        //qDebug() << "ComponentInfo::addChild - path: " << aChild->componentPath();
+
         // Reset ProtoType Flag
         aChild->mIsProtoType = false;
-        // Set Parent
-        aChild->mParent = this;
         // Clear Dirty Flag
         aChild->mDirty = false;
         // Append Child
@@ -2312,6 +2346,8 @@ void ComponentInfo::addChild(ComponentInfo* aChild)
         setChildObjectID(aChild, aChild->componentID());
         // Set Dirty
         setDirty(true);
+        // Emit Child Added
+        emit childAdded(mChildren.count() - 1);
         // Emit Child Count Changed Signal
         emit childCountChanged(mChildren.count());
     }
@@ -2331,7 +2367,7 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
             // Get Child Component Info
             ComponentInfo* childComponent = mChildren[cIndex];
 
-            qDebug() << "ComponentInfo::removeChild - mComponent: " << childComponent->mName;
+            //qDebug() << "ComponentInfo::removeChild - mComponent: " << childComponent->mName;
 
             // Remove Child Object From ID Map
             setChildObjectID(childComponent, "");
@@ -2358,14 +2394,6 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
 }
 
 //==============================================================================
-// Get Child Count
-//==============================================================================
-int ComponentInfo::childCount()
-{
-    return mChildren.count();
-}
-
-//==============================================================================
 // Get Child
 //==============================================================================
 ComponentInfo* ComponentInfo::childInfo(const int& aIndex)
@@ -2379,6 +2407,59 @@ ComponentInfo* ComponentInfo::childInfo(const int& aIndex)
 }
 
 //==============================================================================
+// Take Child Info
+//==============================================================================
+ComponentInfo* ComponentInfo::takeChild(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < mChildren.count()) {
+        // Take Child
+        ComponentInfo* takenChild = mChildren.takeAt(aIndex);
+        // Check Taken Child
+        if (takenChild) {
+            // Remove Child Object From ID Map
+            setChildObjectID(takenChild, "");
+            // Set Dirty
+            setDirty(true);
+            // Emmit Child Removed Signal
+            emit childRemoved(aIndex);
+            // Emit Child Cound Changed Signal
+            emit childCountChanged(mChildren.count());
+
+            return takenChild;
+        }
+    }
+
+    return NULL;
+}
+
+//==============================================================================
+// Insert Child
+//==============================================================================
+void ComponentInfo::insertChild(const int& aIndex, ComponentInfo* aChild)
+{
+    // Check Child Info
+    if (aChild) {
+        // Reset ProtoType Flag
+        aChild->mIsProtoType = false;
+        // Set Parent
+        aChild->mParent = this;
+        // Clear Dirty Flag
+        aChild->mDirty = false;
+        // Add ID To ID Map
+        setChildObjectID(aChild, aChild->componentID());
+        // Insert Child
+        mChildren.insert(aIndex, aChild);
+        // Set Dirty
+        setDirty(true);
+        // Emit Child Added
+        emit childAdded(aIndex);
+        // Emit Child Cound Changed Signal
+        emit childCountChanged(mChildren.count());
+    }
+}
+
+//==============================================================================
 // Destructor
 //==============================================================================
 ComponentInfo::~ComponentInfo()
@@ -2388,7 +2469,7 @@ ComponentInfo::~ComponentInfo()
     // Clear
     clear();
 
-    qDebug() << "ComponentInfo " << mName << " deleted.";
+    //qDebug() << "ComponentInfo " << mName << " deleted.";
 }
 
 

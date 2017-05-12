@@ -18,6 +18,8 @@ DContainer {
     enablePosOverlay: false
     enableSizeOverlay: false
 
+    drag.filterChildren: false
+
     property int contentWidth: 400
 
     // Bring To Front
@@ -44,13 +46,77 @@ DContainer {
 
     Component.onCompleted: {
         // Open Project
-        //mainController.openProject("/Users/max/Dev/Volvo/myproject/myproject.json");
-        // Seelect Component
+        //mainController.openProject("/Users/max/Dev/Temp/myproject/myproject.json");
+
+        // Select Component
         //propertiesController.selectComponent("AppTile", 0);
 
         // Show Property Editor
         //propertyEditor.show();
+
+        // Select Component
+        //propertiesController.selectComponent("MyRectangle");
+
+        // Set Root Component
+        //demoNodeTree.rootComponent = propertiesController.focusedComponent;
     }
+
+
+    DNodeTree {
+        id: demoNodeTree
+        width: parent.width * 0.6
+        height: parent.height * 0.8
+        anchors.centerIn: parent
+/*
+        DNodeTreeNode {
+            width: parent.width * CONSTS.defaultNodeScaleRatio
+            anchors.right: parent.right
+            expanded: true
+
+            DNodeTreeNode {
+                width: parent.width * CONSTS.defaultNodeScaleRatio
+                anchors.right: parent.right
+            }
+
+            DNodeTreeNode {
+                width: parent.width * CONSTS.defaultNodeScaleRatio
+                anchors.right: parent.right
+            }
+
+            DNodeTreeNode {
+                width: parent.width * CONSTS.defaultNodeScaleRatio
+                anchors.right: parent.right
+                expanded: true
+
+                DNodeTreeNode {
+                    width: parent.width * CONSTS.defaultNodeScaleRatio
+                    anchors.right: parent.right
+                }
+
+                DNodeTreeNode {
+                    width: parent.width * CONSTS.defaultNodeScaleRatio
+                    anchors.right: parent.right
+                }
+
+                DNodeTreeNode {
+                    width: parent.width * CONSTS.defaultNodeScaleRatio
+                    anchors.right: parent.right
+                }
+            }
+        }
+
+        DNodeTreeNode {
+            width: parent.width * CONSTS.defaultNodeScaleRatio
+            anchors.right: parent.right
+        }
+
+        DNodeTreeNode {
+            width: parent.width * CONSTS.defaultNodeScaleRatio
+            anchors.right: parent.right
+        }
+*/
+    }
+
 
 //    DPropertyItemValue {
 //        anchors.centerIn: parent

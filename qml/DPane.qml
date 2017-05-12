@@ -22,7 +22,5 @@ DPaneBase {
             rightMargin: DStyle.defaultMargin
             bottomMargin: DStyle.defaultMargin
         }
-
-        clip: true
     }
 }

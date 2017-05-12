@@ -106,5 +106,7 @@
         <file>qml/DPropertyEnumValueEditor.qml</file>
         <file>qml/DSlider.qml</file>
         <file>qml/liveMain.qml</file>
+        <file>qml/DNodeTree.qml</file>
+        <file>qml/DNodeTreeNode.qml</file>
     </qresource>
 </RCC>
