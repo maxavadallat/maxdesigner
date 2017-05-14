@@ -55,6 +55,10 @@ void LiveWindow::init()
 
     // Check Project Model
     if (mProjectModel) {
+        // Connect Signals
+        connect(mProjectModel, SIGNAL(screenWidthChanged(int)), this, SIGNAL(screenWidthChanged(int)));
+        connect(mProjectModel, SIGNAL(screenHeightChanged(int)), this, SIGNAL(screenHeightChanged(int)));
+
         // Set Imports Path
 
         // ...
@@ -80,7 +84,26 @@ void LiveWindow::restoreUI()
     // Set Focuse Policy
     ui->quickLiveWidget->setFocusPolicy(Qt::StrongFocus);
 
+    // resize To Project Screen Size
+    resize(screenWidth(), screenHeight());
+
     // ...
+}
+
+//==============================================================================
+// Get Screen Width
+//==============================================================================
+int LiveWindow::screenWidth()
+{
+    return mProjectModel ? mProjectModel->screenWidth() : 640;
+}
+
+//==============================================================================
+// Get Screen height
+//==============================================================================
+int LiveWindow::screenHeight()
+{
+    return mProjectModel ? mProjectModel->screenHeight() : 480;
 }
 
 //==============================================================================
@@ -158,13 +181,17 @@ void LiveWindow::setComponent(ComponentInfo* aComponent)
         shutDown();
         // Set Component
         mComponent = aComponent;
-        // Setup Live
-        setupLive();
 
-        // Check If Window Shown
-        if (isVisible()) {
-            // Set Live Content
-            setLiveContent();
+        // Check Component
+        if (mComponent && mComponent->isRoot()) {
+            // Setup Live
+            setupLive();
+
+            // Check If Window Shown
+            if (isVisible()) {
+                // Set Live Content
+                setLiveContent();
+            }
         }
     }
 }

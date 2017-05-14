@@ -60,6 +60,8 @@ class ComponentInfo : public QObject
     Q_PROPERTY(bool builtIn READ builtIn NOTIFY builtInChanged)
     // Child Count
     Q_PROPERTY(int childCount READ childCount NOTIFY childCountChanged)
+    // Child Depth
+    Q_PROPERTY(int depth READ depth NOTIFY depthChanged)
 
     // Info Path
     Q_PROPERTY(QString infoPath READ infoPath NOTIFY infoPathChanged)
@@ -77,12 +79,15 @@ class ComponentInfo : public QObject
     Q_PROPERTY(QString width READ width NOTIFY widthChanged)
     Q_PROPERTY(QString height READ height NOTIFY heightChanged)
 
+    Q_PROPERTY(bool useImplictSize READ useImplictSize WRITE setUseImplictSize NOTIFY useImplictSizeChanged)
+
+    Q_PROPERTY(bool layerVisible READ layerVisible WRITE setLayerVisible NOTIFY layerVisibleChanged)
+
     Q_PROPERTY(bool dirty READ getDirty NOTIFY dirtyChanged)
 
     // Anchors
 
     // ...
-
 
 public:
     // Property Type
@@ -191,6 +196,16 @@ public:
     // Get Height
     QString height();
 
+    // Get Layer Visible
+    bool layerVisible();
+    // Set Layer Visible
+    void setLayerVisible(const bool& aLayerVisible);
+
+    // Get Use Implicit Size
+    bool useImplictSize();
+    // Set Use Implicit Size
+    void setUseImplictSize(const bool& aUseImplicitSize);
+
     // Get Own Property Keys
     Q_INVOKABLE QStringList componentPropertyKeys();
 
@@ -217,6 +232,8 @@ public:
 
     // Get Child Count
     int childCount();
+    // Child Depth
+    int depth();
 
     // Get Child Info
     Q_INVOKABLE ComponentInfo* childInfo(const int& aIndex);
@@ -230,6 +247,8 @@ public:
     // Remove Child
     Q_INVOKABLE void removeChild(ComponentInfo* aChild, const bool& aDelete = true);
 
+    // Remove/Delete From Parent
+    Q_INVOKABLE void removeFromParent();
     // Request Close
     Q_INVOKABLE void requestClose();
 
@@ -276,11 +295,13 @@ signals:
 
     // Child Count Changed Signal
     void childCountChanged(const int& aCount);
+    // Child Depth Changed Signal
+    void depthChanged(const int& aDepth);
 
     // Child Added Signal
     void childAdded(const int& aIndex);
     // Child Moved Signal
-    void childMoved(const int& aSource, const int& aTarget);
+    void childMoved(const int& aIndex, const int& aTarget);
     // Child Removed Signal
     void childRemoved(const int& aIndex);
 
@@ -302,6 +323,11 @@ signals:
     void widthChanged(const QString& aWidth);
     // Height Changed Signal
     void heightChanged(const QString& aHeight);
+
+    // Layer Visible Changed Signal
+    void layerVisibleChanged(const bool& aLayerVisible);
+    // Use Implicit Size Changed Signal
+    void useImplictSizeChanged(const bool& aUseImplicitSize);
 
     // Dirty Changed Signal
     void dirtyChanged(const bool& aDirty);
@@ -577,6 +603,8 @@ protected: // Data
 
     // Focused State
     bool                    mFocused;
+    // Layer Visible
+    bool                    mLayerVisible;
     // Is Root
     bool                    mIsRoot;
 

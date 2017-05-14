@@ -163,6 +163,38 @@ void ProjectPropertiesDialog::setProjectDir(const QString& aDir)
 }
 
 //==============================================================================
+// Get Project Screen Width
+//==============================================================================
+int ProjectPropertiesDialog::screenWidth()
+{
+    return ui->screenWidthSpinBox->value();
+}
+
+//==============================================================================
+// Set Project Screen Width
+//==============================================================================
+void ProjectPropertiesDialog::setScreenWidth(const int& aWidth)
+{
+    ui->screenHeightSpinBox->setValue(aWidth);
+}
+
+//==============================================================================
+// Get Project Screen Height
+//==============================================================================
+int ProjectPropertiesDialog::screenHeight()
+{
+    return ui->screenHeightSpinBox->value();
+}
+
+//==============================================================================
+// Set Project Screen Height
+//==============================================================================
+void ProjectPropertiesDialog::setScreenHeight(const int& aHeight)
+{
+    ui->screenHeightSpinBox->setValue(aHeight);
+}
+
+//==============================================================================
 // Get Main QML File
 //==============================================================================
 QString ProjectPropertiesDialog::baseComponentsDir()

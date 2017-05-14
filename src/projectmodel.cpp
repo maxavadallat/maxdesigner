@@ -715,6 +715,54 @@ void ProjectModel::setProjectDir(const QString& aDir)
 }
 
 //==============================================================================
+// Get Project Screen Width
+//==============================================================================
+int ProjectModel::screenWidth()
+{
+    return mProperties[JSON_KEY_PROJECT_SCREEN_WIDTH].toInt();
+}
+
+//==============================================================================
+// Set Project Screen Width
+//==============================================================================
+void ProjectModel::setScreenWidth(const int& aWidth)
+{
+    // Check Screen Width
+    if (aWidth != screenWidth()) {
+        // Set Screen Width
+        mProperties[JSON_KEY_PROJECT_SCREEN_WIDTH] = aWidth;
+        // Emit Screen Width Changed Signal
+        emit screenWidthChanged(screenWidth());
+        // Set Dirty Properties
+        setDirty(true);
+    }
+}
+
+//==============================================================================
+// Get Project Screen Height
+//==============================================================================
+int ProjectModel::screenHeight()
+{
+    return mProperties[JSON_KEY_PROJECT_SCREEN_HEIGHT].toInt();
+}
+
+//==============================================================================
+// Set Project Screen Height
+//==============================================================================
+void ProjectModel::setScreenHeight(const int& aHeight)
+{
+    // Check Screen Height
+    if (aHeight != screenHeight()) {
+        // Set Screen Height
+        mProperties[JSON_KEY_PROJECT_SCREEN_HEIGHT] = aHeight;
+        // Emit Screen Height changed Signal
+        emit screenHeightChanged(screenHeight());
+        // Set Dirty Properties
+        setDirty(true);
+    }
+}
+
+//==============================================================================
 // Get Assets Dir
 //==============================================================================
 QString ProjectModel::assetsDir()

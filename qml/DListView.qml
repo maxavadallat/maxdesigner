@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.7
 
 import "style"
 import "DConstants.js" as CONSTS
@@ -12,6 +12,7 @@ DControl {
     property alias currentIndex: listView.currentIndex
     property int itemHeight: CONSTS.defaultPaneItemHeight
 
+    property alias spacing: listView.spacing
     property alias addTransition: listView.add
     property alias addDisplacedTransition: listView.addDisplaced
     property alias moveTransition: listView.move
@@ -20,10 +21,17 @@ DControl {
 
     clip: true
 
+    // Ensure Item Visible
+    function ensureItemVisible(index) {
+        // Position View At Index
+        listView.positionViewAtIndex(index, ListView.Contain);
+    }
+
     ListView {
         id: listView
         anchors.fill: parent
         //highlightFollowsCurrentItem: true
+        interactive: contentHeight > height
 
         add: Transition {
             ParallelAnimation {

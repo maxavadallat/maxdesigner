@@ -108,5 +108,8 @@
         <file>qml/liveMain.qml</file>
         <file>qml/DNodeTree.qml</file>
         <file>qml/DNodeTreeNode.qml</file>
+        <file>qml/DToolBar.qml</file>
+        <file>qml/DToolButton.qml</file>
+        <file>qml/DToolBarSeparator.qml</file>
     </qresource>
 </RCC>

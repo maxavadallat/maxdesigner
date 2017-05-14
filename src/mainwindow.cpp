@@ -386,6 +386,8 @@ void MainWindow::setCurrentComponent(ComponentInfo* aComponent)
         // Check Current Component
         if (mCurrentComponent) {
 
+            //qDebug() << "MainWindow::setCurrentComponent - mName: " << mCurrentComponent->componentName();
+
             // Connect Signals
             // Connect Dirty Changed Signal
             connect(mCurrentComponent, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
@@ -1276,6 +1278,11 @@ void MainWindow::updateProject()
     // Set Properties Controller
     mProjectModel->setPropertiesController(mPropertiesController);
 
+    // Set Screen Width
+    mProjectModel->setScreenWidth(mProjectPropertiesDiaog->screenWidth());
+    // Set Screen Height
+    mProjectModel->setScreenHeight(mProjectPropertiesDiaog->screenHeight());
+
     // Set Base Components Dir
     mProjectModel->setBaseComponentsDir(mProjectPropertiesDiaog->baseComponentsDir());
     // Set Data Sources Dir
@@ -1315,6 +1322,12 @@ void MainWindow::closeProject()
     if (mOpenFiles) {
         // Close Current Project
         mOpenFiles->closeProject();
+    }
+
+    // Check Live Window
+    if (mLiveWindow) {
+        // Connect Signals
+        disconnect(mPropertiesController, SIGNAL(focusedComponentChanged(ComponentInfo*)), mLiveWindow, SLOT(setComponent(ComponentInfo*)));
     }
 
     // Check Properties Controller
@@ -2072,6 +2085,9 @@ MainWindow::~MainWindow()
 
     // Check Properties Controller
     if (mPropertiesController) {
+        // Disconnect Signals
+        disconnect(mPropertiesController, SIGNAL(focusedComponentChanged(ComponentInfo*)), this, SLOT(setCurrentComponent(ComponentInfo*)));
+
         delete mPropertiesController;
         mPropertiesController = NULL;
     }

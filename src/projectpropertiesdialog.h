@@ -40,6 +40,16 @@ public:
     // Set Project Dir
     void setProjectDir(const QString& aDir);
 
+    // Get Project Screen Width
+    int screenWidth();
+    // Set Project Screen Width
+    void setScreenWidth(const int& aWidth);
+
+    // Get Project Screen Height
+    int screenHeight();
+    // Set Project Screen Height
+    void setScreenHeight(const int& aHeight);
+
     // Get Assets Directory
     QString assetsDir();
     // Set Assets Directory

@@ -132,6 +132,8 @@
 // JSON Keys for Project Info
 #define JSON_KEY_PROJECT_NAME                               "projectName"
 #define JSON_KEY_PROJECT_DIR                                "projectDir"
+#define JSON_KEY_PROJECT_SCREEN_WIDTH                       "projectScreenWidth"
+#define JSON_KEY_PROJECT_SCREEN_HEIGHT                      "projectScreenHeight"
 #define JSON_KEY_PROJECT_ASSETS_DIR                         "projectAssetsDir"
 #define JSON_KEY_PROJECT_BASECOMPONENTS_DIR                 "projectBaseComponentsDir"
 #define JSON_KEY_PROJECT_COMPONENTS_DIR                     "projectComponentsDir"

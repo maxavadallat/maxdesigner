@@ -24,8 +24,12 @@ Item {
 
     readonly property int handleWidth: 16
 
+    property bool swipeActive: false
+
     clip: true
 
+    signal swipeStarted()
+    signal swipeFinished()
     signal actionButtonClicked()
 
     onWidthChanged: {
@@ -109,6 +113,16 @@ Item {
         drag.threshold: 0
 
         drag.filterChildren: true
+
+        onXChanged: {
+            // Check If Swipe Active
+            if (pressed && !swipeGestureRoot.swipeActive) {
+                // Set Swipe Active
+                swipeGestureRoot.swipeActive = true;
+                // Emit Swipe Started Signal
+                swipeGestureRoot.swipeStarted();
+            }
+        }
 
         onClicked: {
             hideSwipe();
@@ -215,6 +229,13 @@ Item {
             to: swipeGestureRoot.swipeMaxX
             duration: DStyle.animDuration
             easing.type: Easing.OutBack
+
+            onStopped: {
+                // reset Swipe Active
+                swipeGestureRoot.swipeActive = false;
+                // Emit Swipe Finshed
+                swipeGestureRoot.swipeFinished();
+            }
         }
 
         NumberAnimation on x {
@@ -229,6 +250,13 @@ Item {
             }
             duration: DStyle.animDuration
             easing.type: Easing.OutBack
+
+            onStopped: {
+                // reset Swipe Active
+                swipeGestureRoot.swipeActive = false;
+                // Emit Swipe Finshed
+                swipeGestureRoot.swipeFinished();
+            }
         }
     }
 }

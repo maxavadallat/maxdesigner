@@ -19,9 +19,17 @@ class LiveWindow : public QMainWindow
 {
     Q_OBJECT
 
+    Q_PROPERTY(int screenWidth READ screenWidth NOTIFY screenWidthChanged)
+    Q_PROPERTY(int screenHeight READ screenHeight NOTIFY screenHeightChanged)
+
 public:
     // Constructor
     explicit LiveWindow(ProjectModel* aProject, QWidget* aParent = NULL);
+
+    // Get Screen Width
+    int screenWidth();
+    // Get Screen height
+    int screenHeight();
 
     // Destructor
     ~LiveWindow();
@@ -35,6 +43,10 @@ signals:
     void loadContent(const QString& liveContent);
     // Clear Content Signal
     void clearContent();
+    // Screen Width Changed Signal
+    void screenWidthChanged(const int& aWidth);
+    // Screen Height changed Signal
+    void screenHeightChanged(const int& aHeight);
 
 protected:
     // Init

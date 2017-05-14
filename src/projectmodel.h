@@ -25,6 +25,9 @@ class ProjectModel : public QObject
     Q_PROPERTY(QString projectDir READ projectDir NOTIFY projectDirChanged)
     Q_PROPERTY(QString projectFilePath READ absoluteProjectFilePath NOTIFY projectFilePathChanged)
 
+    Q_PROPERTY(int screenWidth READ screenWidth NOTIFY screenWidthChanged)
+    Q_PROPERTY(int screenHeight READ screenHeight NOTIFY screenHeightChanged)
+
     Q_PROPERTY(QString assetsDir READ assetsDir NOTIFY assetsDirChanged)
     Q_PROPERTY(QString baseComponentsDir READ baseComponentsDir NOTIFY baseComponentsDirChanged)
     Q_PROPERTY(QString componentsDir READ componentsDir NOTIFY componentsDirChanged)
@@ -97,6 +100,16 @@ public:
     QString projectDir();
     // Set Project Dir
     void setProjectDir(const QString& aDir);
+
+    // Get Project Screen Width
+    int screenWidth();
+    // Set Project Screen Width
+    void setScreenWidth(const int& aWidth);
+
+    // Get Project Screen Height
+    int screenHeight();
+    // Set Project Screen Height
+    void setScreenHeight(const int& aHeight);
 
     // Get Assets Dir
     QString assetsDir();
@@ -176,6 +189,10 @@ signals:
     void projectDirChanged(const QString& aDir);
     // Project File Path Changed
     void projectFilePathChanged(const QString& aFilePath);
+    // Project Screen Width Changed Signal
+    void screenWidthChanged(const int& aWidth);
+    // Project Screen Height Changed Signal
+    void screenHeightChanged(const int& aHeight);
     // Assets Dir Changed Signal
     void assetsDirChanged(const QString& aImagesDir);
     // Base Components Dir Changed Signal

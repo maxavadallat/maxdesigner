@@ -78,3 +78,16 @@ var propertyTypes                               = ["string", "bool", "int", "dou
 var defaultNodeTreeItemHeight                   = 48;
 // Default Node Scale Ratio
 var defaultNodeScaleRatio                       = 0.95;
+
+// Tool Bar Size
+var defaultToolBarWidth                         = 80;
+var defaultToolBarHeight                        = 80;
+
+// Too Button Size
+var defaultToolButtonWidth                      = 48;
+var defaultToolButtonHeight                     = defaultToolButtonWidth;
+
+
+
+
+

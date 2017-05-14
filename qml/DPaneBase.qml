@@ -465,10 +465,9 @@ DContainer {
                 return 0;
             }
 
-            text: "•••"
-
             horizontalAlignment: Text.AlignHCenter
             color: buttonMouseArea.pressed ? DStyle.colorBorder : DStyle.colorFontDark
+            text: "•••"
         }
 
         DMouseArea {

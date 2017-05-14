@@ -10,5 +10,15 @@
         <file>assets/icons/information-icon.png</file>
         <file>assets/icons/question-icon.png</file>
         <file>assets/icons/warning-icon.png</file>
+        <file>assets/icons/eye.png</file>
+        <file>assets/icons/align.hcenter.png</file>
+        <file>assets/icons/align.hleft.png</file>
+        <file>assets/icons/align.hright.png</file>
+        <file>assets/icons/align.vbottom.png</file>
+        <file>assets/icons/align.vcenter.png</file>
+        <file>assets/icons/align.vtop.png</file>
+        <file>assets/icons/centerin.png</file>
+        <file>assets/icons/fill.png</file>
+        <file>assets/images/tron-wide-wallpaper.jpeg</file>
     </qresource>
 </RCC>

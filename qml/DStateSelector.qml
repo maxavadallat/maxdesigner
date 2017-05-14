@@ -11,6 +11,8 @@ DRectangle {
     width: 300
     height: 96
 
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
     anchors.bottomMargin: stateSelectorShown ? 0 : -height
 
     Behavior on anchors.bottomMargin { PropertyAnimation { easing.type: Easing.InOutBack } }

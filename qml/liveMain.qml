@@ -9,8 +9,8 @@ import "system"
 Item {
     id: liveRoot
 
-    width: 640
-    height: 480
+    width: liveController.screenWidth
+    height: liveController.screenHeight
 
     Connections {
         target: liveController
@@ -30,9 +30,30 @@ Item {
         }
     }
 
+
+    // Background Container
     Rectangle {
+        id: bgContainer
         anchors.fill: parent
-        color: "black"
+
+        color: DStyle.colorMainBG
+
+        Image {
+            id: bgImage
+            anchors.fill: parent
+            source: "qrc:/assets/images/tron-wide-wallpaper.jpeg"
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            opacity: 0.1
+        }
+    }
+
+    Rectangle {
+        width: liveController.screenWidth
+        height: liveController.screenHeight
+        anchors.centerIn: parent
+        color: "transparent"
+        border.color: DStyle.colorBorderNoFocus
     }
 
     DLoader {
@@ -46,7 +67,7 @@ Item {
                 break;
 
                 case Loader.Error:
-
+                    console.warn("liveMain.contentLoader.onStatusChanged - status: " + status + " - ERROR LOADING CONTENT!!");
                 break;
 
                 case Loader.Loading:
@@ -58,7 +79,5 @@ Item {
 
     DStateSelector {
         id: stateSelector
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
     }
 }

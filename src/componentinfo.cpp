@@ -74,7 +74,9 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mTag("")
     , mCategory(aCategory)
     , mBaseName(aBaseName)
+    , mImplicitSize(false)
     , mFocused(false)
+    , mLayerVisible(true)
     , mIsRoot(true)
     , mGroupped(false)
     , mContainer(NULL)
@@ -707,6 +709,50 @@ void ComponentInfo::setHeight(const QString& aHeight)
 }
 
 //==============================================================================
+// Get Layer Visible
+//==============================================================================
+bool ComponentInfo::layerVisible()
+{
+    return mLayerVisible;
+}
+
+//==============================================================================
+// Set Layer Visible
+//==============================================================================
+void ComponentInfo::setLayerVisible(const bool& aLayerVisible)
+{
+    // Check Layer Visible
+    if (mLayerVisible != aLayerVisible) {
+        // Set Layer Visible
+        mLayerVisible = aLayerVisible;
+        // Emit Layer Visible Changed Signal
+        emit layerVisibleChanged(mLayerVisible);
+    }
+}
+
+//==============================================================================
+// Get Use Implicit Size
+//==============================================================================
+bool ComponentInfo::useImplictSize()
+{
+    return mImplicitSize;
+}
+
+//==============================================================================
+// Set Use Implicit Size
+//==============================================================================
+void ComponentInfo::setUseImplictSize(const bool& aUseImplicitSize)
+{
+    // Check Use Implicit Size
+    if (mImplicitSize != aUseImplicitSize) {
+        // Set Use Implicit Size
+        mImplicitSize = aUseImplicitSize;
+        // Emit Use Implicit size Changed Signal
+        emit useImplictSizeChanged(mImplicitSize);
+    }
+}
+
+//==============================================================================
 // Get Property Keys
 //==============================================================================
 QStringList ComponentInfo::componentPropertyKeys()
@@ -1053,6 +1099,8 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject)
             ComponentInfo* childComponent = componentProtoType->clone();
             // Set Parent FIRST!!! Needed for the Recursive call of fromJSONObject
             childComponent->mParent = this;
+            // Emit Depth Changed Signal
+            emit childComponent->depthChanged(childComponent->depth());
             // Set Up/Update Child Component from JSON Object
             childComponent->fromJSONObject(childObject);
             // Add Child
@@ -1084,6 +1132,18 @@ void ComponentInfo::fromJSON(const QByteArray& aContent)
 
     // From JSON Object
     fromJSONObject(ciObject);
+}
+
+//==============================================================================
+// Remove/Delete From Parent
+//==============================================================================
+void ComponentInfo::removeFromParent()
+{
+    // Check Parent
+    if (mParent) {
+        // Remove Child
+        mParent->removeChild(this);
+    }
 }
 
 //==============================================================================
@@ -2328,6 +2388,19 @@ int ComponentInfo::childCount()
 }
 
 //==============================================================================
+// Child Depth
+//==============================================================================
+int ComponentInfo::depth()
+{
+    // Check Parent
+    if (mParent) {
+        return mParent->depth() + 1;
+    }
+
+    return 0;
+}
+
+//==============================================================================
 // Add Child
 //==============================================================================
 void ComponentInfo::addChild(ComponentInfo* aChild)
@@ -2384,6 +2457,8 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
             // Set Dirty
             setDirty(true);
 
+            // Emit Child Removed Signal
+            emit childRemoved(cIndex);
             // Emit Child Count Changed Signal
             emit childCountChanged(mChildren.count());
 
