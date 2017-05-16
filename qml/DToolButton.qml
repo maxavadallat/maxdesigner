@@ -1,9 +1,10 @@
 import QtQuick 2.0
+import QtGraphicalEffects 1.0
 
 import "style"
 import "DConstants.js" as CONSTS
 
-DMouseArea {
+DButtonBase {
     id: toolButtonRoot
 
     width: CONSTS.defaultToolButtonWidth
@@ -11,17 +12,26 @@ DMouseArea {
 
     property alias source: iconImage.source
 
-//    DRectangle {
-//        anchors.fill: parent
-//        color: Qt.hsla(Math.random(), Math.random(), 0.5, 0.3)
-//        radius: DStyle.defaultRadius
-//
-//    }
+    text: ""
 
-    DImage {
-        id: iconImage
+    Item {
         anchors.centerIn: parent
-        opacity: 0.7
         scale: parent.pressed ? DStyle.pressedScale : 1.0
+
+        DImage {
+            id: iconImage
+            anchors.centerIn: parent
+            opacity: 0.7
+        }
+
+        Glow {
+            anchors.fill: iconImage
+            radius: DStyle.defaultGlowRadius
+            samples: DStyle.defaultGlowSamples
+            spread: DStyle.defaultGlowSpread
+            color: DStyle.colorFontDark
+            source: iconImage
+            visible: toolButtonRoot.checked
+        }
     }
 }

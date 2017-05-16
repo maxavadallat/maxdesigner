@@ -9,40 +9,35 @@ import "DConstants.js" as CONSTS
 Item {
     id: nodeRoot
 
-    width: componentInfo !== null ? parent.width * Math.pow(CONSTS.defaultNodeScaleRatio, componentInfo.depth) : 0
-    //width: componentInfo !== null ? parent.width * Math.pow(CONSTS.defaultNodeScaleRatio, componentInfo.depth) : parent.width
+    width: 300
     height: CONSTS.defaultNodeTreeItemHeight
 
-    Behavior on height { DAnimation { } }
-
-    property bool nodeInit: false
+    Behavior on height {
+        SequentialAnimation {
+            DAnimation {
+                duration: nodeTree !== null && nodeTree.currentNode === nodeRoot ? DStyle.animDuration : 0
+            }
+            ScriptAction {
+                script: {
+                    nodeTree.currentNode = null;
+                }
+            }
+        }
+    }
 
     property ComponentInfo componentInfo: null
 
-    property Connections componentInfoConnections: Connections {
-        target: componentInfo
-        onChildAdded: nodeRoot.childAdded(nodeRoot.itemIndex, aIndex);
-        onChildMoved: nodeRoot.childMoved(nodeRoot.itemIndex, aIndex, aTarget);
-        onChildRemoved: nodeRoot.childRemoved(nodeRoot.itemIndex, aIndex);
-    }
-
     property bool rootNode: false
 
-    property string title: "Title test"
-
-    property bool nodeVisibility: true
-
-    property int parentIndex: -1
-
-    property int itemIndex: -1
+    property string title: componentInfo !== null ? componentInfo.componentPath : "Title test"
 
     property int childIndex: -1
 
-    property var childIndexes: ""
-
-    property int depth: 0
+    default property alias childrenContainerAlias: childrenColumn.children
 
     property bool expanded: false
+
+    property bool nodeInit: false
 
     property bool grabbed: false
 
@@ -50,29 +45,49 @@ Item {
     property bool centerHovered: false
     property bool bottomHovered: false
 
-    property var prevAnchor: undefined
+    property Connections componentInfoConnections: Connections {
+        target: componentInfo
 
-    property int swipeIndex: -1
+        onChildAdded: {
+            // Append Node
+            //appendNode(aIndex);
 
-    z: grabbed ? 1.0 : 0.0
+            // Insert Node
+            insertNode(aIndex);
 
-    scale: grabbed ? 1.1 : 1.0
+            // Expand
+            expand();
+        }
 
-    Behavior on scale { DAnimation { easing.type: Easing.OutBack } }
+        onChildMoved: {
 
-    visible: height > 0
+            // ...
 
-    //clip: true
+        }
 
-    signal itemSelected(var index)
-    signal expandItem(var index)
-    signal collapseItem(var index)
-    signal swipeActivated(var index)
-    signal deleteItem(var index)
+        onChildRemoved: {
+            // Remove Node
+            removeNode(aIndex);
+            // Check Children Column
+            if (childrenColumn.children.length === 0) {
+                // Collapse
+                collapse();
+            }
+        }
+    }
 
-    signal childAdded(var index, var childIndex)
-    signal childMoved(var index, var childIndex, var targetIndex)
-    signal childRemoved(var index, var childIndex)
+    // Parent Node Tree
+    property var nodeTree: null
+
+    property bool hideDropAreas: false
+
+    property var childTemp: []
+
+    property bool enableLayerVisibilityButton: true
+
+    opacity: grabbed ? 0.5 : 1.0
+
+    clip: true
 
     Component.onCompleted: {
         // Set Node Init
@@ -83,138 +98,150 @@ Item {
 
     onComponentInfoChanged: {
         //console.log("DNodeTreeNode.onComponentInfoChanged - componentName: " + (nodeRoot.componentInfo !== null ? nodeRoot.componentInfo.componentName  + " - childCount: " + nodeRoot.componentInfo.childCount : "NULL"));
-//        // Clear
-//        clear();
-//        // Build Node tree
-//        buildNodeTree();
-    }
 
-    onSwipeIndexChanged: {
-        // Check Swipe Index
-        if (swipeIndex !== itemIndex) {
-            // Hide Swipe
-            hideSwipe();
-        }
+        // Clear
+        clear();
+        // Build Node tree
+        buildNodeTree();
     }
 
     onExpandedChanged: {
-//        // Check If Expanded
-//        if (nodeRoot.expanded) {
-//            // Set Height
-//            nodeRoot.height = Qt.binding(function() { return CONSTS.defaultNodeTreeItemHeight + childrenColumn.height + DStyle.defaultSpacing; });
-//        } else {
-//            // Set Height
-//            nodeRoot.height = CONSTS.defaultNodeTreeItemHeight;
-//        }
+        // Check If Expanded
+        if (nodeRoot.expanded) {
+            // Set Height
+            nodeRoot.height = Qt.binding(function() {
+                // Check Children
+                if (childrenColumn.children.length > 0) {
+                    return CONSTS.defaultNodeTreeItemHeight + childrenColumn.height + DStyle.defaultSpacing;
+                }
+
+                return CONSTS.defaultNodeTreeItemHeight;
+            });
+        } else {
+            // Set Height
+            nodeRoot.height = CONSTS.defaultNodeTreeItemHeight;
+        }
 
         // Hide Swipe
         swipeGesture.hideSwipe();
     }
 
     onGrabbedChanged: {
-//        // Check Grabbed State
-//        if (nodeRoot.grabbed) {
-//            // set Drag Target
-//            nodeMouseArea.drag.target = nodeRoot;
-//            // Set Prev Anchor
-//            nodeRoot.prevAnchor = anchors.right;
-//            // Reset Right Anchor
-//            anchors.right = undefined;
-
-//            // Set Drag Active
-//            Drag.active = true;
-
-//        } else {
-//            // Reset Drag Target
-//            nodeMouseArea.drag.target = undefined;
-//            // Reset Right Anchor
-//            anchors.right = nodeRoot.prevAnchor;
-
-//            // RESet Drag Active
-//            Drag.active = false;
-
-//        }
+        // Check Grabbed State
+        if (nodeRoot.grabbed) {
+            // Collapse
+            collapse();
+            // Get Position
+            var pX = mapToItem(nodeTree, 0, 0).x;
+            var pY = mapToItem(nodeTree, 0, 0).y;
+            // Emit Node Grabbed Signal
+            nodeTree.nodeGrabbed(pX, pY, nodeRoot.width, nodeRoot.height, nodeRoot.componentInfo);
+        } else {
+            // Emit Node Released Signal
+            nodeTree.nodeReleased();
+        }
     }
 
     // Expand
     function expand() {
-//        // Check Children
-//        if (childrenColumn.children.length > 0) {
-//            // Set Expanded
-//            nodeRoot.expanded = true;
-//        }
+        // Check Children
+        if (childrenColumn.children.length > 0) {
+            // Set Expanded
+            nodeRoot.expanded = true;
+        }
     }
 
     // Collapse
     function collapse() {
-//        // Reset Expanded
-//        nodeRoot.expanded = false;
+        // Reset Expanded
+        nodeRoot.expanded = false;
     }
 
-//    // Build Node Tree
-//    function buildNodeTree() {
-//        // Check Component Info
-//        if (nodeRoot.componentInfo !== null && nodeRoot.nodeTree !== null) {
-//            // Set Title
-//            nodeRoot.title = nodeRoot.componentInfo.componentName;
+    // Build Node Tree
+    function buildNodeTree() {
+        // Check Component Info
+        if (nodeRoot.componentInfo !== null && nodeRoot.nodeTree !== null) {
+            // Set Title
+            //nodeRoot.title = nodeRoot.componentInfo.componentPath;
 
-//            // Get Children Count
-//            var cCount = nodeRoot.componentInfo.childCount;
+            // Get Children Count
+            var cCount = nodeRoot.componentInfo.childCount;
 
-//            //console.log("DNodeTreeNode.buildNodeTree  - componentInfo: " + nodeRoot.componentInfo.componentName + " - cCount: " + cCount);
+            //console.log("DNodeTreeNode.buildNodeTree  - componentInfo: " + nodeRoot.componentInfo.componentName + " - cCount: " + cCount);
 
-//            // Iterate Through Children
-//            for (var i=0; i<cCount; i++) {
-//                // Append Node
-//                appendNode(i);
-//            }
-//        }
-//    }
+            // Iterate Through Children
+            for (var i=0; i<cCount; i++) {
+                // Append Node
+                appendNode(i);
+            }
 
-//    // Append Node
-//    function appendNode(newNodeIndex) {
-//        // Get Child Info
-//        var newNode = nodeRoot.nodeTree.createNode(nodeRoot.componentInfo.childInfo(newNodeIndex), childrenColumn);
-//        // Check New Node
-//        if (newNode !== null) {
-//            // Set Width
-//            newNode.width = Qt.binding(function() { return nodeRoot.width * CONSTS.defaultNodeScaleRatio; });
-//            // Set Anchor
-//            newNode.anchors.right = childrenColumn.right;
-//            // Hide Swipe
-//            //newNode.hideSwipe();
-//        }
-//    }
+            // Check Child  Count
+            if (cCount > 0) {
+                expand();
+            }
+        }
+    }
 
-//    // Insert Node
-//    function insertNode(newNodeIndex) {
+    // Append Node
+    function appendNode(newNodeIndex) {
+        // Create New Node
+        var newNode = nodeRoot.nodeTree.createNode(nodeRoot.componentInfo.childInfo(newNodeIndex), childrenColumn);
 
-//        // ...
+        // Check New Node
+        if (newNode !== null) {
+            // Set Width
+            newNode.width = Qt.binding(function() { return nodeRoot.width * CONSTS.defaultNodeScaleRatio; });
+            // Set Anchor
+            newNode.anchors.right = childrenColumn.right;
+            // Hide Swipe
+            //newNode.hideSwipe();
+        }
+    }
 
-//    }
+    // Insert Node
+    function insertNode(newNodeIndex) {
+        // Iterate Through Child Nodes
+        for (var i=childrenColumn.children.length-1; i>=newNodeIndex; i--) {
+            // Take Children Out Temporarily
+            childTemp.push(childrenColumn.children[i]);
+            // Set Parent Temporarily
+            childTemp[childTemp.length-1].parent = nodeRoot;
+        }
 
-//    // Remove Node
-//    function removeNode(nodeIndex) {
-//        // Destroy Node
-//        childrenColumn.children[nodeIndex].destroy();
-//    }
+        // Append Node
+        appendNode(newNodeIndex);
 
-//    // Clear
-//    function clear() {
-//        // Get Children Column Children Count
-//        var cccCount = childrenColumn.children.length;
+        // Add Temporarily Removed Items To ChildrenColumn
+        while (childTemp.length > 0) {
+            // Get Last Item
+            var lastItem = childTemp.pop();
+            // Set Parent
+            lastItem.parent = childrenColumn;
+        }
+    }
 
-//        // Check Count
-//        if (cccCount > 0) {
-//            //console.log("DNodeTreeNode.clear  - cccCount: " + cccCount);
+    // Remove Node
+    function removeNode(nodeIndex) {
+        // Destroy Node
+        childrenColumn.children[nodeIndex].destroy();
+    }
 
-//            // Iterate Through Children
-//            for (var i=cccCount-1; i>=0; i--) {
-//                // Destroy Child
-//                childrenColumn.children[i].destroy();
-//            }
-//        }
-//    }
+    // Clear
+    function clear() {
+        // Get Children Column Children Count
+        var cccCount = childrenColumn.children.length;
+
+        // Check Count
+        if (cccCount > 0) {
+            //console.log("DNodeTreeNode.clear  - cccCount: " + cccCount);
+
+            // Iterate Through Children
+            for (var i=cccCount-1; i>=0; i--) {
+                // Destroy Child
+                childrenColumn.children[i].destroy();
+            }
+        }
+    }
 
     // Hide Swipe
     function hideSwipe() {
@@ -222,93 +249,25 @@ Item {
         swipeGesture.hideSwipe();
     }
 
-//    // Start Drag
-//    function startDrag() {
+    // Extend Top For Component Drop
+    function extendTop() {
+        // ...
+    }
 
-//    }
+    // Collapse Top Drop Area
+    function collapseTop() {
 
-//    // Finish Drag
-//    function finishDrag() {
+    }
 
-//    }
+    // Extend Bottom For Component Drop
+    function extendBottom() {
+        // ...
+    }
 
-//    function extendTop() {
+    // Collapse Bottom Drop Area
+    function collapseBottom() {
 
-//    }
-
-//    function extendBottom() {
-
-//    }
-
-//    // Top Drop Area
-//    DropArea {
-//        id: topDropArea
-//        width: parent.width
-//        height: (parent.height - centerDropArea.height) * 0.5
-//        anchors.top: parent.top
-
-//        Rectangle {
-//            anchors.fill: parent
-//            color: "transparent"
-//            border.color: parent.containsDrag ? "orange" : "#FF222222"
-//        }
-
-//        onEntered: {
-//            // Restart Hover Time
-//            hoverTimer.restart();
-//        }
-
-//        onExited: {
-//            // Stop Hover Timer
-//            hoverTimer.running = false;
-//        }
-//    }
-//    // Center Drop Area
-//    DropArea {
-//        id: centerDropArea
-//        width: parent.width
-//        height: parent.height * 0.7
-//        anchors.verticalCenter: parent.verticalCenter
-
-//        Rectangle {
-//            anchors.fill: parent
-//            color: "transparent"
-//            border.color: parent.containsDrag ? "orange" : "#FF222222"
-//        }
-
-//        onEntered: {
-//            // Restart Hover Time
-//            hoverTimer.restart();
-//        }
-
-//        onExited: {
-//            // Stop Hover Timer
-//            hoverTimer.running = false;
-//        }
-//    }
-//    // Bottom Drop Area
-//    DropArea {
-//        id: bottomDropArea
-//        width: parent.width
-//        height: (parent.height - centerDropArea.height) * 0.5
-//        anchors.bottom: parent.bottom
-
-//        Rectangle {
-//            anchors.fill: parent
-//            color: "transparent"
-//            border.color: parent.containsDrag ? "orange" : "#FF222222"
-//        }
-
-//        onEntered: {
-//            // Restart Hover Time
-//            hoverTimer.restart();
-//        }
-
-//        onExited: {
-//            // Stop Hover Timer
-//            hoverTimer.running = false;
-//        }
-//    }
+    }
 
 //    Rectangle {
 //        anchors.fill: parent
@@ -316,63 +275,141 @@ Item {
 //        border.color: "orange"
 //    }
 
+    Item {
+        id: expandButtonContainer
+        width: height * 0.5
+        height: CONSTS.defaultNodeTreeItemHeight
+        visible: childrenColumn.children.length > 0
+
+        DMouseArea {
+            id: expandButton
+
+            width: parent.height * 0.5
+            height: width
+
+            anchors.centerIn: parent
+
+            onPressed: {
+                // Set Current Node
+                nodeTree.currentNode = nodeRoot;
+            }
+
+            onClicked: {
+                // Check If Expanded
+                if (!nodeRoot.expanded) {
+                    // Set Expanded
+                    nodeRoot.expand();
+                } else {
+                    // Restore
+                    nodeRoot.collapse();
+                }
+            }
+
+            DText {
+                anchors.centerIn: parent
+                scale: parent.pressed ? DStyle.pressedScale : 1.0
+                rotation: nodeRoot.expanded ? 135 : 0
+                Behavior on rotation { DAnimation { } }
+                font.pixelSize: DStyle.fontSizeS
+                text: "❖"
+            }
+        }
+    }
+
+    Item {
+        id: dropAreasContainer
+        width: parent.width
+        height: CONSTS.defaultNodeTreeItemHeight
+        visible: !nodeRoot.hideDropAreas && !nodeRoot.grabbed && !nodeRoot.rootNode
+
+        DropArea {
+            id: topDropArea
+            width: parent.width
+            height: (parent.height - centerDropArea.height) * 0.5
+            anchors.top: parent.top
+
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                border.color: parent.containsDrag ? "orange" : "#FF222222"
+            }
+
+            onEntered: {
+                // Restart Hover Time
+                hoverTimer.restart();
+            }
+
+            onExited: {
+                // Stop Hover Timer
+                hoverTimer.running = false;
+            }
+        }
+
+        DropArea {
+            id: centerDropArea
+            width: parent.width
+            height: parent.height * 0.7
+            anchors.verticalCenter: parent.verticalCenter
+
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                border.color: parent.containsDrag ? "orange" : "#FF222222"
+            }
+
+            onEntered: {
+                // Restart Hover Time
+                hoverTimer.restart();
+            }
+
+            onExited: {
+                // Stop Hover Timer
+                hoverTimer.running = false;
+            }
+        }
+
+        DropArea {
+            id: bottomDropArea
+            width: parent.width
+            height: (parent.height - centerDropArea.height) * 0.5
+            anchors.bottom: parent.bottom
+
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                border.color: parent.containsDrag ? "orange" : "#FF222222"
+            }
+
+            onEntered: {
+                // Restart Hover Time
+                hoverTimer.restart();
+            }
+
+            onExited: {
+                // Stop Hover Timer
+                hoverTimer.running = false;
+            }
+        }
+    }
+
     // Node Container
     Item {
         id: nodeContainer
 
-        anchors.fill: parent
+        width: parent.width - expandButtonContainer.width
+        height: CONSTS.defaultNodeTreeItemHeight
+        anchors.left: expandButtonContainer.right
 
-        // Expand Button
-        Item {
-            id: expandButtonContainer
-            width: height * 0.5
-            height: parent.height
-            visible: nodeRoot.childIndexes.length > 0
-
-            DMouseArea {
-                id: expandButton
-
-                width: parent.height * 0.5
-                height: width
-
-                anchors.centerIn: parent
-
-                onClicked: {
-                    // Check If Expanded
-                    if (!nodeRoot.expanded) {
-                        // Set Expanded
-                        //nodeRoot.expand();
-
-                        // Emit Expand Item Signal
-                        nodeRoot.expandItem(nodeRoot.itemIndex);
-                    } else {
-                        // Restore
-                        //nodeRoot.collapse();
-                        // Emit Collapse Item Signal
-                        nodeRoot.collapseItem(nodeRoot.itemIndex);
-                    }
-                }
-
-                DText {
-                    anchors.centerIn: parent
-                    scale: parent.pressed ? DStyle.pressedScale : 1.0
-                    rotation: nodeRoot.expanded ? 135 : 0
-                    Behavior on rotation { DAnimation { } }
-                    font.pixelSize: DStyle.fontSizeS
-                    text: "❖"
-    //                text: nodeRoot.expanded ? "-" : "+"
-                }
-            }
-        }
-
-        // Node Rectangle
+        // Node Rect
         DRectangle {
             id: nodeRect
-            width: parent.width - expandButtonContainer.width
+            width: parent.width
             height: parent.height
-            anchors.right: parent.right
             border.color: propertiesController.focusedComponent === nodeRoot.componentInfo ? DStyle.colorBorder : DStyle.colorBorderNoFocus
             smooth: true
+//            z: nodeRoot.grabbed ? 1.0 : 0.0
+//            scale: nodeRoot.grabbed ? 1.1 : 1.0
+//            Behavior on scale { DAnimation { } }
 
             // Node Icon
             Rectangle {
@@ -396,7 +433,7 @@ Item {
                 text: nodeRoot.title
                 wrapMode: Text.NoWrap
                 elide: Text.ElideMiddle
-                opacity: nodeRoot.componentInfo !== null ? nodeRoot.componentInfo.layerVisible ? 1.0 : 0.3 : 1.0
+                opacity: nodeRoot.componentInfo !== null ? nodeRoot.componentInfo.layerVisible ? 1.0 : 0.5 : 0.0
             }
 
             // Node Mouse Area
@@ -405,14 +442,13 @@ Item {
                 anchors.fill: parent
 
                 onPressed: {
-                    // Emit Item Selected Signal
-                    nodeRoot.itemSelected(itemIndex);
+                    //console.log("nx: " + nodeRoot.x + " - ny: " + nodeRoot.y);
+
+                    // Emit Node Pressed Signal
+                    nodeTree.nodePressed(Math.round(mouse.x), Math.round(mouse.y));
                 }
 
                 onClicked: {
-                    // Set Focus
-                    //nodeRect.focus = true;
-
                     // Set Focused Component
                     propertiesController.focusedComponent = nodeRoot.componentInfo;
                 }
@@ -438,6 +474,14 @@ Item {
                     }
                 }
 
+                onPositionChanged: {
+                    // Check If Grabbed
+                    if (nodeRoot.grabbed) {
+                        // Emit Node Pos Changed Signal
+                        nodeTree.nodePosChanged(Math.round(mouse.x), Math.round(mouse.y));
+                    }
+                }
+
                 onReleased: {
                     // Reset Grabbed
                     nodeRoot.grabbed = false;
@@ -457,6 +501,7 @@ Item {
                 anchors.right: parent.right
                 anchors.rightMargin: DStyle.defaultMargin * 2
                 anchors.verticalCenter: parent.verticalCenter
+                visible: nodeRoot.enableLayerVisibilityButton
 
                 OpacityMask {
                     id: buttonMask
@@ -465,7 +510,7 @@ Item {
                     opacity: {
                         // Check Component Info
                         if (nodeRoot.componentInfo !== null) {
-                            return nodeRoot.componentInfo.layerVisible ? 0.8 : 0.3;
+                            return nodeRoot.componentInfo.layerVisible ? 0.8 : 0.5;
                         }
 
                         return 0.0;
@@ -491,8 +536,11 @@ Item {
                 }
 
                 onClicked:  {
-                    // Toggle Layer Visibility
-                    nodeRoot.componentInfo.layerVisible = !nodeRoot.componentInfo.layerVisible;
+                    // Check Component Info
+                    if (nodeRoot.componentInfo !== null) {
+                        // Toggle Layer Visibility
+                        nodeRoot.componentInfo.layerVisible = !nodeRoot.componentInfo.layerVisible;
+                    }
                 }
             }
 
@@ -501,28 +549,27 @@ Item {
                 id: swipeGesture
                 anchors.fill: parent
                 visible: !nodeRoot.rootNode
-
-                onSwipeStarted: {
-                    // Emit Swipe Activated Signal
-                    nodeRoot.swipeActivated(nodeRoot.itemIndex);
-                }
-
-                onSwipeFinished: {
-                    // ...
-                }
-
                 onActionButtonClicked: {
-                    // Emit Delete Item Signal
-                    //nodeRoot.deleteItem(nodeRoot.itemIndex);
-
-                    // Remove Child From Parent
-                    componentInfo.removeFromParent();
+                    // Check Component Info
+                    if (nodeRoot.componentInfo !== null) {
+                        // Remove From Parent
+                        nodeRoot.componentInfo.removeFromParent();
+                    }
                 }
             }
         }
     }
 
-    // Hover Timer
+    Column {
+        id: childrenColumn
+        width: parent.width
+        anchors.top: nodeContainer.bottom
+        anchors.topMargin: DStyle.defaultSpacing
+        spacing: DStyle.defaultSpacing
+
+        // ...
+    }
+
     Timer {
         id: hoverTimer
         interval: 1000

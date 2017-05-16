@@ -1,3 +1,7 @@
+
+// Default Drag Threshold for Containers
+var defaultDragThreshold                        = 10;
+
 // Default Pane Width
 var defaultPaneWidth                            = 300;
 // Default Pane Height

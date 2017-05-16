@@ -329,6 +329,14 @@ DPaneBase {
         }
     }
 
+//    onTransitionStarted: {
+//        // Check State
+//        if (componentRootContainerRoot.state === componentRootContainerRoot.stateHidden) {
+//            // Close Node Pane
+//            nodePaneLoader.item.reset(false);
+//        }
+//    }
+
     onTransitionFinished: {
         // Check State
         if (componentRootContainerRoot.state === componentRootContainerRoot.stateShown) {
@@ -340,6 +348,8 @@ DPaneBase {
             componentRootContainerRoot.focus = true;
             // Set Update Component Info Enabled
             componentRootContainerRoot.updateComponentInfoEnabled = true;
+            // Set Node Pane Loader Active
+            nodePaneLoader.active = false;
         } else {
             // Reset Update Component Info Enabled
             componentRootContainerRoot.updateComponentInfoEnabled = false;
@@ -649,5 +659,40 @@ DPaneBase {
         opacity: 0.05
         font.pixelSize: 48
         text: componentInfo ? componentInfo.componentName : ""
+    }
+
+    // Node Pane Loader
+    DLoader {
+        id: nodePaneLoader
+        anchors.right: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+
+        sourceComponent: DNodePane {
+            anchors.verticalCenter: parent.verticalCenter
+
+            onTransitionStarted: {
+                // ...
+            }
+
+            onTransitionFinished: {
+                // ...
+            }
+        }
+
+        onStatusChanged: {
+            // Switch Status
+            switch (status) {
+                case Loader.Ready:
+                    // Set Node Pane Parent Pane
+                    nodePaneLoader.item.parentPane = componentRootContainerRoot;
+                    // Set Component Root Container Child Pane
+                    componentRootContainerRoot.childPane = nodePaneLoader.item;
+                break;
+
+                case Loader.Error:
+                    console.warn("DComponentRootContainer.nodePaneLoader.onStatusChanged - status: " + status + " - ERROR LOADING NODE PANE!");
+                break;
+            }
+        }
     }
 }

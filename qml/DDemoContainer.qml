@@ -20,6 +20,9 @@ DContainer {
 
     drag.filterChildren: false
 
+    minWidth: 400
+    minHeight: 400
+
     property int contentWidth: 400
 
     // Bring To Front
@@ -57,17 +60,76 @@ DContainer {
         // Select Component
         //propertiesController.selectComponent("MyRectangle");
 
+        // Set Component Info
+        //demoPane.componentInfo = propertiesController.focusedComponent;
+
         // Set Root Component
         //demoNodeTree.rootComponent = propertiesController.focusedComponent;
     }
 
+    DButton {
+        width: 196
+        anchors.right: parent.right
+        anchors.rightMargin: DStyle.defaultMargin
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: DStyle.defaultMargin
+
+        text: demoPane.state === demoPane.stateCreate ? "Create Node Pane" : "Reset Node Pane"
+
+        onClicked: {
+            if (demoPane.state === demoPane.stateCreate) {
+                demoPane.show();
+            } else {
+                demoPane.reset(false);
+            }
+        }
+    }
+
+
+    DNodePane {
+        id: demoPane
+
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+
+    }
+
+/*
+    DButton {
+        anchors.right: parent.right
+        anchors.rightMargin: DStyle.defaultMargin
+        anchors.verticalCenter: parent.verticalCenter
+        text: "Add Child"
+
+        onClicked: {
+
+            // Previous Focused Component
+            var lastFocused = propertiesController.focusedComponent;
+
+            // Select Item
+            propertiesController.selectComponent("Item");
+            // Get New Item Clone
+            var newItem = propertiesController.focusedComponent.clone();
+
+            // Set Focused Component
+            propertiesController.focusedComponent = lastFocused;
+
+            // Check Focused Component
+
+            // Add Child
+            //propertiesController.focusedComponent.addChild(newItem);
+
+            // Insert Child
+            propertiesController.focusedComponent.insertChild(0, newItem);
+        }
+    }
 
     DNodeTree {
         id: demoNodeTree
         width: parent.width * 0.6
         height: parent.height * 0.8
         anchors.centerIn: parent
-/*
+
         DNodeTreeNode {
             width: parent.width * CONSTS.defaultNodeScaleRatio
             anchors.right: parent.right
@@ -114,9 +176,9 @@ DContainer {
             width: parent.width * CONSTS.defaultNodeScaleRatio
             anchors.right: parent.right
         }
-*/
-    }
 
+    }
+*/
 
 //    DPropertyItemValue {
 //        anchors.centerIn: parent

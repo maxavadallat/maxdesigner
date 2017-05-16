@@ -763,5 +763,9 @@ Item {
         anchors.centerIn: parent
         visible: false
     }
+
+    DToolBar {
+        id: toolBar
+    }
 }
 

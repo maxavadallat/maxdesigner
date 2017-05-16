@@ -15,11 +15,51 @@ DRectangle {
     anchors.top: parent.top
     anchors.topMargin: toolBarTopMargin
 
-    property int toolBarTopMargin: toolBarHidden ? -toolBarRoot.height - showHideButton.height : showToolBar ? -DStyle.defaultRadius : -toolBarRoot.height
+    property int toolBarTopMargin: -toolBarRoot.height
     Behavior on toolBarTopMargin { DAnimation { easing.type: Easing.OutBack } }
 
-    property bool showToolBar: true
-    property bool toolBarHidden: false
+    readonly property string stateShown: "shown"
+    readonly property string stateClosed: "closed"
+    readonly property string stateHidden: "hidden"
+
+    property string previousState: ""
+
+    state: stateShown
+
+    // Show Toolbar
+    function showToolbar() {
+        // Set State
+        toolBarRoot.state = stateShown;
+    }
+
+    // Close Toolbar
+    function closeToolbar() {
+        // Set State
+        toolBarRoot.state = stateClosed;
+    }
+
+    // Hide Toolbar
+    function hideToolbar() {
+        // Save Previous State
+        toolBarRoot.previousState = toolBarRoot.state;
+        // Set State
+        toolBarRoot.state = stateHidden;
+    }
+
+    // Restore Toolbar
+    function restoreToolbar() {
+        // Check Previous State
+        if (toolBarRoot.previousState !== "") {
+            // Set Previous State
+            toolBarRoot.state = toolBarRoot.previousState;
+            // Reset Previous State
+            toolBarRoot.previousState = "";
+        } else {
+            // Set State
+            toolBarRoot.state = stateClosed;
+        }
+    }
+
 
     Row {
         id: toolBarRow
@@ -30,38 +70,46 @@ DRectangle {
 
         DToolButton {
             source: "qrc:/assets/icons/align.hleft.png"
+            onClicked: checked = !checked;
         }
 
         DToolButton {
             source: "qrc:/assets/icons/align.hcenter.png"
+            onClicked: checked = !checked;
         }
 
         DToolButton {
             source: "qrc:/assets/icons/align.hright.png"
+            onClicked: checked = !checked;
         }
 
         DToolBarSeparator { }
 
         DToolButton {
             source: "qrc:/assets/icons/align.vtop.png"
+            onClicked: checked = !checked;
         }
 
         DToolButton {
             source: "qrc:/assets/icons/align.vcenter.png"
+            onClicked: checked = !checked;
         }
 
         DToolButton {
             source: "qrc:/assets/icons/align.vbottom.png"
+            onClicked: checked = !checked;
         }
 
         DToolBarSeparator { }
 
         DToolButton {
             source: "qrc:/assets/icons/fill.png"
+            onClicked: checked = !checked;
         }
 
         DToolButton {
             source: "qrc:/assets/icons/centerin.png"
+            onClicked: checked = !checked;
         }
     }
 
@@ -80,8 +128,31 @@ DRectangle {
         }
 
         onClicked: {
-            // Toggle Show Tool Bar
-            toolBarRoot.showToolBar = !toolBarRoot.showToolBar;
+            // Check Toolbar State
+            if (toolBarRoot.state === stateClosed) {
+                // Show Toolbar
+                showToolbar();
+            } else {
+                // Close Toolbar
+                closeToolbar();
+            }
         }
     }
+
+    states: [
+        State {
+            name: stateHidden
+            PropertyChanges { target: toolBarRoot; toolBarTopMargin: -toolBarRoot.height - showHideButton.height }
+        },
+
+        State {
+            name: stateClosed
+            PropertyChanges { target: toolBarRoot; toolBarTopMargin: -toolBarRoot.height }
+        },
+
+        State {
+            name: stateShown
+            PropertyChanges { target: toolBarRoot; toolBarTopMargin: -DStyle.defaultRadius }
+        }
+    ]
 }

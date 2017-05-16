@@ -30,28 +30,34 @@ Item {
         }
     }
 
-
-    // Background Container
     Rectangle {
-        id: bgContainer
         anchors.fill: parent
-
-        color: DStyle.colorMainBG
-
-        Image {
-            id: bgImage
-            anchors.fill: parent
-            source: "qrc:/assets/images/tron-wide-wallpaper.jpeg"
-            fillMode: Image.PreserveAspectCrop
-            asynchronous: true
-            opacity: 0.1
-        }
+        color: "black"
     }
 
+//    // Background Container
+//    Rectangle {
+//        id: bgContainer
+//        anchors.fill: parent
+
+//        color: DStyle.colorMainBG
+
+//        Image {
+//            id: bgImage
+//            anchors.fill: parent
+//            source: "qrc:/assets/images/tron-wide-wallpaper.jpeg"
+//            fillMode: Image.PreserveAspectCrop
+//            asynchronous: true
+//            opacity: 0.1
+//        }
+//    }
+
     Rectangle {
+        id: screenBorderRect
         width: liveController.screenWidth
         height: liveController.screenHeight
         anchors.centerIn: parent
+        anchors.verticalCenterOffset: -20
         color: "transparent"
         border.color: DStyle.colorBorderNoFocus
     }
@@ -59,6 +65,8 @@ Item {
     DLoader {
         id: contentLoader
         anchors.centerIn: parent
+        anchors.verticalCenterOffset: screenBorderRect.anchors.verticalCenterOffset
+        anchors.horizontalCenterOffset: screenBorderRect.anchors.horizontalCenterOffset
         onStatusChanged: {
             // Switch Status
             switch (status) {
@@ -75,6 +83,11 @@ Item {
                 break;
             }
         }
+    }
+
+    DImage {
+        anchors.centerIn: parent
+        source: "qrc:/assets/images/dashboard.png"
     }
 
     DStateSelector {

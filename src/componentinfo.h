@@ -246,6 +246,8 @@ public:
     Q_INVOKABLE ComponentInfo* takeChild(const int& aIndex);
     // Remove Child
     Q_INVOKABLE void removeChild(ComponentInfo* aChild, const bool& aDelete = true);
+    // Move Child
+    Q_INVOKABLE void moveChild(const int& aIndex, const int& aTargetIndex);
 
     // Remove/Delete From Parent
     Q_INVOKABLE void removeFromParent();
@@ -297,6 +299,9 @@ signals:
     void childCountChanged(const int& aCount);
     // Child Depth Changed Signal
     void depthChanged(const int& aDepth);
+
+    // Child About To Be Removed Signal
+    void childAboutToBeRemoved(ComponentInfo* aChild);
 
     // Child Added Signal
     void childAdded(const int& aIndex);

@@ -20,5 +20,6 @@
         <file>assets/icons/centerin.png</file>
         <file>assets/icons/fill.png</file>
         <file>assets/images/tron-wide-wallpaper.jpeg</file>
+        <file>assets/images/dashboard.png</file>
     </qresource>
 </RCC>

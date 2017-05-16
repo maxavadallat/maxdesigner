@@ -111,5 +111,6 @@
         <file>qml/DToolBar.qml</file>
         <file>qml/DToolButton.qml</file>
         <file>qml/DToolBarSeparator.qml</file>
+        <file>qml/DNodePane.qml</file>
     </qresource>
 </RCC>

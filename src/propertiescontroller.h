@@ -304,6 +304,10 @@ private:
     // Set Functions Model
     void setFunctionsModel(ComponentFunctionsModel* aFunctionsModel);
 
+private slots:
+    // Child About To Be Removed Slot
+    void childAboutToBeRemoved(ComponentInfo* aChild);
+
 private: // Data
     // Project Model
     ProjectModel*                   mProject;

@@ -11,6 +11,8 @@ Item {
     default property alias contentContainer: contentContainerColumn.children
 
     property alias contentHeight: contentContainerFlickable.contentHeight
+    property alias contentY: contentContainerFlickable.contentY
+    property bool interactive: true
 
     clip: true
 
@@ -34,12 +36,24 @@ Item {
         pixelAligned: true
         contentWidth: contentContainerColumn.width
         contentHeight: contentContainerColumn.height
-        interactive: contentHeight > height
+        interactive: flickableRoot.interactive && (contentHeight > height)
 
         Column {
             id: contentContainerColumn
             width: contentContainerFlickable.width
             spacing: DStyle.defaultSpacing
+
+            add: Transition {
+                NumberAnimation { properties: "height, opacity"; from: 0; duration: DStyle.animDuration }
+            }
+
+            populate: Transition {
+                NumberAnimation { properties: "x, y"; duration: DStyle.animDuration }
+            }
+
+            move: Transition {
+                NumberAnimation { properties: "x, y"; duration: DStyle.animDuration }
+            }
         }
     }
 

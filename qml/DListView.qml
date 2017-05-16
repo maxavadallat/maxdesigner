@@ -10,6 +10,7 @@ DControl {
     property alias delegate: listView.delegate
     property alias count: listView.count
     property alias currentIndex: listView.currentIndex
+    property alias contentY: listView.contentY
     property int itemHeight: CONSTS.defaultPaneItemHeight
 
     property alias spacing: listView.spacing
@@ -33,11 +34,19 @@ DControl {
         //highlightFollowsCurrentItem: true
         interactive: contentHeight > height
 
+//        add: Transition {
+//            ParallelAnimation {
+//                NumberAnimation { property: "height"; from: 0; to: listViewRoot.itemHeight; duration: DStyle.animDuration }
+//                NumberAnimation { property: "opacity"; from: 0.0; to: 1.0; duration: DStyle.animDuration }
+//            }
+//        }
+
         add: Transition {
-            ParallelAnimation {
-                NumberAnimation { property: "height"; from: 0; to: listViewRoot.itemHeight; duration: DStyle.animDuration }
-                NumberAnimation { property: "opacity"; from: 0.0; to: 1.0; duration: DStyle.animDuration }
-            }
+            NumberAnimation { properties: "height, opacity"; from: 0; duration: DStyle.animDuration }
+        }
+
+        populate: Transition {
+            NumberAnimation { properties: "x, y"; duration: DStyle.animDuration }
         }
 
         addDisplaced: Transition {

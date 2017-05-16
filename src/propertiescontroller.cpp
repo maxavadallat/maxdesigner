@@ -295,6 +295,24 @@ void PropertiesController::setFunctionsModel(ComponentFunctionsModel* aFunctions
 }
 
 //==============================================================================
+// Child About To Be Removed Slot
+//==============================================================================
+void PropertiesController::childAboutToBeRemoved(ComponentInfo* aChild)
+{
+    // Check Child Component
+    if (mFocusedComponent == aChild) {
+        // Check Child Component
+        if (aChild && aChild->mParent) {
+            // Set Focused Component
+            setFocusedComponent(aChild->mParent);
+        } else {
+            // Set Focused Component
+            setFocusedComponent(NULL);
+        }
+    }
+}
+
+//==============================================================================
 // Get Current Project
 //==============================================================================
 ProjectModel* PropertiesController::currentProject()
@@ -334,6 +352,12 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
     if (mFocusedComponent != aComponent) {
 
         //qDebug() << "PropertiesController::setFocusedComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
+
+        // Check Focused Component
+        if (mFocusedComponent) {
+            // Disconnect Signal
+            disconnect(mFocusedComponent, SIGNAL(childAboutToBeRemoved(ComponentInfo*)), this, SLOT(childAboutToBeRemoved(ComponentInfo*)));
+        }
 
         // Set Focused Component
         mFocusedComponent = aComponent;
@@ -438,6 +462,12 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
         }
 
         // ...
+
+        // Check Focused Component
+        if (mFocusedComponent) {
+            // Connect Signal
+            connect(mFocusedComponent, SIGNAL(childAboutToBeRemoved(ComponentInfo*)), this, SLOT(childAboutToBeRemoved(ComponentInfo*)));
+        }
 
         // Emit Focused Component Changed Signal
         emit focusedComponentChanged(mFocusedComponent);

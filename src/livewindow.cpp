@@ -85,7 +85,7 @@ void LiveWindow::restoreUI()
     ui->quickLiveWidget->setFocusPolicy(Qt::StrongFocus);
 
     // resize To Project Screen Size
-    resize(screenWidth(), screenHeight());
+    resize(screenWidth(), screenHeight() + 30);
 
     // ...
 }
@@ -247,6 +247,8 @@ void LiveWindow::on_actionClose_triggered()
 
     // ...
 
+    // Normalize Window
+    showNormal();
     // Close
     close();
 }

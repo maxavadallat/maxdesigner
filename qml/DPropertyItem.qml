@@ -78,6 +78,7 @@ Item {
             propertyValue: propertyItemRoot.propertyValue
             propertyStep: propertyItemRoot.propertyStep
             propertyEnums: propertyItemRoot.propertyEnums
+
             onValueChanged: propertyItemRoot.itemValueChanged(itemIndex, newValue);
             onValueOptionZChanged: propertyItemRoot.z = valueOptionZ;
 

@@ -192,6 +192,13 @@ DContainer {
         }
     }
 
+    readonly property string hideActionHide: "hide"
+    readonly property string hideActionReset: "reset"
+
+    property string hideAction: hideActionHide
+
+    property bool hideButtonVisibleOnCreate: false
+
     enableSizeOverlay: false
     enablePosOverlay: false
 
@@ -474,20 +481,19 @@ DContainer {
             id: buttonMouseArea
             anchors.fill: parent
             onClicked: {
-                // Check State
-                if (paneBaseRoot.state !== stateHidden) {
+                // Check Hide Action
+                if (paneBaseRoot.hideAction === paneBaseRoot.hideActionReset && paneBaseRoot.state === stateShown) {
+                    // Reset
+                    paneBaseRoot.reset(false);
+
+                } else if (paneBaseRoot.hideAction === paneBaseRoot.hideActionReset && paneBaseRoot.state !== stateShown) {
+                    // Set State
+                    paneBaseRoot.show();
+
+                } else if (paneBaseRoot.state !== stateHidden) {
                     // Dismiss Pane
                     paneBaseRoot.dismissPane(false);
-//                    // Check Child Pane
-//                    if (childPane && childPane.state === stateShown) {
-//                        // Set Hide Waiting For Child Reset
-//                        paneBaseRoot.hideWaitingForChildReset = true;
-//                        // Emit Reset Child Request Signal
-//                        paneBaseRoot.resetChildRequest();
-//                    } else {
-//                        // Set State
-//                        paneBaseRoot.hide();
-//                    }
+
                 } else {
                     // Set State
                     paneBaseRoot.show();
@@ -511,7 +517,7 @@ DContainer {
 
             PropertyChanges { target: paneBaseRoot; x: paneBaseRoot.initialX; y: paneBaseRoot.initialY; width: 0; height: 0 }
             PropertyChanges { target: titleTextLabel; opacity: 0.0 }
-            PropertyChanges { target: hideShowButton; opacity: 0.0 }
+            PropertyChanges { target: hideShowButton; opacity: paneBaseRoot.hideButtonVisibleOnCreate && paneBaseRoot.enableHideButton ? 1.0 : 0.0 }
         },
 
         State {
@@ -542,6 +548,7 @@ DContainer {
     ]
 
     transitions: [
+        // To Create
         Transition {
             //from: ""
             to: stateCreate
@@ -557,6 +564,7 @@ DContainer {
             }
         },
 
+        // From Create To Shown
         Transition {
             from: stateCreate
             to: stateShown
@@ -631,6 +639,7 @@ DContainer {
             }
         },
 
+        // From Shown To Create
         Transition {
             from: stateShown
             to: stateCreate
@@ -708,6 +717,7 @@ DContainer {
             }
         },
 
+        // From Hidden To Shown
         Transition {
             from: stateHidden
             to: stateShown
@@ -737,6 +747,7 @@ DContainer {
             }
         },
 
+        // To Hidden
         Transition {
             //from: stateShown
             to: stateHidden
@@ -764,6 +775,7 @@ DContainer {
             }
         },
 
+        // To Closed
         Transition {
             to: stateClosed
 

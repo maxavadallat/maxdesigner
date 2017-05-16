@@ -2401,74 +2401,6 @@ int ComponentInfo::depth()
 }
 
 //==============================================================================
-// Add Child
-//==============================================================================
-void ComponentInfo::addChild(ComponentInfo* aChild)
-{
-    // Check Child
-    if (aChild) {
-        //qDebug() << "ComponentInfo::addChild - path: " << aChild->componentPath();
-
-        // Reset ProtoType Flag
-        aChild->mIsProtoType = false;
-        // Clear Dirty Flag
-        aChild->mDirty = false;
-        // Append Child
-        mChildren << aChild;
-        // Add ID To ID Map
-        setChildObjectID(aChild, aChild->componentID());
-        // Set Dirty
-        setDirty(true);
-        // Emit Child Added
-        emit childAdded(mChildren.count() - 1);
-        // Emit Child Count Changed Signal
-        emit childCountChanged(mChildren.count());
-    }
-}
-
-//==============================================================================
-// Remove Child
-//==============================================================================
-void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
-{
-    // Check Child
-    if (aChild) {
-        // Get Child Index
-        int cIndex = mChildren.indexOf(aChild);
-        // Check Child Index
-        if (cIndex >= 0 && cIndex < mChildren.count()) {
-            // Get Child Component Info
-            ComponentInfo* childComponent = mChildren[cIndex];
-
-            //qDebug() << "ComponentInfo::removeChild - mComponent: " << childComponent->mName;
-
-            // Remove Child Object From ID Map
-            setChildObjectID(childComponent, "");
-
-            // Check Delete
-            if (aDelete) {
-                // Delete Child
-                delete mChildren.takeAt(cIndex);
-            } else {
-                // Remove Child
-                mChildren.removeAt(cIndex);
-            }
-
-            // Set Dirty
-            setDirty(true);
-
-            // Emit Child Removed Signal
-            emit childRemoved(cIndex);
-            // Emit Child Count Changed Signal
-            emit childCountChanged(mChildren.count());
-
-        } else {
-            qWarning() << "ComponentInfo::removeChild - aChild: " << aChild << " - CHILD COMPONENT NOT FOUND!";
-        }
-    }
-}
-
-//==============================================================================
 // Get Child
 //==============================================================================
 ComponentInfo* ComponentInfo::childInfo(const int& aIndex)
@@ -2482,30 +2414,31 @@ ComponentInfo* ComponentInfo::childInfo(const int& aIndex)
 }
 
 //==============================================================================
-// Take Child Info
+// Add Child
 //==============================================================================
-ComponentInfo* ComponentInfo::takeChild(const int& aIndex)
+void ComponentInfo::addChild(ComponentInfo* aChild)
 {
-    // Check Index
-    if (aIndex >= 0 && aIndex < mChildren.count()) {
-        // Take Child
-        ComponentInfo* takenChild = mChildren.takeAt(aIndex);
-        // Check Taken Child
-        if (takenChild) {
-            // Remove Child Object From ID Map
-            setChildObjectID(takenChild, "");
-            // Set Dirty
-            setDirty(true);
-            // Emmit Child Removed Signal
-            emit childRemoved(aIndex);
-            // Emit Child Cound Changed Signal
-            emit childCountChanged(mChildren.count());
+    // Check Child
+    if (aChild) {
+        qDebug() << "ComponentInfo::addChild - mName: " << aChild->mName;
 
-            return takenChild;
-        }
+        // Reset ProtoType Flag
+        aChild->mIsProtoType = false;
+        // Clear Dirty Flag
+        aChild->mDirty = false;
+        // Set Parent
+        aChild->mParent = this;
+        // Append Child
+        mChildren << aChild;
+        // Add ID To ID Map
+        setChildObjectID(aChild, aChild->componentID());
+        // Set Dirty
+        setDirty(true);
+        // Emit Child Added
+        emit childAdded(mChildren.count() - 1);
+        // Emit Child Count Changed Signal
+        emit childCountChanged(mChildren.count());
     }
-
-    return NULL;
 }
 
 //==============================================================================
@@ -2535,6 +2468,89 @@ void ComponentInfo::insertChild(const int& aIndex, ComponentInfo* aChild)
 }
 
 //==============================================================================
+// Remove Child
+//==============================================================================
+void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
+{
+    // Check Child
+    if (aChild) {
+        // Get Child Index
+        int cIndex = mChildren.indexOf(aChild);
+        // Check Child Index
+        if (cIndex >= 0 && cIndex < mChildren.count()) {
+            // Get Child Component Info
+            ComponentInfo* childComponent = mChildren[cIndex];
+
+            qDebug() << "ComponentInfo::removeChild - mName: " << childComponent->mName;
+
+            // Emit Child About To Be Removed
+            emit childComponent->childAboutToBeRemoved(childComponent);
+
+            // Remove Child Object From ID Map
+            setChildObjectID(childComponent, "");
+
+            // Check Delete
+            if (aDelete) {
+                // Delete Child
+                delete mChildren.takeAt(cIndex);
+            } else {
+                // Remove Child
+                mChildren.removeAt(cIndex);
+            }
+
+            // Set Dirty
+            setDirty(true);
+
+            // Emit Child Removed Signal
+            emit childRemoved(cIndex);
+            // Emit Child Count Changed Signal
+            emit childCountChanged(mChildren.count());
+
+        } else {
+            qWarning() << "ComponentInfo::removeChild - aChild: " << aChild << " - CHILD COMPONENT NOT FOUND!";
+        }
+    }
+}
+
+//==============================================================================
+// Move Child
+//==============================================================================
+void ComponentInfo::moveChild(const int& aIndex, const int& aTargetIndex)
+{
+    // Move Child
+    mChildren.move(aIndex, aTargetIndex);
+}
+
+//==============================================================================
+// Take Child Info
+//==============================================================================
+ComponentInfo* ComponentInfo::takeChild(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < mChildren.count()) {
+        // Take Child
+        ComponentInfo* takenChild = mChildren.takeAt(aIndex);
+        // Check Taken Child
+        if (takenChild) {
+            // Emit Child About To Be Removed
+            emit takenChild->childAboutToBeRemoved(takenChild);
+            // Remove Child Object From ID Map
+            setChildObjectID(takenChild, "");
+            // Set Dirty
+            setDirty(true);
+            // Emmit Child Removed Signal
+            emit childRemoved(aIndex);
+            // Emit Child Cound Changed Signal
+            emit childCountChanged(mChildren.count());
+
+            return takenChild;
+        }
+    }
+
+    return NULL;
+}
+
+//==============================================================================
 // Destructor
 //==============================================================================
 ComponentInfo::~ComponentInfo()
@@ -2544,7 +2560,7 @@ ComponentInfo::~ComponentInfo()
     // Clear
     clear();
 
-    //qDebug() << "ComponentInfo " << mName << " deleted.";
+    qDebug() << "ComponentInfo " << mName << " deleted.";
 }
 
 
