@@ -31,6 +31,7 @@ DMouseArea {
     signal keyEvent(var event)
     signal accepted(var newText)
     signal textEdited(var newText)
+    signal textCleared();
 
     onClicked: {
         // Set Focus
@@ -181,6 +182,8 @@ DMouseArea {
             textInput.text = "";
             // Emit Accepted Signal
             textInputRoot.textEdited(textInput.text);
+            // Emit Text Cleared Signal
+            textInputRoot.textCleared();
         }
     }
 }

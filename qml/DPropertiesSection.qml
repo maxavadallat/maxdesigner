@@ -58,6 +58,8 @@ Repeater {
                     sourceModel: propertiesController.propertiesModel ? propertiesController.propertiesModel.componentPropertyList(sectionIndex) : undefined
                 }
 
+                itemHeight: CONSTS.defaultPaneItemHeight
+
                 delegate: DPropertyItem {
                     id: propertyItemDelegate
                     width: basePropertiesRepeaterRoot.width

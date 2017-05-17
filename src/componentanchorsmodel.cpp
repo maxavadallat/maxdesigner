@@ -125,13 +125,20 @@ void ComponentAnchorsModel::setAnchorsLeft(const QString& aAnchorLeft)
             // Clear Anchor Left
             mComponent->mAnchors.remove(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFT);
         } else {
+            // Clear Anchor Fill
+            setAnchorsFill("");
+            // Clear Anchor Center In
+            setAnchorsCenterIn("");
+            // Clear Anchor Horizontal Center
+            setHorizontalCenter("");
+
             // Set Anchors Left
             mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFT] = aAnchorLeft;
         }
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchors Left Changed
-        emit mComponent->anchorLeftChanged(aAnchorLeft);
+        emit mComponent->anchorsLeftChanged(aAnchorLeft);
         // Emit Anchors Left Changed Signal
         emit anchorsLeftChanged(aAnchorLeft);
     }
@@ -162,13 +169,20 @@ void ComponentAnchorsModel::setAnchorsRight(const QString& aAnchorRight)
             // Clear Anchor Right
             mComponent->mAnchors.remove(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHT);
         } else {
+            // Clear Anchor Fill
+            setAnchorsFill("");
+            // Clear Anchor Center In
+            setAnchorsCenterIn("");
+            // Clear Anchor Horizontal Center
+            setHorizontalCenter("");
+
             // Set Anchors Left
             mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHT] = aAnchorRight;
         }
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchors Right Changed
-        emit mComponent->anchorRightChanged(aAnchorRight);
+        emit mComponent->anchorsRightChanged(aAnchorRight);
         // Emit Anchors Right Changed Signal
         emit anchorsRightChanged(aAnchorRight);
     }
@@ -199,13 +213,20 @@ void ComponentAnchorsModel::setAnchorsTop(const QString& aAnchorTop)
             // Clear Anchor Top
             mComponent->mAnchors.remove(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOP);
         } else {
+            // Clear Anchor Fill
+            setAnchorsFill("");
+            // Clear Anchor Center In
+            setAnchorsCenterIn("");
+            // Clear Anchor Vertical Center
+            setVerticalCenter("");
+
             // Set Anchors Top
             mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOP] = aAnchorTop;
         }
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchors Top Changed Signal
-        emit mComponent->anchorTopChanged(aAnchorTop);
+        emit mComponent->anchorsTopChanged(aAnchorTop);
         // Emit Anchors Top Changed Signal
         emit anchorsTopChanged(aAnchorTop);
     }
@@ -236,13 +257,20 @@ void ComponentAnchorsModel::setAnchorsBottom(const QString& aAnchorBottom)
             // Clear Anchor Bottom
             mComponent->mAnchors.remove(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOM);
         } else {
+            // Clear Anchor Fill
+            setAnchorsFill("");
+            // Clear Anchor Center In
+            setAnchorsCenterIn("");
+            // Clear Anchor Vertical Center
+            setVerticalCenter("");
+
             // Set Anchors Bottom
             mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOM] = aAnchorBottom;
         }
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchor Bottom Changed Signal
-        emit mComponent->anchorBottomChanged(aAnchorBottom);
+        emit mComponent->anchorsBottomChanged(aAnchorBottom);
         // Emit Anchors Bottom Changed Signal
         emit anchorsBottomChanged(aAnchorBottom);
     }
@@ -273,13 +301,28 @@ void ComponentAnchorsModel::setAnchorsFill(const QString& aAnchorFill)
             // Clear Anchor Fill
             mComponent->mAnchors.remove(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_FILL);
         } else {
+            // Clear Anchor Left
+            setAnchorsLeft("");
+            // Clear Anchor Right
+            setAnchorsRight("");
+            // Clear Anchor Top
+            setAnchorsTop("");
+            // Clear Anchor Bottom
+            setAnchorsBottom("");
+            // Clear Anchor Center In
+            setAnchorsCenterIn("");
+            // Clear Anchor Horizontal Center
+            setHorizontalCenter("");
+            // Clear Anchor Vertical Center
+            setVerticalCenter("");
+
             // Set Anchors Fill
             mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_FILL] = aAnchorFill;
         }
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchor Fill Changed Signal
-        emit mComponent->anchorFillChanged(aAnchorFill);
+        emit mComponent->anchorsFillChanged(aAnchorFill);
         // Emit Anchors Fill Changed Signal
         emit anchorsFillChanged(aAnchorFill);
     }
@@ -310,13 +353,28 @@ void ComponentAnchorsModel::setAnchorsCenterIn(const QString& aAnchorCenterIn)
             // Clear Anchor Center In
             mComponent->mAnchors.remove(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_CENTERIN);
         } else {
+            // Clear Anchor Fill
+            setAnchorsFill("");
+            // Clear Anchor Left
+            setAnchorsLeft("");
+            // Clear Anchor Right
+            setAnchorsRight("");
+            // Clear Anchor Top
+            setAnchorsTop("");
+            // Clear Anchor Bottom
+            setAnchorsBottom("");
+            // Clear Anchor Horizontal Center
+            setHorizontalCenter("");
+            // Clear Anchor Vertical Center
+            setVerticalCenter("");
+
             // Set Anchors CenterIn
             mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_CENTERIN] = aAnchorCenterIn;
         }
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchor Center In Changed Signal
-        emit mComponent->anchorCenterInChanged(aAnchorCenterIn);
+        emit mComponent->anchorsCenterInChanged(aAnchorCenterIn);
         // Emit Anchors CenterIn Changed Signal
         emit anchorsCenterInChanged(aAnchorCenterIn);
     }
@@ -347,13 +405,22 @@ void ComponentAnchorsModel::setHorizontalCenter(const QString& aHorizontalCenter
             // Clear Anchor Horizontal Center
             mComponent->mAnchors.remove(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER);
         } else {
+            // Clear Anchor Fill
+            setAnchorsFill("");
+            // Clear Anchor Left
+            setAnchorsLeft("");
+            // Clear Anchor Right
+            setAnchorsRight("");
+            // Clear Anchor Center In
+            setAnchorsCenterIn("");
+
             // Set Anchors Horizontal Center
             mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER] = aHorizontalCenter;
         }
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchor Horizontal Center Changed Signal
-        emit mComponent->anchorHorizontalCenterChanged(aHorizontalCenter);
+        emit mComponent->anchorsHorizontalCenterChanged(aHorizontalCenter);
         // Emit Anchors Horizontal Centr Changed Signal
         emit anchorsHorizontalCenterChanged(aHorizontalCenter);
     }
@@ -384,13 +451,22 @@ void ComponentAnchorsModel::setVerticalCenter(const QString& aVerticalCenter)
             // Clear Anchor Vertical Center
             mComponent->mAnchors.remove(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER);
         } else {
+            // Clear Anchor Fill
+            setAnchorsFill("");
+            // Clear Anchor Top
+            setAnchorsTop("");
+            // Clear Anchor Bottom
+            setAnchorsBottom("");
+            // Clear Anchors Center In
+            setAnchorsCenterIn("");
+
             // Set Anchors Vertical Center
             mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER] = aVerticalCenter;
         }
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchor Vertical Center Changed Signal
-        emit mComponent->anchorVerticalCenterChanged(aVerticalCenter);
+        emit mComponent->anchorsVerticalCenterChanged(aVerticalCenter);
         // Emit Anchors Vertical Changed Signal
         emit anchorsVerticalCenterChanged(aVerticalCenter);
     }
@@ -427,7 +503,7 @@ void ComponentAnchorsModel::setAnchorsMargins(const QString& aAnchorMargins)
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchor Margins Changed Signal
-        emit mComponent->anchorMarginsChanged(aAnchorMargins);
+        emit mComponent->anchorsMarginsChanged(aAnchorMargins);
         // Emit Anchors Margins Changed Signal
         emit anchorsMarginsChanged(aAnchorMargins);
     }
@@ -464,7 +540,7 @@ void ComponentAnchorsModel::setAnchorsLeftMargin(const QString& aAnchorLeftMargi
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchors Left Margin Changed Signal
-        emit mComponent->anchorLeftMarginChanged(aAnchorLeftMargin);
+        emit mComponent->anchorsLeftMarginChanged(aAnchorLeftMargin);
         // Emit Anchors LeftMargin Changed Signal
         emit anchorsLeftMarginChanged(aAnchorLeftMargin);
     }
@@ -501,7 +577,7 @@ void ComponentAnchorsModel::setAnchorsRightMargin(const QString& aAnchorRightMar
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchors RightMargin Changed Signal
-        emit mComponent->anchorRightMarginChanged(aAnchorRightMargin);
+        emit mComponent->anchorsRightMarginChanged(aAnchorRightMargin);
         // Emit Anchors RightMargin Changed Signal
         emit anchorsRightMarginChanged(aAnchorRightMargin);
     }
@@ -538,7 +614,7 @@ void ComponentAnchorsModel::setAnchorsTopMargin(const QString& aAnchorTopMargin)
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchors TopMargin Changed Signal
-        emit mComponent->anchorTopMarginChanged(aAnchorTopMargin);
+        emit mComponent->anchorsTopMarginChanged(aAnchorTopMargin);
         // Emit Anchors TopMargin Changed Signal
         emit anchorsTopMarginChanged(aAnchorTopMargin);
     }
@@ -575,7 +651,7 @@ void ComponentAnchorsModel::setAnchorsBottomMargin(const QString& aAnchorBottomM
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchors BottomMargin Changed Signal
-        emit mComponent->anchorBottomMarginChanged(aAnchorBottomMargin);
+        emit mComponent->anchorsBottomMarginChanged(aAnchorBottomMargin);
         // Emit Anchors BottomMargin Changed Signal
         emit anchorsBottomMarginChanged(aAnchorBottomMargin);
     }
@@ -612,7 +688,7 @@ void ComponentAnchorsModel::setAnchorsHorizontalOffset(const QString& aAnchorHor
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchors HorizontalOffset Changed Signal
-        emit mComponent->anchorHorizontalCenterOffsetChanged(aAnchorHorizontalOffset);
+        emit mComponent->anchorsHorizontalOffsetChanged(aAnchorHorizontalOffset);
         // Emit Anchors HorizontalOffset Changed Signal
         emit anchorsHorizontalOffsetChanged(aAnchorHorizontalOffset);
     }
@@ -649,7 +725,7 @@ void ComponentAnchorsModel::setAnchorsVerticalOffset(const QString& aAnchorVerti
         // Set Component Dirty
         mComponent->setDirty(true);
         // Emit Anchors Vertical Offset Changed Signal
-        emit mComponent->anchorVerticalCenterOffsetChanged(aAnchorVerticalOffset);
+        emit mComponent->anchorsVerticalOffsetChanged(aAnchorVerticalOffset);
         // Emit Anchors Vertical Offset Changed Signal
         emit anchorsVerticalOffsetChanged(aAnchorVerticalOffset);
     }

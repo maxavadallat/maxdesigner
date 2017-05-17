@@ -1,4 +1,4 @@
-import QtQuick 2.7
+import QtQuick 2.0
 
 import "style"
 import "DConstants.js" as CONSTS
@@ -34,20 +34,17 @@ DControl {
         //highlightFollowsCurrentItem: true
         interactive: contentHeight > height
 
-//        add: Transition {
-//            ParallelAnimation {
-//                NumberAnimation { property: "height"; from: 0; to: listViewRoot.itemHeight; duration: DStyle.animDuration }
-//                NumberAnimation { property: "opacity"; from: 0.0; to: 1.0; duration: DStyle.animDuration }
-//            }
-//        }
-
         add: Transition {
-            NumberAnimation { properties: "height, opacity"; from: 0; duration: DStyle.animDuration }
+            ParallelAnimation {
+                NumberAnimation { property: "height"; from: 0; to: listViewRoot.itemHeight; duration: DStyle.animDuration }
+                NumberAnimation { property: "opacity"; from: 0.0; to: 1.0; duration: DStyle.animDuration }
+            }
         }
 
-        populate: Transition {
-            NumberAnimation { properties: "x, y"; duration: DStyle.animDuration }
-        }
+        // SHOULD NOT OVERRIDE THIS!!!
+//        populate: Transition {
+//            NumberAnimation { duration: DStyle.animDuration }
+//        }
 
         addDisplaced: Transition {
             NumberAnimation { properties: "x, y"; duration: DStyle.animDuration }

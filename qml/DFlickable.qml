@@ -42,18 +42,6 @@ Item {
             id: contentContainerColumn
             width: contentContainerFlickable.width
             spacing: DStyle.defaultSpacing
-
-            add: Transition {
-                NumberAnimation { properties: "height, opacity"; from: 0; duration: DStyle.animDuration }
-            }
-
-            populate: Transition {
-                NumberAnimation { properties: "x, y"; duration: DStyle.animDuration }
-            }
-
-            move: Transition {
-                NumberAnimation { properties: "x, y"; duration: DStyle.animDuration }
-            }
         }
     }
 

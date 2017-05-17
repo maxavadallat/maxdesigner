@@ -82,7 +82,7 @@ QtObject {
     // Default Spacing
     readonly property int defaultSpacing:                   8
     // Default Glow Radius
-    readonly property int defaultGlowRadius:                32
+    readonly property int defaultGlowRadius:                24
     // Default Glow Samples
     readonly property int defaultGlowSamples:               16
     // Default Glow Spread

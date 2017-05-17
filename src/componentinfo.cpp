@@ -709,6 +709,126 @@ void ComponentInfo::setHeight(const QString& aHeight)
 }
 
 //==============================================================================
+// Left Anchor Target
+//==============================================================================
+QString ComponentInfo::anchorsLeft()
+{
+    return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFT).toString();
+}
+
+//==============================================================================
+// Right Anchor Target
+//==============================================================================
+QString ComponentInfo::anchorsRight()
+{
+    return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHT).toString();
+}
+
+//==============================================================================
+// Top Anchor Target
+//==============================================================================
+QString ComponentInfo::anchorsTop()
+{
+    return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOP).toString();
+}
+
+//==============================================================================
+// Bottom Anchor Target
+//==============================================================================
+QString ComponentInfo::anchorsBottom()
+{
+    return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOM).toString();
+}
+
+//==============================================================================
+// Fill Target
+//==============================================================================
+QString ComponentInfo::anchorsFill()
+{
+    return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_FILL).toString();
+}
+
+//==============================================================================
+// CenterIn Target
+//==============================================================================
+QString ComponentInfo::anchorsCenterIn()
+{
+    return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_CENTERIN).toString();
+}
+
+//==============================================================================
+// Horizontal Center Target
+//==============================================================================
+QString ComponentInfo::horizontalCenter()
+{
+    return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER).toString();
+}
+
+//==============================================================================
+// Vertical Center Target
+//==============================================================================
+QString ComponentInfo::verticalCenter()
+{
+    return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER).toString();
+}
+
+//==============================================================================
+// Margins
+//==============================================================================
+QString ComponentInfo::anchorsMargins()
+{
+    return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_MARGINS).toString();
+}
+
+//==============================================================================
+// Left Margin
+//==============================================================================
+QString ComponentInfo::anchorsLeftMargin()
+{
+    return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_LEFTMARGIN).toString();
+}
+
+//==============================================================================
+// Right Margin
+//==============================================================================
+QString ComponentInfo::anchorsRightMargin()
+{
+    return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_RIGHTMARGIN).toString();
+}
+
+//==============================================================================
+// Top Margin
+//==============================================================================
+QString ComponentInfo::anchorsTopMargin()
+{
+    return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_TOPMARGIN).toString();
+}
+
+//==============================================================================
+// Bottom Margin
+//==============================================================================
+QString ComponentInfo::anchorsBottomMargin()
+{
+    return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_BOTTOMMARGIN).toString();
+}
+
+//==============================================================================
+// Horizontal Center Offset
+//==============================================================================
+QString ComponentInfo::anchorsHorizontalOffset()
+{
+    return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER_OFFS).toString();
+}
+
+//==============================================================================
+// Vertical Center Offset
+//==============================================================================
+QString ComponentInfo::anchorsVerticalOffset()
+{
+    return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER_OFFS).toString();
+}
+
+//==============================================================================
 // Get Layer Visible
 //==============================================================================
 bool ComponentInfo::layerVisible()

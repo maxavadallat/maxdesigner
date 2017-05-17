@@ -14,6 +14,7 @@ DMouseArea {
     default property alias mainContainer: contentContainer.children
 
     property alias rootContainer: rootContainer
+    property alias contentContainer: contentContainer
 
     property int minWidth: 0
     property int minHeight: 0
@@ -25,8 +26,8 @@ DMouseArea {
     property bool enableSizeOverlay: true
     property bool enablePosOverlay: true
 
-    property alias backgroundColor: containerBG.color
     property string borderColor: DStyle.colorBorderNoFocus
+    property alias backgroundColor: containerBG.color
     property alias radius: containerBG.radius
 
     property alias clipContent: contentContainer.clip

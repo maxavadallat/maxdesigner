@@ -4,17 +4,29 @@ import enginecomponents 0.1
 import "DConstants.js" as CONSTS
 import "style"
 
-DPaneBase {
+DContainer {
     id: nodePaneRoot
+
+    anchors.verticalCenter: parent.verticalCenter
 
     property ComponentInfo componentInfo: null
 
-    title: componentInfo !== null ? componentInfo.componentName : "NULL"
+    property string title: componentInfo !== null ? componentInfo.componentName : "NULL"
 
-    hideToSide: hideToRight
+    property int initialX: 0
+    property int initialY: parent ? parent.height * 0.5 : 0
 
-    creationWidth: 320
-    creationHeight: 400
+    property int initialWidth: 0
+    property int initialHeight: 0
+
+    property int creationX: initialX - creationWidth - DStyle.defaultMargin
+    property int creationY: initialY - creationHeight * 0.5
+
+    property int creationWidth: 320
+    property int creationHeight: 400
+
+    readonly property string stateCreate: "create"
+    readonly property string stateShown: "shown"
 
     minWidth: 320
     minHeight: 400
@@ -22,13 +34,14 @@ DPaneBase {
     enablePosOverlay: false
     enableSizeOverlay: false
 
-    hideAction: hideActionReset
-
-    hideButtonVisibleOnCreate: true
-
     resizeRightEnabled: false
 
     state: stateCreate
+
+    enableDrag: false
+
+    signal transitionStarted(var newState)
+    signal transitionFinished(var newState)
 
     onTransitionStarted: {
         // Check New State
@@ -43,14 +56,20 @@ DPaneBase {
         if (newState === stateShown) {
             // Set Opacity
             nodeTree.opacity = 1.0;
-
-            // Check Parent Pane
-            if (nodePaneRoot.parentPane !== null) {
-
-            }
         }
     }
 
+    // Title Label
+    DText {
+        id: titleLabel
+        anchors.left: parent.left
+        anchors.leftMargin: DStyle.defaultMargin
+        anchors.top: parent.top
+        anchors.topMargin: DStyle.defaultMargin
+        text: nodePaneRoot.title
+    }
+
+    // Node tree
     DNodeTree {
         id: nodeTree
         anchors.fill: parent
@@ -63,14 +82,129 @@ DPaneBase {
         Behavior on opacity { DFadeAnimation { } }
         visible: opacity > 0.0
 
-        onNodeGrabbed: {
-            // Disable Drag by Setting Drag Threshold
-            drag.threshold = Math.max(nodePaneRoot.width, nodePaneRoot.height);
+//        onNodeGrabbed: {
+//            // Disable Drag by Setting Drag Threshold
+//            drag.threshold = Math.max(nodePaneRoot.width, nodePaneRoot.height);
+//        }
+
+//        onNodeReleased: {
+//            // Reset Drag Threshold for the pane
+//            drag.threshold = CONSTS.defaultDragThreshold;
+//        }
+    }
+
+    // Hide/Show Button
+    DMouseArea {
+        id: hideShowButton
+
+        parent: nodePaneRoot
+
+        width: CONSTS.defaultPaneHideButtonWidth
+        height: CONSTS.defaultPaneHideButtonHeight
+
+        anchors.right: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+
+        DText {
+            anchors.centerIn: parent
+            rotation: 90
+            horizontalAlignment: Text.AlignHCenter
+            color: parent.pressed ? DStyle.colorBorder : DStyle.colorFontDark
+            text: "•••"
         }
 
-        onNodeReleased: {
-            // Reset Drag Threshold for the pane
-            drag.threshold = CONSTS.defaultDragThreshold;
+        onClicked: {
+            // Check State
+            if (nodePaneRoot.state === stateShown) {
+                // Set State
+                nodePaneRoot.state = stateCreate;
+            } else {
+                // Set State
+                nodePaneRoot.state = stateShown;
+            }
         }
     }
+
+    states: [
+        // Create State
+        State {
+            name: stateCreate
+
+            PropertyChanges { target: nodePaneRoot; x: initialX; y: initialY; width: initialWidth; height: initialHeight }
+        },
+
+        // Shown State
+        State {
+            name: stateShown
+
+            PropertyChanges { target: nodePaneRoot; x: nodePaneRoot.creationX; y: nodePaneRoot.creationY }
+            PropertyChanges { target: nodePaneRoot; width: nodePaneRoot.creationWidth; height: nodePaneRoot.creationHeight }
+
+        }
+    ]
+
+    transitions: [
+        // To Shown
+        Transition {
+            to: stateShown
+
+            SequentialAnimation {
+                // Emit Transition Started Signal
+                ScriptAction { script: { nodePaneRoot.transitionStarted(state); } }
+
+                PropertyAction { target: nodePaneRoot; property: "height"; value: 1 }
+
+                PropertyAction { target: nodePaneRoot; property: "x"; value: nodePaneRoot.initialX }
+                PropertyAction { target: nodePaneRoot; property: "y"; value: nodePaneRoot.initialY }
+
+                ParallelAnimation {
+                    DAnimation { target: nodePaneRoot; property: "x"; to: nodePaneRoot.creationX }
+                    DAnimation { target: nodePaneRoot; property: "width"; to: nodePaneRoot.initialX - nodePaneRoot.creationX }
+                }
+
+                ParallelAnimation {
+                    DAnimation { target: nodePaneRoot; property: "width" }
+                    DAnimation { target: nodePaneRoot; property: "x" }
+                }
+
+                ParallelAnimation {
+                    DAnimation { target: nodePaneRoot; property: "y" }
+                    DAnimation { target: nodePaneRoot; property: "height" }
+                }
+
+                // Emit Transition Finished Signal
+                ScriptAction { script: { nodePaneRoot.transitionFinished(state); } }
+            }
+        },
+        // To Create
+        Transition {
+            to: stateCreate
+
+            SequentialAnimation {
+                // Emit Transition Started Signal
+                ScriptAction { script: { nodePaneRoot.transitionStarted(state); } }
+
+                ParallelAnimation {
+                    DAnimation { target: nodePaneRoot; property: "y"; to: nodePaneRoot.y + nodePaneRoot.height * 0.5 }
+                    DAnimation { target: nodePaneRoot; property: "height"; to: 1 }
+                }
+
+                ParallelAnimation {
+                    DAnimation { target: nodePaneRoot; property: "width"; to: -nodePaneRoot.x }
+                }
+
+                ParallelAnimation {
+                    DAnimation { target: nodePaneRoot; property: "width"; to: 0 }
+                    DAnimation { target: nodePaneRoot; property: "x"; to: nodePaneRoot.initialX }
+                }
+
+                ParallelAnimation {
+                    PropertyAction { target: nodePaneRoot; property: "height"; value: 0 }
+                }
+
+                // Emit Transition Finished Signal
+                ScriptAction { script: { nodePaneRoot.transitionFinished(state); } }
+            }
+        }
+    ]
 }

@@ -112,19 +112,17 @@ DContainer {
 
     readonly property int animDuration: DStyle.animDuration * 2.5
 
-    property alias paneContainer: contentContainer
+    property alias paneContainer: paneContentContainer
 
-    default property alias paneContainerChildren: contentContainer.children
+    default property alias paneContainerChildren: paneContentContainer.children
 
-    property alias enablePaneContent: contentContainer.enabled
+    property alias enablePaneContent: paneContentContainer.enabled
 
     property alias titleLabel: titleTextLabel
 
     property bool showBackground: true
 
     property bool showTitle: true
-
-    //property alias topMouseAreaVisible: topMouseArea.visible
 
     property int scaleDuration: 0
     property real previousScale: 1.0
@@ -134,18 +132,6 @@ DContainer {
     property bool destroyOnResetFinished: false
 
     property bool enableHideButton: true
-
-    property Connections parentConnections: Connections {
-        target: parent
-
-        onWidthChanged: {
-
-        }
-
-        onHeightChanged: {
-
-        }
-    }
 
     property bool hideWaitingForChildReset: false
 
@@ -216,22 +202,6 @@ DContainer {
 
     signal childTransitionFinished(var newState)
     signal parentTransitionFinished(var newState)
-
-    onWidthChanged: {
-//        // Check State
-//        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
-//            // Update Creation Width
-//            paneBaseRoot.creationWidth = paneBaseRoot.width;
-//        }
-    }
-
-    onHeightChanged: {
-//        // Check State
-//        if (paneBaseRoot.state === paneBaseRoot.stateShown) {
-//            // Update Creation Height
-//            paneBaseRoot.creationHeight = paneBaseRoot.height;
-//        }
-    }
 
     onPressed: {
         //console.log("DPaneBase.onPressed");
@@ -378,34 +348,9 @@ DContainer {
 
     // Content Container
     Item {
-        id: contentContainer
+        id: paneContentContainer
         anchors.fill: parent
     }
-
-//    MouseArea {
-//        id: topMouseArea
-//        anchors.fill: parent
-
-//        visible: paneBaseRoot.focus
-
-//        onPressed: {
-//            //console.log("DPaneBase.topMouseArea.onPressed");
-//            // Check Set Drag Target
-//            if (paneBaseRoot.parent.bringToFront !== undefined) {
-//                // Set Drag Target - ASSUMING Parent is MainGrabArea
-//                paneBaseRoot.parent.bringToFront(paneBaseRoot);
-//            }
-
-//            // Set Mouse Event Accepted
-//            mouse.accepted = false;
-//        }
-
-//        onReleased: {
-//            //console.log("DPaneBase.topMouseArea.onReleased");
-//            // Set Mouse Event Accepted
-//            mouse.accepted = false;
-//        }
-//    }
 
     // Hide Indicator
     DControl {

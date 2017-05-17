@@ -79,15 +79,47 @@ class ComponentInfo : public QObject
     Q_PROPERTY(QString width READ width NOTIFY widthChanged)
     Q_PROPERTY(QString height READ height NOTIFY heightChanged)
 
+    // Left Anchor Target
+    Q_PROPERTY(QString anchorsLeft READ anchorsLeft NOTIFY anchorsLeftChanged)
+    // Right Anchor Target
+    Q_PROPERTY(QString anchorsRight READ anchorsRight NOTIFY anchorsRightChanged)
+    // Top Anchor Target
+    Q_PROPERTY(QString anchorsTop READ anchorsTop NOTIFY anchorsTopChanged)
+    // Bottom Anchor Target
+    Q_PROPERTY(QString anchorsBottom READ anchorsBottom NOTIFY anchorsBottomChanged)
+
+    // Fill Target
+    Q_PROPERTY(QString anchorsFill READ anchorsFill NOTIFY anchorsFillChanged)
+    // CenterIn Target
+    Q_PROPERTY(QString anchorsCenterIn READ anchorsCenterIn NOTIFY anchorsCenterInChanged)
+    // Horizontal Center Target
+    Q_PROPERTY(QString horizontalCenter READ horizontalCenter NOTIFY anchorsHorizontalCenterChanged)
+    // Vertical Center Target
+    Q_PROPERTY(QString verticalCenter READ verticalCenter NOTIFY anchorsVerticalCenterChanged)
+
+    // Margins
+    Q_PROPERTY(QString anchorsMargins READ anchorsMargins NOTIFY anchorsMarginsChanged)
+
+    // Left Margin
+    Q_PROPERTY(QString anchorsLeftMargin READ anchorsLeftMargin NOTIFY anchorsLeftMarginChanged)
+    // Right Margin
+    Q_PROPERTY(QString anchorsRightMargin READ anchorsRightMargin NOTIFY anchorsRightMarginChanged)
+    // Top Margin
+    Q_PROPERTY(QString anchorsTopMargin READ anchorsTopMargin NOTIFY anchorsTopMarginChanged)
+    // Bottom Margin
+    Q_PROPERTY(QString anchorsBottomMargin READ anchorsBottomMargin NOTIFY anchorsBottomMarginChanged)
+
+    // Horizontal Center Offset
+    Q_PROPERTY(QString anchorsHorizontalOffset READ anchorsHorizontalOffset NOTIFY anchorsHorizontalOffsetChanged)
+    // Vertical Center Offset
+    Q_PROPERTY(QString anchorsVerticalOffset READ anchorsVerticalOffset NOTIFY anchorsVerticalOffsetChanged)
+
+
     Q_PROPERTY(bool useImplictSize READ useImplictSize WRITE setUseImplictSize NOTIFY useImplictSizeChanged)
 
     Q_PROPERTY(bool layerVisible READ layerVisible WRITE setLayerVisible NOTIFY layerVisibleChanged)
 
     Q_PROPERTY(bool dirty READ getDirty NOTIFY dirtyChanged)
-
-    // Anchors
-
-    // ...
 
 public:
     // Property Type
@@ -195,6 +227,41 @@ public:
     QString width();
     // Get Height
     QString height();
+
+    // Left Anchor Target
+    QString anchorsLeft();
+    // Right Anchor Target
+    QString anchorsRight();
+    // Top Anchor Target
+    QString anchorsTop();
+    // Bottom Anchor Target
+    QString anchorsBottom();
+
+    // Fill Target
+    QString anchorsFill();
+    // CenterIn Target
+    QString anchorsCenterIn();
+    // Horizontal Center Target
+    QString horizontalCenter();
+    // Vertical Center Target
+    QString verticalCenter();
+
+    // Margins
+    QString anchorsMargins();
+
+    // Left Margin
+    QString anchorsLeftMargin();
+    // Right Margin
+    QString anchorsRightMargin();
+    // Top Margin
+    QString anchorsTopMargin();
+    // Bottom Margin
+    QString anchorsBottomMargin();
+
+    // Horizontal Center Offset
+    QString anchorsHorizontalOffset();
+    // Vertical Center Offset
+    QString anchorsVerticalOffset();
 
     // Get Layer Visible
     bool layerVisible();
@@ -347,45 +414,43 @@ signals:
     // Anchors
 
     // Left Anchor Changed Signal
-    void anchorLeftChanged(const QString& aLeft);
+    void anchorsLeftChanged(const QString& aLeft);
     // Left Anchor Margin Changed Signal
-    void anchorLeftMarginChanged(const QString& aMargin);
+    void anchorsLeftMarginChanged(const QString& aMargin);
 
     // Right Anchor Changed Signal
-    void anchorRightChanged(const QString& aRight);
+    void anchorsRightChanged(const QString& aRight);
     // Right Anchor Margin Changed Signal
-    void anchorRightMarginChanged(const QString& aMargin);
+    void anchorsRightMarginChanged(const QString& aMargin);
 
     // Top Anchor Changed Signal
-    void anchorTopChanged(const QString& aTop);
+    void anchorsTopChanged(const QString& aTop);
     // Top Anchor Margin Changed Signal
-    void anchorTopMarginChanged(const QString& aMargin);
+    void anchorsTopMarginChanged(const QString& aMargin);
 
     // Bottom Anchor Changed Signal
-    void anchorBottomChanged(const QString& aBottom);
+    void anchorsBottomChanged(const QString& aBottom);
     // Bottom Anchor Margin Changed Signal
-    void anchorBottomMarginChanged(const QString& aMargin);
+    void anchorsBottomMarginChanged(const QString& aMargin);
 
     // Anchor Margin Changed Signal
-    void anchorMarginsChanged(const QString& aMargins);
+    void anchorsMarginsChanged(const QString& aMargins);
 
     // Fill Anchor Changed Signal
-    void anchorFillChanged(const QString& aFill);
-    // Fill Anchor Margin Changed Signal
-    void anchorFillMarginChanged(const QString& aMargin);
+    void anchorsFillChanged(const QString& aFill);
 
     // Center Anchor Changed Signal
-    void anchorCenterInChanged(const QString& aCenterIn);
+    void anchorsCenterInChanged(const QString& aCenterIn);
 
     // Horizontal Center Anchor Changed Signal
-    void anchorHorizontalCenterChanged(const QString& aHorizontalCenter);
+    void anchorsHorizontalCenterChanged(const QString& aHorizontalCenter);
     // Vertical Center Anchor Changed Signal
-    void anchorVerticalCenterChanged(const QString& aVerticalCenter);
+    void anchorsVerticalCenterChanged(const QString& aVerticalCenter);
 
     // Horizontal Center Anchor Offset Changed Signal
-    void anchorHorizontalCenterOffsetChanged(const QString& aOffset);
+    void anchorsHorizontalOffsetChanged(const QString& aOffset);
     // Vertical Center Anchor Offset Changed Signal
-    void anchorVerticalCenterOffsetChanged(const QString& aOffset);
+    void anchorsVerticalOffsetChanged(const QString& aOffset);
 
     // Component Property Changed Signal
     void componentPropertyChanged(const QString& aName, const QVariant& aValue);

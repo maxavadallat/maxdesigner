@@ -65,6 +65,9 @@ DContainer {
 
         // Set Root Component
         //demoNodeTree.rootComponent = propertiesController.focusedComponent;
+
+        demoContainer.x = (demoContainerRoot.width - demoContainer.width) * 0.5;
+        demoContainer.y = (demoContainerRoot.height - demoContainer.height) * 0.5;
     }
 
     DButton {
@@ -85,14 +88,52 @@ DContainer {
         }
     }
 
-
-    DNodePane {
-        id: demoPane
-
+    DButton {
         anchors.right: parent.right
+        anchors.rightMargin: DStyle.defaultMargin
         anchors.verticalCenter: parent.verticalCenter
+        text: "Add Child"
 
+        onClicked: {
+
+            // Previous Focused Component
+            var lastFocused = propertiesController.focusedComponent;
+
+            // Select Item
+            propertiesController.selectComponent("Item");
+            // Get New Item Clone
+            var newItem = propertiesController.focusedComponent.clone();
+
+            // Set Focused Component
+            propertiesController.focusedComponent = lastFocused;
+
+            // Check Focused Component
+
+            // Add Child
+            //propertiesController.focusedComponent.addChild(newItem);
+
+            // Insert Child
+            propertiesController.focusedComponent.insertChild(0, newItem);
+        }
     }
+
+    DContainer {
+        id: demoContainer
+        width: 200
+        height: 300
+
+        minWidth: 100
+        minHeight: 100
+
+        DNodePane {
+            id: demoPane
+
+            parent: demoContainer
+
+            anchors.verticalCenter: parent.verticalCenter
+        }
+    }
+
 
 /*
     DButton {

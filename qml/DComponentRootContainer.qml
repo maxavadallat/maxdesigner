@@ -26,6 +26,7 @@ DPaneBase {
         DComponentChildContainer {
             width: CONSTS.componentItemWidth
             height: CONSTS.componentItemHeight
+            rootContainer: componentRootContainerRoot
         }
     }
 
@@ -206,6 +207,8 @@ DPaneBase {
 
     focusOnShow: true
 
+    setFocusOnResize: true
+
     enableSizeOverlayOnShow: true
 
     enableScaling: true
@@ -349,7 +352,7 @@ DPaneBase {
             // Set Update Component Info Enabled
             componentRootContainerRoot.updateComponentInfoEnabled = true;
             // Set Node Pane Loader Active
-            nodePaneLoader.active = false;
+            nodePaneLoader.active = true;
         } else {
             // Reset Update Component Info Enabled
             componentRootContainerRoot.updateComponentInfoEnabled = false;
@@ -427,11 +430,11 @@ DPaneBase {
     }
 
     // Add Child Component Info
-    function addChildComponent(aComponentInfo) {
+    function addChildComponent(newChildInfo) {
         // Check Root Container Component Info
         if (componentRootContainerRoot.componentInfo !== null) {
             // Add Child Component Info
-            componentRootContainerRoot.componentInfo.addChild(aComponentInfo);
+            componentRootContainerRoot.componentInfo.addChild(newChildInfo);
 
         } else {
             console.error("DComponentRootContainer.addChildComponent - NO PARENT COMPONENT INFO!!");
@@ -483,6 +486,8 @@ DPaneBase {
             // Set Height
             aChildObject.height = aComponentInfo.height;
 
+            // Check
+
             // ...
 
             // Set Anchors
@@ -495,12 +500,6 @@ DPaneBase {
     function setChildComponentID(aChild, aID) {
         // Store Child Component ID
         componentRootContainerRoot.componentInfo.setChildObjectID(aChild, aID);
-    }
-
-    // Component Loader
-    DLoader {
-        id: componentLoader
-        anchors.fill: parent
     }
 
     // Zoom Area
@@ -542,7 +541,7 @@ DPaneBase {
         id: baseCanvas
         anchors.fill: parent
         visible: {
-            if (componentRootContainerRoot.componentInfo && componentRootContainerRoot.componentInfo.childCount > 0) {
+            if (componentRootContainerRoot.rootComponentCreated && componentRootContainerRoot.rootComponent !== null) {
                 return false;
             }
 
@@ -566,6 +565,7 @@ DPaneBase {
             //hoverX = drag.x;
             //hoverY = drag.y;
 
+            // Check Drag Keys
             if (drag.keys[0] === CONSTS.newChildComponentDragKey) {
                 //console.log("DComponentRootContainer.dropArea.onEntered - keys: " + drag.keys);
                 // Accept Drag
@@ -591,6 +591,12 @@ DPaneBase {
             // Check Source
             if (drop.source === null) {
                 console.warn("DComponentRootContainer.dropArea.onDropped - NULL SOURCE!!");
+                return;
+            }
+
+            // Check Source
+            if (drop.source === componentRootContainerRoot.componentInfo) {
+                console.warn("DComponentRootContainer.dropArea.onDropped - RECURSIVE!!!");
                 return;
             }
 
@@ -664,29 +670,31 @@ DPaneBase {
     // Node Pane Loader
     DLoader {
         id: nodePaneLoader
-        anchors.right: parent.left
-        anchors.verticalCenter: parent.verticalCenter
+
+        parent: componentRootContainerRoot
+
+        anchors.fill: parent
 
         sourceComponent: DNodePane {
             anchors.verticalCenter: parent.verticalCenter
 
-            onTransitionStarted: {
-                // ...
-            }
+            componentInfo: componentRootContainerRoot.componentInfo
 
-            onTransitionFinished: {
-                // ...
-            }
+//            onTransitionStarted: {
+//                // ...
+//            }
+
+//            onTransitionFinished: {
+//                // ...
+//            }
         }
 
         onStatusChanged: {
             // Switch Status
             switch (status) {
                 case Loader.Ready:
-                    // Set Node Pane Parent Pane
-                    nodePaneLoader.item.parentPane = componentRootContainerRoot;
                     // Set Component Root Container Child Pane
-                    componentRootContainerRoot.childPane = nodePaneLoader.item;
+                    //componentRootContainerRoot.childPane = nodePaneLoader.item;
                 break;
 
                 case Loader.Error:

@@ -30,19 +30,8 @@ DSection {
                 }
             }
 
-            onAccepted: {
-                // Clear Other Anchors
-                propertiesController.anchorsModel.anchorsCenterIn = "";
-                propertiesController.anchorsModel.horizontalCenter = "";
-                propertiesController.anchorsModel.verticalCenter = "";
-                propertiesController.anchorsModel.anchorsLeft = "";
-                propertiesController.anchorsModel.anchorsRight = "";
-                propertiesController.anchorsModel.anchorsTop = "";
-                propertiesController.anchorsModel.anchorsBottom = "";
-
-                // Set Fill Target
-                propertiesController.anchorsModel.anchorsFill = newText;
-            }
+            onAccepted: propertiesController.anchorsModel.anchorsFill = newText;
+            onTextCleared: propertiesController.anchorsModel.anchorsFill = "";
         }
     }
 
@@ -65,15 +54,8 @@ DSection {
                 }
             }
 
-            onAccepted: {
-                // Clear Other Anchors
-                propertiesController.anchorsModel.anchorsFill = "";
-                propertiesController.anchorsModel.anchorsCenterIn = "";
-                propertiesController.anchorsModel.horizontalCenter = "";
-
-                // Set Left Target
-                propertiesController.anchorsModel.anchorsLeft = newText;
-            }
+            onAccepted: propertiesController.anchorsModel.anchorsLeft = newText;
+            onTextCleared:propertiesController.anchorsModel.anchorsLeft = "";
         }
 
         DTextInput {
@@ -91,15 +73,8 @@ DSection {
                 }
             }
 
-            onAccepted: {
-                // Clear Other Anchors
-                propertiesController.anchorsModel.anchorsFill = "";
-                propertiesController.anchorsModel.anchorsCenterIn = "";
-                propertiesController.anchorsModel.horizontalCenter = "";
-
-                // Set Right Target
-                propertiesController.anchorsModel.anchorsRight = newText;
-            }
+            onAccepted: propertiesController.anchorsModel.anchorsRight = newText;
+            onTextCleared: propertiesController.anchorsModel.anchorsRight = "";
         }
 
         DTextInput {
@@ -117,15 +92,8 @@ DSection {
                 }
             }
 
-            onAccepted: {
-                // Clear Other Anchors
-                propertiesController.anchorsModel.anchorsFill = "";
-                propertiesController.anchorsModel.anchorsCenterIn = "";
-                propertiesController.anchorsModel.verticalCenter = "";
-
-                // Set Top Target
-                propertiesController.anchorsModel.anchorsTop = newText;
-            }
+            onAccepted: propertiesController.anchorsModel.anchorsTop = newText;
+            onTextCleared: propertiesController.anchorsModel.anchorsTop = "";
         }
 
         DTextInput {
@@ -143,15 +111,8 @@ DSection {
                 }
             }
 
-            onAccepted: {
-                // Clear Other Anchors
-                propertiesController.anchorsModel.anchorsFill = "";
-                propertiesController.anchorsModel.anchorsCenterIn = "";
-                propertiesController.anchorsModel.verticalCenter = "";
-
-                // Set Bottom Target
-                propertiesController.anchorsModel.anchorsBottom = newText;
-            }
+            onAccepted: propertiesController.anchorsModel.anchorsBottom = newText;
+            onTextCleared: propertiesController.anchorsModel.anchorsBottom = "";
         }
 
         Column {
@@ -172,16 +133,8 @@ DSection {
                     }
                 }
 
-                onAccepted: {
-                    // Clear Other Anchors
-                    propertiesController.anchorsModel.anchorsFill = "";
-                    propertiesController.anchorsModel.anchorsCenterIn = "";
-                    propertiesController.anchorsModel.anchorsLeft = "";
-                    propertiesController.anchorsModel.anchorsRight = "";
-
-                    // Set Horizontal Center Target
-                    propertiesController.anchorsModel.horizontalCenter = newText;
-                }
+                onAccepted: propertiesController.anchorsModel.horizontalCenter = newText;
+                onTextCleared:propertiesController.anchorsModel.horizontalCenter = "";
             }
 
             DTextInput {
@@ -198,17 +151,8 @@ DSection {
                     }
                 }
 
-                onAccepted: {
-                    // Clear Other Anchors
-                    propertiesController.anchorsModel.anchorsFill = "";
-                    propertiesController.anchorsModel.anchorsLeft = "";
-                    propertiesController.anchorsModel.anchorsRight = "";
-                    propertiesController.anchorsModel.anchorsTop = "";
-                    propertiesController.anchorsModel.anchorsBottom = "";
-
-                    // Set Center In Target
-                    propertiesController.anchorsModel.anchorsCenterIn = newText;
-                }
+                onAccepted: propertiesController.anchorsModel.anchorsCenterIn = newText;
+                onTextCleared: propertiesController.anchorsModel.anchorsCenterIn = "";
             }
 
             DTextInput {
@@ -225,16 +169,8 @@ DSection {
                     }
                 }
 
-                onAccepted: {
-                    // Clear Other Anchors
-                    propertiesController.anchorsModel.anchorsFill = "";
-                    propertiesController.anchorsModel.anchorsCenterIn = "";
-                    propertiesController.anchorsModel.anchorsTop = "";
-                    propertiesController.anchorsModel.anchorsBottom = "";
-
-                    // Set Vertical Center Target
-                    propertiesController.anchorsModel.verticalCenter = newText;
-                }
+                onAccepted: propertiesController.anchorsModel.verticalCenter = newText;
+                onTextCleared: propertiesController.anchorsModel.verticalCenter = "";
             }
         }
     }
