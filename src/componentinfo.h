@@ -140,7 +140,7 @@ public:
 
 public:
     // Create Component From Component Info File
-    static ComponentInfo* fromInfoFile(const QString& aFilePath, ProjectModel* aProject);
+    static ComponentInfo* fromInfoFile(const QString& aFilePath, ProjectModel* aProject, const bool aCreateChildren = true);
 
     // Clone Component Info
     Q_INVOKABLE ComponentInfo* clone();
@@ -274,7 +274,7 @@ public:
     void setUseImplictSize(const bool& aUseImplicitSize);
 
     // Get Own Property Keys
-    Q_INVOKABLE QStringList componentPropertyKeys();
+    Q_INVOKABLE QStringList componentOwnPropertyKeys();
 
     // Get All Inherited Property Keys
     Q_INVOKABLE QStringList inheritedPropertyKeys();
@@ -291,11 +291,17 @@ public:
     // Check If Has Property
     Q_INVOKABLE bool hasProperty(const QString& aName);
 
+    // Get Property Type & Value
+    Q_INVOKABLE QString propertyTypeAndValue(const QString& aName);
+
     // Get Property Type
     Q_INVOKABLE QString propertyType(const QString& aName);
 
     // Get Property Enum Values
     Q_INVOKABLE QStringList propertyEnums(const QString& aName);
+
+    // Get Property Value
+    Q_INVOKABLE QVariant propertyValue(const QString& aName);
 
     // Get Child Count
     int childCount();
@@ -541,7 +547,7 @@ protected:
     void clearIDMap();
 
     // Load
-    bool load(const QString& aFilePath = "");
+    bool load(const QString& aFilePath = "", const bool aCreateChildren = true);
     // Save
     bool save(const QString& aFilePath = "");
 
@@ -551,9 +557,9 @@ protected:
     QByteArray toJSONContent();
 
     // Set Up From JSON Object
-    void fromJSONObject(const QJsonObject& aObject);
+    void fromJSONObject(const QJsonObject& aObject, const bool aCreateChildren = true);
     // Set Up Component From JSON Content/String
-    void fromJSON(const QByteArray& aContent);
+    void fromJSON(const QByteArray& aContent, const bool aCreateChildren = true);
 
     // Set QML Source Path
     void setSourcePath(const QString& aPath);
@@ -583,11 +589,14 @@ protected:
     // Set Dirty State
     void setDirty(const bool& aDirty);
 
+    // Set Proto Type
+    void setProtoType(ComponentInfo* aProtoTypw);
+
     // Find Root Component
     ComponentInfo* findRoot(ComponentInfo* aComponent);
 
     // Generate Component ID
-    QString liveCodeGenerateID();
+    QString liveCodeGenerateID(const bool& aLiveRoot = true);
     // Format Imports
     QString liveCodeFormatImports(const bool& aLiveRoot = true);
     // Format Component Name
@@ -619,7 +628,7 @@ protected:
     // Format Transitions
     QString liveCodeFormatTransitions(const QString& aIndent = "");
     // Generate Enum Value Live Code Cases
-    QStringList liveCodeGenerateEnumValuecases(const QStringList& aEnumValues);
+    QStringList liveCodeGenerateEnumValueCases(const QStringList& aEnumValues);
 
 protected slots:
     // Base Components Dir Changed Slot

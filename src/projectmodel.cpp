@@ -12,16 +12,17 @@
 #include "componentinfo.h"
 #include "viewsmodel.h"
 #include "datasourcesmodel.h"
+#include "propertiescontroller.h"
 #include "constants.h"
 
 //==============================================================================
 // Constructor
 //==============================================================================
-ProjectModel::ProjectModel(QObject* parent)
+ProjectModel::ProjectModel(PropertiesController* aPropertiesController, QObject* parent)
     : QObject(parent)
     , mName("")
     , mDirty(false)
-    , mPropertiesController(NULL)
+    , mPropertiesController(aPropertiesController)
     , mBaseComponents(NULL)
     , mComponents(NULL)
     , mViews(NULL)
@@ -121,6 +122,53 @@ void ProjectModel::createDataSourcesModel()
 
     // Load Data Sources
     mDataSources->loadDataSources();
+}
+
+//==============================================================================
+// Create Initial Components
+//==============================================================================
+void ProjectModel::createInitialComponents()
+{
+    // Check Properties Controller
+    if (!mPropertiesController) {
+        qWarning() << "ProjectModel::createInitialComponents - NO PROPERTIES CONTROLLER!!!";
+        return;
+    }
+
+    qDebug() << "ProjectModel::createInitialComponents";
+
+    // Create Base Components - Built-in's
+    createBaseComponent("QtObject", "", COMPONENT_CATEGORY_NONVISUAL, true);
+    createBaseComponent("Item", "QtObject", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    createBaseComponent("Row", "Item", COMPONENT_CATEGORY_LAYOUT, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    createBaseComponent("Column", "Item", COMPONENT_CATEGORY_LAYOUT, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    createBaseComponent("Rectangle", "Item", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    createBaseComponent("Image", "Item", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    createBaseComponent("BorderImage", "Item", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    createBaseComponent("MouseArea", "Item", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    createBaseComponent("Loader", "Item", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+
+    // ...
+
+    // Create Data Source - System Model
+    createDataSource("SystemModel");
+    // Create Data Source - Style
+    createDataSource("Style");
+
+    // ...
+
+    // Create View - App Base
+    createView("AppBase", "Item", DEFAULT_VIEW_WIDTH, DEFAULT_VIEW_HEIGHT);
+
+    // Create Main View
+    createView("MainView", "Item", screenWidth(), screenHeight());
+
+    // ...
+
+    // Add Own Properties
+
+    // ...
+
 }
 
 //==============================================================================
@@ -273,6 +321,9 @@ bool ProjectModel::initProject(const QString& aName, const QString& aDir)
         createViewsModel();
         // Create Data Sources Model
         createDataSourcesModel();
+
+        // Create Initial Components
+        createInitialComponents();
 
         // ...
 
@@ -1089,6 +1140,22 @@ void ProjectModel::setPluginPaths(const QStringList& aPluginPaths)
 }
 
 //==============================================================================
+// Get Filtered Properties
+//==============================================================================
+QStringList ProjectModel::filteredProperties()
+{
+    return mPropertiesController ? mPropertiesController->filteredProperties() : QStringList();
+}
+
+//==============================================================================
+// Get Filtered Property Changes
+//==============================================================================
+QStringList ProjectModel::filteredPropertyChanges()
+{
+    return mPropertiesController ? mPropertiesController->filteredPropertyChanges() : QStringList();
+}
+
+//==============================================================================
 // Get Properties Controller
 //==============================================================================
 PropertiesController* ProjectModel::propertiesController()
@@ -1268,7 +1335,7 @@ QString ProjectModel::generateLiveCode(const QString& aName, const QString& aCon
     qDebug() << "ProjectModel::generateLiveCode - aName: " << aName;
 
     // Init Live Code File Name
-    QString fileName = QString("%1/%2Live.%3").arg(liveTempDir()).arg(aName).arg(DEFAULT_QML_SUFFIX);
+    QString fileName = QString(DEFAULT_LIVE_FILE_NAME_PATTERN).arg(liveTempDir()).arg(aName).arg(DEFAULT_QML_SUFFIX);
 
     // Init Live Code File
     QFile liveFile(fileName);
@@ -1305,7 +1372,7 @@ void ProjectModel::removeLiveCode(const QString& aName)
     qDebug() << "ProjectModel::removeLiveCode - aName: " << aName;
 
     // Init Live Code File Name
-    QString fileName = QString("%1/%2Live.%3").arg(liveTempDir()).arg(aName).arg(DEFAULT_QML_SUFFIX);
+    QString fileName = QString(DEFAULT_LIVE_FILE_NAME_PATTERN).arg(liveTempDir()).arg(aName).arg(DEFAULT_QML_SUFFIX);
 
     // Init Live Code File
     QFile liveFile(fileName);

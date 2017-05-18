@@ -95,6 +95,7 @@ DMouseArea {
         verticalAlignment: Text.AlignVCenter
 
         font.pixelSize: fixTextSize ? DStyle.fontSizeL : textInput.height - 6
+        font.family: DStyle.instrument101FontName
 
         selectByMouse: true
 

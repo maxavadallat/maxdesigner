@@ -78,10 +78,7 @@ Item {
         // Set Visibility
         grabbedNode.visible = true;
 
-        grabbedNode.Drag.active = true;
-
-        grabbedNode.Drag.hotSpot.x = nodeTreeRoot.nodePressX;
-        grabbedNode.Drag.hotSpot.y = nodeTreeRoot.nodePressY - 2;
+        grabbedNode.dragActive = true;
 
         //grabbedNode.scale = 1.1;
     }
@@ -106,7 +103,8 @@ Item {
         // Set Interactive State
         nodeTreeFlickable.interactive = true;
 
-        grabbedNode.Drag.active = false;
+        // Reset Drag Active
+        grabbedNode.dragActive = false;
     }
 
     // Create Node
@@ -161,5 +159,15 @@ Item {
         visible: false
         hideDropAreas: true
         enableLayerVisibilityButton: false
+
+        property bool dragActive: false
+
+        Drag.active: dragActive
+
+        Drag.hotSpot.x: nodeTreeRoot.nodePressX
+        Drag.hotSpot.y: nodeTreeRoot.nodePressY - 2
+
+        Drag.source: grabbedNode.componentInfo
+        Drag.keys: [ CONSTS.childComponentDragKey ]
     }
 }

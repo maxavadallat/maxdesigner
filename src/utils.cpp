@@ -98,14 +98,17 @@ QString Utils::parseMaxValue(const QString& aTypeAndValue)
 //==============================================================================
 // Parse Component Property Value
 //==============================================================================
-QString Utils::parseValue(const QString& aTypeAndValue)
+QString Utils::parseValue(const QString& aTypeAndValue, const bool& aRaw)
 {
-    // Get Binding Pos
-    int bPos = hasBinding(aTypeAndValue);
+    // Check Raw
+    if (!aRaw) {
+        // Get Binding Pos
+        int bPos = hasBinding(aTypeAndValue);
 
-    // Check Binding Pos
-    if (bPos > 0) {
-        return "";
+        // Check Binding Pos
+        if (bPos > 0) {
+            return "";
+        }
     }
 
     // Init Value Section Pos

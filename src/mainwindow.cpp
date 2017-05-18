@@ -501,13 +501,14 @@ void MainWindow::openProject(const QString& aFilePath)
     // Check Project Model
     if (!mProjectModel) {
         // Create Project Model
-        mProjectModel = new ProjectModel();
+        mProjectModel = new ProjectModel(mPropertiesController);
 
         // Connect Signal
         connect(mProjectModel, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)), this, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)));
         connect(mProjectModel, SIGNAL(componentsModelChanged(ComponentsModel*)), this, SIGNAL(componentsModelChanged(ComponentsModel*)));
         connect(mProjectModel, SIGNAL(viewsModelChanged(ViewsModel*)), this, SIGNAL(viewsModelChanged(ViewsModel*)));
         connect(mProjectModel, SIGNAL(dataSourcesModelChanged(DataSourcesModel*)), this, SIGNAL(dataSourcesModelChanged(DataSourcesModel*)));
+
     }
 
     // Load Project
@@ -532,6 +533,9 @@ void MainWindow::openProject(const QString& aFilePath)
         ui->actionCreateNewDataSource->setEnabled(true);
         // Set Component Names Visible Menu Item
         ui->actionShowComponentNames->setEnabled(true);
+
+        // Add Impor Path To Main Quick Widget
+        ui->mainQuickWidget->engine()->addImportPath(mProjectModel->liveTempDir());
 
         // ...
 
@@ -1067,15 +1071,12 @@ void MainWindow::createNewProject()
     // Check Project Model
     if (!mProjectModel) {
         // Create Project Model
-        mProjectModel = new ProjectModel();
+        mProjectModel = new ProjectModel(mPropertiesController);
         // Connect Signal
         connect(mProjectModel, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)), this, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)));
         connect(mProjectModel, SIGNAL(componentsModelChanged(ComponentsModel*)), this, SIGNAL(componentsModelChanged(ComponentsModel*)));
         connect(mProjectModel, SIGNAL(viewsModelChanged(ViewsModel*)), this, SIGNAL(viewsModelChanged(ViewsModel*)));
-
-//        connect(mProjectModel, SIGNAL(baseComponentCreated(ComponentInfo*)), this, SLOT(baseComponentCreated(ComponentInfo*)));
-//        connect(mProjectModel, SIGNAL(componentCreated(ComponentInfo*)), this, SLOT(componentCreated(ComponentInfo*)));
-//        connect(mProjectModel, SIGNAL(viewCreated(ComponentInfo*)), this, SLOT(viewCreated(ComponentInfo*)));
+        connect(mProjectModel, SIGNAL(dataSourcesModelChanged(DataSourcesModel*)), this, SIGNAL(dataSourcesModelChanged(DataSourcesModel*)));
     }
 
     // Set Project Name
@@ -1344,6 +1345,13 @@ void MainWindow::closeProject()
     }
 
     //qDebug() << "MainWindow::closeProject";
+
+    // Remove Import Path
+    QStringList ipList  = ui->mainQuickWidget->engine()->importPathList();
+    // Remove Live Temp Dir
+    ipList.removeAt(ipList.indexOf(mProjectModel->liveTempDir()));
+    // Set Import Paths
+    ui->mainQuickWidget->engine()->setImportPathList(ipList);
 
     // Save Project
     saveProject();

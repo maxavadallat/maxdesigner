@@ -50,7 +50,7 @@ class ProjectModel : public QObject
 
 public:
     // Constructor
-    explicit ProjectModel(QObject* aParent = NULL);
+    explicit ProjectModel(PropertiesController* aPropertiesController, QObject* aParent = NULL);
 
     // Init New Project
     bool initProject(const QString& aName, const QString& aDir);
@@ -157,6 +157,11 @@ public:
     // Set Plugin Paths
     void setPluginPaths(const QStringList& aPluginPaths);
 
+    // Get Filtered Properties
+    QStringList filteredProperties();
+    // Get Filtered Property Changes
+    QStringList filteredPropertyChanges();
+
     // Get Properties Controller
     PropertiesController* propertiesController();
 
@@ -262,6 +267,9 @@ protected:
     void createViewsModel();
     // Create Data Sources Model
     void createDataSourcesModel();
+
+    // Create Initial Components
+    void createInitialComponents();
 
     // Set Properties Controller
     void setPropertiesController(PropertiesController* aController);

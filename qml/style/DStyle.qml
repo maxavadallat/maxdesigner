@@ -187,7 +187,18 @@ QtObject {
 
     // ...
 
+    readonly property string instrument101FontName:         "Instrument 101"
+    readonly property string instrument103FontName:         "Instrument 103"
+
     Component.onCompleted: {
         //console.log("Style.onCompleted");
+    }
+
+    property FontLoader instrument101Font: FontLoader {
+        source: "qrc:/assets/fonts/instrument101.ttf"
+    }
+
+    property FontLoader instrument103Font: FontLoader {
+        source: "qrc:/assets/fonts/instrument103.ttf"
     }
 }

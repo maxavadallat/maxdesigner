@@ -185,6 +185,8 @@ DContainer {
 
     property bool hideButtonVisibleOnCreate: false
 
+    property bool enableDragByPaneButton: false
+
     enableSizeOverlay: false
     enablePosOverlay: false
 
@@ -333,6 +335,27 @@ DContainer {
         }
     }
 
+    // Hide/Show/Pane Button Function
+    function paneButtonFunction() {
+        // Check Hide Action
+        if (paneBaseRoot.hideAction === paneBaseRoot.hideActionReset && paneBaseRoot.state === stateShown) {
+            // Reset
+            paneBaseRoot.reset(false);
+
+        } else if (paneBaseRoot.hideAction === paneBaseRoot.hideActionReset && paneBaseRoot.state !== stateShown) {
+            // Set State
+            paneBaseRoot.show();
+
+        } else if (paneBaseRoot.state !== stateHidden) {
+            // Dismiss Pane
+            paneBaseRoot.dismissPane(false);
+
+        } else {
+            // Set State
+            paneBaseRoot.show();
+        }
+    }
+
     // Title
     DText {
         id: titleTextLabel
@@ -352,7 +375,7 @@ DContainer {
         anchors.fill: parent
     }
 
-    // Hide Indicator
+    // Hide/Show Button
     DControl {
         id: hideShowButton
 
@@ -425,24 +448,22 @@ DContainer {
         DMouseArea {
             id: buttonMouseArea
             anchors.fill: parent
-            onClicked: {
-                // Check Hide Action
-                if (paneBaseRoot.hideAction === paneBaseRoot.hideActionReset && paneBaseRoot.state === stateShown) {
-                    // Reset
-                    paneBaseRoot.reset(false);
+            onClicked: paneButtonFunction()
 
-                } else if (paneBaseRoot.hideAction === paneBaseRoot.hideActionReset && paneBaseRoot.state !== stateShown) {
-                    // Set State
-                    paneBaseRoot.show();
-
-                } else if (paneBaseRoot.state !== stateHidden) {
-                    // Dismiss Pane
-                    paneBaseRoot.dismissPane(false);
-
-                } else {
-                    // Set State
-                    paneBaseRoot.show();
+            onPressed: {
+                if (paneBaseRoot.enableDragByPaneButton) {
+                    // Set Drag Target
+                    buttonMouseArea.drag.target = paneBaseRoot;
+                    // Set Drag Active
+                    buttonMouseArea.drag.active = true;
                 }
+            }
+
+            onReleased: {
+                // Reset Drag Active
+                buttonMouseArea.drag.active = false;
+                // Reset Drag Target
+                buttonMouseArea.drag.target = undefined;
             }
         }
     }
@@ -461,6 +482,7 @@ DContainer {
             name: stateCreate
 
             PropertyChanges { target: paneBaseRoot; x: paneBaseRoot.initialX; y: paneBaseRoot.initialY; width: 0; height: 0 }
+            PropertyChanges { target: paneBaseRoot; scale: 1.0 }
             PropertyChanges { target: titleTextLabel; opacity: 0.0 }
             PropertyChanges { target: hideShowButton; opacity: paneBaseRoot.hideButtonVisibleOnCreate && paneBaseRoot.enableHideButton ? 1.0 : 0.0 }
         },
@@ -479,6 +501,7 @@ DContainer {
 
             PropertyChanges { target: paneBaseRoot; x: paneBaseRoot.hiddenX; y: paneBaseRoot.hiddenY }
             PropertyChanges { target: paneBaseRoot; width: paneBaseRoot.creationWidth; height: paneBaseRoot.creationHeight }
+            PropertyChanges { target: paneBaseRoot; scale: 1.0 }
             PropertyChanges { target: titleTextLabel; opacity: 1.0 }
             PropertyChanges { target: hideShowButton; opacity: paneBaseRoot.enableHideButton ? 1.0 : 0.0 }
         },
@@ -705,7 +728,10 @@ DContainer {
                     }
                 }
 
-                PropertyAnimation { target: paneBaseRoot; properties: "x, y"; easing.type: Easing.InOutBack; duration: paneBaseRoot.animDuration }
+                ParallelAnimation {
+                    PropertyAnimation { target: paneBaseRoot; properties: "x, y"; easing.type: Easing.InOutBack; duration: paneBaseRoot.animDuration }
+                    PropertyAnimation { target: paneBaseRoot; property: "scale"; duration: paneBaseRoot.animDuration }
+                }
 
                 ScriptAction {
                     script: {

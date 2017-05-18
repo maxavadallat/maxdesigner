@@ -497,6 +497,12 @@ void ComponentAnchorsModel::setAnchorsMargins(const QString& aAnchorMargins)
             // Clear Anchor Margins
             mComponent->mAnchors.remove(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_MARGINS);
         } else {
+            // Clear Other Margins
+            setAnchorsLeftMargin("");
+            setAnchorsRightMargin("");
+            setAnchorsTop("");
+            setAnchorsBottomMargin("");
+
             // Set Anchors Margins
             mComponent->mAnchors[JSON_KEY_COMPONENT_PROPERTY_ANCHORS_MARGINS] = aAnchorMargins;
         }

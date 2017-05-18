@@ -75,8 +75,13 @@ DControl {
         showClearButton: false
 
         onAccepted: {
+            //console.log("DSpinner.textInput.onAccepted - newText: " + newText);
+
             // Calculate New Value
             var newValue = Math.min(spinnerRoot.maxValue, Math.max(spinnerRoot.minValue, Number(newText)));
+
+            console.log("#### DSpinner.textInput.onAccepted - value: " + spinnerRoot.value + " - newValue: " + newValue);
+
             // Check New Value
             if (spinnerRoot.value !== newValue) {
                 // Emit Value Entered Signal

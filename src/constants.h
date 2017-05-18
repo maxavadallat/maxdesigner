@@ -120,6 +120,9 @@
 // Default Icon File
 #define DEFAULT_IMAGE_PROVIDER_ICON                         ":/assets/images/default_file.png"
 
+// Default Live File Name Pattern
+#define DEFAULT_LIVE_FILE_NAME_PATTERN                      "%1/%2_live.%3"
+
 // Default Dirs & File Names
 #define DEFAULT_PROJECT_NAME                                "myproject"
 #define DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME             "basecomponents"
@@ -159,6 +162,10 @@
 // Default Component Size
 #define DEFAULT_COMPONENT_WIDTH                             320
 #define DEFAULT_COMPONENT_HEIGHT                            200
+
+// Default View Size
+#define DEFAULT_VIEW_WIDTH                                  640
+#define DEFAULT_VIEW_HEIGHT                                 480
 
 // Transition Types
 #define JSON_VALUE_TRANSITION_NODE_TYPE_PARALLEL            "parallel"

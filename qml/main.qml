@@ -77,6 +77,24 @@ Item {
 
     }
 
+    // Background Container
+    Rectangle {
+        id: bgContainer
+        anchors.fill: parent
+
+        color: DStyle.colorMainBG
+
+        Image {
+            id: bgImage
+            anchors.fill: parent
+            source: settingsController.designerMode === "Developer" ? "qrc:/assets/images/tron-wallpaper-23.jpeg"
+                                                                    : "qrc:/assets/images/tron-wallpaper-27.jpeg"
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            opacity: 0.1
+        }
+    }
+
     // Connections - Main Controller
     Connections {
         target: mainController
@@ -100,13 +118,13 @@ Item {
             } else {
                 // Set Open Recent Files On Show Finished
                 openRecentFilesOnShowFinished = false;
+
                 // Reset Project Pane
                 projectPane.reset(false);
                 // Reset Properties Pane
                 propertiesPane.reset(false);
                 // Show Welcome Screen
                 welcomScreen.show();
-
             }
         }
     }
@@ -181,24 +199,6 @@ Item {
                 // Open Component
                 createNewComponentRoot(aComponent, aComponent.width, aComponent.height);
             }
-        }
-    }
-
-    // Background Container
-    Rectangle {
-        id: bgContainer
-        anchors.fill: parent
-
-        color: DStyle.colorMainBG
-
-        Image {
-            id: bgImage
-            anchors.fill: parent
-            source: settingsController.designerMode === "Developer" ? "qrc:/assets/images/tron-wallpaper-23.jpeg"
-                                                                    : "qrc:/assets/images/tron-wallpaper-27.jpeg"
-            fillMode: Image.PreserveAspectCrop
-            asynchronous: true
-            opacity: 0.1
         }
     }
 
@@ -403,6 +403,7 @@ Item {
                     stateEditor.newState = true;
 
                     // Set Component State
+                    //stateEditor.componentState = propertiesController.statesModel.createNewState();
 
                     // Show State Editor
                     stateEditor.show();
@@ -740,30 +741,36 @@ Item {
         }
     }
 
+    // Live Launcher
     DLiveLauncher {
         id: liveLauncher
         anchors.right: parent.right
         anchors.bottom: parent.bottom
     }
 
+    // Welcome Screen
     DWelcome {
         id: welcomScreen
         anchors.centerIn: parent
         state: stateShown
+        //visible: false
     }
 
+    // Minimized Components
     DMinimizedComponents {
         id: minimzedComponents
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
     }
 
+    // Demo Container
     DDemoContainer {
         id: demoContainer
         anchors.centerIn: parent
         visible: false
     }
 
+    // Toolbar
     DToolBar {
         id: toolBar
     }

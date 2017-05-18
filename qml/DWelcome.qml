@@ -43,14 +43,14 @@ Column {
     }
 
     DText {
-        width: 256
+        //width: 256
         anchors.horizontalCenter: parent.horizontalCenter
         text: "- Create a New Project: ⌘N"
         font.pixelSize: DStyle.fontSizeL
     }
 
     DText {
-        width: 256
+        //width: 256
         anchors.horizontalCenter: parent.horizontalCenter
         text: "- Open Project: ⌘O"
         font.pixelSize: DStyle.fontSizeL
@@ -109,7 +109,7 @@ Column {
                 elide: Text.ElideMiddle
                 horizontalAlignment: Text.AlignHCenter
                 text: filePath
-                color: delegateRoot.pressed && delegateRoot.hovering ? DStyle.colorBorder : DStyle.colorFontDark
+                color: delegateRoot.pressed || delegateRoot.hovering ? DStyle.colorBorder : DStyle.colorFontDark
             }
 
             onEntered: {

@@ -21,5 +21,7 @@
         <file>assets/icons/fill.png</file>
         <file>assets/images/tron-wide-wallpaper.jpeg</file>
         <file>assets/images/dashboard.png</file>
+        <file>assets/fonts/instrument101.ttf</file>
+        <file>assets/fonts/instrument103.ttf</file>
     </qresource>
 </RCC>

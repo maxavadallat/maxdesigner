@@ -34,7 +34,7 @@ public:
     // Parse Component Property Max Value
     static QString parseMaxValue(const QString& aTypeAndValue);
     // Parse Component Property Value
-    static QString parseValue(const QString& aTypeAndValue);
+    static QString parseValue(const QString& aTypeAndValue, const bool& aRaw = false);
     // Parse Component Property Formula
     static QString parseFormula(const QString& aTypeAndValue);
     // Parse Component Property Binding

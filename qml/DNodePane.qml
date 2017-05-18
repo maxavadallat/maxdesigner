@@ -7,7 +7,14 @@ import "style"
 DContainer {
     id: nodePaneRoot
 
+    width: initialWidth
+    height: initialHeight
+
+    anchors.right: parent.right
+    anchors.rightMargin: paneRightMargin
     anchors.verticalCenter: parent.verticalCenter
+
+    property int paneRightMargin: 0
 
     property ComponentInfo componentInfo: null
 
@@ -59,6 +66,18 @@ DContainer {
         }
     }
 
+    // Show Nodes
+    function showNodes() {
+        // Set State
+        nodePaneRoot.state = stateShown;
+    }
+
+    // Hide Nodes
+    function hideNodes() {
+        // Set State
+        nodePaneRoot.state = stateCreate;
+    }
+
     // Title Label
     DText {
         id: titleLabel
@@ -67,6 +86,8 @@ DContainer {
         anchors.top: parent.top
         anchors.topMargin: DStyle.defaultMargin
         text: nodePaneRoot.title
+        Behavior on opacity { DFadeAnimation { } }
+        visible: opacity > 0.0
     }
 
     // Node tree
@@ -110,7 +131,7 @@ DContainer {
             rotation: 90
             horizontalAlignment: Text.AlignHCenter
             color: parent.pressed ? DStyle.colorBorder : DStyle.colorFontDark
-            text: "•••"
+            text: "••"
         }
 
         onClicked: {
@@ -130,16 +151,16 @@ DContainer {
         State {
             name: stateCreate
 
-            PropertyChanges { target: nodePaneRoot; x: initialX; y: initialY; width: initialWidth; height: initialHeight }
+            PropertyChanges { target: nodePaneRoot; width: initialWidth; height: initialHeight }
+            PropertyChanges { target: nodePaneRoot; paneRightMargin: 0 }
         },
 
         // Shown State
         State {
             name: stateShown
 
-            PropertyChanges { target: nodePaneRoot; x: nodePaneRoot.creationX; y: nodePaneRoot.creationY }
             PropertyChanges { target: nodePaneRoot; width: nodePaneRoot.creationWidth; height: nodePaneRoot.creationHeight }
-
+            PropertyChanges { target: nodePaneRoot; paneRightMargin: DStyle.defaultMargin }
         }
     ]
 
@@ -154,21 +175,16 @@ DContainer {
 
                 PropertyAction { target: nodePaneRoot; property: "height"; value: 1 }
 
-                PropertyAction { target: nodePaneRoot; property: "x"; value: nodePaneRoot.initialX }
-                PropertyAction { target: nodePaneRoot; property: "y"; value: nodePaneRoot.initialY }
-
                 ParallelAnimation {
-                    DAnimation { target: nodePaneRoot; property: "x"; to: nodePaneRoot.creationX }
-                    DAnimation { target: nodePaneRoot; property: "width"; to: nodePaneRoot.initialX - nodePaneRoot.creationX }
+                    DAnimation { target: nodePaneRoot; property: "width"; to: nodePaneRoot.creationWidth + DStyle.defaultMargin }
                 }
 
                 ParallelAnimation {
                     DAnimation { target: nodePaneRoot; property: "width" }
-                    DAnimation { target: nodePaneRoot; property: "x" }
+                    DAnimation { target: nodePaneRoot; property: "paneRightMargin" }
                 }
 
                 ParallelAnimation {
-                    DAnimation { target: nodePaneRoot; property: "y" }
                     DAnimation { target: nodePaneRoot; property: "height" }
                 }
 
@@ -176,26 +192,33 @@ DContainer {
                 ScriptAction { script: { nodePaneRoot.transitionFinished(state); } }
             }
         },
+
         // To Create
         Transition {
             to: stateCreate
 
             SequentialAnimation {
-                // Emit Transition Started Signal
-                ScriptAction { script: { nodePaneRoot.transitionStarted(state); } }
+
+                ScriptAction {
+                    script: {
+                        // Emit Transition Started Signal
+                        nodePaneRoot.transitionStarted(state);
+                        // Update CreationWidth
+                        nodePaneRoot.creationWidth = nodePaneRoot.width;
+                    }
+                }
 
                 ParallelAnimation {
-                    DAnimation { target: nodePaneRoot; property: "y"; to: nodePaneRoot.y + nodePaneRoot.height * 0.5 }
                     DAnimation { target: nodePaneRoot; property: "height"; to: 1 }
                 }
 
                 ParallelAnimation {
-                    DAnimation { target: nodePaneRoot; property: "width"; to: -nodePaneRoot.x }
+                    DAnimation { target: nodePaneRoot; property: "width"; to: nodePaneRoot.creationWidth + DStyle.defaultMargin }
+                    DAnimation { target: nodePaneRoot; property: "paneRightMargin" }
                 }
 
                 ParallelAnimation {
                     DAnimation { target: nodePaneRoot; property: "width"; to: 0 }
-                    DAnimation { target: nodePaneRoot; property: "x"; to: nodePaneRoot.initialX }
                 }
 
                 ParallelAnimation {

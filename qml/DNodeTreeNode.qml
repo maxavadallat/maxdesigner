@@ -320,7 +320,7 @@ Item {
         id: dropAreasContainer
         width: parent.width
         height: CONSTS.defaultNodeTreeItemHeight
-        visible: !nodeRoot.hideDropAreas && !nodeRoot.grabbed && !nodeRoot.rootNode
+        visible: !nodeRoot.hideDropAreas && !nodeRoot.grabbed
 
         DropArea {
             id: topDropArea

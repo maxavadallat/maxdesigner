@@ -10,7 +10,7 @@ import "system"
 DContainer {
     id: demoContainerRoot
 
-    width: 800
+    width: 1024
     height: 800
 
     clip: true
@@ -58,7 +58,7 @@ DContainer {
         //propertyEditor.show();
 
         // Select Component
-        //propertiesController.selectComponent("MyRectangle");
+        //propertiesController.selectComponent("Button3D");
 
         // Set Component Info
         //demoPane.componentInfo = propertiesController.focusedComponent;
@@ -66,10 +66,54 @@ DContainer {
         // Set Root Component
         //demoNodeTree.rootComponent = propertiesController.focusedComponent;
 
-        demoContainer.x = (demoContainerRoot.width - demoContainer.width) * 0.5;
-        demoContainer.y = (demoContainerRoot.height - demoContainer.height) * 0.5;
-    }
+        //demoContainer.x = (demoContainerRoot.width - demoContainer.width) * 0.5;
+        //demoContainer.y = (demoContainerRoot.height - demoContainer.height) * 0.5;
+/*
+        // Create New Test Object
+        var newTestObject = Qt.createQmlObject(propertiesController.focusedComponent.generateLiveCode(true, false), demoContainerRoot);
 
+        if (newTestObject) {
+
+            newTestObject.anchors.centerIn = demoContainerRoot;
+
+            boundingRect.parent = newTestObject;
+            boundingRect.anchors.fill = newTestObject;
+
+            // Get Child Count
+            var cCount = propertiesController.focusedComponent.childCount;
+
+            for (var i=0; i<cCount; i++) {
+
+                var newChildObject = Qt.createQmlObject(propertiesController.focusedComponent.childInfo(i).generateLiveCode(true, false), newTestObject);
+
+                if (!newChildObject) {
+                    console.error("#### NULL CHILD OBJECT!! ####");
+
+                    break;
+                }
+
+            }
+
+        } else {
+
+            console.error("#### NULL OBJECT!! ####");
+
+            //
+
+        }
+*/
+    }
+/*
+    Rectangle {
+        id: boundingRect
+        width: 300
+        height: 200
+        color: "transparent"
+        border.color: "purple"
+    }
+*/
+
+/*
     DButton {
         width: 196
         anchors.right: parent.right
@@ -81,9 +125,9 @@ DContainer {
 
         onClicked: {
             if (demoPane.state === demoPane.stateCreate) {
-                demoPane.show();
+                demoPane.state = demoPane.stateShown;
             } else {
-                demoPane.reset(false);
+                demoPane.state = demoPane.stateCreate;
             }
         }
     }
@@ -133,7 +177,7 @@ DContainer {
             anchors.verticalCenter: parent.verticalCenter
         }
     }
-
+*/
 
 /*
     DButton {

@@ -40,9 +40,8 @@ class PropertiesController : public QObject
     Q_PROPERTY(QString cWidth READ cWidth NOTIFY cWidthChanged)
     Q_PROPERTY(QString cHeight READ cHeight NOTIFY cHeightChanged)
 
-    // Anchors
-
     Q_PROPERTY(QStringList filteredProperties READ filteredProperties WRITE setFilteredProperties NOTIFY filteredPropertiesChanged)
+    Q_PROPERTY(QStringList filteredPropertyChanges READ filteredPropertyChanges WRITE setFilteredPropertyChanges NOTIFY filteredPropertyChangesChanged)
 
     Q_PROPERTY(ComponentImportsModel* importsModel READ importsModel WRITE setImportsModel NOTIFY importsModelChanged)
     Q_PROPERTY(ComponentOwnPropertiesModel* ownPropertiesModel READ ownPropertiesModel NOTIFY ownPropertiesModelChanged)
@@ -107,6 +106,8 @@ public:
 
     // Get Filtered Properties
     QStringList filteredProperties();
+    // Get Filtered Property Changes
+    QStringList filteredPropertyChanges();
 
     // Get Imports Model
     ComponentImportsModel* importsModel();
@@ -251,6 +252,8 @@ signals:
     void cHeightChanged(const QString& aHeight);
     // Filtered Properties Changed Signal
     void filteredPropertiesChanged(const QStringList& aProperties);
+    // Filtered Property Changes Changed Signal
+    void filteredPropertyChangesChanged(const QStringList& aFilteredChanges);
 
     // Imports Model Changed Signal
     void importsModelChanged(ComponentImportsModel* aImportsModel);
@@ -284,6 +287,8 @@ private:
 
     // Set Filtered Properties
     void setFilteredProperties(const QStringList& aProperties);
+    // Get Filtered Property Changes
+    void setFilteredPropertyChanges(const QStringList& aFilteredChanges);
 
     // Set Imports Model
     void setImportsModel(ComponentImportsModel* aImportsModel);
@@ -317,6 +322,8 @@ private: // Data
 
     // Filtered Properties
     QStringList                     mFilteredProperties;
+    // Filtered Properties
+    QStringList                     mFilteredPropertyChanges;
 
     // Imports
     ComponentImportsModel*          mComponentImports;

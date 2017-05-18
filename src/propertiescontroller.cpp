@@ -53,6 +53,8 @@ void PropertiesController::init()
 
     // Set Filtered Properties
     setFilteredProperties(QString("id,objectName,x,y,z,width,height,states,transitions,children").split(","));
+    // Set Filtered Property Changes
+    setFilteredPropertyChanges(QString("x,y,z").split(","));
 
     // ...
 }
@@ -165,6 +167,20 @@ void PropertiesController::setFilteredProperties(const QStringList& aProperties)
         mFilteredProperties = aProperties;
         // Emit Filtered Properties Changed Signal
         emit filteredPropertiesChanged(mFilteredProperties);
+    }
+}
+
+//==============================================================================
+// Get Filtered Property Changes
+//==============================================================================
+void PropertiesController::setFilteredPropertyChanges(const QStringList& aFilteredChanges)
+{
+    // Check filtered Property Changes
+    if (mFilteredPropertyChanges != aFilteredChanges) {
+        // Set Filtered Property Changes
+        mFilteredPropertyChanges = aFilteredChanges;
+        // Emit Filtered Property Changes Changed Signal
+        emit filteredPropertyChangesChanged(mFilteredPropertyChanges);
     }
 }
 
@@ -620,6 +636,14 @@ void PropertiesController::requestCHeight(const QString& aHeight)
 QStringList PropertiesController::filteredProperties()
 {
     return mFilteredProperties;
+}
+
+//==============================================================================
+// Get Filtered Property Changes
+//==============================================================================
+QStringList PropertiesController::filteredPropertyChanges()
+{
+    return mFilteredPropertyChanges;
 }
 
 //==============================================================================

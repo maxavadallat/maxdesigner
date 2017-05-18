@@ -21,26 +21,14 @@ DPaneBase {
     property bool rootComponentCreated: false
     property bool childComponentsCreated: false
 
+    property bool dropHovering: false
+
     // New Child Component
     property Component newChildComponent: Component {
         DComponentChildContainer {
             width: CONSTS.componentItemWidth
             height: CONSTS.componentItemHeight
-            rootContainer: componentRootContainerRoot
-        }
-    }
-
-    // New State Component
-    property Component newState: Component {
-        State {
-
-        }
-    }
-
-    // New Transition Component
-    property Component newTransition: Component {
-        Transition {
-
+            rootComponent: componentRootContainerRoot
         }
     }
 
@@ -132,38 +120,46 @@ DPaneBase {
 
         onWidthChanged: {
             // Check Width
-            if (componentRootContainerRoot.width !== aWidth) {
+            if (componentRootContainerRoot.width !== Number(aWidth)) {
                 // Calculate Center X
                 var centerX = componentRootContainerRoot.x + componentRootContainerRoot.width * 0.5;
                 // Set Pos X
                 componentRootContainerRoot.x = centerX - aWidth * 0.5;
                 // Set Width
-                componentRootContainerRoot.width = aWidth;
+                componentRootContainerRoot.width = Number(aWidth);
             }
         }
 
         onHeightChanged: {
             // Check Height
-            if (componentRootContainerRoot.height !== aHeight) {
+            if (componentRootContainerRoot.height !== Number(aHeight)) {
                 // Calculate Center Y
                 var centerY = componentRootContainerRoot.y + componentRootContainerRoot.height * 0.5;
                 // Set Pos Y
                 componentRootContainerRoot.y = centerY - aHeight * 0.5;
                 // Set Height
-                componentRootContainerRoot.height = aHeight;
+                componentRootContainerRoot.height = Number(aHeight);
             }
         }
 
         // On Component Property Changed
         onComponentPropertyChanged: {
-            console.log("DComponentRootContainer.componentInfoConnection.onComponentPropertyChanged - aName: " + aName + " - aValue: " + aValue);
+            //console.log("DComponentRootContainer.componentInfoConnection.onComponentPropertyChanged - aName: " + aName + " - aValue: " + aValue);
 
             // Check Root Component
-            if (componentRootContainerRoot.rootComponent !== null) {
+            if (componentRootContainerRoot.rootQMLComponent !== null) {
                 // Set Property
-                componentRootContainerRoot.rootComponent.__setProperty(aName, aValue);
+                componentRootContainerRoot.rootQMLComponent.__setProperty(aName, aValue);
             } else {
                 console.warn("DComponentRootContainer.componentInfoConnection.onComponentPropertyChanged - NO ROOT COMPONENT!!");
+            }
+        }
+
+        onLayerVisibleChanged: {
+            // Check Root Component
+            if (componentRootContainerRoot.rootQMLComponent !== null) {
+                // Set Root Container Visibility
+                componentRootContainerRoot.rootContainer.visible = componentRootContainerRoot.componentInfo.layerVisible;
             }
         }
 
@@ -189,7 +185,9 @@ DPaneBase {
     }
 
     // Root Component
-    property QtObject rootComponent: null
+    property QtObject rootQMLComponent: null
+
+    property bool waitForNodesToClose: false
 
     title: "Component" + (componentInfo ? (" - " + componentInfo.componentName  ) : "")
 
@@ -214,8 +212,8 @@ DPaneBase {
     enableScaling: true
 
     borderColor: {
-        if (dropArea.hovering) {
-            return DStyle.colorBorder;
+        if (dropHovering) {
+            return "yellow";//DStyle.colorBorder;
         }
 
         // Check Focused Component
@@ -229,6 +227,8 @@ DPaneBase {
     borderMargins: -1
 
     radius: 0
+
+    enableDragByPaneButton: true
 
     Component.onDestruction: {
         // Check Component Info
@@ -332,17 +332,26 @@ DPaneBase {
         }
     }
 
-//    onTransitionStarted: {
-//        // Check State
-//        if (componentRootContainerRoot.state === componentRootContainerRoot.stateHidden) {
-//            // Close Node Pane
-//            nodePaneLoader.item.reset(false);
-//        }
-//    }
+    onTransitionStarted: {
+        console.log("DComponentRootContainer.onTransitionStarted - newState: " + newState);
+
+        // Check State
+        if (newState === componentRootContainerRoot.stateHidden) {
+            // Close Node Pane
+            nodePaneLoader.item.hideNodes();
+        } else if (newState === componentRootContainerRoot.stateCreate) {
+            // Close Node Pane
+            nodePaneLoader.item.hideNodes();
+            // Set Node Pane Loader Opacity
+            nodePaneLoader.opacity = 0.0;
+        }
+    }
 
     onTransitionFinished: {
+        console.log("DComponentRootContainer.onTransitionFinished - newState: " + newState);
+
         // Check State
-        if (componentRootContainerRoot.state === componentRootContainerRoot.stateShown) {
+        if (newState === componentRootContainerRoot.stateShown) {
             // Create Main Component
             componentRootContainerRoot.createRootComponent();
             // Create Child Components
@@ -353,6 +362,8 @@ DPaneBase {
             componentRootContainerRoot.updateComponentInfoEnabled = true;
             // Set Node Pane Loader Active
             nodePaneLoader.active = true;
+            // Set Node Pane opacity
+            nodePaneLoader.opacity = 1.0;
         } else {
             // Reset Update Component Info Enabled
             componentRootContainerRoot.updateComponentInfoEnabled = false;
@@ -376,10 +387,10 @@ DPaneBase {
             componentRootContainerRoot.rootComponentCreated = true;
 
             // Create New Root Object
-            componentRootContainerRoot.rootComponent = Qt.createQmlObject(componentRootContainerRoot.componentInfo.generateLiveCode(true, false),  componentRootContainerRoot.rootContainer);
+            componentRootContainerRoot.rootQMLComponent = Qt.createQmlObject(componentRootContainerRoot.componentInfo.generateLiveCode(true, false),  componentRootContainerRoot.rootContainer);
 
             // Check New Root Object
-            if (componentRootContainerRoot.rootComponent === null) {
+            if (componentRootContainerRoot.rootQMLComponent === null) {
                 console.warn("DComponentRootContainer.createRootComponent - ERROR CREATING ROOT COMPONENT!!");
             }
 
@@ -391,11 +402,11 @@ DPaneBase {
     // Remove Root Component
     function removeRootComponent() {
         // Check New Root Object
-        if (componentRootContainerRoot.rootComponent !== null) {
+        if (componentRootContainerRoot.rootQMLComponent !== null) {
             // Destroy Root Component
-            componentRootContainerRoot.rootComponent.destroy();
+            componentRootContainerRoot.rootQMLComponent.destroy();
             // Reset Root Component
-            componentRootContainerRoot.rootComponent = null;
+            componentRootContainerRoot.rootQMLComponent = null;
             // Reset Root Component Created Flag
             componentRootContainerRoot.rootComponentCreated = false;
         }
@@ -409,13 +420,18 @@ DPaneBase {
         if (cCount > 0 && !componentRootContainerRoot.childComponentsCreated) {
             // Set Child Components Created
             componentRootContainerRoot.childComponentsCreated = true;
+
             console.log("DComponentRootContainer.createChildComponents - cCount: " + cCount);
+
             // Iterate Through Child Components
             for (var i=0; i<cCount; i++) {
                 // Get Child Component Info
                 var ccInfo = componentRootContainerRoot.componentInfo.childInfo(i);
+
+                console.log("DComponentRootContainer.createChildComponents - child[" + i + "]: " + ccInfo.componentName);
+
                 // Create Child Container Object
-                var newObject = newChildComponent.createObject(paneContainer, { "parentContainer": componentRootContainerRoot });
+                var newObject = newChildComponent.createObject(contentContainer, { "parentContainer": componentRootContainerRoot });
 
                 // Check New Object
                 if (newObject) {
@@ -473,8 +489,6 @@ DPaneBase {
             aChildObject.componentInfo = aComponentInfo;
             // Set Focus
             aChildObject.focus = aFocus;
-            // Enable Component Info Update
-            aChildObject.updateComponentInfoEnabled = true;
 
             // Set Pos X
             aChildObject.x = aComponentInfo.posX;
@@ -486,11 +500,11 @@ DPaneBase {
             // Set Height
             aChildObject.height = aComponentInfo.height;
 
-            // Check
-
-            // ...
-
             // Set Anchors
+            aChildObject.setAnchoring();
+
+            // Enable Component Info Update
+            aChildObject.updateComponentInfoEnabled = true;
 
             // ...
         }
@@ -501,6 +515,29 @@ DPaneBase {
         // Store Child Component ID
         componentRootContainerRoot.componentInfo.setChildObjectID(aChild, aID);
     }
+
+    // Hide/Show/Pane Button Function
+    function paneButtonFunction() {
+        // Check State
+        if (componentRootContainerRoot.state !== stateHidden) {
+            // Check Node Pane State
+            if (nodePaneLoader.item && nodePaneLoader.item.state === "shown") {
+                // Set Wait For Nodes To Hide
+                componentRootContainerRoot.waitForNodesToClose = true;
+                // Hide Nodes
+                nodePaneLoader.item.hideNodes();
+            } else {
+                // Dismiss Pane
+                componentRootContainerRoot.dismissPane(false);
+            }
+        } else {
+            // Reset Waiting For Nodes To Close
+            componentRootContainerRoot.waitForNodesToClose = false;
+            // Set State
+            componentRootContainerRoot.show();
+        }
+    }
+
 
     // Zoom Area
     DMouseArea {
@@ -541,7 +578,10 @@ DPaneBase {
         id: baseCanvas
         anchors.fill: parent
         visible: {
-            if (componentRootContainerRoot.rootComponentCreated && componentRootContainerRoot.rootComponent !== null) {
+//            if (componentRootContainerRoot.componentInfo && componentRootContainerRoot.componentInfo.childCount > 0) {
+//                return false;
+//            }
+            if (componentRootContainerRoot.rootComponentCreated && componentRootContainerRoot.rootQMLComponent !== null) {
                 return false;
             }
 
@@ -554,40 +594,42 @@ DPaneBase {
         id: dropArea
         anchors.fill: parent
 
-        property bool hovering: false
-        property int hoverX: 0
-        property int hoverY: 0
+//        property int hoverX: 0
+//        property int hoverY: 0
 
         onEntered: {
             // Set Hovering
-            hovering = true;
+            dropHovering = true;
 
             //hoverX = drag.x;
             //hoverY = drag.y;
 
             // Check Drag Keys
-            if (drag.keys[0] === CONSTS.newChildComponentDragKey) {
+            if (drag.keys[0] === CONSTS.newComponentDragKey) {
                 //console.log("DComponentRootContainer.dropArea.onEntered - keys: " + drag.keys);
                 // Accept Drag
                 drag.accept();
             }
         }
 
-        onPositionChanged: {
-            hoverX = drag.x;
-            hoverY = drag.y;
+//        onPositionChanged: {
+//            hoverX = drag.x;
+//            hoverY = drag.y;
 
-            //console.log("DComponentRootContainer.dropArea.onPositionChanged - drag:[" + hoverX + ":" + hoverY + "]");
+//            //console.log("DComponentRootContainer.dropArea.onPositionChanged - drag:[" + hoverX + ":" + hoverY + "]");
 
-            debugCanvas.requestPaint();
-        }
+//            debugCanvas.requestPaint();
+//        }
 
         onExited: {
             // Reset Hovering
-            hovering = false;
+            dropHovering = false;
         }
 
         onDropped: {
+            // Reset Hovering
+            dropHovering = false;
+
             // Check Source
             if (drop.source === null) {
                 console.warn("DComponentRootContainer.dropArea.onDropped - NULL SOURCE!!");
@@ -602,9 +644,6 @@ DPaneBase {
 
             console.log("DComponentRootContainer.dropArea.onDropped - source: " + drop.source);
             //console.log("DComponentRootContainer.dropArea.onDropped - dynamicProperties: " + drop.source.dynamicProperties);
-
-            // Reset Hovering
-            hovering = false;
 
             // Reset Previous Scale Level
             componentRootContainerRoot.previousScale = 1.0;
@@ -662,7 +701,7 @@ DPaneBase {
         anchors.centerIn: parent
         color: "white"
         visible: settingsController.componentNamesVisible
-        opacity: 0.05
+        opacity: CONSTS.componentNamesOpacity
         font.pixelSize: 48
         text: componentInfo ? componentInfo.componentName : ""
     }
@@ -673,10 +712,16 @@ DPaneBase {
 
         parent: componentRootContainerRoot
 
-        anchors.fill: parent
+        anchors.right: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+
+        opacity: 0.0
+        Behavior on opacity { DFadeAnimation { } }
+        visible: opacity > 0.0
 
         sourceComponent: DNodePane {
-            anchors.verticalCenter: parent.verticalCenter
+
+            //anchors.verticalCenter: parent.verticalCenter
 
             componentInfo: componentRootContainerRoot.componentInfo
 
@@ -684,9 +729,15 @@ DPaneBase {
 //                // ...
 //            }
 
-//            onTransitionFinished: {
-//                // ...
-//            }
+            onTransitionFinished: {
+                // Check If Waiting For Nodes To Close
+                if (componentRootContainerRoot.waitForNodesToClose) {
+                    // Reset Waiting For Nodes To Close
+                    componentRootContainerRoot.waitForNodesToClose = false;
+                    // Dismiss Pane
+                    componentRootContainerRoot.dismissPane(false);
+                }
+            }
         }
 
         onStatusChanged: {

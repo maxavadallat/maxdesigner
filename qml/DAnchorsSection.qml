@@ -193,6 +193,7 @@ DSection {
             onValueIncreased: propertiesController.anchorsModel.anchorsLeftMargin = newValue;
             onValueDecreased: propertiesController.anchorsModel.anchorsLeftMargin = newValue;
             onValueEdited: propertiesController.anchorsModel.anchorsLeftMargin = newValue;
+            onValueEntered: propertiesController.anchorsModel.anchorsLeftMargin = newValue;
             onKeyEvent: {
                 if (event.key === Qt.Key_Tab) {
                     rightMarginSpinner.setSpinnerFocus(true, true);
@@ -214,6 +215,7 @@ DSection {
             onValueIncreased: propertiesController.anchorsModel.anchorsRightMargin = newValue;
             onValueDecreased: propertiesController.anchorsModel.anchorsRightMargin = newValue;
             onValueEdited: propertiesController.anchorsModel.anchorsRightMargin = newValue;
+            onValueEntered: propertiesController.anchorsModel.anchorsRightMargin = newValue;
             onKeyEvent: {
                 if (event.key === Qt.Key_Tab) {
                     topMarginSpinner.setSpinnerFocus(true, true);
@@ -235,6 +237,7 @@ DSection {
             onValueIncreased: propertiesController.anchorsModel.anchorsTopMargin = newValue;
             onValueDecreased: propertiesController.anchorsModel.anchorsTopMargin = newValue;
             onValueEdited: propertiesController.anchorsModel.anchorsTopMargin = newValue;
+            onValueEntered: propertiesController.anchorsModel.anchorsTopMargin = newValue;
             onKeyEvent: {
                 if (event.key === Qt.Key_Tab) {
                     bottomMarginSpinner.setSpinnerFocus(true, true);
@@ -256,6 +259,7 @@ DSection {
             onValueIncreased: propertiesController.anchorsModel.anchorsBottomMargin = newValue;
             onValueDecreased: propertiesController.anchorsModel.anchorsBottomMargin = newValue;
             onValueEdited: propertiesController.anchorsModel.anchorsBottomMargin = newValue;
+            onValueEntered: propertiesController.anchorsModel.anchorsBottomMargin = newValue;
             onKeyEvent: {
                 if (event.key === Qt.Key_Tab) {
                     horizontalCenterOffsetSpinner.setSpinnerFocus(true, true);
@@ -277,6 +281,7 @@ DSection {
             onValueIncreased: propertiesController.anchorsModel.anchorsHorizontalOffset = newValue;
             onValueDecreased: propertiesController.anchorsModel.anchorsHorizontalOffset = newValue;
             onValueEdited: propertiesController.anchorsModel.anchorsHorizontalOffset = newValue;
+            onValueEntered: propertiesController.anchorsModel.anchorsHorizontalOffset = newValue;
             onKeyEvent: {
                 if (event.key === Qt.Key_Tab) {
                     verticalCenterOffsetSpinner.setSpinnerFocus(true, true);
@@ -298,6 +303,7 @@ DSection {
             onValueIncreased: propertiesController.anchorsModel.anchorsVerticalOffset = newValue;
             onValueDecreased: propertiesController.anchorsModel.anchorsVerticalOffset = newValue;
             onValueEdited: propertiesController.anchorsModel.anchorsVerticalOffset = newValue;
+            onValueEntered: propertiesController.anchorsModel.anchorsVerticalOffset = newValue;
             onKeyEvent: {
                 if (event.key === Qt.Key_Tab) {
                     leftMarginSpinner.setSpinnerFocus(true, true);

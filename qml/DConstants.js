@@ -36,8 +36,10 @@ var minimizedComponentsHeight                   = 32;
 var componentItemWidth                          = 108;
 var componentItemHeight                         = 58;
 
-// New Component Drag Key
+// New Child Component Drag Key
 var newComponentDragKey                         = "Drag.NewComponent";
+// Child Component Drag Key
+var childComponentDragKey                       = "Drag.ChildComponent";
 
 // Component Move Step
 var componentMoveStep                           = 1;
@@ -91,6 +93,8 @@ var defaultToolBarHeight                        = 80;
 var defaultToolButtonWidth                      = 48;
 var defaultToolButtonHeight                     = defaultToolButtonWidth;
 
+// Component Names Opacity
+var componentNamesOpacity                       = 0.1;
 
 
 

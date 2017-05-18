@@ -24,33 +24,33 @@ DContainer {
 
         onPosXChanged: {
             // Check Pos
-            if (cccRoot.x !== aPosX) {
+            if (cccRoot.x !== Number(aPosX)) {
                 // Set Pos X
-                cccRoot.x = aPosX;
+                cccRoot.x = Number(aPosX);
             }
         }
 
         onPosYChanged: {
             // Check Pos Y
-            if (cccRoot.y !== aPosY) {
+            if (cccRoot.y !== Number(aPosY)) {
                 // Set Pos Y
-                cccRoot.y = aPosY;
+                cccRoot.y = Number(aPosY);
             }
         }
 
         onWidthChanged: {
             // Check Width
-            if (cccRoot.width != aWidth) {
+            if (cccRoot.width !== Number(aWidth)) {
                 // Set Width
-                cccRoot.width = aWidth;
+                cccRoot.width = Number(aWidth);
             }
         }
 
         onHeightChanged: {
             // Check Height
-            if (cccRoot.height !== aHeight) {
+            if (cccRoot.height !== Number(aHeight)) {
                 // Set Height
-                cccRoot.height = aHeight;
+                cccRoot.height = Number(aHeight);
             }
         }
 
@@ -146,14 +146,14 @@ DContainer {
         }
 
         // Horizontal Center Anchor Offset Changed
-        onAnchorsHorizontalCenterOffsetChanged: {
+        onAnchorsHorizontalOffsetChanged: {
             //console.log("DComponentChildContainer.componentInfoConnections.onAnchorsHorizontalCenterOffsetChanged - aOffset: " + aOffset);
             // Set Horizontal Center Offset
             cccRoot.anchors.horizontalCenterOffset = aOffset;
         }
 
         // Vertical Center Anchor Offset Changed
-        onAnchorsVerticalCenterOffsetChanged: {
+        onAnchorsVerticalOffsetChanged: {
             //console.log("DComponentChildContainer.componentInfoConnections.onAnchorsVerticalCenterOffsetChanged - aOffset: " + aOffset);
             // Set Vertical Center Offset
             cccRoot.anchors.verticalCenterOffset = aOffset;
@@ -161,9 +161,41 @@ DContainer {
 
         // Component Property Changed
         onComponentPropertyChanged: {
-            console.log("DComponentChildContainer.componentInfoConnections.onComponentPropertyChanged - aName: " + aName + " - aValue: " + aValue);
+            //console.log("DComponentChildContainer.componentInfoConnections.onComponentPropertyChanged - aName: " + aName + " - aValue: " + aValue);
+
+            // Check Root Component
+            if (cccRoot.childQMLComponent !== null) {
+                // Set Property
+                cccRoot.childQMLComponent.__setProperty(aName, aValue);
+            } else {
+                console.warn("DComponentChildContainer.componentInfoConnections.onComponentPropertyChanged - NO ROOT COMPONENT!!");
+            }
 
             // ...
+        }
+
+        onLayerVisibleChanged: {
+            // Check Root Component
+            if (cccRoot.rootComponent !== null) {
+                // Set Visibility
+                cccRoot.rootContainer.visible = cccRoot.componentInfo.layerVisible;
+            }
+        }
+
+        onOwnPropertyAdded: {
+            console.log("DComponentChildContainer.componentInfoConnections.onOwnPropertyAdded - aName: " + aName);
+//            // Remove Root Component
+//            removeRootComponent();
+//            // Create Root Component
+//            createRootComponent();
+        }
+
+        onOwnPropertyRemoved: {
+            console.log("DComponentChildContainer.componentInfoConnections.onOwnPropertyRemoved - aName: " + aName);
+//            // Remove Root Component
+//            removeRootComponent();
+//            // Create Root Component
+//            createRootComponent();
         }
 
         // Child Component About To Be Removed
@@ -183,10 +215,10 @@ DContainer {
     property bool selected: false
 
     // Root Component Container
-    property QtObject rootContainer: null
-
-    // Root Component
     property QtObject rootComponent: null
+
+    // Child Root Component
+    property QtObject childQMLComponent: null
 
     // Root Component Created
     property bool rootComponentCreated: false
@@ -195,10 +227,6 @@ DContainer {
 
     // Drop Hovering
     property bool dropHovering: false
-
-    // ...
-
-    //backgroundColor: Qt.hsla(Math.random(), 0.5, 0.4, 0.2)
 
     borderColor: {
         // Check Component Info
@@ -254,9 +282,15 @@ DContainer {
             // Set Container
             cccRoot.componentInfo.componentContainer = cccRoot;
 
+            // Create Content
+            createContent();
+
             // ...
 
         } else {
+
+            // Clear Content
+            clearContent();
 
             // ...
 
@@ -358,6 +392,61 @@ DContainer {
         }
     }
 
+    // Set Anchoring
+    function setAnchoring() {
+        // Check Component Info
+        if (cccRoot.componentInfo !== null) {
+            // Set Anchor Fill
+            if (cccRoot.componentInfo.anchorsFill !== "") {
+                // Set Fill Anchor
+                cccRoot.anchors.fill = parseAnchors(cccRoot.componentInfo.anchorsFill, false);
+            } else if (cccRoot.componentInfo.anchorsCenterIn !== "") {
+                // Set Center In Anchor
+                cccRoot.anchors.centerIn = parseAnchors(cccRoot.componentInfo.anchorsCenterIn, false);
+            } else {
+
+                // Check Anchor Horizotal Center
+                if (cccRoot.componentInfo.horizontalCenter !== "") {
+                    // Set Horizontal Center
+                    cccRoot.anchors.horizontalCenter = parseAnchors(cccRoot.componentInfo.horizontalCenter, true);
+                } else {
+                    // Set Left Anchor
+                    cccRoot.anchors.left = parseAnchors(cccRoot.componentInfo.anchorsLeft, true);
+                    // Set Right Anchor
+                    cccRoot.anchors.right = parseAnchors(cccRoot.componentInfo.anchorsRight, true);
+                }
+
+                // Check Anchor Vertical Center
+                if (cccRoot.componentInfo.verticalCenter !== "") {
+                    // Set Vertical Center
+                    cccRoot.anchors.verticalCenter = parseAnchors(cccRoot.componentInfo.verticalCenter, true);
+                } else {
+                    // Set Top Anchor
+                    cccRoot.anchors.top = parseAnchors(cccRoot.componentInfo.anchorsTop, true);
+                    // Set Bottom Anchor
+                    cccRoot.anchors.bottom = parseAnchors(cccRoot.componentInfo.anchorsBottom, true);
+                }
+            }
+
+            // Check Margins
+            if (cccRoot.componentInfo.anchorsMargins !== "") {
+                // Set Margins
+                cccRoot.anchors.margins = Number(cccRoot.componentInfo.anchorsMargins);
+            } else {
+                // Set Left, Right, Top, Botton Margin
+                cccRoot.anchors.leftMargin = Number(cccRoot.componentInfo.anchorsLeftMargin);
+                cccRoot.anchors.rightMargin = Number(cccRoot.componentInfo.anchorsRightMargin);
+                cccRoot.anchors.topMargin = Number(cccRoot.componentInfo.anchorsTopMargin);
+                cccRoot.anchors.bottomMargin = Number(cccRoot.componentInfo.anchorsBottomMargin);
+            }
+
+            // Set Horizontal Center Ofset
+            cccRoot.anchors.horizontalCenterOffset = Number(cccRoot.componentInfo.anchorsHorizontalOffset);
+            // Set Vertical Center Offset
+            cccRoot.anchors.verticalCenterOffset = Number(cccRoot.componentInfo.anchorsVerticalOffset);
+        }
+    }
+
     // Parse Anchors
     function parseAnchors(anchorString, needPoint) {
         // Get Anchor Elements
@@ -370,7 +459,7 @@ DContainer {
 
         // Check Anchor Target
         if (anchorTarget === "") {
-            console.log("DComponentChildContainer.parseAnchors - Clearing Anchor");
+            //console.log("DComponentChildContainer.parseAnchors - Clearing Anchor");
             return undefined;
         }
 
@@ -394,7 +483,7 @@ DContainer {
             return undefined;
         }
 
-        console.log("DComponentChildContainer.parseAnchors - anchorTarget: " + anchorTarget);
+        //console.log("DComponentChildContainer.parseAnchors - anchorTarget: " + anchorTarget);
 
         // Check Anchor Point
         if (anchorPoint === "" || anchorPoint === undefined) {
@@ -426,22 +515,35 @@ DContainer {
 
     // Create Content
     function createContent() {
+        console.log("DComponentChildContainer.createContent");
         // Create Root Component
         createRootComponent();
         // Create Child Components
         //createChildren();
     }
 
+    // Cler Content
+    function clearContent() {
+        console.log("DComponentChildContainer.clearContent");
+        // Remove Children
+        //removeChildren();
+        // Remove Root Component
+        removeRootComponent();
+    }
+
     // Create Root Component
     function createRootComponent() {
         // Check Component Info
         if (cccRoot.componentInfo !== null && !cccRoot.rootComponentCreated) {
+            console.log("DComponentChildContainer.createContent - name: " + cccRoot.componentInfo.componentName);
             // Set Root Component Created
             cccRoot.rootComponentCreated = true;
             // Create Root Component Object
-            cccRoot.rootComponent = Qt.createQmlObject(cccRoot.componentInfo.generateLiveCode(false, false),  cccRoot.rootContainer);
+            cccRoot.childQMLComponent = Qt.createQmlObject(cccRoot.componentInfo.generateLiveCode(false, false),  cccRoot.rootContainer);
             // Check Root Component
-            if (cccRoot.rootComponent !== null) {
+            if (cccRoot.childQMLComponent !== null) {
+                // Set Fill Anchor
+                //cccRoot.rootComponent.anchors.fill = cccRoot;
                 // Set Update Component Info Enabled
                 cccRoot.updateComponentInfoEnabled = true;
             } else {
@@ -455,11 +557,12 @@ DContainer {
     // Remove Root Component
     function removeRootComponent() {
         // Check New Root Object
-        if (cccRoot.rootComponent !== null) {
+        if (cccRoot.childQMLComponent !== null) {
+            console.log("DComponentChildContainer.removeRootComponent");
             // Destroy Root Component
-            cccRoot.rootComponent.destroy();
+            cccRoot.childQMLComponent.destroy();
             // Reset Root Component
-            cccRoot.rootComponent = null;
+            cccRoot.childQMLComponent = null;
             // Reset Root Component Created Flag
             cccRoot.rootComponentCreated = false;
             // Reset Update Component Info Enabled
@@ -470,7 +573,8 @@ DContainer {
     // Create Children
     function createChildren() {
         // Check Component Info
-        if (cccRoot.componentInfo !== null && !cccRoot.childComponentsCreated && cccRoot.rootContainer) {
+        if (cccRoot.componentInfo !== null && !cccRoot.childComponentsCreated && cccRoot.rootComponent !== null) {
+            console.log("DComponentChildContainer.createChildren - count: " + cccRoot.componentInfo.childCount);
             // Set Child Components Created
             cccRoot.childComponentsCreated = true;
             // Get Child Count
@@ -483,6 +587,20 @@ DContainer {
         }
     }
 
+    // Remove Children
+    function removeChildren() {
+        // Get Content Container Child Count
+        var ccCount = cccRoot.contentContainer.children.length;
+
+        console.log("DComponentChildContainer.removeChildren - count: " + ccCount);
+
+        // Iterate Through Children
+        for (var i=ccCount-1; i>=0; i--) {
+            // Destroy Child
+            cccRoot.contentContainer.children[i].destroy();
+        }
+    }
+
     // Create Child
     function createChild(componentInfo) {
         // Check Root Container
@@ -491,17 +609,8 @@ DContainer {
             var newChildContainer = cccRoot.rootContainer.newChildComponent.createObject(cccRoot.contentContainer, { "parentContainer": cccRoot });
             // Check New Child Container
             if (newChildContainer !== null) {
-
-//                // Create Root Component
-//                newChildContainer.createRootComponent();
-//                // Create Children
-//                newChildContainer.createChildren();
-
-                // Create Content
-                newChildContainer.createContent();
-
-                // ...
-
+                // Update Child Component Container Object
+                updateChildContainerObject(newChildContainer, componentInfo, false);
             }
 
             return newChildContainer;
@@ -566,9 +675,8 @@ DContainer {
             // Set Height
             aChildObject.height = aComponentInfo.height;
 
-            // ...
-
             // Set Anchors
+            aChildObject.setAnchoring();
 
             // ...
         }
@@ -587,7 +695,7 @@ DContainer {
             cccRoot.dropHovering = true;
 
             // Check Drag Keys
-            if (drag.keys[0] === CONSTS.newChildComponentDragKey) {
+            if (drag.keys[0] === CONSTS.newComponentDragKey) {
                 //console.log("DComponentRootContainer.dropArea.onEntered - keys: " + drag.keys);
                 // Accept Drag
                 drag.accept();
@@ -655,7 +763,7 @@ DContainer {
         anchors.centerIn: parent
         color: "white"
         visible: settingsController.componentNamesVisible
-        opacity: 0.05
+        opacity: CONSTS.componentNamesOpacity
         font.pixelSize: 48
         text: componentInfo ? componentInfo.componentName : ""
     }
