@@ -1,5 +1,6 @@
 import QtQuick 2.7
 import QtGraphicalEffects 1.0
+import QtQml.Models 2.2
 
 import enginecomponents 0.1
 
@@ -10,7 +11,7 @@ import "system"
 DContainer {
     id: demoContainerRoot
 
-    width: 1024
+    width: 1200
     height: 800
 
     clip: true
@@ -20,8 +21,8 @@ DContainer {
 
     drag.filterChildren: false
 
-    minWidth: 400
-    minHeight: 400
+    minWidth: 1200
+    minHeight: 800
 
     property int contentWidth: 400
 
@@ -61,7 +62,15 @@ DContainer {
         //propertiesController.selectComponent("Button3D");
 
         // Set Component Info
+        //demoContainer.componentInfo = propertiesController.focusedComponent;
+        // Set State
+        //demoContainer.show();
+
+        // Set Component Info
         //demoPane.componentInfo = propertiesController.focusedComponent;
+
+        // Show Nodes
+        //demoPane.showNodes();
 
         // Set Root Component
         //demoNodeTree.rootComponent = propertiesController.focusedComponent;
@@ -103,6 +112,53 @@ DContainer {
         }
 */
     }
+
+
+
+    DNodePane {
+        id: demoPane
+        anchors.verticalCenter: parent.verticalCenter
+
+        creationWidth: 480
+        creationHeight: 600
+
+        minWidth: 480
+        minHeight: 200
+
+    }
+
+/*
+    DNodeTreeEmptyNode {
+        id: demoEmptyNode
+        anchors.centerIn: parent
+    }
+
+    Row {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: DStyle.defaultMargin
+        spacing: DStyle.defaultSpacing
+
+        DButton {
+            text: "Show"
+            onClicked: demoEmptyNode.showEmptyNode();
+        }
+
+        DButton {
+            text: "Hide"
+            onClicked: demoEmptyNode.hideEmptyNode();
+        }
+    }
+*/
+
+//    DNodeTreeNode {
+//        anchors.centerIn: parent
+//    }
+
+//    DNodeTreeEmptyNode {
+//        anchors.centerIn: parent
+//    }
+
 /*
     Rectangle {
         id: boundingRect

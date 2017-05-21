@@ -451,17 +451,16 @@ DContainer {
             onClicked: paneButtonFunction()
 
             onPressed: {
+                // Check Drag Enabled
                 if (paneBaseRoot.enableDragByPaneButton) {
+                    // Bring To Front
+                    bringToFront();
                     // Set Drag Target
                     buttonMouseArea.drag.target = paneBaseRoot;
-                    // Set Drag Active
-                    buttonMouseArea.drag.active = true;
                 }
             }
 
             onReleased: {
-                // Reset Drag Active
-                buttonMouseArea.drag.active = false;
                 // Reset Drag Target
                 buttonMouseArea.drag.target = undefined;
             }

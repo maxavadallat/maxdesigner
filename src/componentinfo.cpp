@@ -103,11 +103,14 @@ void ComponentInfo::init()
 
     // Check Project
     if (mProject) {
-        // Get Base Component
-        mBase = mProject->getComponentByName(mBaseName);
+        // Set Base Component
+        setBaseComponent(mProject->getComponentByName(mBaseName));
 
-        // Set Component ProtoType
-        setProtoType(mProject->getComponentByName(mName, mType));
+        // Check If ProtoType
+        if (!mProtoType && !mProtoType) {
+            // Set Component ProtoType
+            setProtoType(mProject->getComponentByName(mName, mType));
+        }
 
         // Init info Path
         QString ipTemp = "";
@@ -913,8 +916,8 @@ QStringList ComponentInfo::inheritedPropertyKeys()
 
     // Check Bse Name
     if (!mBaseName.isEmpty() && !mBase && mProject) {
-        // Get Base Component
-        mBase = mProject->getComponentByName(mBaseName, "", true);
+        // Set Base Component
+        setBaseComponent(mProject ? mProject->getComponentByName(mBaseName, "", true) : NULL);
     }
 
     // Check Base
@@ -955,19 +958,59 @@ void ComponentInfo::setDirty(const bool& aDirty)
 //==============================================================================
 // Set Proto Type
 //==============================================================================
-void ComponentInfo::setProtoType(ComponentInfo* aProtoTypw)
+void ComponentInfo::setProtoType(ComponentInfo* aProtoType)
 {
     // Check If ProotType
     if (!mIsProtoType) {
         // Check ProtoType Component
-        if (mProtoType != aProtoTypw) {
-            // Set Component ProtoType
-            mProtoType = aProtoTypw;
+        if (mProtoType != aProtoType) {
+            //qDebug() << "ComponentInfo::setProtoType - mName: " << mName << " - aProtoType: " << (aProtoType ? aProtoType->mName : "NULL");
 
-            // Connect Property Updated Signal
+            // Check ProtoType
+            if (mProtoType) {
+                // Disconnect Component Property Changed Signal
+                disconnect(mProtoType, SIGNAL(componentPropertyChanged(QString,QVariant)), this, SLOT(handleBasePropertyChanges(QString,QVariant)));
+            }
+
+            // Set Component ProtoType
+            mProtoType = aProtoType;
+
+            // Check ProtoType
+            if (mProtoType) {
+                // Connect Property Updated Signal
+                connect(mProtoType, SIGNAL(componentPropertyChanged(QString,QVariant)), this, SLOT(handleBasePropertyChanges(QString,QVariant)));
+            }
 
             // ...
         }
+    }
+}
+
+//==============================================================================
+// Set Base Component
+//==============================================================================
+void ComponentInfo::setBaseComponent(ComponentInfo* aBase)
+{
+    // Check Base Component
+    if (mBase != aBase) {
+        //qDebug() << "ComponentInfo::setBaseComponent - mName: " << mName << " - aBase: " << (aBase ? aBase->mName : "NULL");
+
+        // Check Base
+        if (mBase) {
+            // Disconnect Component Property Changed Signal
+            disconnect(mBase, SIGNAL(componentPropertyChanged(QString,QVariant)), this, SLOT(handleBasePropertyChanges(QString,QVariant)));
+        }
+
+        // Set Base Component
+        mBase = aBase;
+
+        // Check Base
+        if (mBase) {
+            // Connect Component Property Changed Signal
+            connect(mBase, SIGNAL(componentPropertyChanged(QString,QVariant)), this, SLOT(handleBasePropertyChanges(QString,QVariant)));
+        }
+
+        // ...
     }
 }
 
@@ -1016,6 +1059,19 @@ void ComponentInfo::dataSourcesDirChanged(const QString& aDataSourcesDir)
     if (mType == COMPONENT_TYPE_DATASOURCE) {
         // Set Info Path
         setInfoPath(QString("%1/%2.%3").arg(aDataSourcesDir).arg(mName).arg(DEFAULT_JSON_SUFFIX));
+    }
+}
+
+//==============================================================================
+// Handle Base Property Changes
+//==============================================================================
+void ComponentInfo::handleBasePropertyChanges(const QString& aName, const QVariant& aValue)
+{
+    // Check Inherited Properties
+    if (mProperties.keys().indexOf(aName) == -1) {
+        qDebug() << "ComponentInfo::handleBasePropertyChanges - aName: " << aName << " - aValue: " << aValue;
+        // Emit Component Property Changed Signal
+        emit componentPropertyChanged(aName, aValue);
     }
 }
 
@@ -1189,7 +1245,7 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject, const bool aCreat
         // Base Components Might Not Be Ready !!!!
 
         // Set Base Component
-        mBase = mProject ? mProject->getComponentByName(mBaseName) : NULL;
+        setBaseComponent(mProject ? mProject->getComponentByName(mBaseName) : NULL);
     }
 
     // Check Keys - Built In
@@ -1295,9 +1351,25 @@ void ComponentInfo::removeFromParent()
 {
     // Check Parent
     if (mParent) {
+        qDebug() << "ComponentInfo::removeFromParent";
         // Remove Child
         mParent->removeChild(this);
     }
+}
+
+//==============================================================================
+// Take From Parent
+//==============================================================================
+int ComponentInfo::takeFromParent()
+{
+    // Check Parent
+    if (mParent) {
+        qDebug() << "ComponentInfo::takeFromParent";
+        // Take Child From Parent
+        return mParent->takeChild(this);
+    }
+
+    return -1;
 }
 
 //==============================================================================
@@ -1849,6 +1921,7 @@ QString ComponentInfo::liveCodeFormatOwnProperties(QStringList& aOPHooks, QStrin
                 } else {
                     // Add Value Setting Hook
                     aOPHooks << QString("%1%1%1case \"%2\": %3.%2 = value; break;\n").arg(aIndent).arg(opKeys[i]).arg(aID);
+
                 }
             }
         }
@@ -2382,7 +2455,7 @@ QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGene
     QStringList enumHookList = QStringList();
 
     // Get Filtered Property Keys
-    QStringList fpKeys = mProject->propertiesController() ? mProject->propertiesController()->filteredProperties() : QStringList();
+    QStringList fpKeys = mProject->filteredProperties();
 
     // Add Own Properties ======================================================
 
@@ -2471,24 +2544,25 @@ QVariant ComponentInfo::componentProperty(const QString& aName)
 //==============================================================================
 void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& aValue)
 {
-    qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue;
+    //qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue;
 
     // Check Property Keys
     if (mProperties.keys().indexOf(aName) >= 0) {
         // Check Value
         if (mProperties.value(aName).toString() != aValue.toString()) {
+            qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - INHERITED";
             // Set Property
             mProperties[aName] = aValue.toString();
             // Set Dirty
             setDirty(true);
             // Check If Filtered Property Change
-            if (mProject->filteredPropertyChanges().indexOf(aName) == -1) {
+            if (mProject->filteredProperties().indexOf(aName) == -1) {
                 // Emit Property Changed Signal
                 emit componentPropertyChanged(aName, aValue);
             }
-
-            return;
         }
+
+        return;
     }
 
     // Check Own Property Keys
@@ -2500,25 +2574,27 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
 
         // Check Value
         if (Utils::parseValue(typeAndValue, true) != aValue.toString()) {
+            qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - OWN";
+
             // Set New Type And Value
             typeAndValue = Utils::composeTypeAndValue(tavElements[0],
+                                                      aValue.toString(),
                                                       tavElements[1],
                                                       tavElements[2],
-                                                      tavElements[3],
-                                                      aValue.toString());
+                                                      tavElements[3]);
 
             // Set Property
             mOwnProperties[aName] = typeAndValue;
             // Set Dirty
             setDirty(true);
             // Check If Filtered Property Change
-            if (mProject->filteredPropertyChanges().indexOf(aName) == -1) {
+            if (mProject->filteredProperties().indexOf(aName) == -1) {
                 // Emit Property Changed Signal
                 emit componentPropertyChanged(aName, aValue);
             }
-
-            return;
         }
+
+        return;
     }
 
     // Check ProtoType
@@ -2529,18 +2605,19 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
             QString ptTypeAndValue = mProtoType->mOwnProperties.value(aName).toString();
             // Check Value
             if (Utils::parseValue(ptTypeAndValue, true) != aValue.toString()) {
+                qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - PROTOTYPE";
                 // Store To Properties
                 mProperties[aName] = aValue.toString();
                 // Set Dirty
                 setDirty(true);
                 // Check If Filtered Property Change
-                if (mProject->filteredPropertyChanges().indexOf(aName) == -1) {
+                if (mProject->filteredProperties().indexOf(aName) == -1) {
                     // Emit Property Changed Signal
                     emit componentPropertyChanged(aName, aValue);
                 }
-
-                return;
             }
+
+            return;
         }
     }
 
@@ -2550,18 +2627,19 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
         QVariant bValue = mBase->componentProperty(aName);
         // Check Value
         if (bValue != aValue) {
+            qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - BASE";
             // Store To Properties
             mProperties[aName] = aValue.toString();
             // Set Dirty
             setDirty(true);
             // Check If Filtered Property Change
-            if (mProject->filteredPropertyChanges().indexOf(aName) == -1) {
+            if (mProject->filteredProperties().indexOf(aName) == -1) {
                 // Emit Property Changed Signal
                 emit componentPropertyChanged(aName, aValue);
             }
-
-            return;
         }
+
+        return;
     }
 
     // Add Own Property - NOT RECOMMENDED!! Use Own Properties Model to Add Properties!
@@ -2580,10 +2658,12 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
         break;
     }
 
+    qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - ADDING OWN";
+
     // Add New Own Property
     mOwnProperties[aName] = Utils::composeTypeAndValue(tPrefix, aValue.toString());
     // Check If Filtered Property Change
-    if (mProject->filteredPropertyChanges().indexOf(aName) == -1) {
+    if (mProject->filteredProperties().indexOf(aName) == -1) {
         // Emit Own Property Added Signal
         emit ownPropertyAdded(aName);
     }
@@ -2903,10 +2983,47 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
 //==============================================================================
 void ComponentInfo::moveChild(const int& aIndex, const int& aTargetIndex)
 {
-    qDebug() << "ComponentInfo::moveChild - aIndex: " << aIndex << " -> " << aTargetIndex;
+    // Check Indexes
+    if (aIndex == aTargetIndex) {
+        return;
+    }
+
+    // Init New target Index
+    int newTargetIndex = aIndex < aTargetIndex ? aTargetIndex-1 : aTargetIndex;
+
+    // Init New Target Index
+    //int newTargetIndex = qBound(0, aTargetIndex, mChildren.count() - 1);
+
+    qDebug() << "ComponentInfo::moveChild - aIndex: " << aIndex << " -> " << newTargetIndex;
 
     // Move Child
-    mChildren.move(aIndex, aTargetIndex);
+    mChildren.move(aIndex, newTargetIndex);
+
+    // Emit Child Moved Signal
+    emit childMoved(aIndex, newTargetIndex);
+
+    // Set Dirty
+    setDirty(true);
+}
+
+//==============================================================================
+// Move Child
+//==============================================================================
+void ComponentInfo::moveChild(ComponentInfo* aChildInfo, const int& aIndex, ComponentInfo* aTargetChildInfo, const int& aTargetIndex)
+{
+    // Check Component Info & Target Info
+    if (aChildInfo == aTargetChildInfo) {
+        // Move Child
+        aChildInfo->moveChild(aIndex, aTargetIndex);
+    } else {
+        // Take Child
+        ComponentInfo* takenChild = aChildInfo->takeChild(aIndex);
+
+        qDebug() << "ComponentInfo::moveChild - mName: " << takenChild->mName << " -> " << aTargetChildInfo->componentPath() << " - aTargetIndex: " << aTargetIndex;
+
+        // Insert Child
+        aTargetChildInfo->insertChild(aTargetIndex, takenChild);
+    }
 }
 
 //==============================================================================
@@ -2920,10 +3037,11 @@ ComponentInfo* ComponentInfo::takeChild(const int& aIndex)
         ComponentInfo* takenChild = mChildren.takeAt(aIndex);
         // Check Taken Child
         if (takenChild) {
-            qDebug() << "ComponentInfo::takeChild - aIndex: " << aIndex;
+            qDebug() << "ComponentInfo::takeChild - path: " << componentPath() << " - aIndex: " << aIndex;
 
             // Emit Child About To Be Removed
             emit takenChild->childAboutToBeRemoved(takenChild);
+
             // Remove Child Object From ID Map
             setChildObjectID(takenChild, "");
             // Set Dirty
@@ -2938,6 +3056,39 @@ ComponentInfo* ComponentInfo::takeChild(const int& aIndex)
     }
 
     return NULL;
+}
+
+//==============================================================================
+// Take Child Info
+//==============================================================================
+int ComponentInfo::takeChild(ComponentInfo* aChildInfo)
+{
+    // Get Child Index
+    int cIndex = mChildren.indexOf(aChildInfo);
+    // Find Index
+    if (cIndex >= 0) {
+        qDebug() << "ComponentInfo::takeChild - path: " << componentPath() << " - mName: " << aChildInfo->mName;
+
+        // Take Child
+        ComponentInfo* takenChild = mChildren.takeAt(cIndex);
+
+        // Remove Child Object From ID Map
+        setChildObjectID(takenChild, "");
+        // Emit Child About To Be Removed
+        emit takenChild->childAboutToBeRemoved(takenChild);
+
+        // Set Dirty
+        setDirty(true);
+
+        // Emmit Child Removed Signal
+        emit childRemoved(cIndex);
+        // Emit Child Cound Changed Signal
+        emit childCountChanged(mChildren.count());
+
+        return cIndex;
+    }
+
+    return -1;
 }
 
 //==============================================================================

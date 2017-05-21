@@ -317,13 +317,19 @@ public:
     Q_INVOKABLE void insertChild(const int& aIndex, ComponentInfo* aChild);
     // Take Child Info
     Q_INVOKABLE ComponentInfo* takeChild(const int& aIndex);
+    // Take Child Info
+    Q_INVOKABLE int takeChild(ComponentInfo* aChildInfo);
     // Remove Child
     Q_INVOKABLE void removeChild(ComponentInfo* aChild, const bool& aDelete = true);
     // Move Child
     Q_INVOKABLE void moveChild(const int& aIndex, const int& aTargetIndex);
+    // Move Child
+    Q_INVOKABLE void moveChild(ComponentInfo* aChildInfo, const int& aIndex, ComponentInfo* aTargetChildInfo, const int& aTargetIndex);
 
     // Remove/Delete From Parent
     Q_INVOKABLE void removeFromParent();
+    // Take From Parent
+    Q_INVOKABLE int takeFromParent();
     // Request Close
     Q_INVOKABLE void requestClose();
 
@@ -589,8 +595,10 @@ protected:
     // Set Dirty State
     void setDirty(const bool& aDirty);
 
-    // Set Proto Type
-    void setProtoType(ComponentInfo* aProtoTypw);
+    // Set ProtoType Component
+    void setProtoType(ComponentInfo* aProtoType);
+    // Set Base Component
+    void setBaseComponent(ComponentInfo* aBase);
 
     // Find Root Component
     ComponentInfo* findRoot(ComponentInfo* aComponent);
@@ -639,6 +647,8 @@ protected slots:
     void viewsDirChanged(const QString& aViewsDir);
     // Data Sources Dir Changed Slot
     void dataSourcesDirChanged(const QString& aDataSourcesDir);
+    // Handle Base Property Changes
+    void handleBasePropertyChanges(const QString& aName, const QVariant& aValue);
 
 protected: // Data
     friend class ComponentImportsModel;

@@ -25,6 +25,8 @@ void ComponentCategoryModel::init()
     mCategories << COMPONENT_CATEGORY_LAYOUT;
     mCategories << COMPONENT_CATEGORY_CONTAINER;
     mCategories << COMPONENT_CATEGORY_DELEGATE;
+    mCategories << COMPONENT_CATEGORY_ANIMATION;
+    mCategories << COMPONENT_CATEGORY_IMAGE;
 
     // ...
 }

@@ -96,6 +96,16 @@ var defaultToolButtonHeight                     = defaultToolButtonWidth;
 // Component Names Opacity
 var componentNamesOpacity                       = 0.1;
 
+// Component Node Icon Type Map/Disct
+var nodeIconTypeMap                             = {
+                                                    "Visual"    : "qrc:/assets/icons/component.visual.png",
+                                                    "NonVisual" : "qrc:/assets/icons/component.nonvisual.png",
+                                                    "Layout"    : "qrc:/assets/icons/component.layout.png",
+                                                    "Container" : "qrc:/assets/icons/component.container.png",
+                                                    "Delegate"  : "qrc:/assets/icons/component.delegate.png",
+                                                    "Animation" : "qrc:/assets/icons/component.animation.png",
+                                                    "Image"     : "qrc:/assets/icons/component.image.png"
+                                                };
 
 
 

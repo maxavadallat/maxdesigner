@@ -117,7 +117,7 @@ void ComponentsModel::updateBaseComponents()
         if (component && !component->mBaseName.isEmpty() && !component->mBase) {
             //qDebug() << "ComponentsModel::updateBaseComponents - name: " << component->mName;
             // Set Base Component
-            component->mBase = mProjectModel->getComponentByName(component->mBaseName);
+            component->setBaseComponent(mProjectModel->getComponentByName(component->mBaseName));
         }
     }
 }

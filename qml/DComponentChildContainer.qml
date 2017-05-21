@@ -44,6 +44,12 @@ DContainer {
                 // Set Width
                 cccRoot.width = Number(aWidth);
             }
+
+            // Check Live QML Component
+            if (cccRoot.childLiveQMLComponent !== null) {
+                // Set Width
+                cccRoot.childLiveQMLComponent.width = cccRoot.width;
+            }
         }
 
         onHeightChanged: {
@@ -51,6 +57,12 @@ DContainer {
             if (cccRoot.height !== Number(aHeight)) {
                 // Set Height
                 cccRoot.height = Number(aHeight);
+            }
+
+            // Check Live QML Component
+            if (cccRoot.childLiveQMLComponent !== null) {
+                // Set Width
+                cccRoot.childLiveQMLComponent.height = cccRoot.height;
             }
         }
 
@@ -164,9 +176,9 @@ DContainer {
             //console.log("DComponentChildContainer.componentInfoConnections.onComponentPropertyChanged - aName: " + aName + " - aValue: " + aValue);
 
             // Check Root Component
-            if (cccRoot.childQMLComponent !== null) {
+            if (cccRoot.childLiveQMLComponent !== null) {
                 // Set Property
-                cccRoot.childQMLComponent.__setProperty(aName, aValue);
+                cccRoot.childLiveQMLComponent.__setProperty(aName, aValue);
             } else {
                 console.warn("DComponentChildContainer.componentInfoConnections.onComponentPropertyChanged - NO ROOT COMPONENT!!");
             }
@@ -176,7 +188,7 @@ DContainer {
 
         onLayerVisibleChanged: {
             // Check Root Component
-            if (cccRoot.rootComponent !== null) {
+            if (cccRoot.rootComponentContainer !== null) {
                 // Set Visibility
                 cccRoot.rootContainer.visible = cccRoot.componentInfo.layerVisible;
             }
@@ -215,10 +227,10 @@ DContainer {
     property bool selected: false
 
     // Root Component Container
-    property QtObject rootComponent: null
+    property QtObject rootComponentContainer: null
 
     // Child Root Component
-    property QtObject childQMLComponent: null
+    property QtObject childLiveQMLComponent: null
 
     // Root Component Created
     property bool rootComponentCreated: false
@@ -310,6 +322,14 @@ DContainer {
                     cccRoot.destroy();
                 }
             break;
+
+            case Qt.Key_N:
+                // Check Root Component Container
+                if (cccRoot.rootComponentContainer !== null) {
+                    // Toggle Nodes
+                    cccRoot.rootComponentContainer.toggleNodePane();
+                }
+            break;
         }
     }
 
@@ -374,7 +394,7 @@ DContainer {
         // Check If Update Component Info Enabled
         if (cccRoot.updateComponentInfoEnabled && propertiesController.focusedComponent === cccRoot.componentInfo) {
             // Check Width
-            if (propertiesController.cWidth !== cccRoot.width) {
+            if (Number(propertiesController.cWidth) !== cccRoot.width) {
                 // Request Component Width
                 propertiesController.requestCWidth(cccRoot.width);
             }
@@ -385,7 +405,7 @@ DContainer {
         // Check If Update Component Info Enabled
         if (cccRoot.updateComponentInfoEnabled && propertiesController.focusedComponent === cccRoot.componentInfo) {
             // Check Height
-            if (propertiesController.cHeight !== cccRoot.height) {
+            if (Number(propertiesController.cHeight) !== cccRoot.height) {
                 // Request Component Height
                 propertiesController.requestCHeight(cccRoot.height);
             }
@@ -539,11 +559,11 @@ DContainer {
             // Set Root Component Created
             cccRoot.rootComponentCreated = true;
             // Create Root Component Object
-            cccRoot.childQMLComponent = Qt.createQmlObject(cccRoot.componentInfo.generateLiveCode(false, false),  cccRoot.rootContainer);
+            cccRoot.childLiveQMLComponent = Qt.createQmlObject(cccRoot.componentInfo.generateLiveCode(false, false),  cccRoot.rootContainer);
             // Check Root Component
-            if (cccRoot.childQMLComponent !== null) {
+            if (cccRoot.childLiveQMLComponent !== null) {
                 // Set Fill Anchor
-                //cccRoot.rootComponent.anchors.fill = cccRoot;
+                //cccRoot.rootComponentContainer.anchors.fill = cccRoot;
                 // Set Update Component Info Enabled
                 cccRoot.updateComponentInfoEnabled = true;
             } else {
@@ -557,12 +577,12 @@ DContainer {
     // Remove Root Component
     function removeRootComponent() {
         // Check New Root Object
-        if (cccRoot.childQMLComponent !== null) {
+        if (cccRoot.childLiveQMLComponent !== null) {
             console.log("DComponentChildContainer.removeRootComponent");
             // Destroy Root Component
-            cccRoot.childQMLComponent.destroy();
+            cccRoot.childLiveQMLComponent.destroy();
             // Reset Root Component
-            cccRoot.childQMLComponent = null;
+            cccRoot.childLiveQMLComponent = null;
             // Reset Root Component Created Flag
             cccRoot.rootComponentCreated = false;
             // Reset Update Component Info Enabled
@@ -573,7 +593,7 @@ DContainer {
     // Create Children
     function createChildren() {
         // Check Component Info
-        if (cccRoot.componentInfo !== null && !cccRoot.childComponentsCreated && cccRoot.rootComponent !== null) {
+        if (cccRoot.componentInfo !== null && !cccRoot.childComponentsCreated && cccRoot.rootComponentContainer !== null) {
             console.log("DComponentChildContainer.createChildren - count: " + cccRoot.componentInfo.childCount);
             // Set Child Components Created
             cccRoot.childComponentsCreated = true;

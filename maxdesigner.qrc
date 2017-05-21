@@ -112,5 +112,7 @@
         <file>qml/DToolButton.qml</file>
         <file>qml/DToolBarSeparator.qml</file>
         <file>qml/DNodePane.qml</file>
+        <file>qml/DMaskedImage.qml</file>
+        <file>qml/DNodeTreeEmptyNode.qml</file>
     </qresource>
 </RCC>

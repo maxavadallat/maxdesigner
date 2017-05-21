@@ -6,4 +6,5 @@ Rectangle {
     color: DStyle.colorBG
     border.color: DStyle.colorBorderNoFocus
     radius: DStyle.defaultRadius
+    visible:  opacity > 0.0
 }

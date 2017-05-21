@@ -20,15 +20,18 @@ Item {
     property int nodePressX: 0
     property int nodePressY: 0
 
-    property int nodePosX: 0
-    property int nodePosY: 0
+    property QtObject dragMouseArea: null
 
     property DNodeTreeNode currentNode: null
 
-    signal nodePressed(var posX, var posY)
-    signal nodeGrabbed(var nodeX, var nodeY, var nodeWidth, var nodeHeight, var componentInfo)
+    property alias nodeGrabbedState: grabbedNode.dragActive
+    property alias grabbedIndex: grabbedNode.childIndex
+
+    signal nodePressed(var posX, var posY, var mouseArea)
+    signal nodeGrabbed(var nodeX, var nodeY, var nodeWidth, var nodeHeight, var componentInfo, var grabbedIndex)
     signal nodePosChanged(var nodeX, var nodeY)
     signal nodeReleased()
+    signal removeEmptyNode()
 
     Component.onCompleted: {
         // Set Node Tree Init
@@ -37,36 +40,34 @@ Item {
         // ...
     }
 
-//    onRootComponentChanged: {
-//        // Check Node Tree Init
-//        if (nodeTreeRoot.nodeTreeInit) {
-//            console.log("DNodeTree.onRootComponentChanged - rootComponent: " + (rootComponent !== null ? rootComponent.componentName : "NULL"));
-//        }
-//    }
-
     onNodePressed: {
-        //console.log("DNodeTree.onNodePressed - [" + posX + ":" + posY + "]");
+        console.log("DNodeTree.onNodePressed - [" + posX + ":" + posY + "]");
 
         // Set Node Press X
         nodeTreeRoot.nodePressX = posX;
         // Set Node Press Y
         nodeTreeRoot.nodePressY = posY;
 
+        // Set Node Drag Mouse Area
+        nodeTreeRoot.dragMouseArea = mouseArea;
+
         // ...
     }
 
     onNodeGrabbed: {
-        //console.log("DNodeTree.onNodeGrabbed - [" + nodeX + ":" + nodeY + "]");
+        //console.log("DNodeTree.onNodeGrabbed - grabbedIndex: " + grabbedIndex);
 
         // Set Interactive State
         nodeTreeFlickable.interactive = false;
 
-        // Store Node Pos X
-        nodeTreeRoot.nodePosX = nodeX;
-        nodeTreeRoot.nodePosY = nodeY;
+        // Set Drag Target
+        nodeTreeRoot.dragMouseArea.drag.target = grabbedNode;
+
+        // Set Grabbed Index
+        grabbedNode.childIndex = grabbedIndex;
 
         // Set Up Grabbed Node
-        grabbedNode.x = nodeX;//nodeTreeRoot.width - nodeWidth;
+        grabbedNode.x = nodeX;
         grabbedNode.y = nodeY;
 
         grabbedNode.width = nodeWidth;
@@ -74,37 +75,31 @@ Item {
 
         // Set Component Info
         grabbedNode.componentInfo = componentInfo;
-
         // Set Visibility
         grabbedNode.visible = true;
+        // Scale Up
+        grabbedNode.scale = 1.05;
 
+        // Set Drag Active
         grabbedNode.dragActive = true;
-
-        //grabbedNode.scale = 1.1;
-    }
-
-    onNodePosChanged: {
-        //console.log("DNodeTree.onNodePosChanged - [" + nodeX + ":" + nodeY + "]");
-
-        // Set Grabbed Node Pos
-        grabbedNode.x = nodeTreeRoot.nodePosX + nodeX - nodeTreeRoot.nodePressX;
-        grabbedNode.y = nodeTreeRoot.nodePosY + nodeY - nodeTreeRoot.nodePressY;
-
-        // ...
-
     }
 
     onNodeReleased: {
+        //console.log("DNodeTree.onNodeReleased");
+
+        // Reset Drag Active
+        grabbedNode.dragActive = false;
+
+        // Set Interactive State
+        nodeTreeFlickable.interactive = true;
+        // Reset Drag Target
+        nodeTreeRoot.dragMouseArea.drag.target = undefined;
+        // Reset Node Drag Mouse Area
+        nodeTreeRoot.dragMouseArea = null;
         // Reset Scale
         grabbedNode.scale = 1.0;
         // Set Visibility
         grabbedNode.visible = false;
-
-        // Set Interactive State
-        nodeTreeFlickable.interactive = true;
-
-        // Reset Drag Active
-        grabbedNode.dragActive = false;
     }
 
     // Create Node
@@ -113,7 +108,6 @@ Item {
         if (componentInfo !== null) {
             // Create New Node Object
             var newNodeObject = newNodeComponent.createObject(nodeParent);
-
             // Set Component Info
             newNodeObject.componentInfo = componentInfo;
 
@@ -123,6 +117,7 @@ Item {
         return null;
     }
 
+    // new Node Component
     Component {
         id: newNodeComponent
 
@@ -132,13 +127,23 @@ Item {
         }
     }
 
-//    Rectangle {
-//        anchors.fill: parent
-//        anchors.margins: -1
-//        color: "transparent"
-//        border.color: "purple"
-//    }
+    // Drag Tracking Mouse Area For Scrolling Node tree Content
+    DMouseArea {
+        id: dragTrackingMouseArea
+        anchors.fill: parent
+        hoverEnabled: true
+        visible: grabbedNode.dragActive && nodeTreeFlickable.contentHeight > nodeTreeFlickable.height
 
+        onPositionChanged: {
+            //console.log("#### DNodeTree.dragTrackingMouseArea.onPositionChanged - mouse: [" + mouse.x + ":" + mouse.y + "]");
+
+            // Check Y Position
+
+            // ...
+        }
+    }
+
+    // Node Tree Flickable
     DFlickable {
         id: nodeTreeFlickable
         anchors.fill: parent
@@ -151,21 +156,40 @@ Item {
             nodeTree: nodeTreeRoot
             rootNode: true
         }
-
     }
 
+    // Grabbed Node Overlay
     DNodeTreeNode {
         id: grabbedNode
+
         visible: false
-        hideDropAreas: true
+
+        dropAreasVisible: false
         enableLayerVisibilityButton: false
+        enableDropAreasVisibility: false
 
         property bool dragActive: false
 
+        onDragActiveChanged: {
+            //console.log("DNodeTree.grabbedNode.onDragActiveChanged - dragActive: " + dragActive);
+
+            // Cheeck Drag Active
+            if (dragActive) {
+                // Start Drag
+                Drag.start();
+            } else {
+                // Stop Drag
+                Drag.drop();
+
+                // Emit Remove Empty Node Signal
+                nodeTreeRoot.removeEmptyNode();
+            }
+        }
+
         Drag.active: dragActive
 
-        Drag.hotSpot.x: nodeTreeRoot.nodePressX
-        Drag.hotSpot.y: nodeTreeRoot.nodePressY - 2
+        Drag.hotSpot.x: grabbedNode.width * 0.5 //nodeTreeRoot.nodePressX
+        Drag.hotSpot.y: grabbedNode.height * 0.5 //nodeTreeRoot.nodePressY
 
         Drag.source: grabbedNode.componentInfo
         Drag.keys: [ CONSTS.childComponentDragKey ]

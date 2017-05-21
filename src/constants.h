@@ -158,6 +158,7 @@
 #define COMPONENT_CATEGORY_CONTAINER                        "Container"
 #define COMPONENT_CATEGORY_DELEGATE                         "Delegate"
 #define COMPONENT_CATEGORY_ANIMATION                        "Animation"
+#define COMPONENT_CATEGORY_IMAGE                            "Image"
 
 // Default Component Size
 #define DEFAULT_COMPONENT_WIDTH                             320

@@ -23,6 +23,15 @@ Item {
     onGrabbedChanged: {
         //console.log("componentItemRoot.onGrabbedChanged - grabbed: " + grabbed);
 
+        // Check Grabbed
+        if (grabbed) {
+            // Start Drag
+            Drag.start();
+        } else {
+            // Drop Drag
+            Drag.drop();
+        }
+
         // Position Item For Grabbed State
         dragContainer.x = mapToItem(mainGrabArea, dragContainer.hotSpotX, dragContainer.hotSpotY).x - dragContainer.hotSpotX;
         dragContainer.y = mapToItem(mainGrabArea, dragContainer.hotSpotX, dragContainer.hotSpotY).y - dragContainer.hotSpotY;

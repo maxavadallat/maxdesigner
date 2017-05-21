@@ -38,7 +38,6 @@ DButtonBase {
         radius: height / 2
         opacity: switchRoot.checked ? 0.5 : 0.0
         Behavior on opacity { NumberAnimation { duration: DStyle.animDuration } }
-        visible: opacity > 0.0
     }
 
     DRectangle {

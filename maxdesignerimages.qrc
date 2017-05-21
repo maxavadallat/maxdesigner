@@ -23,5 +23,12 @@
         <file>assets/images/dashboard.png</file>
         <file>assets/fonts/instrument101.ttf</file>
         <file>assets/fonts/instrument103.ttf</file>
+        <file>assets/icons/component.visual.png</file>
+        <file>assets/icons/component.animation.png</file>
+        <file>assets/icons/component.container.png</file>
+        <file>assets/icons/component.delegate.png</file>
+        <file>assets/icons/component.image.png</file>
+        <file>assets/icons/component.nonvisual.png</file>
+        <file>assets/icons/component.layout.png</file>
     </qresource>
 </RCC>
