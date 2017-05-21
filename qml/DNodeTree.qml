@@ -26,6 +26,7 @@ Item {
 
     property alias nodeGrabbedState: grabbedNode.dragActive
     property alias grabbedIndex: grabbedNode.childIndex
+    property alias scrolling: scrollTimer.scrolling
 
     signal nodePressed(var posX, var posY, var mouseArea)
     signal nodeGrabbed(var nodeX, var nodeY, var nodeWidth, var nodeHeight, var componentInfo, var grabbedIndex)
@@ -41,7 +42,7 @@ Item {
     }
 
     onNodePressed: {
-        console.log("DNodeTree.onNodePressed - [" + posX + ":" + posY + "]");
+        //console.log("DNodeTree.onNodePressed - [" + posX + ":" + posY + "]");
 
         // Set Node Press X
         nodeTreeRoot.nodePressX = posX;
@@ -69,6 +70,7 @@ Item {
         // Set Up Grabbed Node
         grabbedNode.x = nodeX;
         grabbedNode.y = nodeY;
+        grabbedNode.lastY = nodeY;
 
         grabbedNode.width = nodeWidth;
         grabbedNode.height = nodeHeight;
@@ -117,6 +119,40 @@ Item {
         return null;
     }
 
+    // Map To Parent
+    function mapToParent(parentObject, rectangle) {
+        // Init New Rectangle
+        var newRectangle = { "x": rectangle.x, "y": rectangle.y, "width": rectangle.height, "height": rectangle.height };
+        // Get Rectangle Parent
+        var rectParent = rectangle.parent;
+
+        // Iterate Through Parents
+        while (rectParent !== undefined && rectParent !== parentObject) {
+
+            // Add Parent's X & Y To New Rectangle Position
+            newRectangle.x += rectParent.x;
+            newRectangle.y += rectParent.y;
+
+            // Set Parent
+            rectParent = rectParent.parent;
+        }
+
+        return newRectangle;
+    }
+
+    // Ensure Empty Node Visible
+    function ensureEmptyNodeVisible(rectangle) {
+        console.log("DNodeTree.ensureEmptyNodeVisible - recangle[" + Math.round(rectangle.x) + ":" + Math.round(rectangle.y) + "]");
+
+        // Get Mapped Rectangle
+        var newRectangle = mapToParent(nodeTreeFlickable.containerColumn, rectangle);
+
+        console.log("DNodeTree.ensureEmptyNodeVisible - newRectangle[" + Math.round(newRectangle.x) + ":" + Math.round(newRectangle.y) + "]");
+
+        // Flick To Ensure Rectangle Visible
+        nodeTreeFlickable.flick(newRectangle, true);
+    }
+
     // new Node Component
     Component {
         id: newNodeComponent
@@ -127,26 +163,32 @@ Item {
         }
     }
 
-    // Drag Tracking Mouse Area For Scrolling Node tree Content
-    DMouseArea {
-        id: dragTrackingMouseArea
-        anchors.fill: parent
-        hoverEnabled: true
-        visible: grabbedNode.dragActive && nodeTreeFlickable.contentHeight > nodeTreeFlickable.height
+//    Rectangle {
+//        id: topScrollArea
+//        width: parent.width
+//        height: nodeTreeFlickable.height * scrollTimer.panThreshold;
+//        anchors.top: parent.top
+//        color: "transparent"
+//        border.color: grabbedNode.centerY < nodeTreeFlickable.height * scrollTimer.panThreshold ? "red" : "teal"
+//    }
 
-        onPositionChanged: {
-            //console.log("#### DNodeTree.dragTrackingMouseArea.onPositionChanged - mouse: [" + mouse.x + ":" + mouse.y + "]");
-
-            // Check Y Position
-
-            // ...
-        }
-    }
+//    Rectangle {
+//        id: bottomScrollArea
+//        width: parent.width
+//        height: nodeTreeFlickable.height * scrollTimer.panThreshold;
+//        anchors.bottom: parent.bottom
+//        color: "transparent"
+//        border.color: (grabbedNode.centerY)  > nodeTreeFlickable.height * (1 - scrollTimer.panThreshold) ? "red" : "teal"
+//    }
 
     // Node Tree Flickable
     DFlickable {
         id: nodeTreeFlickable
         anchors.fill: parent
+
+//        onContentYChanged: {
+//            console.log("#### cY: " + contentY);
+//        }
 
         DNodeTreeNode {
             id: rootNode
@@ -169,6 +211,66 @@ Item {
         enableDropAreasVisibility: false
 
         property bool dragActive: false
+        property int centerY: y + height * 0.5
+        property int lastY: 0
+
+        onYChanged: {
+            //console.log("#### y: " + y + height * 0.5);
+
+            if (scrollTimer.scrolling) {
+                // Check Scroll Direction
+                if (!scrollTimer.scrollDirection && y > lastY || scrollTimer.scrollDirection && y < lastY) {
+
+                    //Reset Scrolling
+                    scrollTimer.scrolling = false;
+                    // Stop Scroll Timer
+                    //scrollTimer.running = false;
+
+                }
+
+            } else  if (lastY > y && (grabbedNode.centerY) < (nodeTreeFlickable.height * scrollTimer.panThreshold) && !scrollTimer.scrolling) {
+
+                //console.log("#### cY: " + nodeTreeFlickable.contentY);
+
+                // Check Content Position
+                if (nodeTreeFlickable.contentY > 0) {
+
+                    // Set Scroll Direction
+                    scrollTimer.scrollDirection = false;
+                    // Set Scrolling
+                    scrollTimer.scrolling = true;
+
+                    // Set Scroll Timer Running
+                    //scrollTimer.running = true;
+
+                }
+
+            } else if ((lastY < y) && (grabbedNode.centerY) > (nodeTreeFlickable.height * (1 - scrollTimer.panThreshold))  && !scrollTimer.scrolling) {
+
+                //console.log("#### cY: " + nodeTreeFlickable.contentY);
+
+                // Check Content Position
+                if (nodeTreeFlickable.contentY < nodeTreeFlickable.contentHeight - nodeTreeFlickable.height) {
+                    // Set Scroll Direction
+                    scrollTimer.scrollDirection = true;
+                    // Set Scrolling
+                    scrollTimer.scrolling = true;
+
+                    // Set Scroll Timer Running
+                    //scrollTimer.running = true;
+
+                }
+
+            } else {
+                //Reset Scrolling
+                scrollTimer.scrolling = false;
+//                // Stop Scroll Timer
+//                scrollTimer.running = false;
+            }
+
+            // Set Last Y
+            lastY = y;
+        }
 
         onDragActiveChanged: {
             //console.log("DNodeTree.grabbedNode.onDragActiveChanged - dragActive: " + dragActive);
@@ -193,5 +295,60 @@ Item {
 
         Drag.source: grabbedNode.componentInfo
         Drag.keys: [ CONSTS.childComponentDragKey ]
+    }
+
+    // Scroll Timer
+    Timer {
+        id: scrollTimer
+
+        property int panOffset: 0
+        property real panThreshold: 0.2
+        property bool scrolling: false
+        property bool scrollDirection: false
+        property int scrollStep: scrollDirection ? 4 : -4
+
+        interval: 1000 / 120
+        repeat: true
+
+        onScrollingChanged: {
+            //console.log("DNodeTree.scrollTimer.onScrollingChanged - scrolling: " + scrolling);
+            // Check Scrolling
+            if (scrolling) {
+                // Restart
+                restart();
+            } else {
+                // Reset Running
+                running = false;
+            }
+        }
+
+        onTriggered: {
+            //console.log("DNodeTree.scrollTimer.onScrollingChanged - onTriggered");
+
+            // Check Scroll Direction
+            if (scrollDirection) {
+                // Check Content Y
+                if (nodeTreeFlickable.contentY >= nodeTreeFlickable.contentHeight - nodeTreeFlickable.height /*+ grabbedNode.height*/) {
+                    // Reset Running
+                    running = false;
+
+                    return;
+                }
+            } else {
+                // Check Content Y
+                if (nodeTreeFlickable.contentY <= 0) {
+                    // Reset Running
+                    running = false;
+
+                    return;
+                }
+            }
+
+            // Calculate New Content Pos Y
+            var newContentY = Math.max(nodeTreeFlickable.contentY + scrollStep, 0);
+
+            // Set Content Position
+            nodeTreeFlickable.contentY = newContentY;
+        }
     }
 }

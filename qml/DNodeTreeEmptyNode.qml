@@ -20,6 +20,8 @@ Item {
 
     smooth: true
 
+    signal emptyNodeShown()
+
     // Show Empty Node
     function showEmptyNode() {
         // Run Height Animation
@@ -34,21 +36,18 @@ Item {
         emptyNodeRoot.height = 0;
     }
 
-//    Rectangle {
-//        anchors.fill: parent
-//        color: "transparent"
-//        border.color: "teal"
-//    }
-
     // Animatin On Height
     DAnimation {
         id: heightAnimation
 
         target: emptyNodeRoot
         property: "height"
-        to: CONSTS.defaultNodeTreeItemHeight + DStyle.defaultSpacing;
+        to: CONSTS.defaultNodeTreeItemHeight + DStyle.defaultSpacing
 
         onStopped: {
+            // Emit Empty Node Shown Signal
+            emptyNodeRoot.emptyNodeShown();
+            // Start Background Opacity Animation
             bgOpacityAnimation.start();
         }
     }
@@ -129,7 +128,7 @@ Item {
 
         onExited: {
             // Destroy Empty Node
-            parentNode.removeEmptyNode(childIndex);
+            //parentNode.removeEmptyNode();
         }
     }
 }

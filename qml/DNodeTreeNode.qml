@@ -56,7 +56,7 @@ Item {
         target: componentInfo
 
         onChildAdded: {
-            console.log("#### DNodeTreeNode.componentInfoConnections.onChildAdded - aIndex: " + aIndex);
+            console.log("DNodeTreeNode.componentInfoConnections.onChildAdded - aIndex: " + aIndex);
             // Insert Node
             insertNode(aIndex);
             // Expand
@@ -64,14 +64,14 @@ Item {
         }
 
         onChildMoved: {
-            console.log("#### DNodeTreeNode.componentInfoConnections.onChildMoved - aIndex: " + aIndex + " - aTarget: " + aTarget);
+            console.log("DNodeTreeNode.componentInfoConnections.onChildMoved - aIndex: " + aIndex + " - aTarget: " + aTarget);
 
             // Move Node
             moveNode(aIndex, aTarget);
         }
 
         onChildRemoved: {
-            console.log("#### DNodeTreeNode.componentInfoConnections.onChildRemoved - aIndex: " + aIndex);
+            console.log("DNodeTreeNode.componentInfoConnections.onChildRemoved - aIndex: " + aIndex);
 
             // Remove Node
             removeNode(aIndex);
@@ -230,7 +230,7 @@ Item {
 
     // Append Node
     function appendNode() {
-        console.log("DNodeTreeNode.appendNode");
+        //console.log("DNodeTreeNode.appendNode");
 
         // Get New Index
         var newIndex = childNodesModel.count;
@@ -259,7 +259,7 @@ Item {
 
     // Insert Node
     function insertNode(newNodeIndex) {
-        console.log("DNodeTreeNode.insertNode - newNodeIndex: " + newNodeIndex);
+        //console.log("DNodeTreeNode.insertNode - newNodeIndex: " + newNodeIndex);
 
         // Create New Node
         var newNode = nodeRoot.nodeTree.createNode(nodeRoot.componentInfo.childInfo(newNodeIndex), nodeRoot);
@@ -267,7 +267,7 @@ Item {
         // Check New Node
         if (newNode !== null) {
             // Append To Children Node Model
-            childNodesModel.inseert(newNodeIndex, newNode);
+            childNodesModel.insert(newNodeIndex, newNode);
             // Set Width
             newNode.width = Qt.binding(function() { return nodeRoot.width * CONSTS.defaultNodeScaleRatio; });
             // Set Anchor
@@ -290,7 +290,7 @@ Item {
         var nodeObject = childNodesModel.get(nodeIndex);
         // Check Node Object
         if (nodeObject !== null) {
-            console.log("DNodeTreeNode.removeNode - nodeIndex: " + nodeIndex);
+            //console.log("DNodeTreeNode.removeNode - nodeIndex: " + nodeIndex);
 
             // Remove Node Object
             childNodesModel.remove(nodeIndex);
@@ -331,7 +331,6 @@ Item {
 
         // Move Item
         childNodesModel.move(nodeIndex, targetIndex);
-
         // Update Child Indexes
         updateChildIndexes(0);
     }
@@ -397,14 +396,15 @@ Item {
             emptyNode.hideEmptyNode();
             // Reset Empty Node Child Index
             emptyNode.childIndex = -1;
-            // Update Child Indexes
-            updateChildIndexes(0);
         }
+
+        // Update Child Indexes
+        updateChildIndexes(0);
     }
 
     // Update Child Indexes
     function updateChildIndexes(emptyNodeIndex) {
-        console.log("DNodeTreeNode.updateChildIndexes - emptyNodeIndex: " + emptyNodeIndex);
+        //console.log("DNodeTreeNode.updateChildIndexes - emptyNodeIndex: " + emptyNodeIndex);
 
         // Get Children Nodes Count
         var nCount = childNodesModel.count;
@@ -425,6 +425,11 @@ Item {
         anchors.right: parent ? parent.right : undefined
         parentNode: nodeRoot
         nodeTree: nodeRoot.nodeTree
+
+        onEmptyNodeShown: {
+            // Ensure Empty Node Visible
+            nodeTree.ensureEmptyNodeVisible(emptyNode);
+        }
     }
 
     // Drop Area Container
@@ -460,7 +465,7 @@ Item {
         DropArea {
             id: centerDropArea
             width: parent.width
-            height: parent.height * 0.65
+            height: parent.height * 0.6
             anchors.verticalCenter: parent.verticalCenter
 
             onEntered: {
@@ -755,15 +760,15 @@ Item {
             model: childNodesModel
         }
 
-        move: Transition {
-            PropertyAnimation { properties: "y"; duration: DStyle.animDuration }
-        }
+//        move: Transition {
+//            PropertyAnimation { properties: "y"; duration: DStyle.animDuration }
+//        }
     }
 
     // Hover Timer
     Timer {
         id: hoverTimer
-        interval: 300
+        interval: 200
 
         onTriggered: {
             // Check Parent Node

@@ -9,7 +9,7 @@ Item {
     height: 400
 
     default property alias contentContainer: contentContainerColumn.children
-
+    property alias containerColumn: contentContainerColumn
     property alias contentHeight: contentContainerFlickable.contentHeight
     property alias contentY: contentContainerFlickable.contentY
     property bool interactive: true
@@ -17,16 +17,49 @@ Item {
     clip: true
 
     // Flick To Ensure Rectangle Visibility
-    function flick(rectangle) {
+    function flick(rectangle, animated) {
         // Check Content Position
         if (contentContainerFlickable.contentY >= rectangle.y) {
-            // Set Content Position
-            contentContainerFlickable.contentY = rectangle.y;
+            // Check Animated
+            if (animated) {
+                // Set From
+                contentYAnimation.from = contentContainerFlickable.contentY;
+                // Set To
+                contentYAnimation.to = rectangle.y;
+                // Start Animation
+                contentYAnimation.start();
+
+            } else {
+                // Set Content Position
+                contentContainerFlickable.contentY = rectangle.y;
+            }
+
         // Check Content Position
         } else if (contentContainerFlickable.contentY + contentContainerFlickable.height <= rectangle.y + rectangle.height) {
-            // Set Content Position
-            contentContainerFlickable.contentY = rectangle.y + rectangle.height - contentContainerFlickable.height;
+            // Calculate New Content Position
+            var newContentY = rectangle.y + rectangle.height - contentContainerFlickable.height;
+
+            // Check Animated
+            if (animated) {
+                // Set From
+                contentYAnimation.from = contentContainerFlickable.contentY;
+                // Set To
+                contentYAnimation.to = newContentY;
+                // Start Animation
+                contentYAnimation.start();
+
+            } else {
+                // Set Content Position
+                contentContainerFlickable.contentY = newContentY;
+            }
         }
+    }
+
+    PropertyAnimation {
+        id: contentYAnimation
+        target: contentContainerFlickable
+        property: "contentY"
+        duration: DStyle.animDuration * 0.5
     }
 
     Flickable {
