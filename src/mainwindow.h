@@ -138,6 +138,8 @@ private:
 
     // Toggle Show Tracers
     void toggleShowTracers();
+    // Toggle Show Borders
+    void toggleShowBorders();
     // Toggle Show Component Names
     void toggleShowComponentNames();
     // Toggle Slow Motion
@@ -271,6 +273,8 @@ private slots:
     void on_actionGoLive_triggered();
     // Action Show Tracers Triggered Slot
     void on_actionShowTracers_triggered();
+    // Action Show Borders Triggere Slot
+    void on_actionShowBorders_triggered();
     // Action Show Component Names Triggered Slot
     void on_actionShowComponentNames_triggered();
     // Action Slow Motion Triggered Slot

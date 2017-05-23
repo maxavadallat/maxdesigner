@@ -1038,6 +1038,18 @@ void MainWindow::toggleShowTracers()
 }
 
 //==============================================================================
+// Toggle Show Borders
+//==============================================================================
+void MainWindow::toggleShowBorders()
+{
+    // Check Settings
+    if (mSettings) {
+        // Set Show Borders
+        mSettings->setBorderVisible(!mSettings->borderVisible());
+    }
+}
+
+//==============================================================================
 // Toggle Show Component Names
 //==============================================================================
 void MainWindow::toggleShowComponentNames()
@@ -1985,6 +1997,15 @@ void MainWindow::on_actionShowTracers_triggered()
 {
     // Toggle Show Tracers
     toggleShowTracers();
+}
+
+//==============================================================================
+// Action Show Borders Triggere Slot
+//==============================================================================
+void MainWindow::on_actionShowBorders_triggered()
+{
+    // Toggle Show Borders
+    toggleShowBorders();
 }
 
 //==============================================================================

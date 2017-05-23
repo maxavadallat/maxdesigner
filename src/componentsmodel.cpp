@@ -143,11 +143,13 @@ void ComponentsModel::saveAllComponents()
 //==============================================================================
 void ComponentsModel::componentDirtyChanged(const bool& aDirty)
 {
+    Q_UNUSED(aDirty);
+
     // Get Sender Component
     ComponentInfo* senderComponent = static_cast<ComponentInfo*>(sender());
     // Check Sender Component
     if (senderComponent) {
-        qDebug() << "ComponentsModel::componentDirtyChanged - mName: " << senderComponent->mName << " - aDirty: " << aDirty;
+        //qDebug() << "ComponentsModel::componentDirtyChanged - mName: " << senderComponent->mName << " - aDirty: " << aDirty;
         // Get Component Index
         int cIndex = mComponents.keys().indexOf(senderComponent->mName);
         // Check Component Index

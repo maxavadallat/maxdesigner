@@ -12,9 +12,6 @@ Item {
     // Open Recent Files When Panes Are Shown
     property bool openRecentFilesOnShowFinished: false
 
-    // Array For Root Components
-    property var rootComponents: []
-
     // Create New Component Root
     function createNewComponentRoot(componentInfo, width, height) {
         // Incubate Object
@@ -49,9 +46,6 @@ Item {
         // Set Creation Width & Height
         object.creationWidth = width > 0 ? width : CONSTS.defaultNonVisualComponentWidth;
         object.creationHeight = height > 0 ? height : CONSTS.defaultNonVisualComponentHeight;
-
-        // Push Object To Root Components
-        //mainRoot.rootComponents.push(object);
 
         // Show
         object.show();
@@ -768,6 +762,14 @@ Item {
         id: demoContainer
         anchors.centerIn: parent
         visible: false
+    }
+
+    DActivityIndicator {
+        id: systemBusyIndicator
+        width: 256
+        height: 256
+        anchors.centerIn: parent
+        running: DSystemModel.systemBusy
     }
 
     // Toolbar

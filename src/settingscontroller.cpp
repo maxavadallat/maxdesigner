@@ -32,6 +32,7 @@ SettingsController::SettingsController(QObject* aParent)
     : QObject(aParent)
     , mRefCounter(1)
     , mTracerVisible(DEFAULT_SETTINGS_VALUE_TRACER_VISIBLE)
+    , mBorderVisible(DEFAULT_SETTINGS_VALUE_BORDER_VISIBLE)
     , mComponentNamesVisible(DEFAULT_SETTINGS_VALUE_COMPONENT_NAMES_VISIBLE)
     , mSlowMotion(DEFAULT_SETTINGS_VALUE_SLOW_MOTION)
     , mMainWindowState(DEFAULT_SETTINGS_VALUE_MAIN_WINDOW_STATE)
@@ -72,6 +73,7 @@ void SettingsController::loadSettings()
     emit globalUpdateStarted();
 
     setTracerVisible(mSettings.value(SETTINGS_KEY_TRACER_VISIBLE, DEFAULT_SETTINGS_VALUE_TRACER_VISIBLE).toBool());
+    setBorderVisible(mSettings.value(SETTINGS_KEY_BORDER_VISIBLE, DEFAULT_SETTINGS_VALUE_BORDER_VISIBLE).toBool());
     setComponentNamesVisible(mSettings.value(SETTINGS_KEY_COMPONENT_NAMES_VISIBLE, DEFAULT_SETTINGS_VALUE_COMPONENT_NAMES_VISIBLE).toBool());
 
     setMainWindowState(mSettings.value(SETTINGS_KEY_MAIN_WINDOW_STATE, DEFAULT_SETTINGS_VALUE_MAIN_WINDOW_STATE).toInt());
@@ -115,6 +117,7 @@ void SettingsController::saveSettings()
     qDebug() << "SettingsControler::saveSettings";
 
     mSettings.setValue(SETTINGS_KEY_TRACER_VISIBLE, mTracerVisible);
+    mSettings.setValue(SETTINGS_KEY_BORDER_VISIBLE, mBorderVisible);
     mSettings.setValue(SETTINGS_KEY_COMPONENT_NAMES_VISIBLE, mComponentNamesVisible);
     mSettings.setValue(SETTINGS_KEY_MAIN_WINDOW_STATE, mMainWindowState);
     mSettings.setValue(SETTINGS_KEY_DESIGNER_MODE, mDesignerMode);
@@ -155,6 +158,7 @@ void SettingsController::restoreDefaults()
     emit globalUpdateStarted();
 
     setTracerVisible(DEFAULT_SETTINGS_VALUE_TRACER_VISIBLE);
+    setBorderVisible(DEFAULT_SETTINGS_VALUE_BORDER_VISIBLE);
     setMainWindowState(DEFAULT_SETTINGS_VALUE_TRACER_VISIBLE);
     setDesignerMode(DEFAULT_SETTINGS_VALUE_DESIGNER_MODE);
 
@@ -255,6 +259,28 @@ void SettingsController::setTracerVisible(const bool& aVisible)
         emit tracerVisibleChanged(mTracerVisible);
         // Set Dirty
         //setDirty(true);
+    }
+}
+
+//==============================================================================
+// Get Borders Visible
+//==============================================================================
+bool SettingsController::borderVisible()
+{
+    return mBorderVisible;
+}
+
+//==============================================================================
+// Set Borders Visible
+//==============================================================================
+void SettingsController::setBorderVisible(const bool& aVisible)
+{
+    // Check Border Visible
+    if (mBorderVisible != aVisible) {
+        // Set Border Visible
+        mBorderVisible = aVisible;
+        // Emit Border Visible Changed Signal
+        emit borderVisibleChanged(mBorderVisible);
     }
 }
 

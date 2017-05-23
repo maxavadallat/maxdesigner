@@ -145,11 +145,13 @@ void ViewsModel::saveAllComponents()
 //==============================================================================
 void ViewsModel::componentDirtyChanged(const bool& aDirty)
 {
+    Q_UNUSED(aDirty);
+
     // Get Sender Component
     ComponentInfo* senderComponent = static_cast<ComponentInfo*>(sender());
     // Check Sender Component
     if (senderComponent) {
-        qDebug() << "ViewsModel::componentDirtyChanged - mName: " << senderComponent->mName << " - aDirty: " << aDirty;
+        //qDebug() << "ViewsModel::componentDirtyChanged - mName: " << senderComponent->mName << " - aDirty: " << aDirty;
         // Get Component Index
         int vIndex = mViews.keys().indexOf(senderComponent->mName);
         // Check Component Index

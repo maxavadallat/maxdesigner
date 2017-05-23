@@ -3,6 +3,7 @@
 
 
 #define DEFAULT_SETTINGS_VALUE_TRACER_VISIBLE                   false
+#define DEFAULT_SETTINGS_VALUE_BORDER_VISIBLE                   true
 #define DEFAULT_SETTINGS_VALUE_COMPONENT_NAMES_VISIBLE          false
 #define DEFAULT_SETTINGS_VALUE_SLOW_MOTION                      false
 

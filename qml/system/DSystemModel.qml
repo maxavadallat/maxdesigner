@@ -12,4 +12,5 @@ QtObject {
     signal cancelMarkForDeletion()
 
     // ...
+
 }

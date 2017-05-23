@@ -114,5 +114,10 @@
         <file>qml/DNodePane.qml</file>
         <file>qml/DMaskedImage.qml</file>
         <file>qml/DNodeTreeEmptyNode.qml</file>
+        <file>qml/DTransitionTree.qml</file>
+        <file>qml/DTransitionTreeNode.qml</file>
+        <file>qml/DTransitionTreeEmptyNode.qml</file>
+        <file>qml/DComponentContainer.qml</file>
+        <file>qml/DDropArea.qml</file>
     </qresource>
 </RCC>

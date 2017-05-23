@@ -13,9 +13,6 @@ DMouseArea {
 
     default property alias mainContainer: contentContainer.children
 
-    property alias rootContainer: rootContainer
-    property alias contentContainer: contentContainer
-
     property int minWidth: 0
     property int minHeight: 0
 
@@ -169,14 +166,7 @@ DMouseArea {
         anchors.fill: parent
     }
 
-    // Root Container
-    Item {
-        id: rootContainer
-        anchors.fill: parent
-        clip: true
-    }
-
-    // Content/Children Container
+    // Main Conent Container
     Item {
         id: contentContainer
         anchors.fill: parent

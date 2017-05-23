@@ -60,10 +60,21 @@ DSection {
                 propertyValue: model.pValue
                 propertyEnums: model.pEnums
                 showFormula: model.pIsFormula || model.pIsBind
+                actionButtonText: !model.pIsProto && !model.pUseProto ? "Reset" : "Delete"
+                enableSwipe: model.pIsProto || (!model.pIsProto && !model.pUseProto)
 
                 property int sourceIndex: ownPropertiesListView.opFilter.getSourceIndex(itemIndex)
 
-                onItemActionClicked: propertiesController.removeComponentProperty(propertyName);
+                onItemActionClicked: {
+                    if (model.pIsProto) {
+                        // Remove Property
+                        propertiesController.removeComponentProperty(propertyName);
+                    } else {
+                        // Reset Property
+                        propertiesController.clearComponentProperty(propertyName);
+                    }
+                }
+
                 onItemEditClicked: propertiesPaneRoot.editPropertyLaunch(sourceIndex);
                 onFormulaEditClicked: propertiesPaneRoot.editFormulaLaunch(propertyName, true);
                 onItemValueChanged: propertiesController.setComponentProperty(propertyName, newValue);

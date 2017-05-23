@@ -202,7 +202,7 @@ bool ComponentInfo::load(const QString& aFilePath, const bool aCreateChildren)
     // Init Component Info File
     QFile ciFile(mInfoPath);
 
-    qDebug() << "ComponentInfo::load - fileName: " << ciFile.fileName();
+    //qDebug() << "ComponentInfo::load - fileName: " << ciFile.fileName();
 
     // Open File
     if (ciFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -456,7 +456,7 @@ void ComponentInfo::setComponentContainer(QObject* aContainer)
 {
     // Check Container
     if (mContainer != aContainer) {
-        qDebug() << "ComponentInfo::setComponentContainer - aContainer: " << aContainer;
+        //qDebug() << "ComponentInfo::setComponentContainer - aContainer: " << aContainer;
         // Set QML Container
         mContainer = aContainer;
         // Emit QML Container Changed Signal
@@ -639,7 +639,7 @@ QString ComponentInfo::posX()
 void ComponentInfo::setPosX(const QString& aPosX)
 {
     // Set Component Property
-    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_X, aPosX);
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_X, aPosX.toInt());
     // Emit Pos X Changed Signal
     emit posXChanged(posX());
 }
@@ -658,7 +658,7 @@ QString ComponentInfo::posY()
 void ComponentInfo::setPosY(const QString& aPosY)
 {
     // Set Component Property
-    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Y, aPosY);
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Y, aPosY.toInt());
     // Emit Pos Y Changed Signal
     emit posYChanged(posY());
 }
@@ -677,7 +677,7 @@ QString ComponentInfo::posZ()
 void ComponentInfo::setPosZ(const QString& aPosZ)
 {
     // Set Component Property
-    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Z, aPosZ);
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Z, aPosZ.toDouble());
     // Emit Pos Z Changed Signal
     emit posZChanged(posZ());
 }
@@ -696,7 +696,7 @@ QString ComponentInfo::width()
 void ComponentInfo::setWidth(const QString& aWidth)
 {
     // Set Property - Width
-    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth.toInt());
     // Emit Width Changed Signal
     emit widthChanged(width());
 }
@@ -715,7 +715,7 @@ QString ComponentInfo::height()
 void ComponentInfo::setHeight(const QString& aHeight)
 {
     // Set Property - Height
-    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight.toInt());
     // Emit Height Changed Signal
     emit heightChanged(height());
 }
@@ -939,7 +939,7 @@ void ComponentInfo::setDirty(const bool& aDirty)
 {
     // Check Dirty
     if (mDirty != aDirty) {
-        //qDebug() << "ComponentInfo::setDirty - mName: " << mName << " - aDirty: " << aDirty;
+        //qDebug() << "ComponentInfo::setDirty - path: " << componentPath() << " - aDirty: " << aDirty;
 
         // Set Dirty
         mDirty = aDirty;
@@ -1874,7 +1874,9 @@ QString ComponentInfo::liveCodeFormatOwnProperties(QStringList& aOPHooks, QStrin
     QString liveCode = "";
 
     // Get Own Properties Keys
-    QStringList opKeys = componentOwnPropertyKeys(); //mOwnProperties.keys();
+    QStringList opKeys = componentOwnPropertyKeys();
+    // Get Property Keys
+    QStringList pKeys = inheritedPropertyKeys();
     // Get Own Properties Count
     int opCount = opKeys.count();
 
@@ -1901,13 +1903,17 @@ QString ComponentInfo::liveCodeFormatOwnProperties(QStringList& aOPHooks, QStrin
                     // Set Value
                     pValue = QString("\"%1\"").arg(pValue);
                 }
-                // Check If Built In Component
-                if (mBuiltIn) {
-                    // Append Live Code
-                    liveCode += QString("%1%3: %4\n").arg(aIndent).arg(opKeys[i]).arg(pValue);
-                } else {
-                    // Append Live Code
-                    liveCode += QString("%1property %2 %3: %4\n").arg(aIndent).arg(pType).arg(opKeys[i]).arg(pValue);
+
+                // Check Inherited Property Keys
+                if (pKeys.indexOf(opKeys[i]) == -1) {
+                    // Check If Built In Component
+                    if (mBuiltIn) {
+                        // Append Live Code
+                        liveCode += QString("%1%3: %4\n").arg(aIndent).arg(opKeys[i]).arg(pValue);
+                    } else {
+                        // Append Live Code
+                        liveCode += QString("%1property %2 %3: %4\n").arg(aIndent).arg(pType).arg(opKeys[i]).arg(pValue);
+                    }
                 }
 
                 // Check Property Type
@@ -2542,7 +2548,7 @@ QVariant ComponentInfo::componentProperty(const QString& aName)
 //==============================================================================
 // Set Property - Simple!!!
 //==============================================================================
-void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& aValue)
+bool ComponentInfo::setComponentProperty(const QString& aName, const QVariant& aValue)
 {
     //qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue;
 
@@ -2550,7 +2556,7 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
     if (mProperties.keys().indexOf(aName) >= 0) {
         // Check Value
         if (mProperties.value(aName).toString() != aValue.toString()) {
-            qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - INHERITED";
+            //qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - INHERITED";
             // Set Property
             mProperties[aName] = aValue.toString();
             // Set Dirty
@@ -2560,9 +2566,11 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
                 // Emit Property Changed Signal
                 emit componentPropertyChanged(aName, aValue);
             }
+
+            return true;
         }
 
-        return;
+        return false;
     }
 
     // Check Own Property Keys
@@ -2574,7 +2582,7 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
 
         // Check Value
         if (Utils::parseValue(typeAndValue, true) != aValue.toString()) {
-            qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - OWN";
+            //qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - OWN";
 
             // Set New Type And Value
             typeAndValue = Utils::composeTypeAndValue(tavElements[0],
@@ -2592,42 +2600,20 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
                 // Emit Property Changed Signal
                 emit componentPropertyChanged(aName, aValue);
             }
+
+            return true;
         }
 
-        return;
+        return false;
     }
 
-    // Check ProtoType
-    if (mProtoType) {
-        // Check ProtoType Own Properties
-        if (mProtoType->mOwnProperties.keys().indexOf(aName) >= 0) {
-            // Get ProtoType Type & Value
-            QString ptTypeAndValue = mProtoType->mOwnProperties.value(aName).toString();
-            // Check Value
-            if (Utils::parseValue(ptTypeAndValue, true) != aValue.toString()) {
-                qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - PROTOTYPE";
-                // Store To Properties
-                mProperties[aName] = aValue.toString();
-                // Set Dirty
-                setDirty(true);
-                // Check If Filtered Property Change
-                if (mProject->filteredProperties().indexOf(aName) == -1) {
-                    // Emit Property Changed Signal
-                    emit componentPropertyChanged(aName, aValue);
-                }
-            }
-
-            return;
-        }
-    }
-
-    // Check Base Component
-    if (mBase && mBase->hasProperty(aName)) {
-        // Get Value
-        QVariant bValue = mBase->componentProperty(aName);
+    // Check ProtoType Own Properties
+    if (mProtoType && mProtoType->mOwnProperties.keys().indexOf(aName) >= 0) {
+        // Get ProtoType Type & Value
+        QString ptTypeAndValue = mProtoType->mOwnProperties.value(aName).toString();
         // Check Value
-        if (bValue != aValue) {
-            qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - BASE";
+        if (Utils::parseValue(ptTypeAndValue, true) != aValue.toString()) {
+            //qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - PROTOTYPE";
             // Store To Properties
             mProperties[aName] = aValue.toString();
             // Set Dirty
@@ -2637,9 +2623,34 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
                 // Emit Property Changed Signal
                 emit componentPropertyChanged(aName, aValue);
             }
+
+            return true;
         }
 
-        return;
+        return false;
+    }
+
+    // Check Base Component
+    if (mBase && mBase->hasProperty(aName)) {
+        // Get Value
+        QVariant bValue = mBase->componentProperty(aName);
+        // Check Value
+        if (bValue != aValue) {
+            //qDebug() << "ComponentInfo::setComponentProperty - aName: " << aName << " - aValue: " << aValue << " - BASE";
+            // Store To Properties
+            mProperties[aName] = aValue.toString();
+            // Set Dirty
+            setDirty(true);
+            // Check If Filtered Property Change
+            if (mProject->filteredProperties().indexOf(aName) == -1) {
+                // Emit Property Changed Signal
+                emit componentPropertyChanged(aName, aValue);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     // Add Own Property - NOT RECOMMENDED!! Use Own Properties Model to Add Properties!
@@ -2672,6 +2683,8 @@ void ComponentInfo::setComponentProperty(const QString& aName, const QVariant& a
     setDirty(true);
 
     // ...
+
+    return true;
 }
 
 //==============================================================================
@@ -3020,6 +3033,16 @@ void ComponentInfo::moveChild(ComponentInfo* aChildInfo, const int& aIndex, Comp
         ComponentInfo* takenChild = aChildInfo->takeChild(aIndex);
 
         qDebug() << "ComponentInfo::moveChild - mName: " << takenChild->mName << " -> " << aTargetChildInfo->componentPath() << " - aTargetIndex: " << aTargetIndex;
+
+        // Reset Pos
+        takenChild->setPosX(QString("4"));
+        takenChild->setPosY(QString("4"));
+
+        // Reset Anchors
+        while (!takenChild->mAnchors.empty()) {
+            // Remove Last
+            takenChild->mAnchors.erase(takenChild->mAnchors.end());
+        }
 
         // Insert Child
         aTargetChildInfo->insertChild(aTargetIndex, takenChild);

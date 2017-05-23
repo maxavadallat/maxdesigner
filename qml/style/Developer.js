@@ -16,6 +16,10 @@ var colorBorderNoFocus                              = "#FF57787F";
 var colorBorderSelected                             = "yellow"//"#FFEC6302";
 // Default Unfocused Transparent Border Color
 var colorBorderTransparent                          = "#7757787F";
+// Default Hover Ok
+var colorBorderHoverOK                              = "yellow";
+// Default Hover Not Ok
+var colorBorderHoverNOK                             = "red";
 
 // Defaukt Shadow Color
 var colorShadow                                     = "#EE000000";

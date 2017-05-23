@@ -139,14 +139,36 @@ void ProjectModel::createInitialComponents()
 
     // Create Base Components - Built-in's
     createBaseComponent("QtObject", "", COMPONENT_CATEGORY_NONVISUAL, true);
+
+    // Create Base Components - Built-in Visuals
     createBaseComponent("Item", "QtObject", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-    createBaseComponent("Row", "Item", COMPONENT_CATEGORY_LAYOUT, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-    createBaseComponent("Column", "Item", COMPONENT_CATEGORY_LAYOUT, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
     createBaseComponent("Rectangle", "Item", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-    createBaseComponent("Image", "Item", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-    createBaseComponent("BorderImage", "Item", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
     createBaseComponent("MouseArea", "Item", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
     createBaseComponent("Loader", "Item", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+
+    // Create Base Components - Built-in Layout
+    createBaseComponent("Row", "Item", COMPONENT_CATEGORY_LAYOUT, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    createBaseComponent("Column", "Item", COMPONENT_CATEGORY_LAYOUT, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    createBaseComponent("Flow", "Item", COMPONENT_CATEGORY_LAYOUT, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+
+    // Create Base Components - Built-in Images
+    createBaseComponent("Image", "Item", COMPONENT_CATEGORY_IMAGE, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    createBaseComponent("BorderImage", "Item", COMPONENT_CATEGORY_IMAGE, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+
+    // Create Base Components - Built-in Containers
+    createBaseComponent("Flickable", "Item", COMPONENT_CATEGORY_CONTAINER, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    createBaseComponent("ListView", "Item", COMPONENT_CATEGORY_CONTAINER, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    createBaseComponent("GridView", "Item", COMPONENT_CATEGORY_CONTAINER, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    createBaseComponent("Repeater", "Item", COMPONENT_CATEGORY_CONTAINER, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+
+    // Create Base Components - Built-in Animations
+    createBaseComponent("Animation", "", COMPONENT_CATEGORY_ANIMATION, true);
+    createBaseComponent("ParallelAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
+    createBaseComponent("SequentialAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
+    createBaseComponent("PauseAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
+    createBaseComponent("PropertyAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
+    createBaseComponent("PropertyAction", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
+    createBaseComponent("ScriptAction", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
 
     // ...
 
@@ -154,12 +176,21 @@ void ProjectModel::createInitialComponents()
     createDataSource("SystemModel");
     // Create Data Source - Style
     createDataSource("Style");
+    // Create Data Source - Constants
+    createDataSource("Consts");
+    // Create Data Source - Settings Model
+    createDataSource("SettingsModel");
+//    // Create Data Source - Media Model
+//    createDataSource("MediaModel");
+//    // Create Data Source - Phone Model
+//    createDataSource("ConnectivityModel");
+//    // Create Data Source - Phone Model
+//    createDataSource("PhoneModel");
 
     // ...
 
     // Create View - App Base
     createView("AppBase", "Item", DEFAULT_VIEW_WIDTH, DEFAULT_VIEW_HEIGHT);
-
     // Create Main View
     createView("MainView", "Item", screenWidth(), screenHeight());
 

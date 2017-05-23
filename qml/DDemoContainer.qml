@@ -47,8 +47,27 @@ DContainer {
         item.y = posY;
     }
 
+    // Array Move
+    function arrayMove(ref, from, to) {
+        var element = ref.array[from];
+        ref.array.splice(from, 1);
+        ref.array.splice(to, 0, element);
+    }
 
     Component.onCompleted: {
+
+//        var temp = { "array": [0, 1, 2, 3, 4, 5, 6] };
+
+//        console.log("#### temp: " + temp.array);
+
+//        arrayMove(temp, 6, 5);
+
+//        console.log("#### temp: " + temp.array);
+
+//        arrayMove(temp, 5, 4);
+
+//        console.log("#### temp: " + temp.array);
+
         // Open Project
         //mainController.openProject("/Users/max/Dev/Temp/myproject/myproject.json");
 
@@ -59,7 +78,7 @@ DContainer {
         //propertyEditor.show();
 
         // Select Component
-        //propertiesController.selectComponent("Button3D");
+        //propertiesController.selectComponent("MyRectangle");
 
         // Set Component Info
         //demoContainer.componentInfo = propertiesController.focusedComponent;
@@ -113,8 +132,7 @@ DContainer {
 */
     }
 
-
-
+/*
     DNodePane {
         id: demoPane
         anchors.verticalCenter: parent.verticalCenter
@@ -124,8 +142,32 @@ DContainer {
 
         minWidth: 480
         minHeight: 200
-
     }
+
+    DButton {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: DStyle.defaultMargin
+
+        text: "Add Child"
+
+        onClicked: {
+            // Previous Focused Component
+            var lastFocused = propertiesController.focusedComponent;
+
+            // Select Item
+            propertiesController.selectComponent("Item");
+            // Get New Item Clone
+            var newItem = propertiesController.focusedComponent.clone();
+
+            // Set Focused Component
+            propertiesController.focusedComponent = lastFocused;
+
+            // Insert Child
+            propertiesController.focusedComponent.insertChild(0, newItem);
+        }
+    }
+*/
 
 /*
     DNodeTreeEmptyNode {

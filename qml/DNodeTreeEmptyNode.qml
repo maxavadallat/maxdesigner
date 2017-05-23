@@ -108,11 +108,13 @@ Item {
                     // TODO: More Checking
 
                     // Add Child To Parent Node Component
-                    parentNode.componentInfo.addChild(draggedComponentInfo.clone());
+                    parentNode.componentInfo.insertChild(emptyNodeRoot.childIndex, draggedComponentInfo.clone());
 
                 // Drop Another Child Node
                 } else if (drop.keys[0] === CONSTS.childComponentDragKey) {
                     console.log("DNodeTreeEmptyNode.emptyNodeDropArea.onDropped - CHILD DRAG & DROP!");
+
+                    // TODO: Add More Checking
 
                     // Move Child
                     draggedComponentInfo.componentParent.moveChild(draggedComponentInfo.componentParent, nodeTree.grabbedIndex,

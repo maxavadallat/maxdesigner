@@ -2,6 +2,7 @@
 #define SETTINGSKEYS_H
 
 #define SETTINGS_KEY_TRACER_VISIBLE                         "tracerVisible"
+#define SETTINGS_KEY_BORDER_VISIBLE                         "borderVisible"
 #define SETTINGS_KEY_COMPONENT_NAMES_VISIBLE                "showComponentNames"
 #define SETTINGS_KEY_SLOW_MOTION                            "slowMotion"
 

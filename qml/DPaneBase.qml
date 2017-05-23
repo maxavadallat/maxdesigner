@@ -359,6 +359,7 @@ DContainer {
     // Title
     DText {
         id: titleTextLabel
+        parent: paneBaseRoot
         anchors.left: parent.left
         anchors.leftMargin: DStyle.defaultMargin
         anchors.top: parent.top
@@ -467,8 +468,10 @@ DContainer {
         }
     }
 
+    // Dummy For Transitions
     Item {
         id: dummy
+        parent: paneBaseRoot
         visible: false
     }
 

@@ -13,6 +13,7 @@ class SettingsController : public QObject
     Q_OBJECT
 
     Q_PROPERTY(bool tracerVisible READ tracerVisible WRITE setTracerVisible NOTIFY tracerVisibleChanged)
+    Q_PROPERTY(bool borderVisible READ borderVisible WRITE setBorderVisible NOTIFY borderVisibleChanged)
     Q_PROPERTY(bool slowMotion READ slowMotion WRITE setSlowMotion NOTIFY slowMotionChanged)
     Q_PROPERTY(bool componentNamesVisible READ componentNamesVisible WRITE setComponentNamesVisible NOTIFY componentNamesVisibleChanged)
 
@@ -72,6 +73,11 @@ public:
     bool tracerVisible();
     // Set Tracer Visible
     void setTracerVisible(const bool& aVisible);
+
+    // Get Borders Visible
+    bool borderVisible();
+    // Set Borders Visible
+    void setBorderVisible(const bool& aVisible);
 
     // Get Slow Motion
     bool slowMotion();
@@ -164,6 +170,8 @@ public:
 signals:
     // Tracer Visible Changed Signal
     void tracerVisibleChanged(const bool& aVisible);
+    // Border Visible Changed Signal
+    void borderVisibleChanged(const bool& aVisible);
     // Slow Motion Changed Signal
     void slowMotionChanged(const bool& aSlowMotion);
     // Component names Visible Changed Signal
@@ -221,6 +229,8 @@ private:
 
     // Tracer Visible
     bool            mTracerVisible;
+    // Border Visible
+    bool            mBorderVisible;
     // Component Names Visible
     bool            mComponentNamesVisible;
     // Slow Motion

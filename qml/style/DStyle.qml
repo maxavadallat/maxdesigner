@@ -41,6 +41,10 @@ QtObject {
     readonly property string colorBorderSelected:           configArray[styleIndex].colorBorderSelected     //"#FFEC6302"
     // Default Unfocused Transparent Border Color
     readonly property string colorBorderTransparent:        configArray[styleIndex].colorBorderTransparent  //"#7757787F"
+    // Default Hover Ok
+    readonly property string colorBorderHoverOK:            configArray[styleIndex].colorBorderHoverOK      // "yellow";
+    // Default Hover Not Ok
+    readonly property string colorBorderHoverNOK:           configArray[styleIndex].colorBorderHoverNOK     // "red";
 
     // Defaukt Shadow Color
     readonly property string colorShadow:                   configArray[styleIndex].colorShadow             //"#EE000000"

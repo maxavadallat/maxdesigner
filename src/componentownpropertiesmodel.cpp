@@ -88,6 +88,9 @@ void ComponentOwnPropertiesModel::generateOwnPropertyKeys()
         return;
     }
 
+    // Get Own Property Keys
+    mKeys = mComponent->componentOwnPropertyKeys();
+/*
     // Set Keys
     mKeys = mComponent->mOwnProperties.keys();
 
@@ -100,6 +103,7 @@ void ComponentOwnPropertiesModel::generateOwnPropertyKeys()
         // Remove Duplicates
         mKeys.removeDuplicates();
     }
+*/
 
     //qDebug() << "ComponentOwnPropertiesModel::generateOwnPropertyKeys - mComponent: " << mComponent->mName << " - mKeys: " << mKeys;
 }
@@ -314,6 +318,7 @@ void ComponentOwnPropertiesModel::updateComponentProperty(const int& aIndex,
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
+        qDebug() << "ComponentOwnPropertiesModel::updateComponentProperty - aIndex: " << aIndex;
         // Remove Component Property
         removeComponentProperty(aName);
         // Add Component Property
@@ -388,7 +393,8 @@ bool ComponentOwnPropertiesModel::hasProperty(const QString& aName)
 {
     // Check Component
     if (mComponent) {
-        return (mComponent->mOwnProperties.keys().indexOf(aName) >= 0);
+        return (mKeys.indexOf(aName) >= 0);
+        //return (mComponent->mOwnProperties.keys().indexOf(aName) >= 0);
     }
 
     return false;
@@ -400,8 +406,23 @@ bool ComponentOwnPropertiesModel::hasProperty(const QString& aName)
 bool ComponentOwnPropertiesModel::removeComponentProperty(const QString& aName)
 {
     // Check Component
-    if (mComponent && mComponent->mIsProtoType && !aName.isEmpty() && mComponent->mOwnProperties.keys().indexOf(aName) >= 0) {
+    if (!mComponent) {
+        return false;
+    }
+
+    // Get Key Index
+    int cpkIndex = mKeys.indexOf(aName);
+
+    // Check Key Index
+    if (cpkIndex < 0) {
+        return false;
+    }
+
+    // Check Component
+    if (mComponent->mIsProtoType && !aName.isEmpty()) {
+
         qDebug() << "ComponentOwnPropertiesModel::removeComponentProperty - aName: " << aName;
+
         // Remove Key
         mComponent->mOwnProperties.remove(aName);
         // Set Component Dirty
@@ -410,8 +431,7 @@ bool ComponentOwnPropertiesModel::removeComponentProperty(const QString& aName)
         emit mComponent->ownPropertyRemoved(aName);
         // Emit Property Removed Signal
         emit ownPropertyRemoved(aName);
-        // Get Key Index
-        int cpkIndex = mKeys.indexOf(aName);
+
         // Begin Remove Rows
         beginRemoveRows(QModelIndex(), cpkIndex, cpkIndex);
         // Generate Own Property Keys
@@ -445,39 +465,52 @@ bool ComponentOwnPropertiesModel::setComponentProperty(const QString& aName, con
 
     qDebug() << "ComponentOwnPropertiesModel::setComponentProperty - aName: " << aName << " - aValue: " << aValue;
 
-    // Check If ProtoType
-    if (mComponent->mIsProtoType) {
-        // Get Property Type And Value
-        QString cpTypeAndValue = mComponent->mOwnProperties[aName].toString();
+//    // Check If ProtoType
+//    if (mComponent->mIsProtoType) {
+//        // Get Property Type And Value
+//        QString cpTypeAndValue = mComponent->mOwnProperties[aName].toString();
 
-        // Get Type
-        QString pType = Utils::parseType(cpTypeAndValue);
-        // Get Min
-        QString pMin = Utils::parseMinValue(cpTypeAndValue);
-        // Get Max
-        QString pMax = Utils::parseMaxValue(cpTypeAndValue);
-        // Get Enum Values
-        QString pEnums = Utils::parseEnumValuesToString(cpTypeAndValue);
+//        // Get Type
+//        QString pType = Utils::parseType(cpTypeAndValue);
+//        // Get Min
+//        QString pMin = Utils::parseMinValue(cpTypeAndValue);
+//        // Get Max
+//        QString pMax = Utils::parseMaxValue(cpTypeAndValue);
+//        // Get Enum Values
+//        QString pEnums = Utils::parseEnumValuesToString(cpTypeAndValue);
 
-        // Set Component Own Property
-        mComponent->mOwnProperties[aName] = Utils::composeTypeAndValue(pType, aValue.toString(), pMin, pMax, pEnums);
+//        // Set Component Own Property
+//        mComponent->mOwnProperties[aName] = Utils::composeTypeAndValue(pType, aValue.toString(), pMin, pMax, pEnums);
 
-    } else {
-        // Set Component Property Value
-        mComponent->mOwnProperties[aName] = aValue.toString();
+//    } else {
+//        // Set Component Property Value
+//        mComponent->mOwnProperties[aName] = aValue.toString();
+//    }
+
+//    // Set Component Dirty
+//    mComponent->setDirty(true);
+
+//    // Emit Component Property Changed
+//    emit mComponent->componentPropertyChanged(aName, aValue);
+//    // Emit Component Property Value Changed
+//    emit ownPropertyValueChanged(aName, aValue);
+
+    if (mDerivedComponent && mDerivedComponent->setComponentProperty(aName, aValue)) {
+        // Emit Data Changed Signal
+        emit dataChanged(index(cpkIndex), index(cpkIndex));
+
+        return true;
     }
 
-    // Set Component Dirty
-    mComponent->setDirty(true);
+    // Set Component Property
+    if (mComponent->setComponentProperty(aName, aValue)) {
+        // Emit Data Changed Signal
+        emit dataChanged(index(cpkIndex), index(cpkIndex));
 
-    // Emit Component Property Changed
-    emit mComponent->componentPropertyChanged(aName, aValue);
-    // Emit Component Property Value Changed
-    emit ownPropertyValueChanged(aName, aValue);
-    // Emit Data Changed Signal
-    emit dataChanged(index(cpkIndex), index(cpkIndex));
+        return true;
+    }
 
-    return true;
+    return false;
 }
 
 //==============================================================================
@@ -490,28 +523,34 @@ bool ComponentOwnPropertiesModel::clearComponentProperty(const QString& aName)
         return false;
     }
 
+    // Get Key Index
+    int cpkIndex = mKeys.indexOf(aName);
+
+    // Check Key Index
+    if (cpkIndex < 0) {
+        return false;
+    }
+
     qDebug() << "ComponentOwnPropertiesModel::clearComponentProperty - aName: " << aName;
 
-    // Get Key Index
-    int kIndex = mKeys.indexOf(aName);
+    // Init Component For Clear Property
+    ComponentInfo* component = mDerivedComponent ? mDerivedComponent : mComponent;
 
     // Check If Prototype
-    if (!mComponent->mIsProtoType && kIndex >= 0) {
-        // Get Own Property Key
-        int opkIndex = mComponent->mOwnProperties.keys().indexOf(aName);
+    if (!component->mIsProtoType) {
+        // Get Property Keys Index
+        int pkIndex = component->mProperties.keys().indexOf(aName);
 
-        // Check Own Property Key Index
-        if (opkIndex >= 0) {
-            // Remove Key
-            mComponent->mOwnProperties.remove(aName);
-            // Set Component Dirty
-            mComponent->setDirty(true);
-
-//            // Generate Merged Keys
-//            generateMergedKeys();
-
+        // Check Property Key Index
+        if (pkIndex >= 0) {
+            // Remov Property
+            component->mProperties.remove(aName);
+            // Set Dirty
+            component->setDirty(true);
+            // Emit Component Property Changed
+            emit component->componentPropertyChanged(aName, component->componentProperty(aName));
             // Emit Data Changed Signal
-            emit dataChanged(index(kIndex), index(kIndex));
+            emit dataChanged(index(cpkIndex), index(cpkIndex));
 
             return true;
         }
@@ -545,6 +584,76 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
     if (copRow >= 0 && copRow < rowCount()) {
         // Get Key
         QString opKey = mKeys[copRow];
+
+        // Init Type & Value
+        QString opTypeAndValue = mDerivedComponent ? mDerivedComponent->propertyTypeAndValue(opKey) : mComponent->propertyTypeAndValue(opKey);
+
+        // Init Derived Component Key Index
+        int dcpkIndex = mDerivedComponent ? mDerivedComponent->mProperties.keys().indexOf(opKey) : -1;
+
+        // Init Using Base Property Vaue
+        bool opBase = (dcpkIndex == -1);
+
+        // Get Type
+        QString opType = Utils::parseType(opTypeAndValue);
+
+        // Get Formula
+        bool opFormula = Utils::hasFormula(opTypeAndValue) > 0;
+
+        // Get Property Bind
+        bool opBind = Utils::hasBinding(opTypeAndValue) > 0;
+
+        // Get Enum Values
+        QString opEnumValues = Utils::parseEnumValuesToString(opTypeAndValue);
+
+        // Get Inherited Property Key Index
+        int ipkIndex = mComponent->mProperties.keys().indexOf(opKey);
+
+        // Init Component Is a Prototype
+        bool opProtoType = mComponent->mIsProtoType;
+
+        // Init Using Prototype Property Value
+        bool opUseProto = mComponent->mIsProtoType ? false : (ipkIndex == -1);
+
+        // Init Property Value
+        QString opValue = "";
+
+        // Check Derived Component Property Key Index
+        if (dcpkIndex >= 0) {
+            // Set Property Value
+            opValue = mDerivedComponent->mProperties.value(opKey).toString();
+
+        // Check Inherited Property Key Index
+        } else if (ipkIndex >= 0) {
+            // Set Property Value
+            opValue = mComponent->mProperties.value(opKey).toString();
+
+        } else {
+
+            // Set Property Value
+            opValue = Utils::parseValue(opTypeAndValue);
+        }
+
+        // TODO: Handle Bindings And Formulas Better!!
+
+        // ...
+
+        // Switch Role
+        switch (role) {
+            default:
+            case PropertyNameRole:      return opKey;
+            case PropertyTypeRole:      return opType;
+            case PropertyEnumsRole:     return opEnumValues;
+            case PropertyValueRole:     return opValue;
+            case PropertyIsBind:        return opBind;
+            case PropertyIsFormula:     return opFormula;
+            case PropertyIsProto:       return opProtoType;
+            case PropertyUseProto:      return opUseProto;
+            case PropertyIsBase:        return opBase;
+        }
+
+
+/*
         // Get Own Property Key Index
         int opkIndex = mComponent->mOwnProperties.keys().indexOf(opKey);
 
@@ -608,6 +717,7 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
                 case PropertyIsBase:        return opBase;
             }
         }
+*/
     }
 
     return QVariant();
@@ -628,6 +738,7 @@ QHash<int, QByteArray> ComponentOwnPropertiesModel::roleNames() const
     rNames[PropertyIsBind]    = "pIsBind";
     rNames[PropertyIsFormula] = "pIsFormula";
     rNames[PropertyIsProto]   = "pIsProto";
+    rNames[PropertyUseProto]  = "pUseProto";
     rNames[PropertyIsBase]    = "pIsBase";
 
     return rNames;

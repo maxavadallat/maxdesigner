@@ -218,15 +218,26 @@ public:
 
     // Get Pos X
     QString posX();
+    // Set Pos X
+    Q_INVOKABLE void setPosX(const QString& aPosX);
+
     // Get Pos Y
     QString posY();
+    // Set Pos Y
+    Q_INVOKABLE void setPosY(const QString& aPosY);
+
     // Get Pos Z
     QString posZ();
 
     // Get Width
     QString width();
+    // Set Width
+    Q_INVOKABLE void setWidth(const QString& aWidth);
+
     // Get Height
     QString height();
+    // Set Height
+    Q_INVOKABLE void setHeight(const QString& aHeight);
 
     // Left Anchor Target
     QString anchorsLeft();
@@ -578,19 +589,10 @@ protected:
     void setComponentObjectName(const QString& aObjectName);
 
     // Set Component Property - SIMPLE!!!
-    void setComponentProperty(const QString& aName, const QVariant& aValue);
+    bool setComponentProperty(const QString& aName, const QVariant& aValue);
 
-    // Set Pos X
-    void setPosX(const QString& aPosX);
-    // Set Pos Y
-    void setPosY(const QString& aPosY);
     // Set Pos Z
     void setPosZ(const QString& aPosZ);
-
-    // Set Width
-    void setWidth(const QString& aWidth);
-    // Set Height
-    void setHeight(const QString& aHeight);
 
     // Set Dirty State
     void setDirty(const bool& aDirty);

@@ -128,6 +128,7 @@ public:
         PropertyIsBind,
         PropertyIsFormula,
         PropertyIsProto,
+        PropertyUseProto,
         PropertyIsBase
     };
 

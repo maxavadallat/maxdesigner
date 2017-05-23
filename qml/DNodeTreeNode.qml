@@ -39,14 +39,14 @@ Item {
     property string title: componentInfo !== null ? ("[" + childIndex + "]: " + componentInfo.componentPath) : "Title test"
     // Node Child Index
     property int childIndex: -1
-    // Node's grabbed Child Index
+    // Node's Grabbed Child Index
     property int grabbedChildIndex: -1
     // Node Expanded State
     property bool expanded: false
     // Node Intialized - Component Completed
     property bool nodeInit: false
     // Node Grabbed
-    property bool grabbed: false
+    property bool nodeGrabbed: false
     // Parent Node Tree
     property QtObject nodeTree: null
     // Parent Node
@@ -56,7 +56,7 @@ Item {
         target: componentInfo
 
         onChildAdded: {
-            console.log("DNodeTreeNode.componentInfoConnections.onChildAdded - aIndex: " + aIndex);
+            //console.log("DNodeTreeNode.componentInfoConnections.onChildAdded - aIndex: " + aIndex);
             // Insert Node
             insertNode(aIndex);
             // Expand
@@ -64,20 +64,20 @@ Item {
         }
 
         onChildMoved: {
-            console.log("DNodeTreeNode.componentInfoConnections.onChildMoved - aIndex: " + aIndex + " - aTarget: " + aTarget);
+            //console.log("DNodeTreeNode.componentInfoConnections.onChildMoved - aIndex: " + aIndex + " - aTarget: " + aTarget);
 
             // Move Node
             moveNode(aIndex, aTarget);
         }
 
         onChildRemoved: {
-            console.log("DNodeTreeNode.componentInfoConnections.onChildRemoved - aIndex: " + aIndex);
+            //console.log("DNodeTreeNode.componentInfoConnections.onChildRemoved - aIndex: " + aIndex);
 
             // Remove Node
             removeNode(aIndex);
 
             // Check Children Column
-            if (childrenColumn.children.length === 0) {
+            if (childNodesModel.count === 0) {
                 // Collapse
                 collapse();
             }
@@ -99,9 +99,9 @@ Item {
     // Enable Layer Visibility Button
     property bool enableLayerVisibilityButton: true
     // Enable Drop Areas Visibility
-    property bool enableDropAreasVisibility: !grabbed
+    property bool enableDropAreasVisibility: !nodeGrabbed
 
-    opacity: grabbed ? 0.5 : 1.0
+    opacity: nodeGrabbed ? 0.5 : 1.0
 
     clip: true
 
@@ -139,7 +139,7 @@ Item {
             // Set Height
             nodeRoot.height = Qt.binding(function() {
                 // Check Children
-                if (childrenColumn.children.length > 0) {
+                if (childNodesModel.count > 0) {
                     return expandedHeight;
                 }
 
@@ -154,13 +154,14 @@ Item {
         swipeGesture.hideSwipe();
     }
 
-    onGrabbedChanged: {
-        //console.log("DNodeTreeNode.onGrabbedChanged - grabbed: " + grabbed + " - childIndex: " + childIndex);
+    onNodeGrabbedChanged: {
+        //console.log("DNodeTreeNode.onNodeGrabbedChanged - nodeGrabbed: " + nodeGrabbed + " - childIndex: " + childIndex);
 
         // Check Grabbed State
-        if (nodeRoot.grabbed) {
+        if (nodeRoot.nodeGrabbed) {
             // Collapse
             collapse();
+
             // Get Position
             var pX = mapToItem(nodeTree, 0, 0).x;
             var pY = mapToItem(nodeTree, 0, 0).y;
@@ -169,16 +170,14 @@ Item {
             nodeTree.nodeGrabbed(pX, pY, nodeRoot.width, nodeRoot.height, nodeRoot.componentInfo, nodeRoot.childIndex);
             // Set Parent Node's Grabbed Child Index
             nodeRoot.parentNode.grabbedChildIndex = nodeRoot.childIndex;
-            // Set Enable Drop Area Visibility
-            nodeRoot.enableDropAreasVisibility = false;
 
         } else {
+
             // Emit Node Released Signal
             nodeTree.nodeReleased();
             // Reset Parent Node's Grabbed Child Index
             nodeRoot.parentNode.grabbedChildIndex = -1;
-            // Reset Enable Drop Area Visibility
-            nodeRoot.enableDropAreasVisibility = true;
+
         }
     }
 
@@ -191,7 +190,8 @@ Item {
     // Expand
     function expand() {
         // Check Children
-        if (childrenColumn.children.length > 0) {
+        if (childNodesModel.count > 0) {
+            //console.log("DNodeTreeNode.expand");
             // Set Expanded
             nodeRoot.expanded = true;
         }
@@ -199,6 +199,7 @@ Item {
 
     // Collapse
     function collapse() {
+        //console.log("DNodeTreeNode.collapse");
         // Reset Expanded
         nodeRoot.expanded = false;
     }
@@ -260,6 +261,9 @@ Item {
     // Insert Node
     function insertNode(newNodeIndex) {
         //console.log("DNodeTreeNode.insertNode - newNodeIndex: " + newNodeIndex);
+
+        // Remove Empty Node
+        removeEmptyNode();
 
         // Create New Node
         var newNode = nodeRoot.nodeTree.createNode(nodeRoot.componentInfo.childInfo(newNodeIndex), nodeRoot);
@@ -387,7 +391,7 @@ Item {
     function removeEmptyNode() {
         // Check Empty Node Index
         if (emptyNode.childIndex >= 0) {
-            console.log("DNodeTreeNode.removeEmptyNode - childIndex: " + emptyNode.childIndex);
+            //console.log("DNodeTreeNode.removeEmptyNode - childIndex: " + emptyNode.childIndex);
             // Set Current Node For Animating Height
             nodeTree.currentNode = nodeRoot;
             // Remove Empty Node
@@ -396,10 +400,11 @@ Item {
             emptyNode.hideEmptyNode();
             // Reset Empty Node Child Index
             emptyNode.childIndex = -1;
+            // Update Child Indexes
+            updateChildIndexes(0);
+        } else {
+            //console.warn("DNodeTreeNode.removeEmptyNode - NO CHILD INDEX!!!!");
         }
-
-        // Update Child Indexes
-        updateChildIndexes(0);
     }
 
     // Update Child Indexes
@@ -437,7 +442,7 @@ Item {
         id: dropAreasContainer
         width: parent.width
         height: nodeRoot.collapsedHeight
-        visible: !nodeRoot.grabbed && nodeRoot.enableDropAreasVisibility //&& nodeRoot.childIndex !== nodeRoot.parentNode.grabbedChildIndex
+        visible: !nodeRoot.nodeGrabbed && nodeRoot.enableDropAreasVisibility //&& nodeRoot.childIndex !== nodeRoot.parentNode.grabbedChildIndex
 
         DropArea {
             id: topDropArea
@@ -471,33 +476,35 @@ Item {
             onEntered: {
                 // Check Enable Drop Area Visibility
                 if (nodeRoot.enableDropAreasVisibility) {
+                    //console.log("DNodeTreeNode.centerDropArea.onEntered");
+
                     // Restart Hover Time
                     hoverTimer.restart();
-                }
 
-                // Check Keys - New Component
-                if (drag.keys[0] === CONSTS.newComponentDragKey || drag.keys[0] === CONSTS.childComponentDragKey) {
+                    // Check Keys - New Component
+                    if (drag.keys[0] === CONSTS.newComponentDragKey || drag.keys[0] === CONSTS.childComponentDragKey) {
 
-                    // Check Source & Source Parent Component
-                    if (drag.source !== null && drag.source.componentParent !== nodeRoot.componentInfo) {
-                        //console.log("DNodeTreeNode.centerDropArea.onEntered - ACCEPT!");
+                        // Check Source & Source Parent Component
+                        if (drag.source !== null && drag.source.componentParent !== nodeRoot.componentInfo) {
+                            //console.log("DNodeTreeNode.centerDropArea.onEntered - ACCEPT!");
 
-                        // Accept Drag
-                        drag.accept();
+                            // Accept Drag
+                            drag.accept();
+                        }
+
                     }
-
                 }
 
                 // Emit Remove Empty Node Signal
                 nodeTree.removeEmptyNode();
             }
 
-            onExited: {
-                // Stop Hover Timer
-                hoverTimer.running = false;
-            }
-
             onDropped: {
+                // Check Enable Drop Area Visibility
+                if (!nodeRoot.enableDropAreasVisibility) {
+                    return;
+                }
+
                 // Check Drop Source
                 //console.log("DNodeTreeNode.centerDropArea.onDropped - keys: " + drop.keys + " - source: " + drop.source);
 
@@ -511,11 +518,40 @@ Item {
                     if (drop.keys[0] === CONSTS.newComponentDragKey) {
                         console.log("DNodeTreeNode.centerDropArea.onDropped - NEW CHILD");
 
+                        // Check Component Info
+                        if (nodeRoot.componentInfo.protoType && nodeRoot.componentInfo === draggedComponentInfo) {
+                            console.warn("DNodeTreeNode.centerDropArea.onDropped - RECURSIVE!!");
+                            return;
+                        }
+
+                        // TODO: More Checking
+
+                        // Add Child To Parent Node Component
+                        nodeRoot.componentInfo.addChild(draggedComponentInfo.clone());
 
                         // ...
 
                     } else if (drop.keys[0] === CONSTS.childComponentDragKey) {
+
+                        // Check Source's Parent
+                        if (draggedComponentInfo.componentParent === nodeRoot.componentInfo) {
+                            console.warn("DNodeTreeNode.centerDropArea.onDropped - ALREADY A CHILD!");
+                            return;
+                        }
+
+                        // Check Source
+                        if (draggedComponentInfo === nodeRoot.componentInfo) {
+                            console.warn("DNodeTreeNode.centerDropArea.onDropped - SAME COMPONENT!");
+                            return;
+                        }
+
                         console.log("DNodeTreeNode.centerDropArea.onDropped - CHILD DRAG");
+
+                        // TODO: Add More Checking
+
+                        // Move Child
+                        draggedComponentInfo.componentParent.moveChild(draggedComponentInfo.componentParent, nodeTree.grabbedIndex,
+                                                                       nodeRoot.componentInfo, nodeRoot.componentInfo.childCount);
 
                         // ...
 
@@ -523,6 +559,11 @@ Item {
                         console.warn("DNodeTreeNode.centerDropArea.onDropped - UNSUPPORTED DROP!");
                     }
                 }
+            }
+
+            onExited: {
+                // Stop Hover Timer
+                hoverTimer.running = false;
             }
         }
 
@@ -676,29 +717,25 @@ Item {
                         console.log("DNodeTreeNode.nodeMouseArea.onPressAndHold - START DRAG");
                         // Collapse
                         nodeRoot.collapse();
+                        // Set Drop Areas Visibility
+                        nodeRoot.enableDropAreasVisibility = false;
                         // Set Grabbed
-                        nodeRoot.grabbed = true;
-                    }
-                }
-
-                onPositionChanged: {
-                    // Check If Grabbed
-                    if (nodeRoot.grabbed && nodeTree) {
-                        // Emit Node Pos Changed Signal
-                        nodeTree.nodePosChanged(Math.round(mouse.x), Math.round(mouse.y));
+                        nodeRoot.nodeGrabbed = true;
                     }
                 }
 
                 onReleased: {
-                    // Reset Drag Active
-                    //Drag.active = false;
+                    //console.log("DNodeTreeNode.nodeMouseArea.onReleased");
                     // Reset Grabbed
-                    nodeRoot.grabbed = false;
+                    nodeRoot.nodeGrabbed = false;
+                    // Set Drop Areas Visibility
+                    nodeRoot.enableDropAreasVisibility = true;
                 }
 
                 onCanceled: {
+                    //console.log("DNodeTreeNode.nodeMouseArea.onCanceled");
                     // Reset Grabbed
-                    nodeRoot.grabbed = false;
+                    nodeRoot.nodeGrabbed = false;
                 }
             }
 
@@ -760,9 +797,9 @@ Item {
             model: childNodesModel
         }
 
-//        move: Transition {
-//            PropertyAnimation { properties: "y"; duration: DStyle.animDuration }
-//        }
+        move: Transition {
+            PropertyAnimation { properties: "y"; duration: DStyle.animDuration }
+        }
     }
 
     // Hover Timer
@@ -771,17 +808,15 @@ Item {
         interval: 200
 
         onTriggered: {
-            // Check Parent Node
-            if (parentNode === null) {
-                return;
-            }
-
             // Check Top Area
             if (topDropArea.containsDrag) {
                 //console.log("DNodeTreeNode.hoverTimer.onTriggered - childIndex: " + nodeRoot.childIndex + " - TOP");
 
-                // Insert Empty Node
-                parentNode.insertEmptyNode(childIndex);
+                // Check Parent Node
+                if (parentNode !== null) {
+                    // Insert Empty Node
+                    parentNode.insertEmptyNode(childIndex);
+                }
 
             // Check Center Drop Area
             } else if (centerDropArea.containsDrag) {
@@ -794,8 +829,14 @@ Item {
             } else if (bottomDropArea.containsDrag) {
                 //console.log("DNodeTreeNode.hoverTimer.onTriggered - childIndex: " + nodeRoot.childIndex + " - BOTTOM");
 
-                // Insert Empty Node
-                parentNode.insertEmptyNode(childIndex + 1);
+                // Check Parent Node
+                if (parentNode !== null) {
+                    // Insert Empty Node
+                    parentNode.insertEmptyNode(childIndex + 1);
+                }
+            } else {
+
+                console.warn("DNodeTreeNode.hoverTimer.onTriggered - UNSUPPORTED EVENT!!");
 
             }
         }

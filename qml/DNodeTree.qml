@@ -73,7 +73,6 @@ Item {
         grabbedNode.lastY = nodeY;
 
         grabbedNode.width = nodeWidth;
-        grabbedNode.height = nodeHeight;
 
         // Set Component Info
         grabbedNode.componentInfo = componentInfo;
@@ -127,7 +126,7 @@ Item {
         var rectParent = rectangle.parent;
 
         // Iterate Through Parents
-        while (rectParent !== undefined && rectParent !== parentObject) {
+        while (rectParent !== undefined && rectParent !== null && rectParent !== parentObject) {
 
             // Add Parent's X & Y To New Rectangle Position
             newRectangle.x += rectParent.x;
@@ -142,12 +141,12 @@ Item {
 
     // Ensure Empty Node Visible
     function ensureEmptyNodeVisible(rectangle) {
-        console.log("DNodeTree.ensureEmptyNodeVisible - recangle[" + Math.round(rectangle.x) + ":" + Math.round(rectangle.y) + "]");
+        //console.log("DNodeTree.ensureEmptyNodeVisible - recangle[" + Math.round(rectangle.x) + ":" + Math.round(rectangle.y) + "]");
 
         // Get Mapped Rectangle
         var newRectangle = mapToParent(nodeTreeFlickable.containerColumn, rectangle);
 
-        console.log("DNodeTree.ensureEmptyNodeVisible - newRectangle[" + Math.round(newRectangle.x) + ":" + Math.round(newRectangle.y) + "]");
+        //console.log("DNodeTree.ensureEmptyNodeVisible - newRectangle[" + Math.round(newRectangle.x) + ":" + Math.round(newRectangle.y) + "]");
 
         // Flick To Ensure Rectangle Visible
         nodeTreeFlickable.flick(newRectangle, true);
@@ -163,32 +162,10 @@ Item {
         }
     }
 
-//    Rectangle {
-//        id: topScrollArea
-//        width: parent.width
-//        height: nodeTreeFlickable.height * scrollTimer.panThreshold;
-//        anchors.top: parent.top
-//        color: "transparent"
-//        border.color: grabbedNode.centerY < nodeTreeFlickable.height * scrollTimer.panThreshold ? "red" : "teal"
-//    }
-
-//    Rectangle {
-//        id: bottomScrollArea
-//        width: parent.width
-//        height: nodeTreeFlickable.height * scrollTimer.panThreshold;
-//        anchors.bottom: parent.bottom
-//        color: "transparent"
-//        border.color: (grabbedNode.centerY)  > nodeTreeFlickable.height * (1 - scrollTimer.panThreshold) ? "red" : "teal"
-//    }
-
     // Node Tree Flickable
     DFlickable {
         id: nodeTreeFlickable
         anchors.fill: parent
-
-//        onContentYChanged: {
-//            console.log("#### cY: " + contentY);
-//        }
 
         DNodeTreeNode {
             id: rootNode
@@ -223,9 +200,6 @@ Item {
 
                     //Reset Scrolling
                     scrollTimer.scrolling = false;
-                    // Stop Scroll Timer
-                    //scrollTimer.running = false;
-
                 }
 
             } else  if (lastY > y && (grabbedNode.centerY) < (nodeTreeFlickable.height * scrollTimer.panThreshold) && !scrollTimer.scrolling) {
@@ -239,10 +213,6 @@ Item {
                     scrollTimer.scrollDirection = false;
                     // Set Scrolling
                     scrollTimer.scrolling = true;
-
-                    // Set Scroll Timer Running
-                    //scrollTimer.running = true;
-
                 }
 
             } else if ((lastY < y) && (grabbedNode.centerY) > (nodeTreeFlickable.height * (1 - scrollTimer.panThreshold))  && !scrollTimer.scrolling) {
@@ -255,17 +225,11 @@ Item {
                     scrollTimer.scrollDirection = true;
                     // Set Scrolling
                     scrollTimer.scrolling = true;
-
-                    // Set Scroll Timer Running
-                    //scrollTimer.running = true;
-
                 }
 
             } else {
                 //Reset Scrolling
                 scrollTimer.scrolling = false;
-//                // Stop Scroll Timer
-//                scrollTimer.running = false;
             }
 
             // Set Last Y

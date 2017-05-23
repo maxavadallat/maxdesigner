@@ -6,6 +6,6 @@ Loader {
     active: false
 
     onStatusChanged: {
-        console.log("DLoader.onStatusChanged - status: " + status);
+        //console.log("DLoader.onStatusChanged - status: " + status);
     }
 }

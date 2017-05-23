@@ -104,6 +104,8 @@ Item {
         property real lastTime: 0
         property int velocity: 0
 
+        visible: swipeGestureRoot.enableSwipe
+
         preventStealing: !swipeGestureRoot.swipeOn
 
         drag.target: actionButtonContainer
@@ -205,7 +207,6 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             opacity: actionButtonContainer.x < swipeGestureRoot.swipeMaxX ? 0.0 : 0.5
             Behavior on opacity { DFadeAnimation { } }
-            visible: swipeGestureRoot.enableSwipe && opacity > 0.0
             rotation: 90
             text: "---"
         }
