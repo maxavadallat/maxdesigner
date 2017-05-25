@@ -20,7 +20,10 @@ DRectangle {
     property bool highlightCurrentLine: true
     property alias wrapMode: sourceTextInput.wrapMode
     property alias editorFocus: sourceTextInput.focus
+    property alias length: sourceTextInput.length
     property bool showBorder: true
+
+    clip: true
 
     border.color: {
         if (invalidSource) {
@@ -131,6 +134,12 @@ DRectangle {
         return resultText;
     }
 
+    // Set Cursor Pos
+    function setCursorPos(newPos) {
+        // Set Cursor Position
+        sourceTextInput.cursorPosition = newPos;
+    }
+
     DMouseArea {
         anchors.fill: parent
         onClicked: {
@@ -139,6 +148,13 @@ DRectangle {
             // Emit Source Editor Activated Signal
             sourceCodeEditorRoot.sourceEditorActivated();
         }
+    }
+
+    Rectangle {
+        id: lineNumbersBG
+        width: lineNumbers.width + DStyle.defaultMargin
+        height: parent.height
+        color: "#11EEEEEE"
     }
 
     DFlickable {
@@ -154,7 +170,7 @@ DRectangle {
 
             Item {
                 id: lineNumbers
-                width: 32
+                width: 32  // TODO: Update
                 height: sourceTextInput.height
 
                 Column {
@@ -171,7 +187,7 @@ DRectangle {
                                 font.family: "Courier"
                                 text: index + ":"
                                 //horizontalAlignment: Text.AlignRight
-                                opacity: 0.8
+                                opacity: 0.7
                                 onWidthChanged: {
                                     if (width > lineNumbers.width) {
                                         lineNumbers.width = width;

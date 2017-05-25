@@ -38,9 +38,15 @@ DPane {
                 statesSection.close();
                 transitionsSection.close();
 
+                // Set No Focused Component Container Opacity
+                noFocusedComponentContainer.opacity = 1.0;
+
                 // ...
 
             } else {
+                // Set No Focused Component Container Opacity
+                noFocusedComponentContainer.opacity = 0.0;
+
                 // Set Tag Row Height
                 componentTagRow.height = componentTagEditor.height;
 
@@ -106,7 +112,7 @@ DPane {
     creationWidth: settingsController ? settingsController.propertiesPaneWidth : 300
     creationHeight: settingsController ? settingsController.propertiesPaneHeight : 600
 
-    minWidth: 300
+    minWidth: 360
     minHeight: parent ? parent.height * 0.6 : 600
 
     maxWidth: parent ? parent.width * 0.5 : 2000
@@ -115,8 +121,6 @@ DPane {
     enablePaneContent: propertiesController.focusedComponent !== null
 
     setFocusOnResize: false
-
-    //topMouseAreaVisible: true
 
     hideToSide: hideToRight
 
@@ -173,6 +177,9 @@ DPane {
             idEditor.text = propertiesController.focusedComponent.componentID;
             // Set ID Row height
             idRow.height = idEditor.height;
+        } else {
+            // Reset Text
+            idEditor.text = "";
         }
 
         // Check If Has Object Name
@@ -181,6 +188,9 @@ DPane {
             objectNameEditor.text = propertiesController.focusedComponent.componentObjectName;
             // Set Object Name Row Height
             objectNameRow.height = objectNameEditor.height;
+        } else {
+            // Reset Text
+            objectNameEditor.text = "";
         }
 
         // Check Focused Component
@@ -209,7 +219,7 @@ DPane {
         id: idRow
         height: 0
         Behavior on height { DAnimation { } }
-        visible: height > 0
+        visible: height > 0 && opacity > 0.0
         clip: true
         spacing: DStyle.defaultSpacing
 
@@ -238,7 +248,7 @@ DPane {
         id: objectNameRow
         height: 0
         Behavior on height { DAnimation { } }
-        visible: height > 0
+        visible: height > 0 && opacity > 0.0
         clip: true
         spacing: DStyle.defaultSpacing
 
@@ -267,7 +277,7 @@ DPane {
         id: componentTagRow
         height: 0
         Behavior on height { DAnimation { } }
-        visible: height > 0
+        visible: height > 0 && opacity > 0.0
         clip: true
         spacing: DStyle.defaultSpacing
 
@@ -357,5 +367,18 @@ DPane {
         id: propertiesSection
         width: propertiesPaneRoot.contentWidth
         namesColumnWidth: propertiesPaneRoot.namesColumnWidth
+    }
+
+    DControl {
+        id: noFocusedComponentContainer
+        width: propertiesPaneRoot.width
+        height: propertiesPaneRoot.height - propertiesPaneRoot.titleHeight
+
+        DText {
+            anchors.centerIn: parent
+            text: "No Component Selected"
+            font.pixelSize: DStyle.fontSizeXL
+            opacity: 0.7
+        }
     }
 }

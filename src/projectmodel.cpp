@@ -27,6 +27,7 @@ ProjectModel::ProjectModel(PropertiesController* aPropertiesController, QObject*
     , mComponents(NULL)
     , mViews(NULL)
     , mDataSources(NULL)
+    , mBusy(false)
 {
     qDebug() << "ProjectModel created.";
 
@@ -137,49 +138,88 @@ void ProjectModel::createInitialComponents()
 
     qDebug() << "ProjectModel::createInitialComponents";
 
+    // Set System Busy
+    setBusy(true);
+
+    // Init New Component Info
+    ComponentInfo* newComponent = NULL;
+/*
     // Create Base Components - Built-in's
-    createBaseComponent("QtObject", "", COMPONENT_CATEGORY_NONVISUAL, true);
+    newComponent = createBaseComponent("QtObject", "", COMPONENT_CATEGORY_NONVISUAL, true);
+    // Add Own Property
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_ID, ComponentInfo::EPropertyType::EPTString);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_OBJECT_NAME, ComponentInfo::EPropertyType::EPTString);
 
     // Create Base Components - Built-in Visuals
-    createBaseComponent("Item", "QtObject", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-    createBaseComponent("Rectangle", "Item", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-    createBaseComponent("MouseArea", "Item", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-    createBaseComponent("Loader", "Item", COMPONENT_CATEGORY_VISUAL, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    newComponent = createBaseComponent("Item", "QtObject", COMPONENT_CATEGORY_VISUAL, true);
+    // Add Own Properties
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_X, ComponentInfo::EPropertyType::EPTInt);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Y, ComponentInfo::EPropertyType::EPTInt);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Z, ComponentInfo::EPropertyType::EPTReal);
+
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, ComponentInfo::EPropertyType::EPTInt);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, ComponentInfo::EPropertyType::EPTInt);
+
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_ENABLED, ComponentInfo::EPropertyType::EPTBool, "", "", "", true);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_VISIBLE, ComponentInfo::EPropertyType::EPTBool, "", "", "", true);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_OPACITY, ComponentInfo::EPropertyType::EPTReal, "", "", "", 1.0);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_FOCUS, ComponentInfo::EPropertyType::EPTBool);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_CLIP, ComponentInfo::EPropertyType::EPTBool);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_ROTATION, ComponentInfo::EPropertyType::EPTInt);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_SMOOTH, ComponentInfo::EPropertyType::EPTBool);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_SCALE, ComponentInfo::EPropertyType::EPTReal, "", "", "", 1.0);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_STATE, ComponentInfo::EPropertyType::EPTString);
+
+    // ...
+
+    newComponent = createBaseComponent("Rectangle", "Item", COMPONENT_CATEGORY_VISUAL, true);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_COLOR, ComponentInfo::EPropertyType::EPTString);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_BORDERCOLOR, ComponentInfo::EPropertyType::EPTString);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_BORDERWIDTH, ComponentInfo::EPropertyType::EPTInt);
+    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_RADIUS, ComponentInfo::EPropertyType::EPTInt);
+
+    // ...
+
+    newComponent = createBaseComponent("MouseArea", "Item", COMPONENT_CATEGORY_VISUAL, true);
+
+    newComponent = createBaseComponent("Loader", "Item", COMPONENT_CATEGORY_VISUAL, true);
 
     // Create Base Components - Built-in Layout
-    createBaseComponent("Row", "Item", COMPONENT_CATEGORY_LAYOUT, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-    createBaseComponent("Column", "Item", COMPONENT_CATEGORY_LAYOUT, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-    createBaseComponent("Flow", "Item", COMPONENT_CATEGORY_LAYOUT, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    newComponent = createBaseComponent("Row", "Item", COMPONENT_CATEGORY_LAYOUT, true);
+    newComponent = createBaseComponent("Column", "Item", COMPONENT_CATEGORY_LAYOUT, true);
+    newComponent = createBaseComponent("Flow", "Item", COMPONENT_CATEGORY_LAYOUT, true);
 
     // Create Base Components - Built-in Images
-    createBaseComponent("Image", "Item", COMPONENT_CATEGORY_IMAGE, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-    createBaseComponent("BorderImage", "Item", COMPONENT_CATEGORY_IMAGE, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    newComponent = createBaseComponent("Image", "Item", COMPONENT_CATEGORY_IMAGE, true);
+
+
+    newComponent = createBaseComponent("BorderImage", "Item", COMPONENT_CATEGORY_IMAGE, true);
 
     // Create Base Components - Built-in Containers
-    createBaseComponent("Flickable", "Item", COMPONENT_CATEGORY_CONTAINER, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-    createBaseComponent("ListView", "Item", COMPONENT_CATEGORY_CONTAINER, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-    createBaseComponent("GridView", "Item", COMPONENT_CATEGORY_CONTAINER, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-    createBaseComponent("Repeater", "Item", COMPONENT_CATEGORY_CONTAINER, true, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+    newComponent = createBaseComponent("Flickable", "Item", COMPONENT_CATEGORY_CONTAINER, true);
+    newComponent = createBaseComponent("ListView", "Item", COMPONENT_CATEGORY_CONTAINER, true);
+    newComponent = createBaseComponent("GridView", "Item", COMPONENT_CATEGORY_CONTAINER, true);
+    newComponent = createBaseComponent("Repeater", "Item", COMPONENT_CATEGORY_CONTAINER, true);
 
     // Create Base Components - Built-in Animations
-    createBaseComponent("Animation", "", COMPONENT_CATEGORY_ANIMATION, true);
-    createBaseComponent("ParallelAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
-    createBaseComponent("SequentialAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
-    createBaseComponent("PauseAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
-    createBaseComponent("PropertyAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
-    createBaseComponent("PropertyAction", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
-    createBaseComponent("ScriptAction", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
+    newComponent = createBaseComponent("Animation", "", COMPONENT_CATEGORY_ANIMATION, true);
+    newComponent = createBaseComponent("ParallelAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
+    newComponent = createBaseComponent("SequentialAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
+    newComponent = createBaseComponent("PauseAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
+    newComponent = createBaseComponent("PropertyAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
+    newComponent = createBaseComponent("PropertyAction", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
+    newComponent = createBaseComponent("ScriptAction", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
 
     // ...
 
     // Create Data Source - System Model
-    createDataSource("SystemModel");
+    newComponent = createDataSource("SystemModel");
     // Create Data Source - Style
-    createDataSource("Style");
+    newComponent = createDataSource("Style");
     // Create Data Source - Constants
-    createDataSource("Consts");
+    newComponent = createDataSource("Consts");
     // Create Data Source - Settings Model
-    createDataSource("SettingsModel");
+    newComponent = createDataSource("SettingsModel");
 //    // Create Data Source - Media Model
 //    createDataSource("MediaModel");
 //    // Create Data Source - Phone Model
@@ -190,16 +230,24 @@ void ProjectModel::createInitialComponents()
     // ...
 
     // Create View - App Base
-    createView("AppBase", "Item", DEFAULT_VIEW_WIDTH, DEFAULT_VIEW_HEIGHT);
+    newComponent = createView("AppBase", "Item", DEFAULT_VIEW_WIDTH, DEFAULT_VIEW_HEIGHT);
     // Create Main View
-    createView("MainView", "Item", screenWidth(), screenHeight());
+    newComponent = createView("MainView", "Item", screenWidth(), screenHeight());
+
+    // ...
+*/
+
+
+
+
+
+    // Save All Components
+    saveAllComponents();
 
     // ...
 
-    // Add Own Properties
-
-    // ...
-
+    // Set Busy State
+    setBusy(false);
 }
 
 //==============================================================================
@@ -1224,6 +1272,28 @@ ViewsModel* ProjectModel::viewsModel()
 DataSourcesModel* ProjectModel::dataSourcesModel()
 {
     return mDataSources;
+}
+
+//==============================================================================
+// Get Busy State
+//==============================================================================
+bool ProjectModel::busy()
+{
+    return mBusy;
+}
+
+//==============================================================================
+// Set Busy State
+//==============================================================================
+void ProjectModel::setBusy(const bool& aBusy)
+{
+    // Check Busy State
+    if (mBusy != aBusy) {
+        // Set Busy State
+        mBusy = aBusy;
+        // Emit Busy State Changed Signal
+        emit busyChanged(mBusy);
+    }
 }
 
 //==============================================================================

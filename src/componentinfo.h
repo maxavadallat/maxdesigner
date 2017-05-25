@@ -79,6 +79,11 @@ class ComponentInfo : public QObject
     Q_PROPERTY(QString width READ width NOTIFY widthChanged)
     Q_PROPERTY(QString height READ height NOTIFY heightChanged)
 
+    Q_PROPERTY(bool useIPosX READ useIPosX WRITE setUseIPosX NOTIFY useIPosXChanged)
+    Q_PROPERTY(bool useIPosY READ useIPosY WRITE setUseIPosY NOTIFY useIPosYChanged)
+    Q_PROPERTY(bool useIWidth READ useIWidth WRITE setUseIWidth NOTIFY useIWidthChanged)
+    Q_PROPERTY(bool useIHeight READ useIHeight WRITE setUseIHeight NOTIFY useIHeightChanged)
+
     // Left Anchor Target
     Q_PROPERTY(QString anchorsLeft READ anchorsLeft NOTIFY anchorsLeftChanged)
     // Right Anchor Target
@@ -113,9 +118,6 @@ class ComponentInfo : public QObject
     Q_PROPERTY(QString anchorsHorizontalOffset READ anchorsHorizontalOffset NOTIFY anchorsHorizontalOffsetChanged)
     // Vertical Center Offset
     Q_PROPERTY(QString anchorsVerticalOffset READ anchorsVerticalOffset NOTIFY anchorsVerticalOffsetChanged)
-
-
-    Q_PROPERTY(bool useImplictSize READ useImplictSize WRITE setUseImplictSize NOTIFY useImplictSizeChanged)
 
     Q_PROPERTY(bool layerVisible READ layerVisible WRITE setLayerVisible NOTIFY layerVisibleChanged)
 
@@ -239,6 +241,26 @@ public:
     // Set Height
     Q_INVOKABLE void setHeight(const QString& aHeight);
 
+    // Get Use Implicit Pos X
+    bool useIPosX();
+    // Set Use Implicit Pos X
+    void setUseIPosX(const bool& aUseIPosX);
+
+    // Get Use Implicit Pos Y
+    bool useIPosY();
+    // Set Use Implicit Pos Y
+    void setUseIPosY(const bool& aUseIPosY);
+
+    // Get Use Implicit Width
+    bool useIWidth();
+    // Set Use Implicit Width
+    void setUseIWidth(const bool& aUseIWidth);
+
+    // Get Use Implicit Height
+    bool useIHeight();
+    // Set Use Implicit Height
+    void setUseIHeight(const bool& aUseIHeight);
+
     // Left Anchor Target
     QString anchorsLeft();
     // Right Anchor Target
@@ -279,11 +301,6 @@ public:
     // Set Layer Visible
     void setLayerVisible(const bool& aLayerVisible);
 
-    // Get Use Implicit Size
-    bool useImplictSize();
-    // Set Use Implicit Size
-    void setUseImplictSize(const bool& aUseImplicitSize);
-
     // Get Own Property Keys
     Q_INVOKABLE QStringList componentOwnPropertyKeys();
 
@@ -312,7 +329,7 @@ public:
     Q_INVOKABLE QStringList propertyEnums(const QString& aName);
 
     // Get Property Value
-    Q_INVOKABLE QVariant propertyValue(const QString& aName);
+    Q_INVOKABLE QVariant propertyValue(const QString& aName, const bool& aRaw = false);
 
     // Get Child Count
     int childCount();
@@ -418,6 +435,15 @@ signals:
     void widthChanged(const QString& aWidth);
     // Height Changed Signal
     void heightChanged(const QString& aHeight);
+
+    // Use Implicit Pos X Changed Signal
+    void useIPosXChanged(const bool& aUseIPosX);
+    // Use Implicit Pos Y Changed Signal
+    void useIPosYChanged(const bool& aUseIPosY);
+    // Use Implicit Width Changed Signal
+    void useIWidthChanged(const bool& aUseIWidth);
+    // Use Implicit Height Changed Signal
+    void useIHeightChanged(const bool& aUseIHeight);
 
     // Layer Visible Changed Signal
     void layerVisibleChanged(const bool& aLayerVisible);
@@ -588,6 +614,17 @@ protected:
     // Set Object Name
     void setComponentObjectName(const QString& aObjectName);
 
+    // Add Own Property
+    bool addComponentProperty(const QString& aName,
+                              const ComponentInfo::EPropertyType& aType = ComponentInfo::EPropertyType::EPTString,
+                              const QString& aMin = "",
+                              const QString& aMax = "",
+                              const QString& aEnumValues = "",
+                              const QVariant& aDefaultValue = QVariant());
+
+    // Remove Property
+    void removeComponentProperty(const QString& aName);
+
     // Set Component Property - SIMPLE!!!
     bool setComponentProperty(const QString& aName, const QVariant& aValue);
 
@@ -672,6 +709,8 @@ protected: // Data
     bool                    mDirty;
     // Built In
     bool                    mBuiltIn;
+    // Locked For Editing
+    bool                    mLocked;
 
     // Component Info File Path
     QString                 mInfoPath;
@@ -689,8 +728,14 @@ protected: // Data
     // Base Component Name
     QString                 mBaseName;
 
-    // Use Implicit Size
-    bool                    mImplicitSize;
+    // Use Implicit Pos X
+    bool                    mImplicitPosX;
+    // Use Implicit Pos Y
+    bool                    mImplicitPosY;
+    // Use Implicit Width
+    bool                    mImplicitWidth;
+    // Use Implicit Height
+    bool                    mImplicitHeight;
 
     // Focused State
     bool                    mFocused;

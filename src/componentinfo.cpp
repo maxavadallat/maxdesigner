@@ -70,6 +70,7 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mIsProtoType(aProtoType)
     , mDirty(true)
     , mBuiltIn(aBuiltIn)
+    , mLocked(false)
     , mInfoPath("")
     , mQMLPath("")
     , mName(aName)
@@ -77,7 +78,10 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mTag("")
     , mCategory(aCategory)
     , mBaseName(aBaseName)
-    , mImplicitSize(false)
+    , mImplicitPosX(false)
+    , mImplicitPosY(false)
+    , mImplicitWidth(false)
+    , mImplicitHeight(false)
     , mFocused(false)
     , mLayerVisible(true)
     , mIsRoot(true)
@@ -639,7 +643,7 @@ QString ComponentInfo::posX()
 void ComponentInfo::setPosX(const QString& aPosX)
 {
     // Set Component Property
-    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_X, aPosX.toInt());
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_X, aPosX);
     // Emit Pos X Changed Signal
     emit posXChanged(posX());
 }
@@ -658,7 +662,7 @@ QString ComponentInfo::posY()
 void ComponentInfo::setPosY(const QString& aPosY)
 {
     // Set Component Property
-    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Y, aPosY.toInt());
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Y, aPosY);
     // Emit Pos Y Changed Signal
     emit posYChanged(posY());
 }
@@ -677,7 +681,7 @@ QString ComponentInfo::posZ()
 void ComponentInfo::setPosZ(const QString& aPosZ)
 {
     // Set Component Property
-    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Z, aPosZ.toDouble());
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Z, aPosZ);
     // Emit Pos Z Changed Signal
     emit posZChanged(posZ());
 }
@@ -696,7 +700,7 @@ QString ComponentInfo::width()
 void ComponentInfo::setWidth(const QString& aWidth)
 {
     // Set Property - Width
-    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth.toInt());
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
     // Emit Width Changed Signal
     emit widthChanged(width());
 }
@@ -715,9 +719,97 @@ QString ComponentInfo::height()
 void ComponentInfo::setHeight(const QString& aHeight)
 {
     // Set Property - Height
-    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight.toInt());
+    setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
     // Emit Height Changed Signal
     emit heightChanged(height());
+}
+
+//==============================================================================
+// Get Use Implicit Pos X
+//==============================================================================
+bool ComponentInfo::useIPosX()
+{
+    return mImplicitPosX;
+}
+
+//==============================================================================
+// Set Use Implicit Pos X
+//==============================================================================
+void ComponentInfo::setUseIPosX(const bool& aUseIPosX)
+{
+    // Check Use Implicit Pos X
+    if (mImplicitPosX != aUseIPosX) {
+        // Set Use Implicit Pos X
+        mImplicitPosX = aUseIPosX;
+        // Emit Use Implicit Pos X Changed Signal
+        emit useIPosXChanged(mImplicitPosX);
+    }
+}
+
+//==============================================================================
+// Get Use Implicit Pos Y
+//==============================================================================
+bool ComponentInfo::useIPosY()
+{
+    return mImplicitPosY;
+}
+
+//==============================================================================
+// Set Use Implicit Pos Y
+//==============================================================================
+void ComponentInfo::setUseIPosY(const bool& aUseIPosY)
+{
+    // Check Use Implicit Pos Y
+    if (mImplicitPosY != aUseIPosY) {
+        // Set Use Implicit Pos Y
+        mImplicitPosY = aUseIPosY;
+        // Emit Use Implicit Pos Y Changed Signal
+        emit useIPosYChanged(mImplicitPosY);
+    }
+}
+
+//==============================================================================
+// Get Use Implicit Width
+//==============================================================================
+bool ComponentInfo::useIWidth()
+{
+    return mImplicitWidth;
+}
+
+//==============================================================================
+// Set Use Implicit Width
+//==============================================================================
+void ComponentInfo::setUseIWidth(const bool& aUseIWidth)
+{
+    // Check Use Implicit Width
+    if (mImplicitWidth != aUseIWidth) {
+        // Set Use Implicit Width
+        mImplicitWidth = aUseIWidth;
+        // Emit Use Implicit Width Changed Signal
+        emit useIWidthChanged(mImplicitWidth);
+    }
+}
+
+//==============================================================================
+// Get Use Implicit Height
+//==============================================================================
+bool ComponentInfo::useIHeight()
+{
+    return mImplicitHeight;
+}
+
+//==============================================================================
+// Set Use Implicit Height
+//==============================================================================
+void ComponentInfo::setUseIHeight(const bool& aUseIHeight)
+{
+    // Check Use Implicit Height
+    if (mImplicitHeight != aUseIHeight) {
+        // Set Use Implicit Height
+        mImplicitHeight = aUseIHeight;
+        // Emit Use Implicit Height Changed Signal
+        emit useIHeightChanged(mImplicitHeight);
+    }
 }
 
 //==============================================================================
@@ -859,28 +951,6 @@ void ComponentInfo::setLayerVisible(const bool& aLayerVisible)
         mLayerVisible = aLayerVisible;
         // Emit Layer Visible Changed Signal
         emit layerVisibleChanged(mLayerVisible);
-    }
-}
-
-//==============================================================================
-// Get Use Implicit Size
-//==============================================================================
-bool ComponentInfo::useImplictSize()
-{
-    return mImplicitSize;
-}
-
-//==============================================================================
-// Set Use Implicit Size
-//==============================================================================
-void ComponentInfo::setUseImplictSize(const bool& aUseImplicitSize)
-{
-    // Check Use Implicit Size
-    if (mImplicitSize != aUseImplicitSize) {
-        // Set Use Implicit Size
-        mImplicitSize = aUseImplicitSize;
-        // Emit Use Implicit size Changed Signal
-        emit useImplictSizeChanged(mImplicitSize);
     }
 }
 
@@ -2152,10 +2222,6 @@ QString ComponentInfo::liveCodeFormatSlots(const QString& aIndent)
 
     // TODO: Add Property Value Changed Slots
 
-    // Check Implicit Size
-    if (mImplicitSize) {
-
-    }
 
     // TODO: Add Property Value Changed Signals
 
@@ -2546,6 +2612,79 @@ QVariant ComponentInfo::componentProperty(const QString& aName)
 }
 
 //==============================================================================
+// Add Own Property
+//==============================================================================
+bool ComponentInfo::addComponentProperty(const QString& aName,
+                                         const ComponentInfo::EPropertyType& aType,
+                                         const QString& aMin,
+                                         const QString& aMax,
+                                         const QString& aEnumValues,
+                                         const QVariant& aDefaultValue)
+{
+    // Check Owh Property Keys
+    if (mOwnProperties.keys().indexOf(aName) >= 0) {
+        qDebug() << "ComponentInfo::addComponentProperty - ALREADY HAS A PROPERTY!";
+
+        return false;
+    }
+
+    // Switch Type
+    switch (aType) {
+        default:
+        case ComponentInfo::EPropertyType::EPTString:
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING, aDefaultValue.toString());
+        break;
+        case ComponentInfo::EPropertyType::EPTBool:
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_BOOL, aDefaultValue.toString());
+        break;
+        case ComponentInfo::EPropertyType::EPTInt:
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_INT, aDefaultValue.toString(), aMin, aMax);
+        break;
+        case ComponentInfo::EPropertyType::EPTDouble:
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_DOUBLE, aDefaultValue.toString(), aMin, aMax);
+        break;
+        case ComponentInfo::EPropertyType::EPTReal:
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_REAL, aDefaultValue.toString(), aMin, aMax);
+        break;
+        case ComponentInfo::EPropertyType::EPTVar:
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_VAR, aDefaultValue.toString());
+        break;
+        case ComponentInfo::EPropertyType::EPTQtObject:
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_OBJECT, aDefaultValue.toString());
+        break;
+        case ComponentInfo::EPropertyType::EPTQtObjectList:
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_LIST, aDefaultValue.toString());
+        break;
+        case ComponentInfo::EPropertyType::EPTEnum:
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM, aDefaultValue.toString(), "", "", aEnumValues);
+        break;
+        case ComponentInfo::EPropertyType::EPTAlias:
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_ALIAS, aDefaultValue.toString());
+        break;
+    }
+
+    // Set Dirty
+    setDirty(true);
+    // Emit Own Property Added
+    emit ownPropertyAdded(aName);
+
+
+    return true;
+}
+
+//==============================================================================
+// Remove Property
+//==============================================================================
+void ComponentInfo::removeComponentProperty(const QString& aName)
+{
+    // Check Own Properties
+    if (mOwnProperties.keys().indexOf(aName) >= 0) {
+        // Remove Key
+        mOwnProperties.remove(aName);
+    }
+}
+
+//==============================================================================
 // Set Property - Simple!!!
 //==============================================================================
 bool ComponentInfo::setComponentProperty(const QString& aName, const QVariant& aValue)
@@ -2814,7 +2953,7 @@ QStringList ComponentInfo::propertyEnums(const QString& aName)
 //==============================================================================
 // Get Property Value
 //==============================================================================
-QVariant ComponentInfo::propertyValue(const QString& aName)
+QVariant ComponentInfo::propertyValue(const QString& aName, const bool& aRaw)
 {
     // Check Name
     if (aName.isEmpty()) {
@@ -2834,7 +2973,7 @@ QVariant ComponentInfo::propertyValue(const QString& aName)
     // Check Type And Value
     if (!typeAndValue.isEmpty()) {
         // Parse Value
-        return Utils::parseValue(typeAndValue);
+        return Utils::parseValue(typeAndValue, aRaw);
     }
 
     // Check Prototype
@@ -2845,7 +2984,7 @@ QVariant ComponentInfo::propertyValue(const QString& aName)
         // Check Type And Value
         if (!typeAndValue.isEmpty()) {
             // Parse Value
-            return Utils::parseValue(typeAndValue);
+            return Utils::parseValue(typeAndValue, aRaw);
         }
     }
 

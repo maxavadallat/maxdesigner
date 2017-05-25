@@ -313,7 +313,8 @@ private slots:
     // Child About To Be Removed Slot
     void childAboutToBeRemoved(ComponentInfo* aChild);
 
-private: // Data
+protected: // Data
+    friend class ProjectModel;
     // Project Model
     ProjectModel*                   mProject;
 

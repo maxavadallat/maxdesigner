@@ -119,5 +119,10 @@
         <file>qml/DTransitionTreeEmptyNode.qml</file>
         <file>qml/DComponentContainer.qml</file>
         <file>qml/DDropArea.qml</file>
+        <file>assets/json/builtincomponents.json</file>
+        <file>qml/DPosXEditor.qml</file>
+        <file>qml/DPosYEditor.qml</file>
+        <file>qml/DWidthEditor.qml</file>
+        <file>qml/DHeightEditor.qml</file>
     </qresource>
 </RCC>

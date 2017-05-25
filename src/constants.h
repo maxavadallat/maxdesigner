@@ -125,10 +125,12 @@
 
 // Default Dirs & File Names
 #define DEFAULT_PROJECT_NAME                                "myproject"
+
 #define DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME             "basecomponents"
 #define DEFAULT_PROJECT_COMPONENTS_DIR_NAME                 "components"
 #define DEFAULT_PROJECT_VIEWS_DIR_NAME                      "views"
 #define DEFAULT_PROJECT_DATASOURCES_DIR_NAME                "datasources"
+
 #define DEFAULT_PROJECT_ASSETS_DIR_NAME                     "assets"
 #define DEFAULT_PROJECT_LIVE_TEMP_DIR_NAME                  "livetemp"
 
@@ -159,6 +161,7 @@
 #define COMPONENT_CATEGORY_DELEGATE                         "Delegate"
 #define COMPONENT_CATEGORY_ANIMATION                        "Animation"
 #define COMPONENT_CATEGORY_IMAGE                            "Image"
+#define COMPONENT_CATEGORY_VIEW                             "View"
 
 // Default Component Size
 #define DEFAULT_COMPONENT_WIDTH                             320
@@ -182,7 +185,11 @@
 #define JSON_KEY_COMPONENT_CATEGORY                         "componentCategory"
 #define JSON_KEY_COMPONENT_TAG                              "componentTag"
 #define JSON_KEY_COMPONENT_BUILTIN                          "componentBuiltIn"
-#define JSON_KEY_COMPONENT_USE_IMPLICIT_SIZE                "componentImplicitSize"
+#define JSON_KEY_COMPONENT_USE_IMPLICIT_POSX                "componentImplicitPosX"
+#define JSON_KEY_COMPONENT_USE_IMPLICIT_POSY                "componentImplicitPosY"
+#define JSON_KEY_COMPONENT_USE_IMPLICIT_WIDTH               "componentImplicitWidth"
+#define JSON_KEY_COMPONENT_USE_IMPLICIT_HEIGHT              "componentImplicitHeight"
+#define JSON_KEY_COMPONENT_LOCKED                           "componentLocked"
 #define JSON_KEY_COMPONENT_BASE                             "componentBase"
 #define JSON_KEY_COMPONENT_OWN_PROPERTIES                   "componentOwnProperties"
 #define JSON_KEY_COMPONENT_PROPERTIES                       "componentProperties"
@@ -249,6 +256,7 @@
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_LIST                "list<QtObject>"
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM                "enum"
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_ALIAS               "alias"
+#define JSON_VALUE_PROPERTY_TYPE_PREFIX_DEFAULT             "default"
 
 // Default/Basic JSON Keys For Component Properties
 #define JSON_KEY_COMPONENT_PROPERTY_ID                      "id"

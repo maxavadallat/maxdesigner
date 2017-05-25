@@ -11,7 +11,7 @@ DContainer {
 
     property string title: "Title"
 
-    property string hideToSide: ""  // "", "left", "right", "top", "bottom"
+    property string hideToSide: hideToLeft  // "", "left", "right", "top", "bottom"
 
     readonly property string hideToLeft: "left"
     readonly property string hideToRight: "right"
@@ -35,6 +35,7 @@ DContainer {
     property int lastShownHeight: creationHeight
 
     property alias titleBottom: titleTextLabel.bottom
+    property alias titleWidth: titleTextLabel.width
     property alias titleHeight: titleTextLabel.height
 
     property int initialX: {

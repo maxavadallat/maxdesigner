@@ -13,6 +13,7 @@ class ComponentsModel;
 class ViewsModel;
 class DataSourcesModel;
 class PropertiesController;
+class SettingsController;
 
 //==============================================================================
 // Project Model
@@ -45,6 +46,8 @@ class ProjectModel : public QObject
     Q_PROPERTY(ComponentsModel* componentsModel READ componentsModel NOTIFY componentsModelChanged)
     Q_PROPERTY(ViewsModel* viewsModel READ viewsModel NOTIFY viewsModelChanged)
     Q_PROPERTY(DataSourcesModel* dataSourcesModel READ dataSourcesModel NOTIFY dataSourcesModelChanged)
+
+    Q_PROPERTY(bool busy READ busy WRITE setBusy NOTIFY busyChanged)
 
     //Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent NOTIFY currentComponentChanged)
 
@@ -174,6 +177,11 @@ public:
     // Get Data Sources Model
     DataSourcesModel* dataSourcesModel();
 
+    // Get Busy State
+    bool busy();
+    // Set Busy State
+    void setBusy(const bool& aBusy);
+
     // Get Component By Name
     Q_INVOKABLE ComponentInfo* getComponentByName(const QString& aName, const QString& aType = "", const bool& aPreload = false);
     // Get Component By File Path
@@ -244,6 +252,9 @@ signals:
     // Data Source Created
     void dataSourceCreated(ComponentInfo* aComponent);
 
+    // Busy State Changed Signal
+    void busyChanged(const bool& aBusy);
+
     // Project Loaded Signal
     void projectLoaded();
 
@@ -303,6 +314,8 @@ private: // Data
     ViewsModel*             mViews;
     // Data Sources Model
     DataSourcesModel*       mDataSources;
+    // Busy State
+    bool                    mBusy;
 };
 
 #endif // PROJECTMODEL_H

@@ -6,5 +6,7 @@ Rectangle {
     color: DStyle.colorBG
     border.color: DStyle.colorBorderNoFocus
     radius: DStyle.defaultRadius
-    visible:  opacity > 0.0
+    opacity: enabled ? 1.0 : DStyle.disabledOpacity
+    Behavior on opacity { DFadeAnimation { } }
+    visible: opacity > 0.0
 }
