@@ -76,6 +76,8 @@ void ProjectPropertiesDialog::reset()
     ui->projectNameEdit->setText("");
     ui->projectDirEdit->setText("");
 
+    ui->dashboardPathEdit->setText("");
+
     ui->baseComponentsDirEdit->setText("");
     ui->dataSourcesDirEdit->setText("");
     ui->componentsDirEdit->setText("");
@@ -192,6 +194,22 @@ int ProjectPropertiesDialog::screenHeight()
 void ProjectPropertiesDialog::setScreenHeight(const int& aHeight)
 {
     ui->screenHeightSpinBox->setValue(aHeight);
+}
+
+//==============================================================================
+// Get Dashboard Image Path
+//==============================================================================
+QString ProjectPropertiesDialog::dashboardPath()
+{
+    return ui->dashboardPathEdit->text();
+}
+
+//==============================================================================
+// Set Dashboard Image Path
+//==============================================================================
+void ProjectPropertiesDialog::setDashboardPath(const QString& aDashboardPath)
+{
+    ui->dashboardPathEdit->setText(aDashboardPath);
 }
 
 //==============================================================================
@@ -439,6 +457,37 @@ void ProjectPropertiesDialog::on_projectDirBrowseButton_clicked()
 }
 
 //==============================================================================
+// Dashboar Path Browse Button Clicked Slot
+//==============================================================================
+void ProjectPropertiesDialog::on_dashboardPathBrowseButton_clicked()
+{
+    // Init Dashboard Select Dialog
+    QFileDialog dDialog(NULL, "Select Dashboard Image");
+    // Set File Mode
+    dDialog.setFileMode(QFileDialog::ExistingFile);
+
+    // Init Selection Directory
+    QString dPath = QDir::homePath();
+
+    // Init Dashboard Image File Info
+    QFileInfo dFileInfo(ui->dashboardPathEdit->text());
+    // Check If Exist
+    if (dFileInfo.exists()) {
+        // Update Selection Directory
+        dPath = dFileInfo.absolutePath();
+    }
+
+    // Set Directory
+    dDialog.setDirectory(dPath);
+
+    // Exec Dialog
+    if (dDialog.exec()) {
+        // Set Dashboard Asset Dir
+        ui->dashboardPathEdit->setText(dDialog.selectedFiles()[0]);
+    }
+}
+
+//==============================================================================
 // Base Componens Dir Browse Button Clicked
 //==============================================================================
 void ProjectPropertiesDialog::on_baseComponentsBrowseDirButton_clicked()
@@ -681,7 +730,6 @@ void ProjectPropertiesDialog::on_projectDirEdit_textEdited(const QString& )
     // Set Project Dir Edited
     mProjectDirEdited = true;
 }
-
 
 //==============================================================================
 // Base Components Dir Edit Text Edited Slot

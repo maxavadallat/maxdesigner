@@ -788,6 +788,14 @@ void MainWindow::launchProjectProperties()
     // Set Project Name
     mProjectPropertiesDiaog->setProjectName(mProjectModel->projectName());
 
+    // Set Screen Width
+    mProjectPropertiesDiaog->setScreenWidth(mProjectModel->screenWidth());
+    // Set Screen Height
+    mProjectPropertiesDiaog->setScreenHeight(mProjectModel->screenHeight());
+
+    // Set Dashboard Image
+    mProjectPropertiesDiaog->setDashboardPath(mProjectModel->dashboard());
+
     // Set QML Directory
     mProjectPropertiesDiaog->setDataSourcesDir(mProjectModel->dataSourcesDir());
     // Set Main QML File
@@ -1295,6 +1303,9 @@ void MainWindow::updateProject()
     mProjectModel->setScreenWidth(mProjectPropertiesDiaog->screenWidth());
     // Set Screen Height
     mProjectModel->setScreenHeight(mProjectPropertiesDiaog->screenHeight());
+
+    // Set Dashboard Image
+    mProjectModel->setDashboard(mProjectPropertiesDiaog->dashboardPath());
 
     // Set Base Components Dir
     mProjectModel->setBaseComponentsDir(mProjectPropertiesDiaog->baseComponentsDir());

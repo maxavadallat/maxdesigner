@@ -50,6 +50,11 @@ public:
     // Set Project Screen Height
     void setScreenHeight(const int& aHeight);
 
+    // Get Dashboard Image Path
+    QString dashboardPath();
+    // Set Dashboard Image Path
+    void setDashboardPath(const QString& aDashboardPath);
+
     // Get Assets Directory
     QString assetsDir();
     // Set Assets Directory
@@ -111,6 +116,8 @@ private:
 private slots:
     // On Project Dir Browse Button Clicked Slot
     void on_projectDirBrowseButton_clicked();
+    // Dashboar Path Browse Button Clicked Slot
+    void on_dashboardPathBrowseButton_clicked();
     // Base Componens Dir Browse Button Clicked
     void on_baseComponentsBrowseDirButton_clicked();
     // Data Sources Dir Browse Button Clicked
