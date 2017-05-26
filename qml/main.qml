@@ -269,6 +269,26 @@ Item {
         PropertiesPane {
             id: propertiesPane
 
+            onPosXEditLaunch: {
+                // Show Pos X Editor
+                posXEditor.show();
+            }
+
+            onPosYEditLaunch: {
+                // Show Pos Y Editor
+                posYEditor.show();
+            }
+
+            onWidthEditLaunch: {
+                // Show Width Editor
+                widthEditor.show();
+            }
+
+            onHeightEditLaunch: {
+                // SHow Height EDitor
+                heightEditor.show();
+            }
+
             onNewImportLaunch: {
                 // Check Imports Model
                 if (propertiesController.importsModel !== null && importEditor.state === importEditor.stateCreate) {
@@ -444,6 +464,42 @@ Item {
             }
         }
 
+        // Pos X Editor
+        DPosXEditor {
+            id: posXEditor
+
+            initialX: propertiesPane.x
+            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+
+        }
+
+        // Pos Y Editor
+        DPosYEditor {
+            id: posYEditor
+
+            initialX: propertiesPane.x
+            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+
+        }
+
+        // Width EDitor
+        DWidthEditor {
+            id: widthEditor
+
+            initialX: propertiesPane.x
+            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+
+        }
+
+        // Height Editor
+        DHeightEditor {
+            id: heightEditor
+
+            initialX: propertiesPane.x
+            initialY: Math.max(Math.min(parentHeight / 2, propertiesPane.y + propertiesPane.height - DStyle.defaultMargin), propertiesPane.y + DStyle.defaultMargin)
+
+        }
+
         // Import Editor
         DImportEditor {
             id: importEditor
@@ -490,6 +546,7 @@ Item {
             }
         }
 
+        // Property Enum Value Editor
         DPropertyEnumValueEditor {
             id: propertyEnumValueEditor
 

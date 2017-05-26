@@ -65,6 +65,50 @@ DPane {
                 openFilesListView.currentIndex = openFilesModel.currentIndex;
             }
         }
+
+        onComponentOpened: {
+            //console.log("ProjectPane.openFilesModelConnection.onComponentOpened - aComponent: " + aComponent);
+
+        }
+
+        onFileOpened: {
+            //console.log("ProjectPane.openFilesModelConnection.onFileOpened - aFilePath: " + aFilePath);
+
+            // Check Current Project
+            if (mainController.currentProject !== null) {
+                // Get Component
+                var component = mainController.currentProject.getComponentByPath(aFilePath);
+                // Check Component
+                if (component !== null) {
+                    // Get Component Type
+                    var cType = component.componentType;
+
+                    // Switch Component Type
+                    switch (cType) {
+                        case "BaseComponent":   baseComponentsSection.open(); break;
+                        case "Component":       componentsSection.open();     break;
+                        case "View":            viewsSection.open();          break;
+                        case "DataSource":      dataSourcesSection.open();    break;
+                    }
+                }
+            }
+        }
+
+        onFileClosed: {
+            // Check Open Files List View Count
+            if (openFilesListView.count === 0) {
+                // Close Section
+                openFilesSection.close();
+            }
+        }
+
+        onComponentClosed: {
+            // Check Open Files List View Count
+            if (openFilesListView.count === 0) {
+                // Close Section
+                openFilesSection.close();
+            }
+        }
     }
 
     onWidthChanged: {

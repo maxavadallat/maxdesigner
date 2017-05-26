@@ -7,7 +7,7 @@ import "style"
 DPaneBase {
     id: posXEditorRoot
 
-    anchors.verticalCenter: parentPane ? parentPane.verticalCenter : parent ? parent.verticalCenter : undefined
+    //anchors.verticalCenter: parentPane ? parentPane.verticalCenter : parent ? parent.verticalCenter : undefined
 
     property ComponentInfo componentInfo: propertiesController.focusedComponent
 
@@ -46,8 +46,7 @@ DPaneBase {
     // ...
 
     onComponentInfoChanged: {
-//        // Reset Pos X Editor
-//        resetPosXEditor();
+
     }
 
     onTransitionStarted: {
@@ -104,7 +103,7 @@ DPaneBase {
         // Check Use Implicit Pos X
         if (posXEditorRoot.componentInfo && posXEditorRoot.componentInfo.useIPosX) {
             // Reset Pos X Editor
-            resetPosXEditor();
+            //resetPosXEditor();
             return true;
         }
 
@@ -125,7 +124,7 @@ DPaneBase {
         }
 
         // Get Property Value Text
-        pxeText = pxeText.substr(cfPos + 1, pxeText.length);
+        pxeText = pxeText.substr(cfPos + 1, pxeText.length - 1);
 
         // Check If Number
         if (Number(pxeText) === Number.NaN) {

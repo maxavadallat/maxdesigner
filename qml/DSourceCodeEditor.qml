@@ -40,6 +40,7 @@ DRectangle {
 
     // Set Text
     function setText(plainText) {
+        //console.log("DSourceCodeEditor.setText - plainText: " + plainText);
         // Set Text
         sourceTextInput.text = convertTextToRichText(plainText);
     }

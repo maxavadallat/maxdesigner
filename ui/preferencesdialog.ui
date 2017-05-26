@@ -83,7 +83,7 @@
         <string>Grid Size:</string>
        </property>
       </widget>
-      <widget class="QSpinBox" name="spinBox">
+      <widget class="QSpinBox" name="gridSizeSpinBox">
        <property name="geometry">
         <rect>
          <x>292</x>
@@ -102,7 +102,7 @@
         <number>4</number>
        </property>
       </widget>
-      <widget class="QCheckBox" name="checkBox">
+      <widget class="QCheckBox" name="showGridCheckBox">
        <property name="geometry">
         <rect>
          <x>24</x>
@@ -115,7 +115,7 @@
         <string>Show Grid</string>
        </property>
       </widget>
-      <widget class="QCheckBox" name="checkBox_2">
+      <widget class="QCheckBox" name="snapToGridCheckBox">
        <property name="geometry">
         <rect>
          <x>24</x>
@@ -128,7 +128,7 @@
         <string>Snap To Grid</string>
        </property>
       </widget>
-      <widget class="QCheckBox" name="checkBox_3">
+      <widget class="QCheckBox" name="showRulersCheckBox">
        <property name="geometry">
         <rect>
          <x>24</x>
@@ -154,7 +154,7 @@
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
-      <widget class="QCheckBox" name="checkBox_4">
+      <widget class="QCheckBox" name="showLineNumbersCheckBox">
        <property name="geometry">
         <rect>
          <x>24</x>
@@ -167,7 +167,7 @@
         <string>Show Line Numbers</string>
        </property>
       </widget>
-      <widget class="QCheckBox" name="checkBox_5">
+      <widget class="QCheckBox" name="showCurrentLineCheckBox">
        <property name="geometry">
         <rect>
          <x>24</x>
@@ -180,7 +180,7 @@
         <string>Show Current Line</string>
        </property>
       </widget>
-      <widget class="QCheckBox" name="checkBox_6">
+      <widget class="QCheckBox" name="syntaxHighlightCheckBox">
        <property name="geometry">
         <rect>
          <x>24</x>
@@ -206,7 +206,7 @@
         <string>Tab Size:</string>
        </property>
       </widget>
-      <widget class="QSpinBox" name="spinBox_2">
+      <widget class="QSpinBox" name="tabSizeSpinBox">
        <property name="geometry">
         <rect>
          <x>112</x>
@@ -225,7 +225,7 @@
         <number>4</number>
        </property>
       </widget>
-      <widget class="QCheckBox" name="checkBox_7">
+      <widget class="QCheckBox" name="showBordersCheckBox">
        <property name="geometry">
         <rect>
          <x>208</x>
@@ -235,10 +235,10 @@
         </rect>
        </property>
        <property name="text">
-        <string>Show Tracers</string>
+        <string>Show Borders</string>
        </property>
       </widget>
-      <widget class="QCheckBox" name="checkBox_11">
+      <widget class="QCheckBox" name="showComponentNamesCheckBox">
        <property name="geometry">
         <rect>
          <x>208</x>
@@ -316,7 +316,7 @@
       <attribute name="title">
        <string>Live!</string>
       </attribute>
-      <widget class="QCheckBox" name="checkBox_8">
+      <widget class="QCheckBox" name="showScreenMarkerCheckBox">
        <property name="geometry">
         <rect>
          <x>48</x>
@@ -329,7 +329,7 @@
         <string>Show Screen Marker</string>
        </property>
       </widget>
-      <widget class="QCheckBox" name="checkBox_9">
+      <widget class="QCheckBox" name="showDashboardCheckBox">
        <property name="geometry">
         <rect>
          <x>48</x>
@@ -342,7 +342,7 @@
         <string>Show Dashboard</string>
        </property>
       </widget>
-      <widget class="QFrame" name="frame">
+      <widget class="QFrame" name="backgroundColorFrame">
        <property name="geometry">
         <rect>
          <x>52</x>
@@ -374,7 +374,7 @@
         <string>Background Color:</string>
        </property>
       </widget>
-      <widget class="QToolButton" name="toolButton">
+      <widget class="QToolButton" name="backgroundColorSelectButton">
        <property name="geometry">
         <rect>
          <x>192</x>
@@ -387,7 +387,7 @@
         <string>...</string>
        </property>
       </widget>
-      <widget class="QCheckBox" name="checkBox_10">
+      <widget class="QCheckBox" name="clipToScreenCheckBox">
        <property name="geometry">
         <rect>
          <x>48</x>

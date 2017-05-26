@@ -83,29 +83,39 @@ Item {
 
         // Component ID Changed
         onComponentIDChanged: {
-            // Check Parent Container
-            if (parentComponentContainer !== null && parentComponentContainer.setChildComponentID !== undefined) {
-                // Set Child Component ID
-                parentComponentContainer.setChildComponentID(ccRoot, aID);
-            }
+            // Set Child Component ID
+            ccRoot.setChildComponentID(ccRoot.parentComponentContainer, aID);
+//            // Check Parent Container
+//            if (parentComponentContainer !== null && parentComponentContainer.setChildComponentID !== undefined) {
+//                // Set Child Component ID
+//                parentComponentContainer.setChildComponentID(ccRoot, aID);
+//            }
         }
 
         // Pos X Changed
         onPosXChanged: {
+            console.log("DComponentContainer.componentInfoConnections.onPosXChanged - aPosX: " + aPosX);
+
             // Check Pos
             if (ccRoot.parentComponentContainer.x !== Number(aPosX)) {
                 // Set Pos X
                 ccRoot.parentComponentContainer.x = Number(aPosX);
             }
+
+            // TODO: Handle Bindings & Formulas!
         }
 
         // Pos Y Changed
         onPosYChanged: {
+            console.log("DComponentContainer.componentInfoConnections.onPosYChanged - aPosY: " + aPosY);
+
             // Check Pos Y
             if (ccRoot.parentComponentContainer.y !== Number(aPosY)) {
                 // Set Pos Y
                 ccRoot.parentComponentContainer.y = Number(aPosY);
             }
+
+            // TODO: Handle Bindings & Formulas!
         }
 
         // Width Changed
@@ -132,6 +142,8 @@ Item {
                 // Set Width
                 ccRoot.rootLiveQMLComponent.width = ccRoot.width;
             }
+
+            // TODO: Handle Bindings & Formulas!
         }
 
         // Height Changed
@@ -157,6 +169,9 @@ Item {
                 // Set Width
                 ccRoot.rootLiveQMLComponent.height = ccRoot.height;
             }
+
+            // TODO: Handle Bindings & Formulas!
+
         }
 
         // Left Anchor Changed
@@ -363,6 +378,13 @@ Item {
         }
     }
 
+    // Hovering Child Item
+    property QtObject childItem: getHoveringContainer(dropArea.drag.x, dropArea.drag.y, rootComponentContainer);
+    // Drag Source
+    property ComponentInfo dragSource: null
+    // Drag Keys
+    property string dragKey: ""
+
     // New Component Dropped Signal
     signal newComponentDropped(var dropSource, var posX, var posY)
     // Component Need Destroy Signal
@@ -414,9 +436,33 @@ Item {
         }
     }
 
-    // New Component Dropped Signal
-    onNewComponentDropped: {
-        // ...
+//    onDragSourceChanged: {
+//        console.log("DComponentContainer.onDragSourceChanged - dragSource: " + ccRoot.dragSource);
+//    }
+
+    // On Hover Child Item Changed
+    onChildItemChanged: {
+        // Check Child Item
+        if (ccRoot.childItem !== null) {
+            // Set Hover Container
+            ccRoot.rootComponentContainer.hoverContainer = ccRoot.childItem;
+
+        } else if (dropArea.containsDrag) {
+            // Set Hover Container
+            ccRoot.rootComponentContainer.hoverContainer = ccRoot.parentComponentContainer;
+        }
+
+        // Get Hover Container Component Info Path
+        var hPath = ccRoot.rootComponentContainer.hoverContainer ? ccRoot.rootComponentContainer.hoverContainer.componentInfo.componentPath : "NULL";
+
+        //console.log("DComponentContainer.dropArea.onChildItemChanged - hoverContainer: " + hPath);
+        //console.log("DComponentContainer.dropArea.onChildItemChanged - dragSource: " + ccRoot.dragSource);
+
+        // Check Hover Container
+        if (ccRoot.rootComponentContainer.hoverContainer !== null) {
+            // Check Drag Source by Current Hovered Container
+            ccRoot.rootComponentContainer.hoverContainer.componentContainer.checkDragSource(ccRoot.dragSource, ccRoot.dragKey);
+        }
     }
 
     // Update Pos X
@@ -840,6 +886,122 @@ Item {
         return anchorPoint;
     }
 
+    // Get Hovering Container
+    function getHoveringContainer(posX, posY, parentContainer) {
+        // Check If Contains Drag
+        if (!dropArea.containsDrag) {
+            return null;
+        }
+
+        // Set Drop Pos X
+        ccRoot.rootComponentContainer.hoverPosX = posX;
+        // Set Drop Pos Y
+        ccRoot.rootComponentContainer.hoverPosY = posY;
+
+        //console.log("DComponentContainer.dropArea.getHoveringContainer - parentContainer: " + (parentContainer.componentInfo ? parentContainer.componentInfo.componentPath : "NULL") + " - pos: " + posX + ":" + posY);
+
+        // Check Parent Container
+        if (parentContainer === undefined || parentContainer === null) {
+            //console.log("DComponentContainer.dropArea.getHoveringContainer - INVALID PARENT CONTAINER!!!");
+            return null;
+        }
+
+        // Check Component Container
+        if (parentContainer.componentContainer === undefined) {
+            //console.log("DComponentContainer.dropArea.getHoveringContainer - UNDEFINED COMPONENT CONTAINER!!!");
+            return null;
+        }
+
+        // Int Child Found
+        var childFound = parentContainer.componentContainer.childContainer.childAt(posX, posY);
+        // Init Next Child Found
+        var nextChildFound = null;
+        // Check For Children
+        if (childFound && childFound.componentContainer.count > 0) {
+            // Test For Child Hit
+            nextChildFound = getHoveringContainer(posX - childFound.x, posY - childFound.y, childFound);
+        }
+
+        return nextChildFound !== null ? nextChildFound : childFound;
+    }
+
+    // Check Drag Source
+    function checkDragSource(dragSource, dragKey) {
+        //console.log("DComponentContainer.checkDragSource - path: " + ccRoot.componentInfo.componentPath);
+        //console.log("DComponentContainer.checkDragSource - dragSource: " + dragSource);
+        //console.log("DComponentContainer.checkDragSource - dragKey: " + dragKey);
+
+        // Check Source
+        if (dragSource === null) {
+            console.warn("DComponentContainer.checkDragSource - NULL SOURCE!!");
+            // Reset Drop Hover OK
+            ccRoot.dropHoverOK = false;
+            return;
+        }
+
+        // Check Source
+        if (dragSource === ccRoot.componentInfo) {
+            console.warn("DComponentContainer.checkDragSource - RECURSIVE!!!");
+            // Reset Drop Hover OK
+            ccRoot.dropHoverOK = false;
+            return;
+        }
+
+        // TODO: More Checking!!!
+
+        // Check Drag Keys
+        if (dragKey === CONSTS.newComponentDragKey) {
+            //console.log("DComponentContainer.checkDragSource - dragKey: " + dragKey);
+
+            // Accept Drag
+            //drag.accept();
+
+            // Set Drop Hover OK
+            ccRoot.dropHoverOK = true;
+        } else {
+            // Reset Drop Hover OK
+            ccRoot.dropHoverOK = false;
+        }
+
+        // ...
+    }
+
+    // Make The Drop
+    function makeDrop(drop) {
+        // Check Drop OK
+        if (!ccRoot.dropHoverOK) {
+            console.warn("DComponentContainer.dropArea.onDropped - NOT ACCEPTED!!");
+            return;
+        }
+
+        //console.log("DComponentContainer.makeDrop - source: " + drop.source.componentName + " - childItem: " + (childItem ? childItem.componentInfo : "NULL"));
+
+        // Create New Object
+        var newObject = rootComponentContainer.newComponentChildContainer.createObject(childContainer, { "parentComponentContainer": ccRoot });
+
+        // Check New Object
+        if (newObject) {
+            // Update Child Component Container Object
+            ccRoot.updateChildContainerObject(newObject, drop.source.clone(), ccRoot.parentComponentContainer, true);
+
+            // Set Pos X
+            newObject.x = rootComponentContainer.hoverPosX - CONSTS.componentItemWidth * 0.5;
+            //newObject.x =  drop.x - CONSTS.componentItemWidth * 0.5; // TODO: Update For Child Item
+            // Set Pos Y
+            newObject.y = rootComponentContainer.hoverPosY - CONSTS.componentItemHeight * 0.5;
+            //newObject.y = drop.y - CONSTS.componentItemHeight * 0.5; // TODO: Update For Child Item
+
+            // Set Child Was Dropped
+            ccRoot.childWasDropped = true;
+
+            // Add Child Component Info
+            addChildComponent(newObject.componentInfo);
+
+        } else {
+            console.error("DComponentContainer.makeDrop - ERROR CREATING NEW OBJECT!");
+        }
+    }
+
     // Dummy Parent For New Container
     Item {
         id: newContainerDummyParent
@@ -878,62 +1040,17 @@ Item {
         id: dropArea
         anchors.fill: parent
 
-        property QtObject childItem: getHoveringContainer(drag.x, drag.y, rootComponentContainer)
-
         enabled: ccRoot.dropAreaEnabled
 
-        // Get Hovering Container
-        function getHoveringContainer(posX, posY, parentContainer) {
-            // Check If Contains Drag
-            if (!containsDrag) {
-                return null;
-            }
-
-            //console.log("DComponentContainer.dropArea.getHoveringContainer - parentContainer: " + (parentContainer.componentInfo ? parentContainer.componentInfo.componentPath : "NULL") + " - pos: " + posX + ":" + posY);
-            // Check Parent Container
-            if (parentContainer === undefined || parentContainer === null) {
-                //console.log("DComponentContainer.dropArea.getHoveringContainer - INVALID PARENT CONTAINER!!!");
-                return null;
-            }
-
-            // Check Component Container
-            if (parentContainer.componentContainer === undefined) {
-                //console.log("DComponentContainer.dropArea.getHoveringContainer - UNDEFINED COMPONENT CONTAINER!!!");
-                return null;
-            }
-
-            // Int Child Found
-            var childFound = parentContainer.componentContainer.childContainer.childAt(posX, posY);
-            // Init Next Child Found
-            var nextChildFound = null;
-            // Check For Children
-            if (childFound && childFound.componentContainer.count > 0) {
-                // Test For Child Hit
-                nextChildFound = getHoveringContainer(posX - childFound.x, posY - childFound.y, childFound);
-            }
-
-            return nextChildFound !== null ? nextChildFound : childFound;
-        }
-
-        onChildItemChanged: {
-            // Check Child Item
-            if (childItem !== null) {
-                //console.log("DComponentContainer.dropArea.onChildItemChanged - childItem: " + childItem);
-                // Set Hover Container
-                ccRoot.rootComponentContainer.hoverContainer = childItem;
-                // Reset Drop Hovering
-                //ccRoot.dropHovering = false;
-
-            } else if (containsDrag) {
-                // Set Hover Container
-                ccRoot.rootComponentContainer.hoverContainer = ccRoot.parentComponentContainer;
-                // Set Hovering
-                //ccRoot.dropHovering = true;
-            }
-        }
-
         onEntered: {
-            console.log("DComponentContainer.dropArea.onEntered - path: " + ccRoot.componentInfo.componentPath);
+            //console.log("DComponentContainer.dropArea.onEntered - path: " + ccRoot.componentInfo.componentPath);
+
+            // Set Drag Source
+            ccRoot.dragSource = drag.source;
+            // Set Drag Key
+            ccRoot.dragKey = drag.keys[0];
+
+            drag.accept();
 
             // Check Hover Container
             if (ccRoot.rootComponentContainer.hoverContainer === null) {
@@ -941,93 +1058,36 @@ Item {
                 ccRoot.rootComponentContainer.hoverContainer = ccRoot.parentComponentContainer;
             }
 
-            // Check Child Item
-            if (childItem !== null) {
-                return;
+            // Check Hover Container
+            if (ccRoot.rootComponentContainer.hoverContainer !== null) {
+                // Check Drag Source by Current Hovered Container
+                ccRoot.rootComponentContainer.hoverContainer.componentContainer.checkDragSource(ccRoot.dragSource, ccRoot.dragKey);
             }
 
-            // Set Hovering
-            //ccRoot.dropHovering = true;
-
-            // Check Source
-            if (drag.source === null) {
-                console.warn("DComponentContainer.dropArea.onEntered - NULL SOURCE!!");
-                // Reset Drop Hover OK
-                ccRoot.dropHoverOK = false;
-                return;
-            }
-
-            // Check Source
-            if (drag.source === ccRoot.componentInfo) {
-                console.warn("DComponentContainer.dropArea.onEntered - RECURSIVE!!!");
-                // Reset Drop Hover OK
-                ccRoot.dropHoverOK = false;
-                return;
-            }
-
-            // TODO: More Checking!!!
-
-            // Check Drag Keys
-            if (drag.keys[0] === CONSTS.newComponentDragKey) {
-                //console.log("DComponentContainer.dropArea.onEntered - keys: " + drag.keys);
-                // Accept Drag
-                drag.accept();
-
-                // Set Drop Hover OK
-                ccRoot.dropHoverOK = true;
-            } else {
-                // Reset Drop Hover OK
-                ccRoot.dropHoverOK = false;
-            }
+            // ...
         }
 
         onDropped: {
-            // Reset Hovering
-            //dropHovering = false;
-
-            // Check Drop OK
-            if (!ccRoot.dropHoverOK) {
-                console.warn("DComponentContainer.dropArea.onDropped - NOT ACCEPTED!!");
-                return;
+            // Check Hover Container
+            if (ccRoot.rootComponentContainer.hoverContainer !== null) {
+                // Make The Drop
+                ccRoot.rootComponentContainer.hoverContainer.componentContainer.makeDrop(drop);
+                // Reset Hover Container
+                ccRoot.rootComponentContainer.hoverContainer = null;
             }
-
-            console.log("DComponentContainer.dropArea.onDropped - source: " + drop.source.componentName + " - childItem: " + (childItem ? childItem.componentInfo : "NULL"));
-
-            // Create New Object
-            var newObject = rootComponentContainer.newComponentChildContainer.createObject(childContainer, { "parentComponentContainer": ccRoot });
-
-            // Check New Object
-            if (newObject) {
-                // Update Child Component Container Object
-                ccRoot.updateChildContainerObject(newObject, drop.source.clone(), ccRoot.parentComponentContainer, true);
-
-                // Set Pos X
-                newObject.x = drop.x - CONSTS.componentItemWidth * 0.5;
-                // Set Pos Y
-                newObject.y = drop.y - CONSTS.componentItemHeight * 0.5;
-
-                // Set Child Was Dropped
-                ccRoot.childWasDropped = true;
-
-                // Add Child Component Info
-                addChildComponent(newObject.componentInfo);
-
-            } else {
-                console.error("DComponentContainer.dropArea.onDropped - ERROR CREATING NEW OBJECT!");
-            }
-
-            // Reset Hover Container
-            ccRoot.rootComponentContainer.hoverContainer = null;
         }
 
         onExited: {
-            console.log("DComponentContainer.dropArea.onExited - path: " + ccRoot.componentInfo.componentPath);
-
-            // Reset Hovering
-            //ccRoot.dropHovering = false;
+            //console.log("DComponentContainer.dropArea.onExited - path: " + ccRoot.componentInfo.componentPath);
 
             // Reset Drop Hover OK
             ccRoot.dropHoverOK = false;
+            // Reset Hover Container
+            ccRoot.rootComponentContainer.hoverContainer = null;
+            // Reset Drag Source
+            ccRoot.dragSource = null;
+            // Reset Drag Key
+            ccRoot.dragKey = "";
         }
 
 //        Canvas {

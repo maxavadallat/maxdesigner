@@ -139,6 +139,7 @@
 #define JSON_KEY_PROJECT_DIR                                "projectDir"
 #define JSON_KEY_PROJECT_SCREEN_WIDTH                       "projectScreenWidth"
 #define JSON_KEY_PROJECT_SCREEN_HEIGHT                      "projectScreenHeight"
+#define JSON_KEY_PROJECT_DASHBOARD                          "projectDashboard"
 #define JSON_KEY_PROJECT_ASSETS_DIR                         "projectAssetsDir"
 #define JSON_KEY_PROJECT_BASECOMPONENTS_DIR                 "projectBaseComponentsDir"
 #define JSON_KEY_PROJECT_COMPONENTS_DIR                     "projectComponentsDir"
@@ -170,6 +171,9 @@
 // Default View Size
 #define DEFAULT_VIEW_WIDTH                                  640
 #define DEFAULT_VIEW_HEIGHT                                 480
+
+// Initial Component JSON File Path
+#define DEFAULT_INITIAL_COMPONENTS_JSON_FILE                ":/assets/json/builtincomponents.json"
 
 // Transition Types
 #define JSON_VALUE_TRANSITION_NODE_TYPE_PARALLEL            "parallel"

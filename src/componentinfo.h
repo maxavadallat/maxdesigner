@@ -589,6 +589,9 @@ protected:
     // Clear ID Map
     void clearIDMap();
 
+    // Init Info Path
+    bool initInfoPath();
+
     // Load
     bool load(const QString& aFilePath = "", const bool aCreateChildren = true);
     // Save

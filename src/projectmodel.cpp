@@ -130,121 +130,126 @@ void ProjectModel::createDataSourcesModel()
 //==============================================================================
 void ProjectModel::createInitialComponents()
 {
-    // Check Properties Controller
-    if (!mPropertiesController) {
-        qWarning() << "ProjectModel::createInitialComponents - NO PROPERTIES CONTROLLER!!!";
-        return;
-    }
-
-    qDebug() << "ProjectModel::createInitialComponents";
-
     // Set System Busy
     setBusy(true);
 
-    // Init New Component Info
-    ComponentInfo* newComponent = NULL;
-/*
-    // Create Base Components - Built-in's
-    newComponent = createBaseComponent("QtObject", "", COMPONENT_CATEGORY_NONVISUAL, true);
-    // Add Own Property
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_ID, ComponentInfo::EPropertyType::EPTString);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_OBJECT_NAME, ComponentInfo::EPropertyType::EPTString);
+    // Init Initial Component File
+    QFile initialComponents(DEFAULT_INITIAL_COMPONENTS_JSON_FILE);
 
-    // Create Base Components - Built-in Visuals
-    newComponent = createBaseComponent("Item", "QtObject", COMPONENT_CATEGORY_VISUAL, true);
-    // Add Own Properties
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_X, ComponentInfo::EPropertyType::EPTInt);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Y, ComponentInfo::EPropertyType::EPTInt);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Z, ComponentInfo::EPropertyType::EPTReal);
+    // Open Initial Components
+    if (initialComponents.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "ProjectModel::createInitialComponents - fileName: " << initialComponents.fileName();
 
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, ComponentInfo::EPropertyType::EPTInt);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, ComponentInfo::EPropertyType::EPTInt);
+        // Init JSON Content
+        QString jsonContent;
+        // Read All
+        jsonContent = initialComponents.readAll();
+        // Close File
+        initialComponents.close();
 
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_ENABLED, ComponentInfo::EPropertyType::EPTBool, "", "", "", true);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_VISIBLE, ComponentInfo::EPropertyType::EPTBool, "", "", "", true);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_OPACITY, ComponentInfo::EPropertyType::EPTReal, "", "", "", 1.0);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_FOCUS, ComponentInfo::EPropertyType::EPTBool);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_CLIP, ComponentInfo::EPropertyType::EPTBool);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_ROTATION, ComponentInfo::EPropertyType::EPTInt);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_SMOOTH, ComponentInfo::EPropertyType::EPTBool);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_SCALE, ComponentInfo::EPropertyType::EPTReal, "", "", "", 1.0);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_STATE, ComponentInfo::EPropertyType::EPTString);
+        // Init JSON Error
+        QJsonParseError jsonError;
+        // Init JSON Document
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonContent.toUtf8(), &jsonError);
 
-    // ...
+        // Check Error
+        if (jsonError.error != QJsonParseError::NoError) {
+            qWarning() << "ProjectModel::createInitialComponents - jsonError: " << jsonError.error << "-" << jsonError.errorString() << " - offset: " << jsonError.offset;
+            // Set Busy State
+            setBusy(false);
 
-    newComponent = createBaseComponent("Rectangle", "Item", COMPONENT_CATEGORY_VISUAL, true);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_COLOR, ComponentInfo::EPropertyType::EPTString);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_BORDERCOLOR, ComponentInfo::EPropertyType::EPTString);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_BORDERWIDTH, ComponentInfo::EPropertyType::EPTInt);
-    newComponent->addComponentProperty(JSON_KEY_COMPONENT_PROPERTY_RADIUS, ComponentInfo::EPropertyType::EPTInt);
+            return;
+        }
 
-    // ...
+        // Get JSON Object
+        QJsonObject jsonObject = jsonDoc.object();
 
-    newComponent = createBaseComponent("MouseArea", "Item", COMPONENT_CATEGORY_VISUAL, true);
+        qDebug() << "ProjectModel::createInitialComponents - jsonObject: " << jsonObject.keys();
 
-    newComponent = createBaseComponent("Loader", "Item", COMPONENT_CATEGORY_VISUAL, true);
+        // Get Base Components
+        QJsonArray baseComponents = jsonObject[DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME].toArray();
+        // Get Base Components Count
+        int bcCount = baseComponents.count();
+        // Iterate Through Base Components
+        for (int i=0; i<bcCount; i++) {
+            // Create New Component
+            ComponentInfo* newComponent = new ComponentInfo("", "", "", this);
+            // From JSON Object
+            newComponent->fromJSONObject(baseComponents[i].toObject());
+            // Add Base Component
+            if (!mBaseComponents->addBaseComponent(newComponent)) {
+                // Set Dirty Flag
+                newComponent->setDirty(false);
+                // Delete New Component
+                delete newComponent;
+            }
+        }
 
-    // Create Base Components - Built-in Layout
-    newComponent = createBaseComponent("Row", "Item", COMPONENT_CATEGORY_LAYOUT, true);
-    newComponent = createBaseComponent("Column", "Item", COMPONENT_CATEGORY_LAYOUT, true);
-    newComponent = createBaseComponent("Flow", "Item", COMPONENT_CATEGORY_LAYOUT, true);
+        // Get Components
+        QJsonArray components = jsonObject[DEFAULT_PROJECT_COMPONENTS_DIR_NAME].toArray();
+        // Get Components Count
+        int cCount = components.count();
+        // Iterate Through Base Components
+        for (int i=0; i<cCount; i++) {
+            // Create New Component
+            ComponentInfo* newComponent = new ComponentInfo("", "", "", this);
+            // From JSON Object
+            newComponent->fromJSONObject(components[i].toObject());
+            // Add Component
+            if (!mComponents->addComponent(newComponent)) {
+                // Set Dirty Flag
+                newComponent->setDirty(false);
+                // Delete New Component
+                delete newComponent;
+            }
+        }
 
-    // Create Base Components - Built-in Images
-    newComponent = createBaseComponent("Image", "Item", COMPONENT_CATEGORY_IMAGE, true);
+        // Get Views
+        QJsonArray views = jsonObject[DEFAULT_PROJECT_VIEWS_DIR_NAME].toArray();
+        // Get Views Count
+        int vCount = views.count();
+        // Iterate Through Base Components
+        for (int i=0; i<vCount; i++) {
+            // Create New Component
+            ComponentInfo* newComponent = new ComponentInfo("", "", "", this);
+            // From JSON Object
+            newComponent->fromJSONObject(views[i].toObject());
+            // Add View Component
+            if (!mViews->addView(newComponent)) {
+                // Set Dirty Flag
+                newComponent->setDirty(false);
+                // Delete New Component
+                delete newComponent;
+            }
+        }
 
+        // Get Data Sources
+        QJsonArray dataSources = jsonObject[DEFAULT_PROJECT_DATASOURCES_DIR_NAME].toArray();
+        // Get Data Sources Count
+        int dsCount = dataSources.count();
+        // Iterate Through Base Components
+        for (int i=0; i<dsCount; i++) {
+            // Create New Component
+            ComponentInfo* newComponent = new ComponentInfo("", "", "", this);
+            // From JSON Object
+            newComponent->fromJSONObject(dataSources[i].toObject());
+            // Add Data Source Base Component
+            if (!mDataSources->addDataSource(newComponent)) {
+                // Set Dirty Flag
+                newComponent->setDirty(false);
+                // Delete New Component
+                delete newComponent;
+            }
+        }
 
-    newComponent = createBaseComponent("BorderImage", "Item", COMPONENT_CATEGORY_IMAGE, true);
+        // ...
 
-    // Create Base Components - Built-in Containers
-    newComponent = createBaseComponent("Flickable", "Item", COMPONENT_CATEGORY_CONTAINER, true);
-    newComponent = createBaseComponent("ListView", "Item", COMPONENT_CATEGORY_CONTAINER, true);
-    newComponent = createBaseComponent("GridView", "Item", COMPONENT_CATEGORY_CONTAINER, true);
-    newComponent = createBaseComponent("Repeater", "Item", COMPONENT_CATEGORY_CONTAINER, true);
-
-    // Create Base Components - Built-in Animations
-    newComponent = createBaseComponent("Animation", "", COMPONENT_CATEGORY_ANIMATION, true);
-    newComponent = createBaseComponent("ParallelAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
-    newComponent = createBaseComponent("SequentialAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
-    newComponent = createBaseComponent("PauseAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
-    newComponent = createBaseComponent("PropertyAnimation", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
-    newComponent = createBaseComponent("PropertyAction", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
-    newComponent = createBaseComponent("ScriptAction", "Animation", COMPONENT_CATEGORY_ANIMATION, true);
-
-    // ...
-
-    // Create Data Source - System Model
-    newComponent = createDataSource("SystemModel");
-    // Create Data Source - Style
-    newComponent = createDataSource("Style");
-    // Create Data Source - Constants
-    newComponent = createDataSource("Consts");
-    // Create Data Source - Settings Model
-    newComponent = createDataSource("SettingsModel");
-//    // Create Data Source - Media Model
-//    createDataSource("MediaModel");
-//    // Create Data Source - Phone Model
-//    createDataSource("ConnectivityModel");
-//    // Create Data Source - Phone Model
-//    createDataSource("PhoneModel");
-
-    // ...
-
-    // Create View - App Base
-    newComponent = createView("AppBase", "Item", DEFAULT_VIEW_WIDTH, DEFAULT_VIEW_HEIGHT);
-    // Create Main View
-    newComponent = createView("MainView", "Item", screenWidth(), screenHeight());
-
-    // ...
-*/
-
-
-
-
+    } else {
+        qWarning() << "ProjectModel::createInitialComponents - CAN NOT OPEN INITIAL COMPONENTS DESCRIPTOR FILE!!";
+    }
 
     // Save All Components
     saveAllComponents();
-
-    // ...
 
     // Set Busy State
     setBusy(false);
@@ -887,6 +892,30 @@ void ProjectModel::setScreenHeight(const int& aHeight)
         mProperties[JSON_KEY_PROJECT_SCREEN_HEIGHT] = aHeight;
         // Emit Screen Height changed Signal
         emit screenHeightChanged(screenHeight());
+        // Set Dirty Properties
+        setDirty(true);
+    }
+}
+
+//==============================================================================
+// Get Dashboard Image
+//==============================================================================
+QString ProjectModel::dashboard()
+{
+    return mProperties[JSON_KEY_PROJECT_DASHBOARD].toString();
+}
+
+//==============================================================================
+// Set Dashboard Image
+//==============================================================================
+void ProjectModel::setDashboard(const QString& aDashImage)
+{
+    // Check Dashboard Image
+    if (aDashImage != dashboard()) {
+        // Set Dashboard Image Source
+        mProperties[JSON_KEY_PROJECT_DASHBOARD] = aDashImage;
+        // Emit Dashboard Image Changed Signal
+        emit dashboardChanged(dashboard());
         // Set Dirty Properties
         setDirty(true);
     }

@@ -98,6 +98,10 @@ DPaneBase {
 
     // Current Hover Container
     property QtObject hoverContainer: null
+    // Hover Pos X
+    property int hoverPosX: 0
+    // Hover Pos Y
+    property int hoverPosY: 0
 
 //    // Exploding Mode
 //    property bool explodingMode: false

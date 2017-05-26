@@ -121,11 +121,13 @@ void DataSourcesModel::saveAllComponents()
 //==============================================================================
 void DataSourcesModel::componentDirtyChanged(const bool& aDirty)
 {
+    Q_UNUSED(aDirty);
+
     // Get Sender Component
     ComponentInfo* senderComponent = static_cast<ComponentInfo*>(sender());
     // Check Sender Component
     if (senderComponent) {
-        qDebug() << "DataSourcesModel::componentDirtyChanged - mName: " << senderComponent->mName << " - aDirty: " << aDirty;
+        //qDebug() << "DataSourcesModel::componentDirtyChanged - mName: " << senderComponent->mName << " - aDirty: " << aDirty;
         // Get Component Index
         int dsIndex = mDataSources.keys().indexOf(senderComponent->mName);
         // Check Component Index

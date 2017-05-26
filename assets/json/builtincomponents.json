@@ -1,23 +1,22 @@
 {
     "basecomponents": [
-        // QtObject
         {
             "componentBase": "",
             "componentBuiltIn": true,
             "componentCategory": "NonVisual",
             "componentName": "QtObject",
+            "componentType": "BaseComponent",
             "componentOwnProperties": {
                 "id": "string::::",
                 "objectName": "string::::"
             }
         },
-
-        // Item
         {
             "componentBase": "QtObject",
             "componentBuiltIn": true,
             "componentCategory": "Visual",
             "componentName": "Item",
+            "componentType": "BaseComponent",
             "componentOwnProperties": {
                 "clip": "bool::::false",
                 "enabled": "bool::::true",
@@ -33,13 +32,12 @@
                 "z": "int::::0"
             }
         },
-
-        // Rectangle
         {
             "componentBase": "Item",
             "componentBuiltIn": true,
             "componentCategory": "Visual",
             "componentName": "Rectangle",
+            "componentType": "BaseComponent",
             "componentOwnProperties": {
                 "border.color": "string::::transparent",
                 "border.width": "int::::1",
@@ -47,13 +45,12 @@
                 "radius": "int::::0"
             }
         },
-
-        // MouseArea
         {
             "componentBase": "Item",
             "componentBuiltIn": true,
             "componentCategory": "Visual",
             "componentName": "MouseArea",
+            "componentType": "BaseComponent",
             "componentOwnProperties": {
                 "containsMouse": "bool::::false",
                 "containsPress": "bool::::false",
@@ -62,13 +59,12 @@
                 "preventStealing": "bool::::false"
             }
         },
-
-        // Image
         {
             "componentBase": "Item",
             "componentBuiltIn": true,
             "componentCategory": "Image",
             "componentName": "Image",
+            "componentType": "BaseComponent",
             "componentOwnProperties": {
                 "asynchronous": "bool::::true",
                 "fillMode": "enum:::Image.Stretch,Image.PreserveAspectFit,Image.PreserveAspectCrop,Image.Tile,Image.TileVertically,Image.TileHorizontally,Image.Pad:Image.PreserveAspectFit",
@@ -76,13 +72,12 @@
                 "source": "string::::"
             }
         },
-
-        // BorderImage
         {
             "componentBase": "Item",
             "componentBuiltIn": true,
             "componentCategory": "Image",
             "componentName": "BorderImage",
+            "componentType": "BaseComponent",
             "componentOwnProperties": {
                 "border.bottom": "int:0:::0",
                 "border.left": "int:0:::0",
@@ -94,46 +89,50 @@
                 "source": "string::::"
             }
         },
-
-        // Row
         {
             "componentBase": "Item",
             "componentBuiltIn": true,
             "componentCategory": "Layout",
             "componentName": "Row",
+            "componentType": "BaseComponent",
+            "componentImplicitWidth": true,
+            "componentImplicitHeight": true,
             "componentOwnProperties": {
                 "spacing": "int:0:::0",
+                "layoutDirection": "enum:::Qt.LeftToRight,Qt.RightToLeft:Qt.LeftToRight"
             }
         },
-
-        // Column
         {
             "componentBase": "Item",
             "componentBuiltIn": true,
             "componentCategory": "Layout",
             "componentName": "Column",
+            "componentType": "BaseComponent",
+            "componentImplicitWidth": true,
+            "componentImplicitHeight": true,
             "componentOwnProperties": {
-                "spacing": "int:0:::0",
+                "spacing": "int:0:::0"
             }
         },
-
-        // Flow
         {
             "componentBase": "Item",
             "componentBuiltIn": true,
             "componentCategory": "Layout",
             "componentName": "Flow",
+            "componentType": "BaseComponent",
+            "componentImplicitWidth": true,
+            "componentImplicitHeight": true,
             "componentOwnProperties": {
                 "spacing": "int:0:::0",
+                "layoutDirection": "enum:::Qt.LeftToRight,Qt.RightToLeft:Qt.LeftToRight"
             }
         },
-
-        // Text
         {
             "componentBase": "Item",
             "componentBuiltIn": true,
             "componentCategory": "Visual",
             "componentName": "Text",
+            "componentType": "BaseComponent",
             "componentOwnProperties": {
                 "color": "string::::white",
                 "elide": "enum:::Text.ElideNone,Text.ElideLeft,Text.ElideMiddle,Text.ElideRight:Text.ElideNone",
@@ -146,125 +145,128 @@
                 "wrapMode": "enum:::Text.NoWrap,Text.WordWrap,Text.WrapAnywhere,Text.Wrap:Text.NoWrap"
             }
         },
-
-        // TextInput
         {
-
+            "componentBase": "Item",
+            "componentBuiltIn": true,
+            "componentCategory": "Visual",
+            "componentName": "TextInput",
+            "componentType": "BaseComponent",
+            "componentOwnProperties": {
+                "color": "string::::white",
+                "font.bold": "bool::::false",
+                "font.family": "string::::",
+                "font.pixelSize": "int::::32",
+                "horizontalAlignment": "enum:::Text.AlignHCenter,Text.AlignLeft,Text.AlignRight:Text.AlignHCenter",
+                "text": "string::::Whatever",
+                "verticalAlignment": "enum:::Text.AlignTop,Text.AlignBottom,Text.AlignVCenter:Text.AlignVCenter",
+                "wrapMode": "enum:::Text.NoWrap,Text.WordWrap,Text.WrapAnywhere,Text.Wrap:Text.NoWrap"
+            }
         },
-
-        // ListView
         {
-
+            "componentBase": "Item",
+            "componentBuiltIn": true,
+            "componentCategory": "Container",
+            "componentName": "ListView",
+            "componentType": "BaseComponent",
+            "componentOwnProperties": {
+            }
         },
-
-        // GridView
         {
-
+            "componentBase": "Item",
+            "componentBuiltIn": true,
+            "componentCategory": "Container",
+            "componentName": "GridView",
+            "componentType": "BaseComponent",
+            "componentOwnProperties": {
+            }
         }
-
-        // ...
     ],
-
     "components": [
-
-        // ButtonBase
         {
             "componentBase": "MouseArea",
             "componentBuiltIn": false,
             "componentCategory": "Visual",
             "componentName": "ButtonBase",
+            "componentType": "Component",
             "componentOwnProperties": {
-                "checked": "bool::::false",
+                "checked": "bool::::false"
             }
         },
-
-        // ListItemBase
         {
             "componentBase": "Item",
             "componentBuiltIn": false,
-            "componentCategory": "Visual",
+            "componentCategory": "Delegate",
             "componentName": "ListItemBase",
+            "componentType": "Component",
             "componentOwnProperties": {
             }
         },
-
-        // CellItemBase
         {
-
+            "componentBase": "Item",
+            "componentBuiltIn": false,
+            "componentCategory": "Delegate",
+            "componentName": "CellItemBase",
+            "componentType": "Component",
+            "componentOwnProperties": {
+            }
         }
-
-        // ...
-
     ],
-
     "views": [
-
-        // MainView
         {
             "componentBase": "Item",
             "componentBuiltIn": false,
             "componentCategory": "Visual",
             "componentName": "MainView",
+            "componentType": "View",
             "componentOwnProperties": {
             }
         },
-
-        // AppBase
         {
             "componentBase": "Item",
             "componentBuiltIn": false,
             "componentCategory": "Visual",
             "componentName": "AppBase",
+            "componentType": "View",
             "componentOwnProperties": {
             }
         }
-
-        // ...
-
     ],
-
     "datasources": [
-
-        // SystemModel
         {
             "componentBase": "QtObject",
             "componentBuiltIn": false,
             "componentCategory": "NonVisual",
             "componentName": "SystemModel",
+            "componentType": "DataSource",
             "componentOwnProperties": {
             }
         },
-
-        // Style
         {
             "componentBase": "QtObject",
             "componentBuiltIn": false,
             "componentCategory": "NonVisual",
             "componentName": "Style",
+            "componentType": "DataSource",
             "componentOwnProperties": {
             }
         },
-
-        // Consts
         {
             "componentBase": "QtObject",
             "componentBuiltIn": false,
             "componentCategory": "NonVisual",
             "componentName": "Consts",
+            "componentType": "DataSource",
             "componentOwnProperties": {
             }
         },
-
-        // SettingsModel
         {
             "componentBase": "QtObject",
             "componentBuiltIn": false,
             "componentCategory": "NonVisual",
             "componentName": "SettingsModel",
+            "componentType": "DataSource",
             "componentOwnProperties": {
             }
         }
-
-        // ...
     ]
 }

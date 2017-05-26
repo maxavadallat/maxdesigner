@@ -22,11 +22,6 @@ DSection {
     minHeight: sizeAndPosFlow.height
     state: stateClosed
 
-    signal posXEditClicked()
-    signal posYEditClicked()
-    signal widthEditClicked()
-    signal heightEditClicked()
-
     // Flip Pos X Editor
     function flipPosXEditor(flipState) {
         // Set Flipped State
@@ -58,10 +53,19 @@ DSection {
 
         Row {
             id: posRow
-            height: propertiesController.focusedComponent && !propertiesController.focusedComponent.isRoot ? DStyle.spinnerHeight : 0
+            height: {
+                // Check Focused Component
+                if (propertiesController.focusedComponent && propertiesController.focusedComponent.isRoot) {
+                    return 0;
+                }
+
+                return DStyle.spinnerHeight;
+            }
+
             Behavior on height { DAnimation { } }
             spacing: DStyle.defaultSpacing
             visible: height > 0
+            clip: true
 
             DFlipable {
                 id: posXFlipable
@@ -130,8 +134,8 @@ DSection {
 
                         text: "Edit"
                         onClicked: {
-                            // Emit Pos X Edit Clicked Signal
-                            sizeAndPosSectionRoot.posXEditClicked();
+                            // Emit Pos X Edit Launch Signal
+                            propertiesPaneRoot.posXEditLaunch();
                         }
                     }
                 }
@@ -204,8 +208,8 @@ DSection {
 
                         text: "Edit"
                         onClicked: {
-                            // Emit Pos Y Edit Clicked Signal
-                            sizeAndPosSectionRoot.posYEditClicked();
+                            // Emit Pos Y Edit Launch Signal
+                            propertiesPaneRoot.posYEditLaunch();
                         }
                     }
                 }
@@ -287,8 +291,8 @@ DSection {
 
                         text: "Edit"
                         onClicked: {
-                            // Emit Width Edit Clicked Signal
-                            sizeAndPosSectionRoot.widthEditClicked();
+                            // Emit Width Edit Launch Signal
+                            propertiesPaneRoot.widthEditLaunch();
                         }
                     }
                 }
@@ -368,8 +372,8 @@ DSection {
 
                         text: "Edit"
                         onClicked: {
-                            // Emit Height Edit Clicked Signal
-                            sizeAndPosSectionRoot.heightEditClicked();
+                            // Emit Height Edit Launch Signal
+                            propertiesPaneRoot.heightEditLaunch();
                         }
                     }
                 }

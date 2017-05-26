@@ -128,6 +128,11 @@ DPane {
 
     state: stateCreate
 
+    signal posXEditLaunch()
+    signal posYEditLaunch()
+    signal widthEditLaunch()
+    signal heightEditLaunch()
+
     signal newImportLaunch()
     signal editImportsLaunch(var index)
 

@@ -29,6 +29,8 @@ class ProjectModel : public QObject
     Q_PROPERTY(int screenWidth READ screenWidth NOTIFY screenWidthChanged)
     Q_PROPERTY(int screenHeight READ screenHeight NOTIFY screenHeightChanged)
 
+    Q_PROPERTY(QString dashboard READ dashboard WRITE setDashboard NOTIFY dashboardChanged)
+
     Q_PROPERTY(QString assetsDir READ assetsDir NOTIFY assetsDirChanged)
     Q_PROPERTY(QString baseComponentsDir READ baseComponentsDir NOTIFY baseComponentsDirChanged)
     Q_PROPERTY(QString componentsDir READ componentsDir NOTIFY componentsDirChanged)
@@ -113,6 +115,11 @@ public:
     int screenHeight();
     // Set Project Screen Height
     void setScreenHeight(const int& aHeight);
+
+    // Get Dashboard Image
+    QString dashboard();
+    // Set Dashboard Image
+    void setDashboard(const QString& aDashImage);
 
     // Get Assets Dir
     QString assetsDir();
@@ -206,6 +213,8 @@ signals:
     void screenWidthChanged(const int& aWidth);
     // Project Screen Height Changed Signal
     void screenHeightChanged(const int& aHeight);
+    // Dashboard Image Changed Signal
+    void dashboardChanged(const QString& aDashImage);
     // Assets Dir Changed Signal
     void assetsDirChanged(const QString& aImagesDir);
     // Base Components Dir Changed Signal

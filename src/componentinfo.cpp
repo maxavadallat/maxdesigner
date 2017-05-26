@@ -111,45 +111,19 @@ void ComponentInfo::init()
         setBaseComponent(mProject->getComponentByName(mBaseName));
 
         // Check If ProtoType
-        if (!mProtoType && !mProtoType) {
+        if (!mProtoType && !mIsProtoType) {
             // Set Component ProtoType
             setProtoType(mProject->getComponentByName(mName, mType));
         }
 
-        // Init info Path
-        QString ipTemp = "";
-        // Check Type
-        if (mType == COMPONENT_TYPE_BASECOMPONENT) {
-            // Set Info Path
-            ipTemp = mProject->baseComponentsDir();
-        } else if (mType == COMPONENT_TYPE_COMPONENT) {
-            // Set Info Path
-            ipTemp = mProject->componentsDir();
-        } else if (mType == COMPONENT_TYPE_VIEW) {
-            // Set Info Path
-            ipTemp = mProject->viewsDir();
-        } else if (mType == COMPONENT_TYPE_DATASOURCE) {
-            // Set Info Path
-            ipTemp = mProject->dataSourcesDir();
-        } else if (mType != "") {
-            qWarning() << "ComponentInfo::init - mType: " << mType << " - NOT SUPPORTED TYPE!!";
-
-            return;
-        }
-
-        // Check Component Name
-        if (mName.isEmpty()) {
-            return;
-        }
-
-        // Set Info Path
-        setInfoPath(QString("%1/%2.%3").arg(ipTemp).arg(mName).arg(DEFAULT_JSON_SUFFIX));
-
-        //qDebug() << "ComponentInfo::init - mInfoPath: " << mInfoPath;
-
     } else {
         qWarning() << "ComponentInfo::init - NO PROJECT!!";
     }
+
+    // Init Info Path
+    initInfoPath();
+
+    //qDebug() << "ComponentInfo::init - mInfoPath: " << mInfoPath;
 
     // ...
 }
@@ -188,23 +162,64 @@ void ComponentInfo::clearIDMap()
 }
 
 //==============================================================================
+// Init Info Path
+//==============================================================================
+bool ComponentInfo::initInfoPath()
+{
+    // Check Component Name
+    if (mName.isEmpty()) {
+        //qWarning() << "ComponentInfo::initInfoPath - NO NAME!";
+        return false;
+    }
+
+    // Check Project
+    if (!mProject) {
+        qWarning() << "ComponentInfo::initInfoPath - NO PROJECT!";
+        return false;
+    }
+
+    // Init info Path
+    QString ipTemp = "";
+    // Check Type
+    if (mType == COMPONENT_TYPE_BASECOMPONENT) {
+        // Set Info Path
+        ipTemp = mProject->baseComponentsDir();
+    } else if (mType == COMPONENT_TYPE_COMPONENT) {
+        // Set Info Path
+        ipTemp = mProject->componentsDir();
+    } else if (mType == COMPONENT_TYPE_VIEW) {
+        // Set Info Path
+        ipTemp = mProject->viewsDir();
+    } else if (mType == COMPONENT_TYPE_DATASOURCE) {
+        // Set Info Path
+        ipTemp = mProject->dataSourcesDir();
+    } else if (mType != "") {
+        qWarning() << "ComponentInfo::initInfoPath - mType: " << mType << " - NOT SUPPORTED TYPE!!";
+
+        return false;
+    }
+
+    // Set Info Path
+    setInfoPath(QString("%1/%2.%3").arg(ipTemp).arg(mName).arg(DEFAULT_JSON_SUFFIX));
+
+    return true;
+}
+
+//==============================================================================
 // Load
 //==============================================================================
 bool ComponentInfo::load(const QString& aFilePath, const bool aCreateChildren)
 {
     // Check File Path
     if (aFilePath.isEmpty()) {
-        // Check Project
-        if (!mProject) {
-            return false;
-        }
-    } else {
-        // Set Info Path
-        setInfoPath(aFilePath);
+        return false;
     }
 
+    // Set Info Path
+    //setInfoPath(aFilePath);
+
     // Init Component Info File
-    QFile ciFile(mInfoPath);
+    QFile ciFile(aFilePath);
 
     //qDebug() << "ComponentInfo::load - fileName: " << ciFile.fileName();
 
@@ -221,6 +236,7 @@ bool ComponentInfo::load(const QString& aFilePath, const bool aCreateChildren)
         setDirty(false);
 
         return true;
+
     } else {
         qWarning() << "ComponentInfo::load - mInfoPath: " << mInfoPath << " - ERROR LOADING COMPONENT INFO!";
     }
@@ -743,6 +759,8 @@ void ComponentInfo::setUseIPosX(const bool& aUseIPosX)
         mImplicitPosX = aUseIPosX;
         // Emit Use Implicit Pos X Changed Signal
         emit useIPosXChanged(mImplicitPosX);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -765,6 +783,8 @@ void ComponentInfo::setUseIPosY(const bool& aUseIPosY)
         mImplicitPosY = aUseIPosY;
         // Emit Use Implicit Pos Y Changed Signal
         emit useIPosYChanged(mImplicitPosY);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -787,6 +807,8 @@ void ComponentInfo::setUseIWidth(const bool& aUseIWidth)
         mImplicitWidth = aUseIWidth;
         // Emit Use Implicit Width Changed Signal
         emit useIWidthChanged(mImplicitWidth);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -809,6 +831,8 @@ void ComponentInfo::setUseIHeight(const bool& aUseIHeight)
         mImplicitHeight = aUseIHeight;
         // Emit Use Implicit Height Changed Signal
         emit useIHeightChanged(mImplicitHeight);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -1200,6 +1224,30 @@ QJsonObject ComponentInfo::toJSONObject(const bool& aChild)
         ciObject[JSON_KEY_COMPONENT_BUILTIN] = QJsonValue(mBuiltIn);
     }
 
+    // Check Use Implicit Pos X
+    if (mImplicitPosX) {
+        // Set Use Implicit Pos X
+        ciObject[JSON_KEY_COMPONENT_USE_IMPLICIT_POSX] = QJsonValue(mImplicitPosX);
+    }
+
+    // Check Use Implicit Pos Y
+    if (mImplicitPosY) {
+        // Set Use Implicit Pos Y
+        ciObject[JSON_KEY_COMPONENT_USE_IMPLICIT_POSY] = QJsonValue(mImplicitPosY);
+    }
+
+    // Check Use Implicit Width
+    if (mImplicitWidth) {
+        // Set Use Implicit Width
+        ciObject[JSON_KEY_COMPONENT_USE_IMPLICIT_WIDTH] = QJsonValue(mImplicitWidth);
+    }
+
+    // Check Use Implicit Height
+    if (mImplicitHeight) {
+        // Set Use Implicit Height
+        ciObject[JSON_KEY_COMPONENT_USE_IMPLICIT_HEIGHT] = QJsonValue(mImplicitHeight);
+    }
+
     // ...
 
     // Check Anchors
@@ -1297,10 +1345,18 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject, const bool aCreat
 {
     // Set Component Name
     setComponentName(aObject[JSON_KEY_COMPONENT_NAME].toString());
+
+    qDebug() << "ComponentInfo::fromJSONObject - mName: " << mName;
+
     // Set Component Type
     setComponentType(aObject[JSON_KEY_COMPONENT_TYPE].toString());
+
+    // Init Info Path
+    initInfoPath();
+
     // Set Component Tag
     setComponentTag(aObject[JSON_KEY_COMPONENT_TAG].toString());
+
     // Check Keys
     if (aObject.keys().indexOf(JSON_KEY_COMPONENT_CATEGORY) >= 0) {
         // Set Component Category
@@ -1323,6 +1379,32 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject, const bool aCreat
         // Set Built In
         setBuiltIn(aObject[JSON_KEY_COMPONENT_BUILTIN].toBool());
     }
+
+    // Check Keys - Use Implicit Pos X
+    if (aObject.keys().indexOf(JSON_KEY_COMPONENT_USE_IMPLICIT_POSX) >= 0) {
+        // Set Use Implicit Pos X
+        setUseIPosX(aObject[JSON_KEY_COMPONENT_USE_IMPLICIT_POSX].toBool());
+    }
+
+    // Check Keys - Use Implicit Pos Y
+    if (aObject.keys().indexOf(JSON_KEY_COMPONENT_USE_IMPLICIT_POSY) >= 0) {
+        // Set Use Implicit Pos Y
+        setUseIPosY(aObject[JSON_KEY_COMPONENT_USE_IMPLICIT_POSY].toBool());
+    }
+
+    // Check Keys - Use Implicit Width
+    if (aObject.keys().indexOf(JSON_KEY_COMPONENT_USE_IMPLICIT_WIDTH) >= 0) {
+        // Set Use Implicit Width
+        setUseIWidth(aObject[JSON_KEY_COMPONENT_USE_IMPLICIT_WIDTH].toBool());
+    }
+
+    // Check Keys - Use Implicit Height
+    if (aObject.keys().indexOf(JSON_KEY_COMPONENT_USE_IMPLICIT_HEIGHT) >= 0) {
+        // Set Use Implicit Height
+        setUseIHeight(aObject[JSON_KEY_COMPONENT_USE_IMPLICIT_HEIGHT].toBool());
+    }
+
+    // ...
 
 //    // Set Parent Component
 //    mParent = mProject ? mProject->getComponentByName(aObject[JSON_KEY_COMPONENT_PARENT].toString()) : NULL;
@@ -1449,6 +1531,7 @@ void ComponentInfo::requestClose()
 {
     // Check If Is Root
     if (mIsRoot) {
+        qDebug() << "ComponentInfo::requestClose";
         // Emit Request Container Close
         emit requestContainerClose();
     }
@@ -1514,6 +1597,7 @@ void ComponentInfo::clearObjectID(const QString& aID)
 
     // Check If ID Is Already Registered
     if (rootInfo->mIDMap.keys().indexOf(aID) >= 0) {
+        qDebug() << "ComponentInfo::clearObjectID - aID: " << aID;
         // Remove Object ID
         rootInfo->mIDMap.remove(aID);
     } else {
