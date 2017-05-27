@@ -125,6 +125,8 @@ public:
         PropertyMinRole,
         PropertyMaxRole,
         PropertyValueRole,
+        PropertyReadOnlyRole,
+        PropertyDefaultRole,
         PropertyIsBind,
         PropertyIsFormula,
         PropertyIsProto,

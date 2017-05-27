@@ -7,18 +7,25 @@ import "style"
 DPaneBase {
     id: enumValueEditorRoot
 
+    anchors.horizontalCenter: parentPane ? parentPane.horizontalCenter : undefined
+
     title: "New Value"
 
     hideToSide: hideToTop
 
-    creationWidth: 272
+    creationWidth: 320
     creationHeight: 98
 
-    minWidth: 272
+    minWidth: 320
     minHeight: 98
 
-    enableResize: false
+    enableDrag: false
+
+    enableResize: true
     enableHideButton: false
+
+    resizeTopEnabled: false
+    resizeBottomEnabled: false
 
     property string enumValue: ""
 
@@ -56,6 +63,7 @@ DPaneBase {
     }
 
     DDisc {
+        id: discButton
         anchors.right: parent.right
         anchors.rightMargin: DStyle.defaultMargin * 2
         anchors.verticalCenter: parent.verticalCenter
@@ -91,7 +99,7 @@ DPaneBase {
 
         DTextInput {
             id: enumValueEditor
-            width: 120
+            width: enumValueEditorRoot.width - discButton.width - valueLabel.width - 32 - DStyle.defaultMargin * 3
             onKeyEvent: {
                 switch (event.key) {
                     case Qt.Key_Escape:

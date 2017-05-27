@@ -40,7 +40,11 @@ ProjectModel::ProjectModel(PropertiesController* aPropertiesController, QObject*
 //==============================================================================
 void ProjectModel::init()
 {
-    // ...
+    // Check Properties Controller
+    if (mPropertiesController) {
+        // Set Current Project
+        mPropertiesController->setCurrentProject(this);
+    }
 }
 
 //==============================================================================
@@ -332,22 +336,28 @@ void ProjectModel::updateBaseComponents()
 {
     qDebug() << "ProjectModel::updateBaseComponents";
 
-    // Base Components
+    // Check Base Components
     if (mBaseComponents) {
         // Update Base Components
         mBaseComponents->updateBaseComponents();
     }
 
-    // Components
+    // Check Components
     if (mComponents) {
         // Update Base Components
         mComponents->updateBaseComponents();
     }
 
-    // Views
+    // Check Views
     if (mViews) {
         // Update Base Components
         mViews->updateBaseComponents();
+    }
+
+    // Check Data Sources
+    if (mDataSources) {
+        // Update Base Components
+        mDataSources->updateBaseComponents();
     }
 
     // ...
@@ -408,6 +418,9 @@ bool ProjectModel::initProject(const QString& aName, const QString& aDir)
 
         // Create Initial Components
         createInitialComponents();
+
+        // Update Base Components
+        updateBaseComponents();
 
         // ...
 

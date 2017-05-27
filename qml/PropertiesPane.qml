@@ -377,7 +377,7 @@ DPane {
     DControl {
         id: noFocusedComponentContainer
         width: propertiesPaneRoot.width
-        height: propertiesPaneRoot.height - propertiesPaneRoot.titleHeight
+        height: propertiesPaneRoot.height * 0.7 - propertiesPaneRoot.titleHeight
 
         DText {
             anchors.centerIn: parent

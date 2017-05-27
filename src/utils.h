@@ -21,10 +21,12 @@ public:
                                        const QString& aValue,
                                        const QString& aMin = "",
                                        const QString& aMax = "",
-                                       const QString& aEnums = "");
+                                       const QString& aEnums = "",
+                                       const bool& aReadOnly = false,
+                                       const bool& aDefault = false);
 
     // Parse Component Property Type
-    static QString parseType(const QString& aTypeAndValue);
+    static QString parseType(const QString& aTypeAndValue, bool& readOnly, bool& defaultAlias, const bool& aTypeOnly = false);
     // Parse Component Property Enum Values
     static QStringList parseEnumValues(const QString& aTypeAndValue);
     // Parse Component Property Enum Values

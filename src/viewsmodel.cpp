@@ -109,10 +109,10 @@ void ViewsModel::updateBaseComponents()
         return;
     }
 
-    // Get Base Components Count
-    int bcCount = rowCount();
+    // Get Views Count
+    int vCount = rowCount();
     // Iterate Through Base Components
-    for (int i=0; i<bcCount; i++) {
+    for (int i=0; i<vCount; i++) {
         // Get Component
         ComponentInfo* component = getViewByIndex(i);
         // Check Base Name

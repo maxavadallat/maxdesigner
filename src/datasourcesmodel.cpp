@@ -101,6 +101,31 @@ void DataSourcesModel::loadDataSources()
 }
 
 //==============================================================================
+// Update Base Components
+//==============================================================================
+void DataSourcesModel::updateBaseComponents()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    // Get Data Sources Count
+    int dsCount = rowCount();
+    // Iterate Through Base Components
+    for (int i=0; i<dsCount; i++) {
+        // Get Component
+        ComponentInfo* component = getDataSourceByIndex(i);
+        // Check Base Name
+        if (component && !component->mBaseName.isEmpty() && !component->mBase) {
+            //qDebug() << "DataSourcesModel::updateBaseComponents - name: " << component->mName;
+            // Set Base Component
+            component->setBaseComponent(mProjectModel->getComponentByName(component->mBaseName));
+        }
+    }
+}
+
+//==============================================================================
 // Save All Components
 //==============================================================================
 void DataSourcesModel::saveAllComponents()

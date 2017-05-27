@@ -63,12 +63,16 @@ Repeater {
                 delegate: DPropertyItem {
                     id: propertyItemDelegate
                     width: basePropertiesRepeaterRoot.width
+
                     namesColumnWidth: basePropertiesRepeaterRoot.namesColumnWidth
+
                     itemIndex: index
                     propertyName: model.pName
                     propertyType: model.pType
                     propertyValue: model.pValue
                     propertyEnums: model.pEnums
+                    propertyReadOnly: model.pReadOnly
+
                     showFormula: model.pIsFormula || model.pIsBind
                     enableSwipe: !model.pIsBase
                     opacity: !model.pIsBase ? 1.0 : 0.6

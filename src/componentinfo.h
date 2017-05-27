@@ -668,7 +668,7 @@ protected:
     // Format Signals
     QString liveCodeFormatSignals(const QStringList& aOPKeys, const QStringList& pKeys, const QString& aIndent = "");
     // Format Slots
-    QString liveCodeFormatSlots(const QString& aIndent = "");
+    QString liveCodeFormatSlots(const QStringList& aOPKeys, const QStringList& pKeys, const QString& aIndent = "");
     // Format Functions
     QString liveCodeFormatFunctions(const QStringList& aOPHooks, const QStringList& aPHooks, const QStringList& aEnumHooks, const QString& aIndent = "");
     // Format Children

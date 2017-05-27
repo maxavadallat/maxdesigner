@@ -53,14 +53,19 @@ DSection {
             delegate: DPropertyItem {
                 id: propertyItemDelegate
                 width: ownPropertiesListView.width
+
                 namesColumnWidth: ownPropertiesSectionRoot.namesColumnWidth
+
                 itemIndex: index
                 propertyName: model.pName
                 propertyType: model.pType
                 propertyValue: model.pValue
                 propertyEnums: model.pEnums
+                propertyReadOnly: model.pReadOnly
+
                 showFormula: model.pIsFormula || model.pIsBind
                 actionButtonText: !model.pIsProto && !model.pUseProto ? "Reset" : "Delete"
+
                 enableSwipe: model.pIsProto || (!model.pIsProto && !model.pUseProto)
 
                 property int sourceIndex: ownPropertiesListView.opFilter.getSourceIndex(itemIndex)

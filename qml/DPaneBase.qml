@@ -357,24 +357,23 @@ DContainer {
         }
     }
 
-    // Title
-    DText {
-        id: titleTextLabel
-        parent: paneBaseRoot
-        anchors.left: parent.left
-        anchors.leftMargin: DStyle.defaultMargin
-        anchors.top: parent.top
-        anchors.topMargin: DStyle.defaultMargin
-        text: paneBaseRoot.title
-        Behavior on opacity { DFadeAnimation { } }
-        opacity: 0.0
-        visible: paneBaseRoot.showTitle && opacity > 0.0
-    }
-
     // Content Container
     Item {
         id: paneContentContainer
         anchors.fill: parent
+
+        // Title
+        DText {
+            id: titleTextLabel
+            anchors.left: parent.left
+            anchors.leftMargin: DStyle.defaultMargin
+            anchors.top: parent.top
+            anchors.topMargin: DStyle.defaultMargin
+            text: paneBaseRoot.title
+            Behavior on opacity { DFadeAnimation { } }
+            opacity: 0.0
+            visible: paneBaseRoot.showTitle && opacity > 0.0
+        }
     }
 
     // Hide/Show Button

@@ -1690,7 +1690,7 @@ QString ComponentInfo::liveCodeFormatImports(const bool& /*aLiveRoot*/)
         }
     } else {
         // Append Imports
-        liveCode += QString("import QtQuick 2.0\n");
+        liveCode += QString("import QtQuick 2.7\n");
     }
 
     // Add New Line
@@ -2041,12 +2041,18 @@ QString ComponentInfo::liveCodeFormatOwnProperties(QStringList& aOPHooks, QStrin
 
         // Iterate Through Own Properties
         for (int i=0; i<opCount; i++) {
+            // Get Property Name
+            QString pName = opKeys[i];
             // Check Filtered Properties
-            if (aFPKeys.indexOf(opKeys[i]) == -1) {
+            if (aFPKeys.indexOf(pName) == -1) {
                 // Get Type And Value
-                QString typeAndValue = propertyTypeAndValue(opKeys[i]);
+                QString typeAndValue = propertyTypeAndValue(pName);
+                // Init Read Only
+                bool readOnly = false;
+                // Init Default Alias
+                bool defaultAlias = false;
                 // Get Type
-                QString pType = Utils::parseType(typeAndValue);
+                QString pType = Utils::parseType(typeAndValue, readOnly, defaultAlias);
                 // Get Value
                 QString pValue = Utils::parseValue(typeAndValue);
 
@@ -2059,30 +2065,47 @@ QString ComponentInfo::liveCodeFormatOwnProperties(QStringList& aOPHooks, QStrin
                 }
 
                 // Check Inherited Property Keys
-                if (pKeys.indexOf(opKeys[i]) == -1) {
+                if (pKeys.indexOf(pName) == -1) {
                     // Check If Built In Component
                     if (mBuiltIn) {
-                        // Append Live Code
-                        liveCode += QString("%1%3: %4\n").arg(aIndent).arg(opKeys[i]).arg(pValue);
+                        // Check If Read Only
+                        if (!readOnly) {
+                            // Append Live Code
+                            liveCode += QString("%1%3: %4\n").arg(aIndent).arg(pName).arg(pValue);
+                        }
+
                     } else {
-                        // Append Live Code
-                        liveCode += QString("%1property %2 %3: %4\n").arg(aIndent).arg(pType).arg(opKeys[i]).arg(pValue);
+                        // Check Read Only
+                        if (readOnly) {
+                            // Append Live Code
+                            liveCode += QString("%1readonly property %2 %3: %4\n").arg(aIndent).arg(pType).arg(pName).arg(pValue);
+                        } else if (defaultAlias) {
+                            // Append Live Code
+                            liveCode += QString("%1default property %2 %3: %4\n").arg(aIndent).arg(pType).arg(pName).arg(pValue);
+                        } else {
+                            // Append Live Code
+                            liveCode += QString("%1property %2 %3: %4\n").arg(aIndent).arg(pType).arg(pName).arg(pValue);
+                        }
                     }
                 }
 
                 // Check Property Type
                 if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM) {
                     // Add Enum Values to Enum Hooks
-                    aEnumHooks << liveCodeGenerateEnumValueCases(propertyEnums(opKeys[i]));
+                    aEnumHooks << liveCodeGenerateEnumValueCases(propertyEnums(pName));
 
                     // Value Setting Hook
-                    aOPHooks << QString("%1%1%1case \"%2\": %3.%2 = __string2enum(value); break;\n").arg(aIndent).arg(opKeys[i]).arg(aID);
+                    aOPHooks << QString("%1%1%1case \"%2\": %3.%2 = __string2enum(value); break;\n").arg(aIndent).arg(pName).arg(aID);
 
                 } else {
-                    // Add Value Setting Hook
-                    aOPHooks << QString("%1%1%1case \"%2\": %3.%2 = value; break;\n").arg(aIndent).arg(opKeys[i]).arg(aID);
-
+                    // Check If Read Only
+                    if (!readOnly) {
+                        // Add Value Setting Hook
+                        aOPHooks << QString("%1%1%1case \"%2\": %3.%2 = value; break;\n").arg(aIndent).arg(pName).arg(aID);
+                    }
                 }
+
+                // TODO: Handle Property Changes -> Add propertyChanged Slots
             }
         }
     }
@@ -2112,108 +2135,48 @@ QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks, Q
         for (int k=0; k<pCount; k++) {
             // Get Type
             QString pType = propertyType(pKeys[k]);
+            // Init ReadOnly
+            bool readOnly = pType.indexOf(JSON_VALUE_PROPERTY_TYPE_PREFIX_READONLY) >= 0;
             // Get Value
             QString pValue = componentProperty(pKeys[k]).toString();
 
-            // Check Key
-            if (aFPKeys.indexOf(pKeys[k]) == -1) {
+            // Check readOnly
+            if (!readOnly) {
+                // Check Key
+                if (aFPKeys.indexOf(pKeys[k]) == -1) {
 
-                // Check Type
-                if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING) {
-                    // Set Value
-                    pValue = QString("\"%1\"").arg(pValue);
+                    // Check Type
+                    if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING) {
+                        // Set Value
+                        pValue = QString("\"%1\"").arg(pValue);
+                    }
+
+                    // Append Live Code
+                    liveCode += QString("%1%2: %3\n").arg(aIndent).arg(pKeys[k]).arg(pValue);
                 }
 
-                // Append Live Code
-                liveCode += QString("%1%2: %3\n").arg(aIndent).arg(pKeys[k]).arg(pValue);
-            }
+                // Check Property Key
+                if (pKeys[k] != JSON_KEY_COMPONENT_PROPERTY_ID) {
+                    // Check Property Type
+                    if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM) {
 
-            // Check Property Key
-            if (pKeys[k] != JSON_KEY_COMPONENT_PROPERTY_ID) {
-                // Check Property Type
-                if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM) {
+                        // Add Enum Values To Enum Hooks
+                        aEnumHooks << liveCodeGenerateEnumValueCases(propertyEnums(pKeys[k]));
 
-                    // Add Enum Values To Enum Hooks
-                    aEnumHooks << liveCodeGenerateEnumValueCases(propertyEnums(pKeys[k]));
+                        // Add Value Setting Hook
+                        aPHooks << QString("%1%1%1case \"%2\": %3.%2 = __string2enum(value); break;\n").arg(aIndent).arg(pKeys[k]).arg(aID);
 
-                    // Add Value Setting Hook
-                    aPHooks << QString("%1%1%1case \"%2\": %3.%2 = __string2enum(value); break;\n").arg(aIndent).arg(pKeys[k]).arg(aID);
-
-                } else {
-                    // Add Value Setting Hook
-                    aPHooks << QString("%1%1%1case \"%2\": %3.%2 = value; break;\n").arg(aIndent).arg(pKeys[k]).arg(aID);
+                    } else {
+                        // Add Value Setting Hook
+                        aPHooks << QString("%1%1%1case \"%2\": %3.%2 = value; break;\n").arg(aIndent).arg(pKeys[k]).arg(aID);
+                    }
                 }
             }
-        }
-    }
 
-/*
-    // Get Properties Keys
-    QStringList pKeys = mProperties.keys();
-    // Get Properties Count
-    int pCount = pKeys.count();
-
-    // Check Inherited Properties Keys Count
-    if (pCount > 0) {
-        // Add New Line
-        liveCode += "\n";
-
-        // Iterate Through Properties
-        for (int k=0; k<pCount; k++) {
-
-            // Check If Filtered Property
-            if (aFPKeys.indexOf(pKeys[k]) == -1) {
-                // Get Type
-                QString pType = propertyType(pKeys[k]);
-                // Get Value
-                QString pValue = mProperties.value(pKeys[k]).toString();
-                // Check Type
-                if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING) {
-                    // Set Value
-                    pValue = QString("\"%1\"").arg(pValue);
-                }
-                // Append Live Code
-                liveCode += QString("%1%2: %3\n").arg(aIndent).arg(pKeys[k]).arg(pValue);
-            }
+            // TODO: Handle Property Changes -> PropertyChanged Slot
 
         }
     }
-
-    // Get All Inherited Property Keys
-    pKeys = inheritedPropertyKeys();
-
-    //qDebug() << "ComponentInfo::liveCodeFormatInheritedProperties - pKeys: " << pKeys;
-
-    // Get Inherited Properties Count
-    pCount = pKeys.count();
-
-    // Iterate Through Inherited Property Keys
-    for (int l=0; l<pCount; l++) {
-        // Check For ID
-        if (pKeys[l] != JSON_KEY_COMPONENT_PROPERTY_ID) {
-            // Get Property Type
-            QString pType = propertyType(pKeys[l]);
-
-            // Check Property Type
-            if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM) {
-
-                // Add Enum Values To Enum Hooks
-                aEnumHooks << liveCodeGenerateEnumValuecases(propertyEnums(pKeys[l]));
-
-                // Add Value Setting Hook
-                aPHooks << QString("%1%1%1case \"%2\": %3.%2 = __string2enum(value); break;\n").arg(aIndent).arg(pKeys[l]).arg(aID);
-
-            } else {
-                // Add Value Setting Hook
-                aPHooks << QString("%1%1%1case \"%2\": %3.%2 = value; break;\n").arg(aIndent).arg(pKeys[l]).arg(aID);
-            }
-        }
-    }
-
-    // TODO: Add Inherited Property Hooks
-
-    // ...
-*/
 
     return liveCode;
 }
@@ -2272,13 +2235,21 @@ QString ComponentInfo::liveCodeFormatSignals(const QStringList& /*aOPKeys*/, con
         }
     }
 
+    // TODO: Add Property Changes Signal
+
+    // Own Properties
+
+    // Inherited Properties
+
+    // ...
+
     return liveCode;
 }
 
 //==============================================================================
 // Format Slots
 //==============================================================================
-QString ComponentInfo::liveCodeFormatSlots(const QString& aIndent)
+QString ComponentInfo::liveCodeFormatSlots(const QStringList& /*aOPKeys*/, const QStringList& /*pKeys*/, const QString& aIndent)
 {
     // Init Live Code
     QString liveCode = "";
@@ -2306,8 +2277,7 @@ QString ComponentInfo::liveCodeFormatSlots(const QString& aIndent)
 
     // TODO: Add Property Value Changed Slots
 
-
-    // TODO: Add Property Value Changed Signals
+    // TODO: Add Property Value Changed Signal
 
     return liveCode;
 }
@@ -2623,11 +2593,11 @@ QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGene
 
     // Add Signals =============================================================
 
-    liveCode += liveCodeFormatSignals(mOwnProperties.keys(), mProperties.keys(), indent);
+    liveCode += liveCodeFormatSignals(componentOwnPropertyKeys(), inheritedPropertyKeys(), indent);
 
     // Add Slots ===============================================================
 
-    liveCode += liveCodeFormatSlots(indent);
+    liveCode += liveCodeFormatSlots(componentOwnPropertyKeys(), inheritedPropertyKeys(), indent);
 
     // Add Hooks for Property Getters And Setters and Functions ================
 
@@ -2986,10 +2956,15 @@ QString ComponentInfo::propertyType(const QString& aName)
     // Get Property Index
     int opIndex = opKeys.indexOf(aName);
 
+    // Init Read Only
+    bool readOnly = false;
+    // Init Default Alias
+    bool defaultAlias = false;
+
     // Check Property Index
     if (opIndex >= 0) {
         // Get Type
-        return Utils::parseType(mOwnProperties.value(aName).toString());
+        return Utils::parseType(mOwnProperties.value(aName).toString(), readOnly, defaultAlias);
     }
 
     // Check Prototype

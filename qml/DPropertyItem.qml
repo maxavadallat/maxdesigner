@@ -16,6 +16,8 @@ Item {
     property string propertyValue: "value"
     property string propertyEnums: ""
 
+    property bool propertyReadOnly: false
+
     property bool showFormula: false
 
     property int itemIndex: -1
@@ -64,7 +66,7 @@ Item {
 
         Behavior on anchors.topMargin { DAnimation { } }
 
-        enabled: !propertyItemRoot.markFordeletion
+        enabled: !propertyItemRoot.markFordeletion && !propertyItemRoot.propertyReadOnly
 
         flipped: propertyItemRoot.showFormula
 
@@ -72,8 +74,11 @@ Item {
             id: frontDelegate
             width: propertyItemFlipable.width
             height: propertyItemFlipable.height
+
+            enabled: !propertyItemRoot.propertyReadOnly
+
             namesColumnWidth: propertyItemRoot.namesColumnWidth
-            propertyName: propertyItemRoot.propertyName
+            propertyName: propertyItemRoot.propertyReadOnly ? "•" + propertyItemRoot.propertyName : propertyItemRoot.propertyName
             propertyType: propertyItemRoot.propertyType
             propertyValue: propertyItemRoot.propertyValue
             propertyStep: propertyItemRoot.propertyStep
@@ -111,6 +116,9 @@ Item {
         back: DPropertyItemFormula {
             width: propertyItemFlipable.width
             height: propertyItemFlipable.height
+
+            enabled: !propertyItemRoot.propertyReadOnly
+
             namesColumnWidth: propertyItemRoot.namesColumnWidth
             propertyName: propertyItemRoot.propertyName
             propertyFormula: propertyItemRoot.propertyValue

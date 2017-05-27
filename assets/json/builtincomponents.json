@@ -52,9 +52,9 @@
             "componentName": "MouseArea",
             "componentType": "BaseComponent",
             "componentOwnProperties": {
-                "containsMouse": "bool::::false",
-                "containsPress": "bool::::false",
-                "pressed": "bool::::false",
+                "containsMouse": "readonly bool::::false",
+                "containsPress": "readonly bool::::false",
+                "pressed": "readonly bool::::false",
                 "hoverEnabled": "bool::::false",
                 "preventStealing": "bool::::false"
             }
@@ -133,6 +133,8 @@
             "componentCategory": "Visual",
             "componentName": "Text",
             "componentType": "BaseComponent",
+            "componentImplicitWidth": true,
+            "componentImplicitHeight": true,
             "componentOwnProperties": {
                 "color": "string::::white",
                 "elide": "enum:::Text.ElideNone,Text.ElideLeft,Text.ElideMiddle,Text.ElideRight:Text.ElideNone",

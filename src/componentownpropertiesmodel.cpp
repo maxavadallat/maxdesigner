@@ -594,8 +594,13 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
         // Init Using Base Property Vaue
         bool opBase = (dcpkIndex == -1);
 
+        // Init Read Only
+        bool opReadOnly = false;
+        // Init Default Alias
+        bool opDefaultAlias = false;
+
         // Get Type
-        QString opType = Utils::parseType(opTypeAndValue);
+        QString opType = Utils::parseType(opTypeAndValue, opReadOnly, opDefaultAlias, true);
 
         // Get Formula
         bool opFormula = Utils::hasFormula(opTypeAndValue) > 0;
@@ -645,79 +650,14 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
             case PropertyTypeRole:      return opType;
             case PropertyEnumsRole:     return opEnumValues;
             case PropertyValueRole:     return opValue;
+            case PropertyReadOnlyRole:  return opReadOnly;
+            case PropertyDefaultRole:   return opDefaultAlias;
             case PropertyIsBind:        return opBind;
             case PropertyIsFormula:     return opFormula;
             case PropertyIsProto:       return opProtoType;
             case PropertyUseProto:      return opUseProto;
             case PropertyIsBase:        return opBase;
         }
-
-
-/*
-        // Get Own Property Key Index
-        int opkIndex = mComponent->mOwnProperties.keys().indexOf(opKey);
-
-        // Init Type & Value
-        QString opTypeAndValue = "";
-
-        // Init Property Is Prototype
-        bool opProtoType = false;
-
-        // Get Inherited Property Index
-        int ipkIndex = mDerivedComponent ? mDerivedComponent->mProperties.keys().indexOf(opKey) : -1;
-        // Init Using Base Property
-        bool opBase = (ipkIndex < 0);
-
-        // Check Own Property Key Index
-        if (opkIndex >= 0) {
-            // Get Own Property Type & Value
-            opTypeAndValue = mComponent->mOwnProperties.value(opKey).toString();
-        } else {
-            // Get Own Property Type & Value
-            opTypeAndValue = mComponent->mProtoType ? mComponent->mProtoType->mOwnProperties.value(opKey).toString() : "";
-            // Set Property Is Prototype
-            opProtoType = true;
-        }
-
-        // Check Own Property Type And Value
-        if (!opTypeAndValue.isEmpty()) {
-            // Get Type
-            QString opType = Utils::parseType(opTypeAndValue);
-            // Init Property Value
-            QString opValue = "";
-
-            // Check Own Property Base
-            if (opBase) {
-                // Set Own Property Value
-                opValue = Utils::parseValue(opTypeAndValue);
-            } else {
-                // Set Own Property Value Value
-                opValue = mDerivedComponent->mProperties.value(opKey).toString();
-            }
-
-            // Get Formula
-            bool opFormula = Utils::hasFormula(opTypeAndValue) > 0;
-            // Get Property Bind
-            bool opBind = Utils::hasBinding(opTypeAndValue) > 0;
-            // Get Enum Values
-            QString opEnumValues = Utils::parseEnumValuesToString(opTypeAndValue);
-
-            //qDebug() << "ComponentOwnPropertiesModel::data - opKey: " << opKey << " - opValue: " << opValue << " - opBase: " << opBase;
-
-            // Switch Role
-            switch (role) {
-                default:
-                case PropertyNameRole:      return opKey;
-                case PropertyTypeRole:      return opType;
-                case PropertyEnumsRole:     return opEnumValues;
-                case PropertyValueRole:     return opValue;
-                case PropertyIsBind:        return opBind;
-                case PropertyIsFormula:     return opFormula;
-                case PropertyIsProto:       return opProtoType;
-                case PropertyIsBase:        return opBase;
-            }
-        }
-*/
     }
 
     return QVariant();
@@ -731,15 +671,17 @@ QHash<int, QByteArray> ComponentOwnPropertiesModel::roleNames() const
     // Init Role Names
     QHash<int, QByteArray> rNames;
 
-    rNames[PropertyNameRole]  = "pName";
-    rNames[PropertyTypeRole]  = "pType";
-    rNames[PropertyEnumsRole] = "pEnums";
-    rNames[PropertyValueRole] = "pValue";
-    rNames[PropertyIsBind]    = "pIsBind";
-    rNames[PropertyIsFormula] = "pIsFormula";
-    rNames[PropertyIsProto]   = "pIsProto";
-    rNames[PropertyUseProto]  = "pUseProto";
-    rNames[PropertyIsBase]    = "pIsBase";
+    rNames[PropertyNameRole]     = "pName";
+    rNames[PropertyTypeRole]     = "pType";
+    rNames[PropertyEnumsRole]    = "pEnums";
+    rNames[PropertyValueRole]    = "pValue";
+    rNames[PropertyReadOnlyRole] = "pReadOnly";
+    rNames[PropertyDefaultRole]  = "pDefault";
+    rNames[PropertyIsBind]       = "pIsBind";
+    rNames[PropertyIsFormula]    = "pIsFormula";
+    rNames[PropertyIsProto]      = "pIsProto";
+    rNames[PropertyUseProto]     = "pUseProto";
+    rNames[PropertyIsBase]       = "pIsBase";
 
     return rNames;
 }

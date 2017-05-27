@@ -16,12 +16,16 @@ DPaneBase {
     property string propertyMax: ""
     property string propertyEnums: ""
     property string propertyDefault: ""
+    property bool propertyReadOnly: false
+    property bool propertyDefaultAlias: false
 
     property bool newProperty: true
 
     property int propertyIndex: -1
 
     property var enumValues: []
+
+    property int labelsWidth: 66
 
     property Connections enumValueEditorConnections: Connections {
         target: childPane
@@ -57,7 +61,13 @@ DPaneBase {
     minWidth: 360
     minHeight: propertyFieldsColumn.height + 48//148
 
-    enableResize: false
+    enableResize: true
+
+    enableHideButton: false
+
+    resizeRightEnabled: false
+    resizeTopEnabled: false
+    resizeBottomEnabled: false
 
     signal newEnumValue()
 
@@ -111,10 +121,20 @@ DPaneBase {
         propertyEditorRoot.propertyEnums = "";
         // Reset Default Value
         propertyEditorRoot.propertyDefault = "";
+        // Reset Read Only
+        propertyEditorRoot.propertyReadOnly = false;
+        // Reset Default Alias
+        propertyEditorRoot.propertyDefaultAlias = false;
         // Clear Enum Values
         propertyEditorRoot.clearEnumValues();
         // Reset Child Pane
         propertyEditorRoot.childPane.resetEnumValueEditor();
+        // Reset Default Bool Value Switch
+        defaultSwitch.checked = false;
+        // Reset Read Only Switch
+        readOnlySwitch.checked = false;
+        // Reset Default ALias Switch
+        defaultAliasSwitch.checked = false;
 
         // ...
     }
@@ -145,6 +165,11 @@ DPaneBase {
 
     // Check If New Enum Value Is Valid
     function enumValueValid(newValue) {
+        // Check Length
+        if (newValue.length === 0) {
+            return false;
+        }
+
         return (propertyEditorRoot.enumValues.indexOf(newValue) < 0);
     }
 
@@ -201,6 +226,11 @@ DPaneBase {
             case 8: propertyEditorRoot.propertyDefault = defaultOption.getItemText(defaultOption.currentIndex); break;
         }
 
+        // Set Property Read Only
+        propertyEditorRoot.propertyReadOnly = readOnlySwitch.checked;
+        // Set Property Default Alias
+        propertyEditorRoot.propertyDefaultAlias = defaultAliasSwitch.checked;
+
         // ...
     }
 
@@ -245,7 +275,7 @@ DPaneBase {
 
             DText {
                 id: nameLabel
-                width: 58
+                width: propertyEditorRoot.labelsWidth
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Text.AlignRight
                 text: "Name:"
@@ -253,7 +283,7 @@ DPaneBase {
 
             DTextInput {
                 id: nameEditor
-                width: propertyFieldsColumn.width - nameLabel.width - DStyle.defaultSpacing //typeOption.width
+                width: propertyFieldsColumn.width - propertyEditorRoot.labelsWidth - DStyle.defaultSpacing * 2 //typeOption.width
                 anchors.verticalCenter: parent.verticalCenter
                 text: propertyEditorRoot.propertyName
 
@@ -296,7 +326,7 @@ DPaneBase {
 
             DText {
                 id: typeLabel
-                width: 58
+                width: propertyEditorRoot.labelsWidth
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Text.AlignRight
                 text: "Type:"
@@ -321,20 +351,22 @@ DPaneBase {
                 ]
 
                 onZChanged: {
+                    // Set Parent Z
                     parent.z = typeOption.z;
                 }
 
                 onCurrentIndexChanged: {
                     // Switch Selected Index
                     switch (currentIndex) {
-                        default:    defaultEditor.text = "";        break;
-                        case 1:     defaultEditor.text = "false";   break;
-                        case 2:     defaultEditor.text = "0";       break;
+                        default:    defaultEditor.text = "";            break;
+                        case 1:     defaultEditor.text = "false";       break;
+                        case 2:     defaultEditor.text = "0";           break;
                         case 3:
-                        case 4:     defaultEditor.text = "0.0";     break;
+                        case 4:     defaultEditor.text = "0.0";         break;
                         case 5:
-                        case 6:     defaultEditor.text = "null";    break;
+                        case 6:     defaultEditor.text = "null";        break;
                         case 8:     /*defaultOption.currentIndex = 0;*/ break;
+                        case 9:     defaultAliasSwitch.checked = false; break;
                     }
                 }
 
@@ -401,7 +433,7 @@ DPaneBase {
 
                 DText {
                     id: valueMinLabel
-                    width: 58
+                    width: propertyEditorRoot.labelsWidth
                     anchors.verticalCenter: parent.verticalCenter
                     horizontalAlignment: Text.AlignRight
                     text: "Min:"
@@ -520,10 +552,10 @@ DPaneBase {
 
             DText {
                 id: defaultLabel
-                width: 58
+                width: propertyEditorRoot.labelsWidth
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Text.AlignRight
-                text: "Default:"
+                text: typeOption.currentIndex === 9 ? "Value:" : "Default:"
             }
 
             DTextInput {
@@ -603,6 +635,52 @@ DPaneBase {
                 text: ""
                 visible: typeOption.currentIndex === 1
                 onClicked: checked = !checked
+            }
+        }
+
+        Row {
+            id: readOnlyRow
+            spacing: DStyle.defaultSpacing
+
+            DText {
+                width: propertyEditorRoot.labelsWidth
+                anchors.verticalCenter: parent.verticalCenter
+                horizontalAlignment: Text.AlignRight
+                text: "ReadOnly:"
+            }
+
+            DSwitch {
+                id: readOnlySwitch
+                width: nameEditor.width
+                text: ""
+                onClicked: {
+                    checked = !checked;
+                }
+            }
+        }
+
+        Row {
+            id: defaultAliasRow
+            height: typeOption.currentIndex === 9 ? defaultAliasSwitch.height : 0
+            Behavior on height { DAnimation { } }
+            visible: height > 0
+            clip: true
+            spacing: DStyle.defaultSpacing
+
+            DText {
+                width: propertyEditorRoot.labelsWidth
+                anchors.verticalCenter: parent.verticalCenter
+                horizontalAlignment: Text.AlignRight
+                text: "default"
+            }
+
+            DSwitch {
+                id: defaultAliasSwitch
+                width: nameEditor.width
+                text: "alias"
+                onClicked: {
+                    checked = !checked;
+                }
             }
         }
     }

@@ -105,7 +105,7 @@ void RecentProjectsModel::loadRecentProjects()
         // End Reset Model
         endResetModel();
     } else {
-        qWarning() << "RecentProjectsModel::loadRecentProjects - ERROR OPENING FILE! - rplFile: " << rplFile.fileName();
+        qWarning() << "RecentProjectsModel::loadRecentProjects - No recent files - rplFile: " << rplFile.fileName();
     }
 }
 

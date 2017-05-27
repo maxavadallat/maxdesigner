@@ -19,17 +19,49 @@ QString Utils::composeTypeAndValue(const QString& aType,
                                    const QString& aValue,
                                    const QString& aMin,
                                    const QString& aMax,
-                                   const QString& aEnums)
+                                   const QString& aEnums,
+                                   const bool& aReadOnly,
+                                   const bool& aDefault)
 {
-    return QString("%1:%2:%3:%4:%5").arg(aType).arg(aMin).arg(aMax).arg(aEnums).arg(aValue);
+    // Init New Type
+    QString newType = aReadOnly ? QString("%1 %2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_READONLY).arg(aType) : aType;
+
+    // Check Default
+    if (aDefault && !aReadOnly) {
+        // Set New Type
+        newType = QString("%1 %2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_DEFAULT).arg(aType);
+    }
+
+    return QString("%1:%2:%3:%4:%5").arg(newType).arg(aMin).arg(aMax).arg(aEnums).arg(aValue);
 }
 
 //==============================================================================
 // Parse Component Property Type
 //==============================================================================
-QString Utils::parseType(const QString& aTypeAndValue)
+QString Utils::parseType(const QString& aTypeAndValue, bool& readOnly, bool& defaultAlias, const bool& aTypeOnly)
 {
-    return aTypeAndValue.left(aTypeAndValue.indexOf(":"));
+    // Get Property Type
+    QString pType = aTypeAndValue.left(aTypeAndValue.indexOf(":"));
+    // Init Type Pos
+    int typePos = 0;
+
+    // Check Type
+    if (pType.indexOf(JSON_VALUE_PROPERTY_TYPE_PREFIX_READONLY) >= 0) {
+        // Set Read Only
+        readOnly = true;
+        // Set Type Pos
+        typePos = 9;
+    } else {
+        // Check Type
+        if (pType.indexOf(JSON_VALUE_PROPERTY_TYPE_PREFIX_DEFAULT) >= 0) {
+            // Set Default Alias
+            defaultAlias = true;
+            // Set Type Pos
+            typePos = 8;
+        }
+    }
+
+    return aTypeOnly ? pType.mid(typePos) : pType;
 }
 
 //==============================================================================

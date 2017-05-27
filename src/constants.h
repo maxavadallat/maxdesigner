@@ -249,6 +249,11 @@
 #define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_DURATION   "componentTransitionPAnimationDuration"
 #define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_ETYPE      "componentTransitionPAnimationEType"
 
+// Read Only Property Type Prefix
+#define JSON_VALUE_PROPERTY_TYPE_PREFIX_READONLY            "readonly"
+// Default Alias Property Type Prefix
+#define JSON_VALUE_PROPERTY_TYPE_PREFIX_DEFAULT             "default"
+
 // Supported Value Types
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING              "string"
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_BOOL                "bool"

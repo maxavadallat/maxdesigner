@@ -45,6 +45,8 @@ protected:
 
     // Load Data Sources
     void loadDataSources();
+    // Update Base Components
+    void updateBaseComponents();
 
     // Save All Components
     void saveAllComponents();
