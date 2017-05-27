@@ -63,7 +63,10 @@ Item {
     property bool childWasDeleted: false
 
     // Child Count
-    property int count: childContainer.children.length
+    property int count: childContainer.children.length // componentInfo ? componentInfo.childCount : 0
+
+    // Component Layout
+    property string componentLayout: ""
 
     // Component Info Connections
     property Connections componentInfoConnections: Connections {
@@ -94,7 +97,7 @@ Item {
 
         // Pos X Changed
         onPosXChanged: {
-            console.log("DComponentContainer.componentInfoConnections.onPosXChanged - aPosX: " + aPosX);
+            //console.log("DComponentContainer.componentInfoConnections.onPosXChanged - aPosX: " + aPosX);
 
             // Check Pos
             if (ccRoot.parentComponentContainer.x !== Number(aPosX)) {
@@ -107,7 +110,7 @@ Item {
 
         // Pos Y Changed
         onPosYChanged: {
-            console.log("DComponentContainer.componentInfoConnections.onPosYChanged - aPosY: " + aPosY);
+            //console.log("DComponentContainer.componentInfoConnections.onPosYChanged - aPosY: " + aPosY);
 
             // Check Pos Y
             if (ccRoot.parentComponentContainer.y !== Number(aPosY)) {
@@ -121,57 +124,15 @@ Item {
         // Width Changed
         onWidthChanged: {
             //console.log("DComponentContainer.componentInfoConnections.onWidthChanged - aWidth: " + aWidth);
-
-            // Check Width
-            if (ccRoot.parentComponentContainer.width !== Number(aWidth)) {
-
-                // Check If Root
-                if (ccRoot.componentInfo.isRoot) {
-                    // Calculate Center X
-                    var centerX = ccRoot.parentComponentContainer.x + ccRoot.parentComponentContainer.width * 0.5;
-                    // Set Pos X
-                    ccRoot.parentComponentContainer.x = centerX - aWidth * 0.5;
-                }
-
-                // Set Width
-                ccRoot.parentComponentContainer.width = Number(aWidth);
-            }
-
-            // Check Live QML Component
-            if (ccRoot.rootLiveQMLComponent !== null) {
-                // Set Width
-                ccRoot.rootLiveQMLComponent.width = ccRoot.width;
-            }
-
-            // TODO: Handle Bindings & Formulas!
+            // Update Width
+            updateWidth(aWidth);
         }
 
         // Height Changed
         onHeightChanged: {
             //console.log("DComponentContainer.componentInfoConnections.onHeightChanged - aHeight: " + aHeight);
-
-            // Check Height
-            if (ccRoot.parentComponentContainer.height !== Number(aHeight)) {
-                // Check If Root
-                if (ccRoot.componentInfo.isRoot) {
-                    // Calculate Center Y
-                    var centerY = ccRoot.parentComponentContainer.y + ccRoot.parentComponentContainer.height * 0.5;
-                    // Set Pos X
-                    ccRoot.parentComponentContainer.y = centerY - aHeight * 0.5;
-                }
-
-                // Set Height
-                ccRoot.parentComponentContainer.height = Number(aHeight);
-            }
-
-            // Check Live QML Component
-            if (ccRoot.rootLiveQMLComponent !== null) {
-                // Set Width
-                ccRoot.rootLiveQMLComponent.height = ccRoot.height;
-            }
-
-            // TODO: Handle Bindings & Formulas!
-
+            // Update Height
+            updateHeight(aHeight);
         }
 
         // Left Anchor Changed
@@ -296,6 +257,7 @@ Item {
             // ...
         }
 
+        // Layout Visible Changed
         onLayerVisibleChanged: {
             // Check Root Component
             if (ccRoot.rootComponentContainer !== null) {
@@ -304,6 +266,7 @@ Item {
             }
         }
 
+        // Own Property Added
         onOwnPropertyAdded: {
             console.log("DComponentContainer.componentInfoConnections.onOwnPropertyAdded - aName: " + aName);
             // Remove Root Component
@@ -312,6 +275,7 @@ Item {
             createRootComponent();
         }
 
+        // Own Property Removed
         onOwnPropertyRemoved: {
             console.log("DComponentContainer.componentInfoConnections.onOwnPropertyRemoved - aName: " + aName);
             // Remove Root Component
@@ -323,6 +287,8 @@ Item {
         // Child Component About To Be Removed
         onChildAboutToBeRemoved: {
             console.log("DComponentContainer.componentInfoConnections.onChildAboutToBeRemoved");
+            // Reset Parent
+            ccRoot.parentComponentContainer.parent = null;
             // Set Update Component Info Enabled
             ccRoot.updateComponentInfoEnabled = false;
             // Reset Component Info
@@ -335,7 +301,7 @@ Item {
         onChildAdded: {
             // Check If Child Was Dropped
             if (ccRoot.childWasDropped) {
-                console.log("DComponentContainer.componentInfoConnection.onChildAdded - WAS DROPPED!");
+                //console.log("DComponentContainer.componentInfoConnection.onChildAdded - WAS DROPPED!");
 
                 // Reset Child Was Dropped
                 ccRoot.childWasDropped = false;
@@ -343,29 +309,34 @@ Item {
                 return;
             }
 
-            console.log("DComponentContainer.componentInfoConnection.onChildAdded - aIndex: " + aIndex);
+            //console.log("DComponentContainer.componentInfoConnection.onChildAdded - aIndex: " + aIndex);
 
             // Create Child Component Container
             var newContainer = createChildComponent(aIndex, newContainerDummyParent);
             // Insert Child Container
             insertChildContainer(aIndex, newContainer);
+
+            // Update Layout Size
+            updateLayoutSize();
         }
 
         // Child Moved Slot
         onChildMoved: {
-            console.log("DComponentContainer.componentInfoConnection.onChildMoved - aIndex: " + aIndex + " - aTarget: " + aTarget);
+            //console.log("DComponentContainer.componentInfoConnection.onChildMoved - aIndex: " + aIndex + " - aTarget: " + aTarget);
             // Move Child Container
             moveChildContainer(aIndex, aTarget);
         }
 
-//        onChildRemoved: {
-//            // NO NEED TO HANDLE onChildAboutToBeRemoved Slot Handles Removal
-//            // ...
-//        }
+        onChildRemoved: {
+
+            // Update Layout Size
+            updateLayoutSize();
+        }
 
         // ...
     }
 
+    // Properties Controller Connection
     property Connections propertiesControllerConnections: Connections {
         target: propertiesController
 
@@ -413,6 +384,8 @@ Item {
         if (ccRoot.componentInfo !== null) {
             // Set Component Container For Anchoring!
             ccRoot.componentInfo.componentContainer = ccRoot.parentComponentContainer;
+            // Set Component Layout
+            ccRoot.componentLayout = ccRoot.componentInfo.layoutBase();
         }
     }
 
@@ -435,10 +408,6 @@ Item {
             ccRoot.componentInfo.setHeight(ccRoot.height);
         }
     }
-
-//    onDragSourceChanged: {
-//        console.log("DComponentContainer.onDragSourceChanged - dragSource: " + ccRoot.dragSource);
-//    }
 
     // On Hover Child Item Changed
     onChildItemChanged: {
@@ -485,6 +454,59 @@ Item {
         }
     }
 
+    // Update Parent Component Container Width
+    function updateWidth(newWidth) {
+        // Check Width
+        if (ccRoot.parentComponentContainer.width !== Number(newWidth)) {
+
+            // Check If Root
+            if (ccRoot.componentInfo.isRoot) {
+                // Calculate Center X
+                var centerX = ccRoot.parentComponentContainer.x + ccRoot.parentComponentContainer.width * 0.5;
+                // Set Pos X
+                ccRoot.parentComponentContainer.x = centerX - newWidth * 0.5;
+            }
+
+            // Set Width
+            ccRoot.parentComponentContainer.width = Number(newWidth);
+        }
+
+        // Check Live QML Component
+        if (ccRoot.rootLiveQMLComponent !== null) {
+            // Set Width
+            ccRoot.rootLiveQMLComponent.width = ccRoot.width;
+        }
+
+        // TODO: Handle Bindings & Formulas!
+
+    }
+
+    // Update Parent Component Container Height
+    function updateHeight(newHeight) {
+        // Check Height
+        if (ccRoot.parentComponentContainer.height !== Number(newHeight)) {
+            // Check If Root
+            if (ccRoot.componentInfo.isRoot) {
+                // Calculate Center Y
+                var centerY = ccRoot.parentComponentContainer.y + ccRoot.parentComponentContainer.height * 0.5;
+                // Set Pos X
+                ccRoot.parentComponentContainer.y = centerY - newHeight * 0.5;
+            }
+
+            // Set Height
+            ccRoot.parentComponentContainer.height = Number(newHeight);
+        }
+
+        // Check Live QML Component
+        if (ccRoot.rootLiveQMLComponent !== null) {
+            // Set Width
+            ccRoot.rootLiveQMLComponent.height = ccRoot.height;
+        }
+
+        // TODO: Handle Bindings & Formulas!
+
+    }
+
     // Array Move
     function arrayMove(ref, from, to) {
         var element = ref.array[from];
@@ -492,11 +514,29 @@ Item {
         ref.array.splice(to, 0, element);
     }
 
+    // Create Content
+    function createContent() {
+        // Create Root Component
+        createRootComponent();
+        // Create Child Components
+        createChildComponents();
+        // Update Layout Size
+        updateLayoutSize();
+    }
+
+    // Remove Content
+    function removeContent() {
+        // Remove Child Components
+        removeChildComponents();
+        // Remove Root Component
+        removeRootComponent();
+    }
+
     // Create Main Component
     function createRootComponent() {
         // Check Component Info
         if (ccRoot.componentInfo !== null && !ccRoot.rootComponentCreated) {
-            console.log("DComponentContainer.createRootComponent - path: " + ccRoot.componentInfo.componentPath);
+            //console.log("DComponentContainer.createRootComponent - name: " + ccRoot.componentInfo.componentName);
             // Set Root Component Created
             ccRoot.rootComponentCreated = true;
             // Create New Root Object
@@ -732,10 +772,13 @@ Item {
             // Set Focus
             aChildContainerObject.focus = aFocus;
 
-            // Set Pos X
-            aChildContainerObject.x = aComponentInfo.posX;
-            // Set Pos Y
-            aChildContainerObject.y = aComponentInfo.posY;
+            // Check Component Layout
+            if (ccRoot.componentLayout === "") {
+                // Set Pos X
+                aChildContainerObject.x = aComponentInfo.posX;
+                // Set Pos Y
+                aChildContainerObject.y = aComponentInfo.posY;
+            }
 
             // Set Width
             aChildContainerObject.width = aComponentInfo.width;
@@ -765,7 +808,7 @@ Item {
     function setAnchoring() {
         // Check Component Info
         if (ccRoot.componentInfo !== null && !ccRoot.componentIsRoot) {
-            console.log("DComponentContainer.setAnchoring");
+            //console.log("DComponentContainer.setAnchoring");
             // Set Anchor Fill
             if (ccRoot.componentInfo.anchorsFill !== "") {
                 // Set Fill Anchor
@@ -984,12 +1027,13 @@ Item {
             // Update Child Component Container Object
             ccRoot.updateChildContainerObject(newObject, drop.source.clone(), ccRoot.parentComponentContainer, true);
 
-            // Set Pos X
-            newObject.x = rootComponentContainer.hoverPosX - CONSTS.componentItemWidth * 0.5;
-            //newObject.x =  drop.x - CONSTS.componentItemWidth * 0.5; // TODO: Update For Child Item
-            // Set Pos Y
-            newObject.y = rootComponentContainer.hoverPosY - CONSTS.componentItemHeight * 0.5;
-            //newObject.y = drop.y - CONSTS.componentItemHeight * 0.5; // TODO: Update For Child Item
+            // Check Component Layout
+            if (ccRoot.componentLayout === "") {
+                // Set Pos X
+                newObject.x = rootComponentContainer.hoverPosX - CONSTS.componentItemWidth * 0.5;
+                // Set Pos Y
+                newObject.y = rootComponentContainer.hoverPosY - CONSTS.componentItemHeight * 0.5;
+            }
 
             // Set Child Was Dropped
             ccRoot.childWasDropped = true;
@@ -997,8 +1041,87 @@ Item {
             // Add Child Component Info
             addChildComponent(newObject.componentInfo);
 
+            // Update Layout Size
+            updateLayoutSize();
+
         } else {
             console.error("DComponentContainer.makeDrop - ERROR CREATING NEW OBJECT!");
+        }
+    }
+
+    // Update Layout Size
+    function updateLayoutSize() {
+        // Check Component Info
+        if (ccRoot.componentLayout.length > 0) {
+            console.log("DComponentContainer.updateLayoutSize - count: " + ccRoot.count + " - componentLayout: " + ccRoot.componentLayout);
+
+            // Init New Width
+            var newWidth = 0;
+            // Init New Height
+            var newHeight = 0;
+
+            // TODO: Handle Different Layout Directions
+
+            // TODO: Handle Child Size Changes
+
+            // Iterate Through Children
+            for (var i=0; i<ccRoot.count; i++) {
+
+                // Check Component
+                if (ccRoot.componentLayout === "Row" && ccRoot.componentInfo.useIWidth) {
+                    // Get Child Object
+                    var childObject = childContainer.children[i];
+
+                    console.log("DComponentContainer.updateLayoutSize - childObject: " + childObject);
+
+                    // Set Child Object Pos X
+                    childObject.x = newWidth;
+                    // Reset Child Object  Pos Y
+                    childObject.y = 0;
+                    // Set New Width
+                    newWidth += childObject.width;
+
+                    // Check Use Implicit Height
+                    if (ccRoot.componentInfo.useIHeight) {
+                        // Set New Height
+                        newHeight = Math.max(newHeight, childObject.height);
+                    }
+                } else if (ccRoot.componentLayout === "Column" && ccRoot.componentInfo.useIHeight) {
+
+                    // ...
+
+                } else if (ccRoot.componentLayout === "Flow" && (ccRoot.componentInfo.useIWidth || ccRoot.componentInfo.useIHeight)) {
+
+                    // ...
+
+                } else {
+                    console.warn("DComponentContainer.updateLayoutSize - UNSUPPORTED LAYOUT COMPONENT!");
+                    return;
+                }
+
+                // ...
+
+            }
+
+            // Check Use Implicit Width
+            if (ccRoot.componentInfo.useIWidth && ccRoot.count > 0) {
+                // Update Width
+                updateWidth(newWidth);
+//                // Set Parent Container Width
+//                ccRoot.parentComponentContainer.width = newWidth;
+
+                // TODO: Set Default Value if New Width is 0
+            }
+
+            // Check New Height
+            if (ccRoot.componentInfo.useIHeight && ccRoot.count > 0) {
+                // Update Height
+                updateHeight(newHeight);
+//                // Set Parent Container Height
+//                ccRoot.parentComponentContainer.height = newHeight;
+
+                // TODO: Set Default Value If New Height is 0
+            }
         }
     }
 

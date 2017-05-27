@@ -346,6 +346,9 @@ void PropertiesController::setCurrentProject(ProjectModel* aProjectModel)
         qDebug() << "PropertiesController::setCurrentProject - aProjectModel: " << (aProjectModel ? aProjectModel->projectName() : "NULL");
         // Set Current Project Model
         mProject = aProjectModel;
+
+        // ...
+
         // Emit Current Project Changed Signal
         emit currentProjectChanged(mProject);
     }

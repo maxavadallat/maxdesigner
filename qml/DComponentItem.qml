@@ -212,6 +212,7 @@ Item {
     Rectangle {
         width: 4
         height: 4
+        z: 0.1
         anchors.right: parent.right
         anchors.rightMargin: DStyle.defaultMargin
         anchors.bottom: parent.bottom

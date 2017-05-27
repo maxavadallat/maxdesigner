@@ -2627,6 +2627,20 @@ QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGene
 }
 
 //==============================================================================
+// Get Layout Base
+//==============================================================================
+QString ComponentInfo::layoutBase()
+{
+    // Check If Category Layout
+    if (mBuiltIn && mCategory == COMPONENT_CATEGORY_LAYOUT) {
+        return mName;
+    }
+
+    // Init Layout Base Name
+    return mBase ? mBase->layoutBase() : "";
+}
+
+//==============================================================================
 // Get Property
 //==============================================================================
 QVariant ComponentInfo::componentProperty(const QString& aName)
@@ -3157,11 +3171,10 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
         if (cIndex >= 0 && cIndex < mChildren.count()) {
             // Get Child Component Info
             ComponentInfo* childComponent = mChildren[cIndex];
-
-            qDebug() << "ComponentInfo::removeChild - path: " << componentPath() << " - mName: " << childComponent->mName;
-
             // Emit Child About To Be Removed
             emit childComponent->childAboutToBeRemoved(childComponent);
+
+            qDebug() << "ComponentInfo::removeChild - path: " << componentPath() << " - mName: " << childComponent->mName;
 
             // Remove Child Object From ID Map
             setChildObjectID(childComponent, "");

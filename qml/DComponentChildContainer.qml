@@ -132,19 +132,15 @@ DContainer {
         parentComponentContainer: cccRoot
 
         onComponentInfoChanged: {
-            console.log("DComponentChildContainer.componentContainer.onComponentInfoChanged - path: " + (componentContainer.componentInfo !== null ? componentContainer.componentInfo.componentPath : "NULL" ));
+            //console.log("DComponentChildContainer.componentContainer.onComponentInfoChanged - path: " + (componentContainer.componentInfo !== null ? componentContainer.componentInfo.componentPath : "NULL" ));
 
             // Check Component Info
             if (componentContainer.componentInfo !== null) {
-                // Create Root Component
-                componentContainer.createRootComponent();
-                // Create Children
-                componentContainer.createChildComponents();
+                // Create Content
+                componentContainer.createContent();
             } else {
-                // Remove Child Components
-                componentContainer.removeChildComponents();
-                // Remove Root Component
-                componentContainer.removeRootComponent();
+                // Remove Content
+                componentContainer.removeContent();
             }
 
             // ...

@@ -20,6 +20,7 @@
             "componentOwnProperties": {
                 "clip": "bool::::false",
                 "enabled": "bool::::true",
+                "focus": "bool::::false",
                 "height": "int::::200",
                 "opacity": "real::::1.0",
                 "rotation": "int::::0",

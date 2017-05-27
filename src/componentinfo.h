@@ -371,6 +371,9 @@ public:
     // Generate Live Code
     Q_INVOKABLE QString generateLiveCode(const bool& aLiveRoot = true, const bool& aGenerateChildren = true);
 
+    // Get Layout Base
+    Q_INVOKABLE QString layoutBase();
+
     // Destructor
     ~ComponentInfo();
 
