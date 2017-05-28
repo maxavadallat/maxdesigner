@@ -80,7 +80,7 @@ DControl {
             // Calculate New Value
             var newValue = Math.min(spinnerRoot.maxValue, Math.max(spinnerRoot.minValue, Number(newText)));
 
-            console.log("#### DSpinner.textInput.onAccepted - value: " + spinnerRoot.value + " - newValue: " + newValue);
+            //console.log("DSpinner.textInput.onAccepted - value: " + spinnerRoot.value + " - newValue: " + newValue);
 
             // Check New Value
             if (spinnerRoot.value !== newValue) {

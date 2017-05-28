@@ -3043,6 +3043,7 @@ QVariant ComponentInfo::propertyValue(const QString& aName, const bool& aRaw)
 
     // Get Type And Value
     QString typeAndValue = mOwnProperties.value(aName).toString();
+
     // Check Type And Value
     if (!typeAndValue.isEmpty()) {
         // Parse Value

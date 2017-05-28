@@ -68,6 +68,13 @@ Item {
     // Component Layout
     property string componentLayout: ""
 
+    // Layout Width
+    property int layoutWidth: updateHorizontalLayout()
+    // Layout Height
+    property int layoutHeight: updateVerticalLayout()
+    // Layout Spacing
+    property int layoutSpacing: updateLayoutSpacing()
+
     // Component Info Connections
     property Connections componentInfoConnections: Connections {
         target: ccRoot.componentInfo
@@ -246,6 +253,20 @@ Item {
         onComponentPropertyChanged: {
             //console.log("DComponentContainer.componentInfoConnections.onComponentPropertyChanged - aName: " + aName + " - aValue: " + aValue);
 
+            // Switch Property Name
+            switch (aName) {
+                case "spacing":
+                    // Update Layout Spacing
+                    ccRoot.layoutSpacing = updateLayoutSpacing();
+                // Fall Through
+                case "layoutDirection":
+                    // Update Horizontal Layout
+                    updateHorizontalLayout();
+                    // Update Vertical Layout
+                    updateVerticalLayout();
+                break;
+            }
+
             // Check Root Component
             if (ccRoot.rootLiveQMLComponent !== null) {
                 // Set Property
@@ -328,16 +349,15 @@ Item {
         }
 
         onChildRemoved: {
-
             // Update Layout Size
             updateLayoutSize();
         }
 
         // ...
     }
-
     // Properties Controller Connection
     property Connections propertiesControllerConnections: Connections {
+
         target: propertiesController
 
         onFocusedComponentChanged: {
@@ -386,6 +406,9 @@ Item {
             ccRoot.componentInfo.componentContainer = ccRoot.parentComponentContainer;
             // Set Component Layout
             ccRoot.componentLayout = ccRoot.componentInfo.layoutBase();
+        } else {
+            // Reset Component Layout
+            ccRoot.componentLayout = "";
         }
     }
 
@@ -1049,10 +1072,136 @@ Item {
         }
     }
 
+    // Update Layout Spacing
+    function updateLayoutSpacing() {
+        // Check Component Layout
+        if (ccRoot.componentLayout === "") {
+            return 0;
+        }
+
+        console.log("DComponentContainer.updateLayoutSpacing - componentLayout: " + ccRoot.componentLayout);
+
+        return ccRoot.componentInfo.propertyValue("spacing");
+    }
+
+    // Update Horizontal Layout
+    function updateHorizontalLayout() {
+        // Check Component Layout
+        if (ccRoot.componentLayout === "" || ccRoot.count === 0 || ccRoot.parentComponentContainer.width === 0) {
+            return 0;
+        }
+
+        console.log("DComponentContainer.updateHorizontalLayout - componentLayout: " + ccRoot.componentLayout + " - layoutSpacing: " + ccRoot.layoutSpacing);
+
+        // Init New Layout Width
+        var newLayoutWidth = 0;
+
+        // Check Component Layout
+        if (ccRoot.componentLayout === "Row") {
+            // Get Layout Direction
+            var rlDirection = ccRoot.componentInfo.propertyValue("layoutDirection");
+
+            // Iterate Through Children
+            for (var i=0; i<ccRoot.count; i++) {
+
+                // Check Layout Direction
+                if (rlDirection === "Qt.LeftToRight") {
+                    // Set Child Pos X
+                    childContainer.children[i].x = newLayoutWidth;
+                } else {
+                    // Set Child Position
+                    childContainer.children[i].x = ccRoot.parentComponentContainer.width - newLayoutWidth - childContainer.children[i].width;
+                }
+
+                // Inc New Layout Width
+                newLayoutWidth += childContainer.children[i].width;
+
+                // Check Index
+                if (ccRoot.count > 1 && (i < (ccRoot.count - 1))) {
+                    // Inc New Layout Width
+                    newLayoutWidth += ccRoot.layoutSpacing;
+                }
+            }
+        } else if (ccRoot.componentLayout === "Column") {
+            // Iterate Through Children
+            for (var j=0; j<ccRoot.count; j++) {
+                // Set New Layout Width
+                newLayoutWidth = Math.max(newLayoutWidth, childContainer.children[j].width);
+            }
+
+        } else if (ccRoot.componentLayout === "Flow") {
+            // Get Layout Direction
+            var flDirection = ccRoot.componentInfo.propertyValue("layoutDirection");
+
+            // Check Layout Direction
+
+            // ...
+
+        } else {
+            console.warn("DComponentContainer.updateHorizontalLayout - componentLayout: " + ccRoot.componentLayout + " - UNSUPPORTED LAYOUT");
+        }
+
+        // ...
+
+        return newLayoutWidth;
+    }
+
+    // Update Vertical Layout
+    function updateVerticalLayout() {
+        // Check Component Layout
+        if (ccRoot.componentLayout === "" || ccRoot.count === 0) {
+            return 0;
+        }
+
+        console.log("DComponentContainer.updateVerticalLayout - componentLayout: " + ccRoot.componentLayout + " - layoutSpacing: " + ccRoot.layoutSpacing);
+
+        // Init New Layout Height
+        var newLayoutHeight = 0;
+
+        // Check Component Layout
+        if (ccRoot.componentLayout === "Row") {
+            // Iterate Through Children
+            for (var i=0; i<ccRoot.count; i++) {
+                // Set New Layout Height
+                newLayoutHeight = Math.max(newLayoutHeight, childContainer.children[i].height);
+            }
+        // Check Component Layout
+        } else if (ccRoot.componentLayout === "Column") {
+            // Iterate Through Children
+            for (var j=0; j<ccRoot.count; j++) {
+                // Set Child Pos Y
+                childContainer.children[j].y = newLayoutHeight;
+                // Inc New Layout Height
+                newLayoutHeight += childContainer.children[j].height;
+                // Check Index
+                if (ccRoot.count > 1 && (j < (ccRoot.count - 1))) {
+                    // Inc New Layout Height
+                    newLayoutHeight += ccRoot.layoutSpacing;
+                }
+            }
+        // Check Component Layout
+        } else if (ccRoot.componentLayout === "Flow") {
+            // Get Layout Direction
+            var flDirection = ccRoot.componentInfo.propertyValue("layoutDirection");
+
+            // Check Layout Direction
+
+            // ...
+
+        } else {
+            console.warn("DComponentContainer.updateVerticalLayout - componentLayout: " + ccRoot.componentLayout + " - UNSUPPORTED LAYOUT");
+        }
+
+        // ...
+
+        return newLayoutHeight;
+    }
+
     // Update Layout Size
     function updateLayoutSize() {
+/*
         // Check Component Info
-        if (ccRoot.componentLayout.length > 0) {
+        if (ccRoot.componentLayout !== "") {
             console.log("DComponentContainer.updateLayoutSize - count: " + ccRoot.count + " - componentLayout: " + ccRoot.componentLayout);
 
             // Init New Width
@@ -1072,7 +1221,7 @@ Item {
                     // Get Child Object
                     var childObject = childContainer.children[i];
 
-                    console.log("DComponentContainer.updateLayoutSize - childObject: " + childObject);
+                    //console.log("DComponentContainer.updateLayoutSize - childObject: " + childObject);
 
                     // Set Child Object Pos X
                     childObject.x = newWidth;
@@ -1086,6 +1235,7 @@ Item {
                         // Set New Height
                         newHeight = Math.max(newHeight, childObject.height);
                     }
+
                 } else if (ccRoot.componentLayout === "Column" && ccRoot.componentInfo.useIHeight) {
 
                     // ...
@@ -1123,6 +1273,7 @@ Item {
                 // TODO: Set Default Value If New Height is 0
             }
         }
+*/
     }
 
     // Dummy Parent For New Container
