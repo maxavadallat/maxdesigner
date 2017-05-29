@@ -30,5 +30,6 @@
         <file>assets/icons/component.image.png</file>
         <file>assets/icons/component.nonvisual.png</file>
         <file>assets/icons/component.layout.png</file>
+        <file>assets/fonts/aero.ttf</file>
     </qresource>
 </RCC>

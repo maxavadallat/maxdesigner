@@ -73,6 +73,7 @@ Item {
     DMouseArea {
         anchors.fill: parent
         visible: swipeOn
+
         onClicked: {
             // Hide Swipe
             hideSwipe();

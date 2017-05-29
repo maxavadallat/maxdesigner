@@ -1211,8 +1211,11 @@ QJsonObject ComponentInfo::toJSONObject(const bool& aChild)
     // Set Component Type
     ciObject[JSON_KEY_COMPONENT_TYPE] = QJsonValue(mType);
 
-    // Set Component Tag
-    ciObject[JSON_KEY_COMPONENT_TAG] = QJsonValue(mTag);
+    // Check Tag
+    if (!mTag.isEmpty()) {
+        // Set Component Tag
+        ciObject[JSON_KEY_COMPONENT_TAG] = QJsonValue(mTag);
+    }
 
     // Check If Child Component
     if (!aChild) {

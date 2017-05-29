@@ -1,5 +1,5 @@
 #include <QDebug>
-#include <QJsonObject>
+#include <QQmlEngine>
 
 #include "componentstatesmodel.h"
 #include "componentinfo.h"
@@ -11,8 +11,11 @@
 ComponentStatesModel::ComponentStatesModel(ComponentInfo* aComponent, QObject* aParent)
     : QAbstractListModel(aParent)
     , mComponent(aComponent)
+    , mNewState(NULL)
+    , mDirty(false)
+    , mSelectedIndex(-1)
 {
-    //qDebug() << "ComponentStatesModel created.";
+    qDebug() << "ComponentStatesModel created.";
 
     // Init
     init();
@@ -23,6 +26,7 @@ ComponentStatesModel::ComponentStatesModel(ComponentInfo* aComponent, QObject* a
 //==============================================================================
 void ComponentStatesModel::init()
 {
+    //qDebug() << "ComponentStatesModel::init";
     // Load Component States
     loadComponentStates();
 }
@@ -59,10 +63,20 @@ void ComponentStatesModel::loadComponentStates()
     // Begin Reset Model
     beginResetModel();
 
-    // ...
+    // Get States Count
+    int csCount = mComponent->mStates.count();
+
+    // Iterate Through States
+    for (int i=0; i<csCount; i++) {
+        // Append State
+        mStates << ComponentState::fromJSONObject(mComponent->mStates[i].toObject(), this);
+    }
 
     // End Reset Model
     endResetModel();
+
+    // Reset Dirty State
+    setDirty(false);
 }
 
 //==============================================================================
@@ -75,7 +89,44 @@ void ComponentStatesModel::saveComponentStates()
         return;
     }
 
-    // ...
+    // Check Dirty State
+    if (mDirty) {
+        //qDebug() <<  "ComponentStatesModel::saveComponentStates";
+
+        // Set Component States
+        mComponent->mStates = toJSONArray();
+        // Set Dirty State
+        mComponent->setDirty(true);
+
+        // ...
+
+        // Reset Dirty State
+        setDirty(false);
+    }
+}
+
+//==============================================================================
+// Set Dirty State
+//==============================================================================
+void ComponentStatesModel::setDirty(const bool& aDirty)
+{
+    // Check Dirty State
+    if (mDirty != aDirty) {
+        //qDebug() << "ComponentStatesModel::setDirty - aDirty: " << aDirty;
+
+        // Set Dirty
+        mDirty = aDirty;
+
+        // Check Dirty State
+        if (!mDirty) {
+            // TODO: Set Dirty State Of States
+
+            qDebug() << "#### mDirty: " << mDirty;
+
+            // ...
+
+        }
+    }
 }
 
 //==============================================================================
@@ -93,30 +144,98 @@ void ComponentStatesModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
-        //qDebug() << "ComponentStatesModel::setCurrentComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
+        // Save Component States
+        saveComponentStates();
+
+        // Clear
+        clear();
+
+        //qDebug() << "ComponentStatesModel::setCurrentComponent - mName: " << (aComponent ? aComponent->mName : "NULL");
+
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Component Changed Signal
         emit currentComponentChanged(mComponent);
+
         // Load Component States
         loadComponentStates();
     }
 }
 
 //==============================================================================
-// Add State
+// Create New Empty State
+//==============================================================================
+ComponentState* ComponentStatesModel::createNewState()
+{
+    //qDebug() << "ComponentStatesModel::createNewState";
+
+    // Check New State
+    if (mNewState == NULL) {
+        // Create new Empty State
+        mNewState = new ComponentState("", "", this);
+    }
+
+    return mNewState;
+}
+
+//==============================================================================
+// Discard New State
+//==============================================================================
+void ComponentStatesModel::discardNewState()
+{
+    // Check New State
+    if (mNewState != NULL) {
+        //qDebug() << "ComponentStatesModel::discardNewState";
+
+        // Delete New State
+        delete mNewState;
+        // Reset New State
+        mNewState = NULL;
+    }
+}
+
+//==============================================================================
+// Append State
+//==============================================================================
+void ComponentStatesModel::appendState(ComponentState* aState)
+{
+    // Check State
+    if (aState) {
+        // Begin Insert rows
+        beginInsertRows(QModelIndex(), rowCount(), rowCount());
+        // Append To States
+        mStates << aState;
+
+        // Check State
+        if (aState == mNewState) {
+            // Reset New State
+            mNewState = NULL;
+        }
+
+        // Set Dirty State
+        setDirty(true);
+
+        // End Insert Rows
+        endInsertRows();
+    }
+}
+
+//==============================================================================
+// Add An Empty State
 //==============================================================================
 void ComponentStatesModel::addState(const QString& aStateName, const QString& aWhen)
 {
     // Check Name
     if (!aStateName.isEmpty()) {
+        //qDebug() << "ComponentStatesModel::addState - aStateName: " << aStateName << " - aWhen: " << aWhen;
         // Create New State
-        ComponentState* newState = new ComponentState(aStateName, aWhen);
-
+        ComponentState* newState = new ComponentState(aStateName, aWhen, this);
         // Begin Insert rows
-        beginInsertRows(QModelIndex(), rowCount() - 1, rowCount() -1);
+        beginInsertRows(QModelIndex(), rowCount(), rowCount());
         // Append To States
         mStates << newState;
+        // Set Dirty State
+        setDirty(true);
         // End Insert Rows
         endInsertRows();
     }
@@ -129,8 +248,13 @@ void ComponentStatesModel::setStateName(const int& aIndex, const QString& aState
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
+        //qDebug() << "ComponentStatesModel::setStateName - aIndex: " << aIndex << " - aStateName: " << aStateName;
         // Set State Name
         mStates[aIndex]->setStateName(aStateName);
+        // Emit Data Changed Signal
+        emit dataChanged(index(aIndex), index(aIndex));
+        // Set Dirty State
+        setDirty(true);
         // Emit Data Changed
         emit dataChanged(index(aIndex), index(aIndex));
     }
@@ -141,6 +265,7 @@ void ComponentStatesModel::setStateName(const int& aIndex, const QString& aState
 //==============================================================================
 void ComponentStatesModel::clearState(const QString& aStateName)
 {
+    //qDebug() << "ComponentStatesModel::clearState - aStateName: " << aStateName;
     // Get Count
     int sCount = rowCount();
     // Iterate Through States
@@ -151,14 +276,17 @@ void ComponentStatesModel::clearState(const QString& aStateName)
         if (cState->stateName() == aStateName) {
             // Clear State
             cState->clearState();
-
+            // Emit Data Changed Signal
+            emit dataChanged(index(i), index(i));
+            // Set Dirty State
+            setDirty(true);
             return;
         }
     }
 }
 
 //==============================================================================
-// Remove State
+// Remove State by Name
 //==============================================================================
 void ComponentStatesModel::removeState(const QString& aStateName)
 {
@@ -170,8 +298,16 @@ void ComponentStatesModel::removeState(const QString& aStateName)
         ComponentState* cState = mStates[i];
         // Check Name
         if (cState->stateName() == aStateName) {
+            //qDebug() << "ComponentStatesModel::removeState - aStateName: " << aStateName;
+            // Begin Remove Rows
+            beginRemoveRows(QModelIndex(), i, i);
             // Delete State
             delete mStates.takeAt(i);
+            // End Remove Rows
+            endRemoveRows();
+
+            // Set Dirty State
+            setDirty(true);
 
             return;
         }
@@ -179,14 +315,21 @@ void ComponentStatesModel::removeState(const QString& aStateName)
 }
 
 //==============================================================================
-// Remove State
+// Remove State by Index
 //==============================================================================
 void ComponentStatesModel::removeState(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
+        //qDebug() << "ComponentStatesModel::removeState - aIndex: " << aIndex;
+        // Begin Remove Rows
+        beginRemoveRows(QModelIndex(), aIndex, aIndex);
         // Delete State
         delete mStates.takeAt(aIndex);
+        // End Remove Rows
+        endRemoveRows();
+        // Set Dirty State
+        setDirty(true);
     }
 }
 
@@ -205,9 +348,13 @@ void ComponentStatesModel::addPropertyChange(const QString& aStateName, const QS
         // Check Name
         if (cState->stateName() == aStateName) {
             // Create New Property Change
-            ComponentPropertyChange* newPropertyChange = new ComponentPropertyChange(aTarget, aProperty, aValue);
+            ComponentPropertyChange* newPropertyChange = new ComponentPropertyChange(aTarget, aProperty, aValue, cState);
             // Add Property Change
             cState->appendPropertyChange(newPropertyChange);
+            // Emit Data Changed Signal
+            emit dataChanged(index(i), index(i));
+            // Set Dirty State
+            setDirty(true);
         }
     }
 }
@@ -228,9 +375,12 @@ void ComponentStatesModel::setPropertyChange(const QString& aStateName, const in
         if (cState->stateName() == aStateName) {
             // Set Property Change
             cState->setPropertyChange(aIndex, aTarget, aProperty, aValue);
-
-            // Emit Data Changed
-            //emit dataChanged(index(i), index(i));
+            // Emit Data Changed Signal
+            emit dataChanged(index(i), index(i));
+            // Set Dirty State
+            setDirty(true);
+//            // Emit Data Changed
+//            emit dataChanged(index(i), index(i));
 
             return;
         }
@@ -254,6 +404,10 @@ void ComponentStatesModel::removePropertyChange(const QString& aStateName, const
         if (cState->stateName() == aStateName) {
             // Remove Property change
             cState->removePropertyChange(aIndex);
+            // Emit Data Changed Signal
+            emit dataChanged(index(i), index(i));
+            // Set Dirty State
+            setDirty(true);
 
             // Emit Data Changed
             //emit dataChanged(index(i), index(i));
@@ -296,6 +450,9 @@ ComponentState* ComponentStatesModel::getState(const QString& aStateName)
         ComponentState* cState = mStates[i];
         // Check Name
         if (cState->stateName() == aStateName) {
+            // Set Selected Index
+            mSelectedIndex = i;
+
             return cState;
         }
     }
@@ -310,10 +467,54 @@ ComponentState* ComponentStatesModel::getState(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
+        // Set Selected Index
+        mSelectedIndex = aIndex;
+
         return mStates[aIndex];
     }
 
     return NULL;
+}
+
+//==============================================================================
+// Update Selected State
+//==============================================================================
+void ComponentStatesModel::updateSelectedState()
+{
+    // Check Selected Index
+    if (mSelectedIndex >= 0 && mSelectedIndex < rowCount()) {
+
+        // ...
+
+        // Emit Data Changed Signal
+        emit dataChanged(index(mSelectedIndex), index(mSelectedIndex));
+    }
+}
+
+//==============================================================================
+// Check If State Valid
+//==============================================================================
+bool ComponentStatesModel::stateValid(const QString& aName, const bool& aNewState)
+{
+    // Check Name
+    if (aName.isEmpty()) {
+        return false;
+    }
+
+    // Check New State
+    if (aNewState) {
+        // Get State By Name
+        ComponentState* componentState = getState(aName);
+        // Check State
+        if (componentState) {
+            // Already Exists
+            return false;
+        }
+    }
+
+    // ...
+
+    return true;
 }
 
 //==============================================================================
@@ -338,7 +539,7 @@ QVariant ComponentStatesModel::data(const QModelIndex& index, int role) const
         switch (role) {
             case ESMRName:      return mStates[smRow]->stateName();
             case ESMRWhen:      return mStates[smRow]->stateWhen();
-            //case ESMRChanges:   return mStates[smRow];
+            case ESMRChanges:   return (mStates[smRow]->rowCount() > 0 ? "{...}" : "");
         }
     }
 
@@ -381,12 +582,22 @@ ComponentStatesModel::~ComponentStatesModel()
 //==============================================================================
 // From JSON Object
 //==============================================================================
-ComponentState* ComponentState::fromJSONObject(const QJsonObject& aObject)
+ComponentState* ComponentState::fromJSONObject(const QJsonObject& aObject, ComponentStatesModel* aModel)
 {
     // Init New Component State
-    ComponentState* newComponentState = new ComponentState(aObject[JSON_KEY_COMPONENT_STATE_NAME].toString());
+    ComponentState* newComponentState = new ComponentState(aObject[JSON_KEY_COMPONENT_STATE_NAME].toString(),
+                                                           aObject[JSON_KEY_COMPONENT_STATE_WHEN].toString(),
+                                                           aModel);
 
-    // ...
+    // Get Property Changes Array
+    QJsonArray pcJSONArray = aObject[JSON_KEY_COMPONENT_STATE_PROPERTY_CHANGES].toArray();
+    // Get Count
+    int pcCount = pcJSONArray.count();
+    // Iterate Through Property Changes
+    for (int i=0; i<pcCount; i++) {
+        // Append Property Change
+        newComponentState->appendPropertyChange(ComponentPropertyChange::fromJSONObject(pcJSONArray[i].toObject(), newComponentState));
+    }
 
     return newComponentState;
 }
@@ -394,12 +605,105 @@ ComponentState* ComponentState::fromJSONObject(const QJsonObject& aObject)
 //==============================================================================
 // Constructor
 //==============================================================================
-ComponentState::ComponentState(const QString& aName, const QString& aWhen, QObject* aParent)
+ComponentState::ComponentState(const QString& aName, const QString& aWhen, ComponentStatesModel* aModel, QObject* aParent)
     : QAbstractListModel(aParent)
+    , mStatesModel(aModel)
     , mName(aName)
     , mWhen(aWhen)
+    , mNewPropertyChange(NULL)
+    , mDirty(false)
+    , mSelectedIndex(-1)
 {
+    // Set Ownership
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
     // ...
+}
+
+//==============================================================================
+// Create New Property Change
+//==============================================================================
+ComponentPropertyChange* ComponentState::createNewPropertyChange()
+{
+    // Check New Property Change
+    if (mNewPropertyChange == NULL) {
+        // Create New Empty Property Change
+        mNewPropertyChange = new ComponentPropertyChange("", "", "", this);
+    }
+
+    // Reset Selected Index
+    mSelectedIndex = -1;
+
+    return mNewPropertyChange;
+}
+
+//==============================================================================
+// Discard New Property Change
+//==============================================================================
+void ComponentState::discardNewPropertyChange()
+{
+    // Check New Property Change
+    if (mNewPropertyChange != NULL) {
+        // Delete New Property Change
+        delete mNewPropertyChange;
+        // Reset New Property Change
+        mNewPropertyChange = NULL;
+    }
+}
+
+//==============================================================================
+// Set Dirty State
+//==============================================================================
+void ComponentState::setDirty(const bool& aDirty)
+{
+    // Check Dirty State
+    if (mDirty != aDirty) {
+        //qDebug() << "ComponentState::setDirty - aDirty: " << aDirty;
+
+        // Set Dirty State
+        mDirty = aDirty;
+
+        // Check Sttes Model
+        if (mStatesModel && mDirty) {
+            // Set Dirty State
+            mStatesModel->setDirty(true);
+        }
+
+        // ...
+    }
+}
+
+//==============================================================================
+// Get Property Change by Index
+//==============================================================================
+ComponentPropertyChange* ComponentState::getPropertyChange(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount()) {
+
+        // Set Selected Index
+        mSelectedIndex = aIndex;
+
+        return mPropertyChanges[aIndex];
+    }
+
+    return NULL;
+}
+
+//==============================================================================
+// Update Selected Property Change
+//==============================================================================
+void ComponentState::updateSelectedPropertyChange()
+{
+    // Check Selected Index
+    if (mSelectedIndex >= 0 && mSelectedIndex < rowCount()) {
+        //qDebug() << "ComponentState::updateSelectedPropertyChange - mSelectedIndex: " << mSelectedIndex;
+
+        // ...
+
+        // Emit Data Changed Signal
+        emit dataChanged(index(mSelectedIndex), index(mSelectedIndex));
+    }
 }
 
 //==============================================================================
@@ -421,6 +725,8 @@ void ComponentState::setStateName(const QString& aName)
         mName = aName;
         // Emit State Name Changed Signal
         emit stateNameChanged(mName);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -443,6 +749,8 @@ void ComponentState::setStateWhen(const QString& aWhen)
         mWhen = aWhen;
         // Emit State When Trigger Changed Signal
         emit stateWhenChanged(mWhen);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -467,8 +775,23 @@ void ComponentState::appendPropertyChange(ComponentPropertyChange* aPropertyChan
         return;
     }
 
+    //qDebug() << "ComponentState::appendPropertyChange";
+
+    // Check New Property Change
+    if (mNewPropertyChange == aPropertyChange) {
+        // Reset New Property Change
+        mNewPropertyChange = NULL;
+    }
+
+    // Begin Insert Rows
+    beginInsertRows(QModelIndex(), rowCount(), rowCount());
     // Append Property Change
     mPropertyChanges << aPropertyChange;
+    // End Insert Rows
+    endInsertRows();
+
+    // Set Dirty
+    setDirty(true);
 }
 
 //==============================================================================
@@ -486,12 +809,22 @@ void ComponentState::insertPropertyChange(const int& aIndex, ComponentPropertyCh
 
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount() - 1) {
+        // Begin Insert Rows
+        beginInsertRows(QModelIndex(), aIndex, aIndex);
         // Insert
         mPropertyChanges.insert(aIndex, aPropertyChange);
     } else {
+        // Begin Insert Rows
+        beginInsertRows(QModelIndex(), rowCount(), rowCount());
         // Append Property Change
         mPropertyChanges << aPropertyChange;
     }
+
+    // End Insert Rows
+    endInsertRows();
+
+    // Set Dirty
+    setDirty(true);
 }
 
 //==============================================================================
@@ -501,8 +834,15 @@ void ComponentState::removePropertyChange(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
+        // Begin Remove Rows
+        beginRemoveRows(QModelIndex(), aIndex, aIndex);
         // Delete Property Change
         delete mPropertyChanges.takeAt(aIndex);
+        // End Remove Rows
+        endRemoveRows();
+
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -513,14 +853,21 @@ void ComponentState::setPropertyChange(const int& aIndex, const QString& aTarget
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
+        // Set Property Change
         mPropertyChanges[aIndex]->setPropertyChangeTarget(aTarget);
         mPropertyChanges[aIndex]->setPropertyChangeProperty(aProperty);
         mPropertyChanges[aIndex]->setPropertyChangeValue(aValue);
+
+        // Emit Data Changed
+        emit dataChanged(index(aIndex), index(aIndex));
+
+        // Set Dirty
+        setDirty(true);
     }
 }
 
 //==============================================================================
-// Clear State
+// Clear State - Clear Property Changes
 //==============================================================================
 void ComponentState::clearState()
 {
@@ -535,6 +882,9 @@ void ComponentState::clearState()
 
     // End Reset Model
     endResetModel();
+
+    // Set Dirty
+    setDirty(true);
 }
 
 //==============================================================================
@@ -546,8 +896,24 @@ QJsonObject ComponentState::toJSONObject()
     QJsonObject newJSONObject;
 
     // Set Up Data
+    newJSONObject[JSON_KEY_COMPONENT_STATE_NAME] = mName;
+    newJSONObject[JSON_KEY_COMPONENT_STATE_WHEN] = mWhen;
 
-    // ...
+    QJsonArray newPCJSONArray;
+
+    // Get Property Changes Count
+    int pcCount = rowCount();
+
+    // Iterate Through Property Changes
+    for (int i=0; i<pcCount; i++) {
+        // Get Property Change
+        ComponentPropertyChange* propertyChange = mPropertyChanges[i];
+        // Add Property Change
+        newPCJSONArray << propertyChange->toJSONObject();
+    }
+
+    // Set Property Changes
+    newJSONObject[JSON_KEY_COMPONENT_STATE_PROPERTY_CHANGES] = newPCJSONArray;
 
     return newJSONObject;
 }
@@ -572,11 +938,12 @@ QVariant ComponentState::data(const QModelIndex& index, int role) const
     if (pcRow >= 0 && pcRow < rowCount()) {
         // Switch Role
         switch (role) {
-            case ESMRTarget:    mPropertyChanges[pcRow]->propertyChangeTarget();
-            case ESMRProperty:  mPropertyChanges[pcRow]->propertyChangeProperty();
-            case ESMRValue:     mPropertyChanges[pcRow]->propertyChangeValue();
+            case ESMRTarget:    return mPropertyChanges[pcRow]->mTarget;
+            case ESMRProperty:  return mPropertyChanges[pcRow]->mProperty;
+            case ESMRValue:     return mPropertyChanges[pcRow]->mValue;
         }
     }
+
     // ...
 
     return QVariant();
@@ -617,12 +984,13 @@ ComponentState::~ComponentState()
 //==============================================================================
 // From JSON Object
 //==============================================================================
-ComponentPropertyChange* ComponentPropertyChange::fromJSONObject(const QJsonObject& aObject)
+ComponentPropertyChange* ComponentPropertyChange::fromJSONObject(const QJsonObject& aObject, ComponentState* aState)
 {
     // Create New Component Property Change
     ComponentPropertyChange* newPropertyChange = new ComponentPropertyChange(aObject[JSON_KEY_COMPONENT_PROPERTY_CHANGE_TARGET].toString(),
                                                                              aObject[JSON_KEY_COMPONENT_PROPERTY_CHANGE_PROPERTY].toString(),
-                                                                             aObject[JSON_KEY_COMPONENT_PROPERTY_CHANGE_VALUE].toString());
+                                                                             aObject[JSON_KEY_COMPONENT_PROPERTY_CHANGE_VALUE].toString(),
+                                                                             aState);
 
 
 
@@ -635,13 +1003,34 @@ ComponentPropertyChange* ComponentPropertyChange::fromJSONObject(const QJsonObje
 ComponentPropertyChange::ComponentPropertyChange(const QString& aTarget,
                                                  const QString& aProperty,
                                                  const QString& aValue,
+                                                 ComponentState* aState,
                                                  QObject* aParent)
     : QObject(aParent)
+    , mState(aState)
     , mTarget(aTarget)
     , mProperty(aProperty)
     , mValue(aValue)
 {
+    // Set Ownership
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
     // ...
+}
+
+//==============================================================================
+// To JSON Object
+//==============================================================================
+QJsonObject ComponentPropertyChange::toJSONObject()
+{
+    // Init New JSON Object
+    QJsonObject newJSONObject;
+
+    // Set Up New JSON Object
+    newJSONObject[JSON_KEY_COMPONENT_PROPERTY_CHANGE_TARGET] = mTarget;
+    newJSONObject[JSON_KEY_COMPONENT_PROPERTY_CHANGE_PROPERTY] = mProperty;
+    newJSONObject[JSON_KEY_COMPONENT_PROPERTY_CHANGE_VALUE] = mValue;
+
+    return newJSONObject;
 }
 
 //==============================================================================
@@ -659,10 +1048,16 @@ void ComponentPropertyChange::setPropertyChangeTarget(const QString& aTarget)
 {
     // Check Target
     if (mTarget != aTarget) {
+        //qDebug() << "ComponentPropertyChange::setPropertyChangeTarget - aTarget: " << aTarget;
         // Set Target
         mTarget = aTarget;
         // Emit Target changed Signal
         emit propertyChangeTargetChanged(mTarget);
+        // Check State
+        if (mState) {
+            // Set Dirty
+            mState->setDirty(true);
+        }
     }
 }
 
@@ -681,10 +1076,16 @@ void ComponentPropertyChange::setPropertyChangeProperty(const QString& aProperty
 {
     // Check Property
     if (mProperty != aProperty) {
+        //qDebug() << "ComponentPropertyChange::setPropertyChangeProperty - aProperty: " << aProperty;
         // Set Property
         mProperty = aProperty;
         // Emit Property Changed Signal
         emit propertyChangePropertyChanged(mProperty);
+        // Check State
+        if (mState) {
+            // Set Dirty
+            mState->setDirty(true);
+        }
     }
 }
 
@@ -703,10 +1104,16 @@ void ComponentPropertyChange::setPropertyChangeValue(const QString& aValue)
 {
     // Check Value
     if (mValue != aValue) {
+        //qDebug() << "ComponentPropertyChange::setPropertyChangeValue - aValue: " << aValue;
         // Set Value
         mValue = aValue;
         // Emit Value Changed Signal
         emit propertyChangeValueChanged(mValue);
+        // Check State
+        if (mState) {
+            // Set Dirty
+            mState->setDirty(true);
+        }
     }
 }
 

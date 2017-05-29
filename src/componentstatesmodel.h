@@ -26,6 +26,13 @@ public:
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
 
+    // Create New State
+    Q_INVOKABLE ComponentState* createNewState();
+    // Discard New State
+    Q_INVOKABLE void discardNewState();
+    // Append State
+    Q_INVOKABLE void appendState(ComponentState* aState);
+
     // Add State
     void addState(const QString& aStateName, const QString& aWhen = "");
     // Set State Name
@@ -35,7 +42,7 @@ public:
     // Remove State
     void removeState(const QString& aStateName);
     // Remove State
-    void removeState(const int& aindex);
+    Q_INVOKABLE void removeState(const int& aindex);
 
     // Add Property Change
     void addPropertyChange(const QString& aStateName, const QString& aTarget, const QString& aProperty, const QString& aValue);
@@ -44,13 +51,16 @@ public:
     // Remove Property Change
     void removePropertyChange(const QString& aStateName, const int& aIndex);
 
-    // To JSON Array
-    QJsonArray toJSONArray();
-
     // Get State By Name
     Q_INVOKABLE ComponentState* getState(const QString& aStateName);
     // Get State By Index
     Q_INVOKABLE ComponentState* getState(const int& aIndex);
+
+    // Update Selected State
+    Q_INVOKABLE void updateSelectedState();
+
+    // Check If State Valid
+    Q_INVOKABLE bool stateValid(const QString& aName, const bool& aNewState = true);
 
     // Destructor
     ~ComponentStatesModel();
@@ -62,6 +72,7 @@ signals:
 protected:
     friend class ComponentInfo;
     friend class PropertiesController;
+    friend class ComponentState;
 
     // Constructor
     explicit ComponentStatesModel(ComponentInfo* aComponent, QObject* aParent = NULL);
@@ -74,6 +85,12 @@ protected:
     void loadComponentStates();
     // Save Component States
     void saveComponentStates();
+
+    // Set Dirty State
+    void setDirty(const bool& aDirty);
+
+    // To JSON Array
+    QJsonArray toJSONArray();
 
 public: // from QAbstractListModel
     // Row Count
@@ -96,6 +113,12 @@ protected: // Data
     ComponentInfo*          mComponent;
     // State List
     QList<ComponentState*>  mStates;
+    // New State For Creation
+    ComponentState*         mNewState;
+    // Dirty State
+    bool                    mDirty;
+    // Selected Index
+    int                     mSelectedIndex;
 };
 
 
@@ -119,10 +142,20 @@ class ComponentState : public QAbstractListModel
 
 public:
     // From JSON Object
-    static ComponentState* fromJSONObject(const QJsonObject& aObject);
+    static ComponentState* fromJSONObject(const QJsonObject& aObject, ComponentStatesModel* aModel);
 
     // Constructor
-    explicit ComponentState(const QString& aName, const QString& aWhen = "", QObject* aParent = NULL);
+    explicit ComponentState(const QString& aName, const QString& aWhen, ComponentStatesModel* aModel, QObject* aParent = NULL);
+
+    // Create New Property Change
+    Q_INVOKABLE ComponentPropertyChange* createNewPropertyChange();
+    // Discard New Property Change
+    Q_INVOKABLE void discardNewPropertyChange();
+
+    // Get Property Change by Index
+    Q_INVOKABLE ComponentPropertyChange* getPropertyChange(const int& aIndex);
+    // Update Selected Property Change
+    Q_INVOKABLE void updateSelectedPropertyChange();
 
     // Get State Name
     QString stateName();
@@ -138,11 +171,11 @@ public:
     bool hasPropertyChanges();
 
     // Append Property Change
-    void appendPropertyChange(ComponentPropertyChange* aPropertyChange);
+    Q_INVOKABLE void appendPropertyChange(ComponentPropertyChange* aPropertyChange);
     // Insert Property Change
     void insertPropertyChange(const int& aIndex, ComponentPropertyChange* aPropertyChange);
     // Remove Property Change
-    void removePropertyChange(const int& aIndex);
+    Q_INVOKABLE void removePropertyChange(const int& aIndex);
 
     // Set Property Change
     void setPropertyChange(const int& aIndex, const QString& aTarget, const QString& aProperty, const QString& aValue);
@@ -175,8 +208,13 @@ public: // from QAbstractListModel
     virtual QHash<int, QByteArray> roleNames() const;
 
 protected:
+    friend class ComponentPropertyChange;
+
     // Set Has Children
     void setHasChildren(const bool& aHasChildren);
+
+    // Set Dirty State
+    void setDirty(const bool& aDirty);
 
 public:
     // State Model Roles
@@ -188,12 +226,21 @@ public:
 
 protected: // Data
     friend class ComponentStatesModel;
+
+    // State Model
+    ComponentStatesModel*           mStatesModel;
     // State Name
     QString                         mName;
     // When Trigger
     QString                         mWhen;
     // Property Changes
     QList<ComponentPropertyChange*> mPropertyChanges;
+    // New Property Change
+    ComponentPropertyChange*        mNewPropertyChange;
+    // Dirty State
+    bool                            mDirty;
+    // Selected Index
+    int                             mSelectedIndex;
 };
 
 
@@ -215,13 +262,17 @@ class ComponentPropertyChange : public QObject
 
 public:
     // From JSON Object
-    static ComponentPropertyChange* fromJSONObject(const QJsonObject& aObject);
+    static ComponentPropertyChange* fromJSONObject(const QJsonObject& aObject, ComponentState* aState);
 
     // Constructor
     explicit ComponentPropertyChange(const QString& aTarget,
                                      const QString& aProperty,
                                      const QString& aValue,
+                                     ComponentState* aState,
                                      QObject* aParent = NULL);
+
+    // To JSON Object
+    QJsonObject toJSONObject();
 
     // Get Target
     QString propertyChangeTarget();
@@ -251,6 +302,10 @@ signals:
 
 protected: // Data
     friend class ComponentStatesModel;
+    friend class ComponentState;
+
+    // Component State
+    ComponentState* mState;
     // Target
     QString         mTarget;
     // Property

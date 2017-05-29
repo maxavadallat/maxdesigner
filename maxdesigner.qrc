@@ -65,8 +65,7 @@
         <file>qml/DSpinner.qml</file>
         <file>qml/DStateDelegate.qml</file>
         <file>qml/DStateEditor.qml</file>
-        <file>qml/DStateItemDelegate.qml</file>
-        <file>qml/DStateItemDelegateNode.qml</file>
+        <file>qml/DPropertyChangeDelegate.qml</file>
         <file>qml/DStateSelector.qml</file>
         <file>qml/DSwipeGesture.qml</file>
         <file>qml/DSwitch.qml</file>
@@ -124,5 +123,7 @@
         <file>qml/DPosYEditor.qml</file>
         <file>qml/DWidthEditor.qml</file>
         <file>qml/DHeightEditor.qml</file>
+        <file>qml/DStateItem.qml</file>
+        <file>qml/DTransitionItem.qml</file>
     </qresource>
 </RCC>

@@ -1406,7 +1406,7 @@ Item {
         color: "white"
         visible: settingsController.componentNamesVisible
         opacity: CONSTS.componentNamesOpacity
-        font.pixelSize: 48
+        font.pixelSize: 48 // TODO: Manage Size
         text: ccRoot.componentInfo ? ccRoot.componentInfo.componentName : ""
     }
 }

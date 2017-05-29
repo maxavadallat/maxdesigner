@@ -56,6 +56,8 @@
 #define DEFAULT_MAIN_QML_COMPONENTS_STATES_MODEL            "ComponentStatesModel"
 // Component State
 #define DEFAULT_MAIN_QML_COMPONENT_STATE                    "ComponentState"
+// Component State
+#define DEFAULT_MAIN_QML_COMPONENT_PROPERTY_CHANGE          "ComponentPropertyChange"
 // Component Transitions Model
 #define DEFAULT_MAIN_QML_COMPONENTS_TRANSITIONS_MODEL       "ComponentTransitionsModel"
 // Component Transition

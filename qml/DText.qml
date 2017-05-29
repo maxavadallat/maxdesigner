@@ -7,7 +7,8 @@ Text {
     verticalAlignment: Text.AlignVCenter
     color: DStyle.colorFontDark
     font.pixelSize: DStyle.fontSizeM
-    font.family: DStyle.instrument101FontName
+    font.family: DStyle.aeroFontName
+    //font.family: DStyle.instrument101FontName
     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
     opacity: enabled ? 1.0 : DStyle.disabledOpacity
     Behavior on opacity { NumberAnimation { duration: DStyle.animDuration } }

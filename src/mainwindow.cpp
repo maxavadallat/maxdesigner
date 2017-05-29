@@ -241,6 +241,8 @@ void MainWindow::init()
     qmlRegisterUncreatableType<ComponentStatesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_STATES_MODEL, "");
     // Register Component State
     qmlRegisterUncreatableType<ComponentState>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENT_STATE, "");
+    // Register Component Property Change
+    qmlRegisterUncreatableType<ComponentPropertyChange>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENT_PROPERTY_CHANGE, "");
 
     // Register Component Transitions Model
     qmlRegisterUncreatableType<ComponentTransitionsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_TRANSITIONS_MODEL, "");

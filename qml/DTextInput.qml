@@ -39,11 +39,14 @@ DMouseArea {
     }
 
     onTextChanged: {
-        //console.log("DTextInput.onTextChanged - text: " + textInputRoot.text)
         // Reset User Input
         textInputRoot.userInput = false;
-        // Set Text Input Text
-        textInput.text = textInputRoot.text;
+        // Check Text
+        if (textInput.text !== textInputRoot.text) {
+            //console.log("DTextInput.onTextChanged - text: " + textInputRoot.text);
+            // Set Text Input Text
+            textInput.text = textInputRoot.text;
+        }
     }
 
     // Set Editor Focus
@@ -58,12 +61,20 @@ DMouseArea {
         }
     }
 
+    // Enable Mosue Selection
     function enableMouseSelection(aEnable) {
         textInput.selectByMouse = aEnable;
     }
 
+    // Select All
     function selectAll() {
         textInput.selectAll();
+    }
+
+    // Clear
+    function clear() {
+        // Reset Text
+        textInput.text = "";
     }
 
     DEditorBackground {

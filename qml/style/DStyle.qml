@@ -193,6 +193,7 @@ QtObject {
 
     readonly property string instrument101FontName:         "Instrument 101"
     readonly property string instrument103FontName:         "Instrument 103"
+    readonly property string aeroFontName:                  "Aero"
 
     Component.onCompleted: {
         //console.log("Style.onCompleted");
@@ -204,5 +205,9 @@ QtObject {
 
     property FontLoader instrument103Font: FontLoader {
         source: "qrc:/assets/fonts/instrument103.ttf"
+    }
+
+    property FontLoader aeroFont: FontLoader {
+        source: "qrc:/assets/fonts/aero.ttf"
     }
 }

@@ -263,8 +263,6 @@ DPaneBase {
         anchors.leftMargin: DStyle.defaultMargin
         anchors.right: parent.right
         anchors.rightMargin: DStyle.defaultMargin * 2 + discButton.width + 16
-//        anchors.verticalCenter: parent.verticalCenter
-//        anchors.verticalCenterOffset: titleLabel.height
         anchors.top: parent.top
         anchors.topMargin: titleLabel.height + DStyle.defaultMargin * 2
         spacing: DStyle.defaultSpacing

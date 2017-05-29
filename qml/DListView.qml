@@ -11,6 +11,7 @@ DControl {
     property alias count: listView.count
     property alias currentIndex: listView.currentIndex
     property alias contentY: listView.contentY
+    property alias contentHeight: listView.contentHeight
     property int itemHeight: CONSTS.defaultPaneItemHeight
 
     property alias spacing: listView.spacing

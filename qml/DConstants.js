@@ -73,6 +73,10 @@ var defaultSignalsMax                           = defaultOwnPropertiesMax;
 var defaultSlotsMax                             = defaultOwnPropertiesMax;
 // Default Functions Max
 var defaultFunctionsMax                         = defaultOwnPropertiesMax;
+// Default States Max
+var defaultStatesMax                            = defaultOwnPropertiesMax;
+// Default Transitions Max
+var defaultTransitionsMax                       = defaultOwnPropertiesMax;
 
 // Default Swipe Area Width
 var defaultSwipeAreaWidth                       = 16;

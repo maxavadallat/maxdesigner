@@ -7,40 +7,118 @@ import "style"
 DPaneBase {
     id: propertyChangesEditorRoot
 
+    anchors.horizontalCenter: parentPane ? parentPane.horizontalCenter : undefined
+
+    property bool newPropertyChange: false
+
+    // Component State
+    property ComponentState componentState: null
+    // Component State Property Change
+    property ComponentPropertyChange componentPropertyChange: null
+
     title: "Property Change"
 
     hideToSide: hideToTop
 
-    creationWidth: 290
+    creationWidth: 320
     creationHeight: 152
 
-    minWidth: 290
+    minWidth: 320
     minHeight: 152
 
-    enableResize: false
+    enableResize: true
     enableHideButton: false
 
-    property ComponentInfo componentInfo: null
+    resizeTopEnabled: false
+    resizeBottomEnabled: false
+
+    enableDrag: false
 
     state: stateCreate
 
     onTransitionFinished: {
+        // Check New State
         if (newState === stateShown) {
             targetEditor.setEditorFocus(true, true);
         }
     }
 
+    // Check If Property Change Valid
+    function propertyChangeValid() {
+        // Init Result
+        var result = true;
+
+        // Check Target Editor
+        if (targetEditor.editedText.length === 0) {
+            // Set Invalid Valud
+            targetEditor.invalidValue = true;
+            // Set Result
+            result = false;
+        }
+
+        // Check Property Name Editor
+        if (propertyEditor.editedText.length === 0) {
+            // Set Invalid Value
+            propertyEditor.invalidValue = true;
+            // Set Result
+            result = false;
+        }
+
+        // ...
+
+        return result;
+    }
+
+    // Update Property Change
+    function updatePropertyChange() {
+        // Check Property Change
+        if (propertyChangesEditorRoot.componentPropertyChange !== null) {
+            // Check Target
+            if (propertyChangesEditorRoot.componentPropertyChange.propertyChangeTarget !== targetEditor.editedText) {
+                // Set Target
+                propertyChangesEditorRoot.componentPropertyChange.propertyChangeTarget = targetEditor.editedText;
+            }
+
+            // Check Property
+            if (propertyChangesEditorRoot.componentPropertyChange.propertyChangeProperty !== propertyEditor.editedText) {
+                // Set Property
+                propertyChangesEditorRoot.componentPropertyChange.propertyChangeProperty = propertyEditor.editedText;
+            }
+
+            // Check Value
+            if (propertyChangesEditorRoot.componentPropertyChange.propertyChangeValue !== valueEditor.editedText) {
+                // Set Value
+                propertyChangesEditorRoot.componentPropertyChange.propertyChangeValue = valueEditor.editedText;
+            }
+
+            // Check Component State
+            if (propertyChangesEditorRoot.componentState !== null) {
+                // Update Selected Property Change
+                propertyChangesEditorRoot.componentState.updateSelectedPropertyChange();
+            }
+
+            // ...
+        }
+    }
+
+    // Accept Property Changes
+    function acceptPropertyChanges() {
+        // Check If Property Change Valid
+        if (propertyChangesEditorRoot.propertyChangeValid()) {
+            // Update Property Change
+            propertyChangesEditorRoot.updatePropertyChange();
+            // Emit Accepted Signal
+            propertyChangesEditorRoot.accepted();
+        }
+    }
+
     DDisc {
+        id: discButton
         anchors.right: parent.right
         anchors.rightMargin: DStyle.defaultMargin * 2
         anchors.verticalCenter: parent.verticalCenter
 
-        onClicked: {
-            // Emit Accepted Signal
-            propertyChangesEditorRoot.accepted();
-
-            // ...
-        }
+        onClicked: acceptPropertyChanges();
     }
 
     Column {
@@ -48,9 +126,12 @@ DPaneBase {
         anchors.leftMargin: DStyle.defaultMargin
         anchors.top: parent.top
         anchors.topMargin: titleLabel.height + DStyle.defaultMargin * 2
+        anchors.right: discButton.left
+        anchors.rightMargin: DStyle.defaultMargin
         spacing: DStyle.defaultSpacing
 
         Row {
+            id: targetEditorRow
             spacing: DStyle.defaultSpacing
 
             DText {
@@ -63,7 +144,9 @@ DPaneBase {
 
             DTextInput {
                 id: targetEditor
-                width: 120
+                width: propertyChangesEditorRoot.width * 0.5
+                text: propertyChangesEditorRoot.componentPropertyChange ? propertyChangesEditorRoot.componentPropertyChange.propertyChangeTarget : ""
+
                 onKeyEvent: {
                     switch (event.key) {
                         case Qt.Key_Escape:
@@ -76,10 +159,21 @@ DPaneBase {
                         break;
                     }
                 }
+
+                onTextEdited: {
+                    // Reset Invalid Value
+                    targetEditor.invalidValue = false;
+                }
+
+                onAccepted: {
+                    // Accept Property Changes
+                    propertyChangesEditorRoot.acceptPropertyChanges();
+                }
             }
         }
 
         Row {
+            id: propertyEditorRow
             spacing: DStyle.defaultSpacing
 
             DText {
@@ -91,7 +185,9 @@ DPaneBase {
 
             DTextInput {
                 id: propertyEditor
-                width: 120
+                width: propertyChangesEditorRoot.width * 0.5
+                text: propertyChangesEditorRoot.componentPropertyChange ? propertyChangesEditorRoot.componentPropertyChange.propertyChangeProperty : ""
+
                 onKeyEvent: {
                     switch (event.key) {
                         case Qt.Key_Escape:
@@ -104,10 +200,21 @@ DPaneBase {
                         break;
                     }
                 }
+
+                onTextEdited: {
+                    // Reset Invalid Value
+                    propertyEditor.invalidValue = false;
+                }
+
+                onAccepted: {
+                    // Accept Property Changes
+                    propertyChangesEditorRoot.acceptPropertyChanges();
+                }
             }
         }
 
         Row {
+            id: valueEditorRow
             spacing: DStyle.defaultSpacing
 
             DText {
@@ -120,7 +227,9 @@ DPaneBase {
 
             DTextInput {
                 id: valueEditor
-                width: 120
+                width: propertyChangesEditorRoot.width * 0.5
+                text: propertyChangesEditorRoot.componentPropertyChange ? propertyChangesEditorRoot.componentPropertyChange.propertyChangeValue : ""
+
                 onKeyEvent: {
                     switch (event.key) {
                         case Qt.Key_Escape:
@@ -132,6 +241,16 @@ DPaneBase {
                             targetEditor.setEditorFocus(true, true);
                         break;
                     }
+                }
+
+                onTextEdited: {
+                    // Reset Invalid Value
+                    valueEditor.invalidValue = false;
+                }
+
+                onAccepted: {
+                    // Accept Property Changes
+                    propertyChangesEditorRoot.acceptPropertyChanges();
                 }
             }
         }
