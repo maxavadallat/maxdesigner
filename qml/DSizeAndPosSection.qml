@@ -10,16 +10,14 @@ DSection {
     id: sizeAndPosSectionRoot
     width: 300
 
-//    property Connections propertiesControllerConnections: Connections {
-//        target: propertiesController
+    // Component Info
+    property ComponentInfo componentInfo: propertiesController.focusedComponent
 
-//        onFocusedComponentChanged: {
-
-//        }
-//    }
+    readonly property int labelWidth: 32
+    readonly property int editButtonWidth: 48
 
     title: "Size & Pos"
-    minHeight: sizeAndPosFlow.height
+    minHeight: sizeAndPosColumn.height
     state: stateClosed
 
     // Flip Pos X Editor
@@ -46,16 +44,24 @@ DSection {
         heightFlipable.flipped = flipState;
     }
 
-    DFlow {
-        id: sizeAndPosFlow
+    Column {
+        id: sizeAndPosColumn
         width: sizeAndPosSectionRoot.width
+        spacing: DStyle.defaultSpacing
         move: Transition { }
+
+//        Rectangle {
+//            width: sizeAndPosColumn.width
+//            height: 16
+//            color: "transparent"
+//            border.color: "teal"
+//        }
 
         Row {
             id: posRow
             height: {
                 // Check Focused Component
-                if (propertiesController.focusedComponent && propertiesController.focusedComponent.isRoot) {
+                if (sizeAndPosSectionRoot.componentInfo && sizeAndPosSectionRoot.componentInfo.isRoot) {
                     return 0;
                 }
 
@@ -69,7 +75,7 @@ DSection {
 
             DFlipable {
                 id: posXFlipable
-                width: front.width
+                width: (sizeAndPosColumn.width - DStyle.defaultSpacing) * 0.5
                 height: DStyle.spinnerHeight
 
                 onFlippedChanged: {
@@ -84,17 +90,26 @@ DSection {
                     spacing: DStyle.defaultSpacing
 
                     DText {
-                        width: 24
+                        id: xLabel
+                        width: sizeAndPosSectionRoot.labelWidth
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignRight
-                        text: "x:"
+                        text: {
+                            // Check Component Info
+                            if (sizeAndPosSectionRoot.componentInfo && sizeAndPosSectionRoot.componentInfo.propertyIsFormula("x")) {
+                                return "fx:"
+                            }
+
+                            return "x:";
+                        }
                     }
 
                     DSpinner {
                         id: xSpinner
+                        width: posXFlipable.width - xLabel.width - DStyle.defaultSpacing
                         anchors.verticalCenter: parent.verticalCenter
 
-                        value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.posX) : 0
+                        value: sizeAndPosSectionRoot.componentInfo ? Number(sizeAndPosSectionRoot.componentInfo.posX) : 0
 
                         onValueIncreased: {
                             propertiesController.requestCX(newValue);
@@ -121,15 +136,24 @@ DSection {
                     spacing: DStyle.defaultSpacing
 
                     DText {
-                        width: 24
+                        id: posXBackLabel
+                        width: sizeAndPosSectionRoot.labelWidth
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignRight
-                        text: "x:"
+                        text: "•x:"
+                    }
+
+                    DText {
+                        id: posXFormulaLabel
+                        width: posXFlipable.width - posXBackLabel.width - posXEditButton.width - DStyle.defaultSpacing * 2
+                        anchors.verticalCenter: parent.verticalCenter
+                        elide: Text.ElideMiddle
+                        text: "{...}"
                     }
 
                     DButton {
                         id: posXEditButton
-                        width: DStyle.spinnerWidth
+                        width: sizeAndPosSectionRoot.editButtonWidth
                         height: DStyle.spinnerHeight
 
                         text: "Edit"
@@ -143,7 +167,7 @@ DSection {
 
             DFlipable {
                 id: posYFlipable
-                width: front.width
+                width: posXFlipable.width//front.width
                 height: DStyle.spinnerHeight
 
                 onFlippedChanged: {
@@ -159,16 +183,17 @@ DSection {
 
                     DText {
                         id: yLabel
-                        width: 24
+                        width: sizeAndPosSectionRoot.labelWidth
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignRight
-                        text: "y:"
+                        text: "•y:"
                     }
 
                     DSpinner {
                         id: ySpinner
+                        width: posYFlipable.width - yLabel.width - DStyle.defaultSpacing
                         anchors.verticalCenter: parent.verticalCenter
-                        value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.posY) : 0
+                        value: sizeAndPosSectionRoot.componentInfo ? Number(sizeAndPosSectionRoot.componentInfo.posY) : 0
 
                         onValueIncreased: {
                             propertiesController.requestCY(newValue);
@@ -195,15 +220,24 @@ DSection {
                     spacing: DStyle.defaultSpacing
 
                     DText {
-                        width: 24
+                        id: posYBackLabel
+                        width: sizeAndPosSectionRoot.labelWidth
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignRight
-                        text: "y:"
+                        text: "•y:"
+                    }
+
+                    DText {
+                        id: posYFormulaLabel
+                        width: posYFlipable.width - posYBackLabel.width - posYEditButton.width - DStyle.defaultSpacing * 2
+                        anchors.verticalCenter: parent.verticalCenter
+                        elide: Text.ElideMiddle
+                        text: "{...}"
                     }
 
                     DButton {
                         id: posYEditButton
-                        width: DStyle.spinnerWidth
+                        width: sizeAndPosSectionRoot.editButtonWidth
                         height: DStyle.spinnerHeight
 
                         text: "Edit"
@@ -218,7 +252,7 @@ DSection {
 
         Row {
             id: sizeRow
-            height: propertiesController.focusedComponent ? DStyle.spinnerHeight : 0
+            height: sizeAndPosSectionRoot.componentInfo ? DStyle.spinnerHeight : 0
             Behavior on height { DAnimation { } }
             spacing: DStyle.defaultSpacing
             visible: height > 0
@@ -226,7 +260,7 @@ DSection {
 
             DFlipable {
                 id: widthFlipable
-                width: front.width
+                width: (sizeAndPosColumn.width - DStyle.defaultSpacing) * 0.5
                 height: DStyle.spinnerHeight
 
                 onFlippedChanged: {
@@ -241,16 +275,18 @@ DSection {
                     spacing: DStyle.defaultSpacing
 
                     DText {
-                        width: 24
+                        id: widthLabel
+                        width: sizeAndPosSectionRoot.labelWidth
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignRight
-                        text: "w:"
+                        text: "•w:"
                     }
 
                     DSpinner {
                         id: widthSpinner
+                        width: widthFlipable.width - widthLabel.width - DStyle.defaultSpacing
                         anchors.verticalCenter: parent.verticalCenter
-                        value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.width) : 0
+                        value: sizeAndPosSectionRoot.componentInfo ? Number(sizeAndPosSectionRoot.componentInfo.width) : 0
                         minValue: 0
 
                         onValueIncreased: {
@@ -278,15 +314,24 @@ DSection {
                     spacing: DStyle.defaultSpacing
 
                     DText {
-                        width: 24
+                        id: widthBackLabel
+                        width: sizeAndPosSectionRoot.labelWidth
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignRight
-                        text: "w:"
+                        text: "•w:"
+                    }
+
+                    DText {
+                        id: widthFormulaLabel
+                        width: widthFlipable.width - widthBackLabel.width - widthEditButton.width - DStyle.defaultSpacing * 2
+                        anchors.verticalCenter: parent.verticalCenter
+                        elide: Text.ElideMiddle
+                        text: "{...}"
                     }
 
                     DButton {
                         id: widthEditButton
-                        width: DStyle.spinnerWidth
+                        width: sizeAndPosSectionRoot.editButtonWidth
                         height: DStyle.spinnerHeight
 
                         text: "Edit"
@@ -300,7 +345,7 @@ DSection {
 
             DFlipable {
                 id: heightFlipable
-                width: front.width
+                width: (sizeAndPosColumn.width - DStyle.defaultSpacing) * 0.5
                 height: DStyle.spinnerHeight
 
                 onFlippedChanged: {
@@ -315,17 +360,18 @@ DSection {
                     spacing: DStyle.defaultSpacing
 
                     DText {
-                        id: hLabel
-                        width: 24
+                        id: heightLabel
+                        width: sizeAndPosSectionRoot.labelWidth
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignRight
-                        text: "h:"
+                        text: "•h:"
                     }
 
                     DSpinner {
                         id: heightSpinner
+                        width: heightFlipable.width - heightLabel.width - DStyle.defaultSpacing
                         anchors.verticalCenter: parent.verticalCenter
-                        value: propertiesController.focusedComponent ? Number(propertiesController.focusedComponent.height) : 0
+                        value: sizeAndPosSectionRoot.componentInfo ? Number(sizeAndPosSectionRoot.componentInfo.height) : 0
                         minValue: 0
 
                         onValueIncreased: {
@@ -359,15 +405,24 @@ DSection {
                     spacing: DStyle.defaultSpacing
 
                     DText {
-                        width: 24
+                        id: heightBackLabel
+                        width: sizeAndPosSectionRoot.labelWidth
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignRight
-                        text: "h:"
+                        text: "•h:"
+                    }
+
+                    DText {
+                        id: heightFormulaLabel
+                        width: heightFlipable.width - heightBackLabel.width - heightEditButton.width - DStyle.defaultSpacing * 2
+                        anchors.verticalCenter: parent.verticalCenter
+                        elide: Text.ElideMiddle
+                        text: "{...}"
                     }
 
                     DButton {
                         id: heightEditButton
-                        width: DStyle.spinnerWidth
+                        width: sizeAndPosSectionRoot.editButtonWidth
                         height: DStyle.spinnerHeight
 
                         text: "Edit"

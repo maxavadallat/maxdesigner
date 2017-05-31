@@ -194,20 +194,30 @@ QtObject {
     readonly property string instrument101FontName:         "Instrument 101"
     readonly property string instrument103FontName:         "Instrument 103"
     readonly property string aeroFontName:                  "Aero"
+    readonly property string neuropolFontName:              "Neuropol"
+    readonly property string zektonFontName:                "Zekton"
 
     Component.onCompleted: {
         //console.log("Style.onCompleted");
     }
 
-    property FontLoader instrument101Font: FontLoader {
-        source: "qrc:/assets/fonts/instrument101.ttf"
-    }
+//    property FontLoader instrument101Font: FontLoader {
+//        source: "qrc:/assets/fonts/instrument101.ttf"
+//    }
 
-    property FontLoader instrument103Font: FontLoader {
-        source: "qrc:/assets/fonts/instrument103.ttf"
-    }
+//    property FontLoader instrument103Font: FontLoader {
+//        source: "qrc:/assets/fonts/instrument103.ttf"
+//    }
 
-    property FontLoader aeroFont: FontLoader {
-        source: "qrc:/assets/fonts/aero.ttf"
+//    property FontLoader aeroFont: FontLoader {
+//        source: "qrc:/assets/fonts/aero.ttf"
+//    }
+
+//    property FontLoader neuropolFont: FontLoader {
+//        source: "qrc:/assets/fonts/neuropol.ttf"
+//    }
+
+    property FontLoader zektonFont: FontLoader {
+        source: "qrc:/assets/fonts/zekton.ttf"
     }
 }

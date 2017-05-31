@@ -21,6 +21,7 @@ PropertiesController::PropertiesController(ProjectModel* aProjectModel, QObject*
     : QObject(aParent)
     , mProject(aProjectModel)
     , mFocusedComponent(NULL)
+    , mFocusedContainer(NULL)
     , mComponentImports(NULL)
     , mComponentAnchors(NULL)
     , mComponentOwnProperties(NULL)
@@ -347,6 +348,18 @@ void PropertiesController::setCurrentProject(ProjectModel* aProjectModel)
         // Set Current Project Model
         mProject = aProjectModel;
 
+        // Check Properties Model
+        if (mComponentProperties) {
+            // Set Project Model
+            mComponentProperties->mProject = aProjectModel;
+        }
+
+        // Check Own Properties Model
+        if (mComponentOwnProperties) {
+            // Set Project Model
+            mComponentOwnProperties->mProject = aProjectModel;
+        }
+
         // ...
 
         // Emit Current Project Changed Signal
@@ -490,6 +503,28 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
 
         // Emit Focused Component Changed Signal
         emit focusedComponentChanged(mFocusedComponent);
+    }
+}
+
+//==============================================================================
+// Get Focused Container
+//==============================================================================
+QObject* PropertiesController::focusedContainer()
+{
+    return mFocusedContainer;
+}
+
+//==============================================================================
+// Set Focused Container
+//==============================================================================
+void PropertiesController::setFocusedContainer(QObject* aContainer)
+{
+    // Cehck Focused Cotnainer
+    if (mFocusedContainer != aContainer) {
+        // Set Focused Container
+        mFocusedContainer = aContainer;
+        // Emit Focused Container Changed Signal
+        emit focusedContainerChanged(mFocusedContainer);
     }
 }
 
@@ -736,16 +771,16 @@ void PropertiesController::setComponentTag(const QString& aTag)
 //==============================================================================
 // Select Component By Name
 //==============================================================================
-void PropertiesController::selectComponent(const QString& aName, const int& aChildIndex)
+ComponentInfo* PropertiesController::selectComponent(const QString& aName, const int& aChildIndex)
 {
     // Check Name
     if (aName.isEmpty()) {
-        return;
+        return NULL;
     }
 
     // Check Project Model
     if (!mProject) {
-        return;
+        return NULL;
     }
 
     // Get Component
@@ -755,6 +790,8 @@ void PropertiesController::selectComponent(const QString& aName, const int& aChi
         // Set Focused Component
         setFocusedComponent(aChildIndex >= 0 ? componentInfo->childInfo(aChildIndex) : componentInfo);
     }
+
+    return mFocusedComponent;
 }
 
 //==============================================================================

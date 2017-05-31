@@ -31,5 +31,7 @@
         <file>assets/icons/component.nonvisual.png</file>
         <file>assets/icons/component.layout.png</file>
         <file>assets/fonts/aero.ttf</file>
+        <file>assets/fonts/neuropol.ttf</file>
+        <file>assets/fonts/zekton.ttf</file>
     </qresource>
 </RCC>

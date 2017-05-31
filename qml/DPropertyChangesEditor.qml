@@ -122,12 +122,13 @@ DPaneBase {
     }
 
     Column {
+        id: proertyChangesColumn
         anchors.left: parent.left
         anchors.leftMargin: DStyle.defaultMargin
         anchors.top: parent.top
         anchors.topMargin: titleLabel.height + DStyle.defaultMargin * 2
         anchors.right: discButton.left
-        anchors.rightMargin: DStyle.defaultMargin
+        anchors.rightMargin: DStyle.defaultMargin * 2
         spacing: DStyle.defaultSpacing
 
         Row {
@@ -144,7 +145,7 @@ DPaneBase {
 
             DTextInput {
                 id: targetEditor
-                width: propertyChangesEditorRoot.width * 0.5
+                width: propertyEditor.width
                 text: propertyChangesEditorRoot.componentPropertyChange ? propertyChangesEditorRoot.componentPropertyChange.propertyChangeTarget : ""
 
                 onKeyEvent: {
@@ -185,7 +186,7 @@ DPaneBase {
 
             DTextInput {
                 id: propertyEditor
-                width: propertyChangesEditorRoot.width * 0.5
+                width: proertyChangesColumn.width - propertyLabel.width - DStyle.defaultSpacing
                 text: propertyChangesEditorRoot.componentPropertyChange ? propertyChangesEditorRoot.componentPropertyChange.propertyChangeProperty : ""
 
                 onKeyEvent: {
@@ -227,7 +228,7 @@ DPaneBase {
 
             DTextInput {
                 id: valueEditor
-                width: propertyChangesEditorRoot.width * 0.5
+                width: propertyEditor.width
                 text: propertyChangesEditorRoot.componentPropertyChange ? propertyChangesEditorRoot.componentPropertyChange.propertyChangeValue : ""
 
                 onKeyEvent: {

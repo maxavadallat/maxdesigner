@@ -49,9 +49,9 @@ DSection {
 
                 onItemDoubleClicked: {
                     // Emit Edit State Launch Signal
-                    //propertiesPaneRoot.editStateLaunch(index);
+                    propertiesPaneRoot.editStateLaunch(index);
                     // Emit Edit State Signal
-                    statesSectionRoot.editStateSignal(index);
+                    //statesSectionRoot.editStateSignal(index);
                 }
             }
         }
@@ -70,10 +70,9 @@ DSection {
 
         onClicked: {
             // Emit New State Launch
-            //propertiesPaneRoot.newStateLaunch();
-
+            propertiesPaneRoot.newStateLaunch();
             // Emit New State Signal
-            statesSectionRoot.newStateSignal();
+            //statesSectionRoot.newStateSignal();
         }
     }
 }

@@ -331,6 +331,9 @@ public:
     // Get Property Value
     Q_INVOKABLE QVariant propertyValue(const QString& aName, const bool& aRaw = false);
 
+    // Get Property Is Formula or Binding for Value
+    Q_INVOKABLE bool propertyIsFormula(const QString& aName);
+
     // Get Child Count
     int childCount();
     // Child Depth
@@ -369,7 +372,7 @@ public:
     Q_INVOKABLE QObject* getChildObject(const QString& aID);
 
     // Generate Live Code
-    Q_INVOKABLE QString generateLiveCode(const bool& aLiveRoot = true, const bool& aGenerateChildren = true);
+    Q_INVOKABLE QString generateLiveCode(const bool& aLiveRoot = true, const bool& aGenerateChildren = true, const QString& aIndent = "");
 
     // Get Layout Base
     Q_INVOKABLE QString layoutBase();
@@ -677,11 +680,13 @@ protected:
     // Format Children
     QString liveCodeFormatChildren(const bool& aGenerateChildren, const QString& aIndent = "");
     // Format States
+    QString liveCodeFormatState(const int& aIndex, const QString& aIndent = "");
+    // Format States
     QString liveCodeFormatStates(const QString& aIndent = "");
     // Format Transitions
     QString liveCodeFormatTransitions(const QString& aIndent = "");
     // Generate Enum Value Live Code Cases
-    QStringList liveCodeGenerateEnumValueCases(const QStringList& aEnumValues);
+    QStringList liveCodeGenerateEnumValueCases(const QStringList& aEnumValues, const QString& aIndent = "");
 
 protected slots:
     // Base Components Dir Changed Slot

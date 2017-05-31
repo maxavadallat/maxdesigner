@@ -62,7 +62,7 @@ DPaneBase {
     creationHeight: stateEditorColumn.height + 44
 
     minWidth: 460
-    minHeight: creationHeight
+    minHeight: stateEditorColumn.height + 44
 
     enableResize: true
 
@@ -111,10 +111,7 @@ DPaneBase {
     onTransitionStarted: {
         // Check New State
         if (newState === stateShown) {
-            // Reset Creation Height
-            stateEditorRoot.creationHeight = Qt.binding(function() { return stateEditorColumn.height + 44; });
-            // reset Min Height
-            stateEditorRoot.minHeight = Qt.binding(function() { return stateEditorColumn.height + 44; });
+
         }
     }
 
@@ -123,6 +120,11 @@ DPaneBase {
         if (newState === stateShown) {
             // Set Editor Focus
             nameEditor.setEditorFocus(true, true);
+
+            // Reset Creation Height
+            stateEditorRoot.creationHeight = Qt.binding(function() { return stateEditorColumn.height + 44; });
+            // reset Min Height
+            stateEditorRoot.minHeight = Qt.binding(function() { return stateEditorColumn.height + 44; });
 
         } else if (newState === stateCreate) {
             // Reset Focus

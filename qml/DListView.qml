@@ -32,7 +32,7 @@ DControl {
     ListView {
         id: listView
         anchors.fill: parent
-        //highlightFollowsCurrentItem: true
+        highlightFollowsCurrentItem: true
         interactive: contentHeight > height
 
         add: Transition {
@@ -42,7 +42,7 @@ DControl {
             }
         }
 
-        // SHOULD NOT OVERRIDE THIS!!!
+        // SHOULD NOT OVERRIDE THIS!!! FUCKS UP MANY THINGS!!!
 //        populate: Transition {
 //            NumberAnimation { duration: DStyle.animDuration }
 //        }
