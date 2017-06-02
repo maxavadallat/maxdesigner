@@ -333,6 +333,9 @@ void ComponentTransitionsModel::moveTransitionNode(ComponentTransition* aTransit
                                                    ComponentTransitionNode* aTargetNode,
                                                    const int& aTargetIndex)
 {
+    Q_UNUSED(aTargetNode);
+    Q_UNUSED(aTargetIndex);
+
     // Check Transition
     if (!aTransition || !aNode) {
         return;

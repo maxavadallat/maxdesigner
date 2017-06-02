@@ -559,15 +559,31 @@ Item {
     function createRootComponent() {
         // Check Component Info
         if (ccRoot.componentInfo !== null && !ccRoot.rootComponentCreated) {
-            //console.log("DComponentContainer.createRootComponent - name: " + ccRoot.componentInfo.componentName);
+            console.log("DComponentContainer.createRootComponent - path: " + ccRoot.componentInfo.componentPath);
             // Set Root Component Created
             ccRoot.rootComponentCreated = true;
-            // Create New Root Object
-            ccRoot.rootLiveQMLComponent = Qt.createQmlObject(ccRoot.componentInfo.generateLiveCode(ccRoot.componentInfo.isRoot, false),  ccRoot.rootContainer);
+
+            // Generate Live Code
+            var cFileName = propertiesController.currentProject.generateLiveCode(ccRoot.componentInfo, false);
+
+            // Create Component
+            var component  = Qt.createComponent("file://" + cFileName);
+            // Check Status
+            if (component.status === Component.Ready) {
+                // Create New Root Object
+                ccRoot.rootLiveQMLComponent = component.createObject(ccRoot.rootContainer);
+
+                // Remove Live Temp File
+                propertiesController.currentProject.removeLiveTempFile(cFileName);
+
+            } else {
+                console.error("DComponentContainer.createRootComponent - ERROR CREATING ROOT COMPONENT!! - error: " + component.errorString());
+                return;
+            }
 
             // Check New Root Object
             if (ccRoot.rootLiveQMLComponent === null) {
-                console.error("DComponentContainer.createRootComponent - ERROR CREATING ROOT COMPONENT!!");
+                console.error("DComponentContainer.createRootComponent - ERROR CREATING ROOT OBJECT!!");
             }
         }
     }
@@ -576,7 +592,7 @@ Item {
     function removeRootComponent() {
         // Check New Root Object
         if (ccRoot.rootLiveQMLComponent !== null) {
-            console.log("DComponentContainer.createRootComponent");
+            console.log("DComponentContainer.removeRootComponent");
             // Destroy Root Component
             ccRoot.rootLiveQMLComponent.destroy();
             // Reset Root Component
@@ -596,7 +612,7 @@ Item {
 
         // Check Compoennt Info
         if (ccRoot.componentInfo !== null) {
-            console.log("DComponentContainer.createChildComponent - childIndex: " + childIndex);
+            console.log("DComponentContainer.createChildComponent - path: " + ccRoot.componentInfo.componentPath + " - childIndex: " + childIndex);
 
             // Get Child Component Info
             var ccInfo = ccRoot.componentInfo.childInfo(childIndex);
@@ -645,7 +661,7 @@ Item {
             // Push To Temp Array
             ccTemp.array.push(childContainer.children[bottomIndex]);
             // Set Item\s Parent to Dummy Parent
-            childContainer.children[bottomIndex].parent = dummyParent;
+            childContainer.children[bottomIndex].parent = containersDummyParent;
         }
 
         // Dec Bottom Index
@@ -785,13 +801,11 @@ Item {
     function updateChildContainerObject(aChildContainerObject, aComponentInfo, aParentComponentContainer, aFocus) {
         // Check Child Object & Component Info
         if (aChildContainerObject && aComponentInfo) {
-            console.log("DComponentContainer.updateChildContainerObject - componentName: " + aComponentInfo.componentName);
+            console.log("DComponentContainer.updateChildContainerObject - path: " + aComponentInfo.componentPath);
 
             // Set Parent Component Container
             aChildContainerObject.parentComponentContainer = aParentComponentContainer;//ccRoot.parentComponentContainer;
 
-            // Set Component Info
-            aChildContainerObject.componentInfo = aComponentInfo;
             // Set Focus
             aChildContainerObject.focus = aFocus;
 
@@ -810,6 +824,9 @@ Item {
 
             // Set Parent Component Container
             aChildContainerObject.componentContainer.parentComponentContainer = aChildContainerObject;
+
+            // Set Component Info
+            aChildContainerObject.componentInfo = aComponentInfo;
 
             // Set Anchors
             aChildContainerObject.componentContainer.setAnchoring();
@@ -831,7 +848,7 @@ Item {
     function setAnchoring() {
         // Check Component Info
         if (ccRoot.componentInfo !== null && !ccRoot.componentIsRoot) {
-            //console.log("DComponentContainer.setAnchoring");
+            console.log("DComponentContainer.setAnchoring - path: " + ccRoot.componentInfo.componentPath);
             // Set Anchor Fill
             if (ccRoot.componentInfo.anchorsFill !== "") {
                 // Set Fill Anchor
@@ -1091,7 +1108,7 @@ Item {
             return 0;
         }
 
-        console.log("DComponentContainer.updateHorizontalLayout - componentLayout: " + ccRoot.componentLayout + " - layoutSpacing: " + ccRoot.layoutSpacing);
+        //console.log("DComponentContainer.updateHorizontalLayout - componentLayout: " + ccRoot.componentLayout + " - layoutSpacing: " + ccRoot.layoutSpacing);
 
         // Init New Layout Width
         var newLayoutWidth = 0;
@@ -1153,7 +1170,7 @@ Item {
             return 0;
         }
 
-        console.log("DComponentContainer.updateVerticalLayout - componentLayout: " + ccRoot.componentLayout + " - layoutSpacing: " + ccRoot.layoutSpacing);
+        //console.log("DComponentContainer.updateVerticalLayout - componentLayout: " + ccRoot.componentLayout + " - layoutSpacing: " + ccRoot.layoutSpacing);
 
         // Init New Layout Height
         var newLayoutHeight = 0;

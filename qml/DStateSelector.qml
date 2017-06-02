@@ -19,7 +19,13 @@ DRectangle {
 
     property bool stateSelectorShown: false
 
-    property ComponentInfo componentInfo: null
+    property ComponentInfo componentInfo: liveController.currentComponent
+
+    property string selectedState: ""
+
+    onComponentInfoChanged: {
+        // ...
+    }
 
     DMouseArea {
         id: hideButton
@@ -41,6 +47,31 @@ DRectangle {
         }
     }
 
+    ListModel {
+        id: statesModel
+
+        ListElement {
+            stateName: "State 1"
+        }
+        ListElement {
+            stateName: "State 2"
+        }
+        ListElement {
+            stateName: "State 3"
+        }
+        ListElement {
+            stateName: "State 4"
+        }
+        ListElement {
+            stateName: "State 5"
+        }
+        ListElement {
+            stateName: "State 6"
+        }
+        ListElement {
+            stateName: "State 7"
+        }
+    }
 
     DCarousel {
         id: stateCarousel
@@ -52,32 +83,10 @@ DRectangle {
         visibleItems: 5
         showTitle: false
 
-        model: ListModel {
-            ListElement {
-                demoTitle: "State 1"
-            }
-            ListElement {
-                demoTitle: "State 2"
-            }
-            ListElement {
-                demoTitle: "State 3"
-            }
-            ListElement {
-                demoTitle: "State 4"
-            }
-            ListElement {
-                demoTitle: "State 5"
-            }
-            ListElement {
-                demoTitle: "State 6"
-            }
-            ListElement {
-                demoTitle: "State 7"
-            }
-        }
+        model: statesModel
 
         contentDelegate: DCarouselDelegate {
-            itemTitle: itemData ? itemData.demoTitle : ""
+            itemTitle: itemData ? itemData.stateName : ""
 
             DRectangle {
                 anchors.fill: parent
@@ -86,12 +95,13 @@ DRectangle {
 
             DText {
                 anchors.centerIn: parent
-                text: itemData ? itemData.demoTitle : ""
+                text: itemData ? itemData.stateName : ""
             }
         }
 
         onCurrentItemChanged: {
-            // Set State
+            // Set Selected State
+            stateSelectorRoot.selectedState = currentItem.itemData.stateName
         }
     }
 }

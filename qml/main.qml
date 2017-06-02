@@ -415,10 +415,8 @@ Item {
                 if (propertiesController.statesModel !== null && stateEditor.state === stateEditor.stateCreate) {
                     // Set New State
                     stateEditor.newState = true;
-
                     // Set Component State
-                    //stateEditor.componentState = propertiesController.statesModel.createNewState();
-
+                    stateEditor.componentState = propertiesController.statesModel.createNewState();
                     // Show State Editor
                     stateEditor.show();
                 }
@@ -429,9 +427,8 @@ Item {
                 if (propertiesController.statesModel !== null && stateEditor.state === stateEditor.stateCreate) {
                     // Set New State
                     stateEditor.newState = false;
-
                     // Set Component State
-
+                    stateEditor.componentState = propertiesController.statesModel.getState(index);
                     // Show State Editor
                     stateEditor.show();
                 }
@@ -748,8 +745,8 @@ Item {
 
             parentPane: stateEditor
 
-            initialX: stateEditor.x + stateEditor.width * 0.5
-            initialY: stateEditor.y + stateEditor.height
+            initialX: parentPane.x + parentPane.width * 0.5
+            initialY: parentPane.y + parentPane.height
 
             creationX: initialX - propertyChangesEditor.width * 0.5
             creationY: initialY + 32

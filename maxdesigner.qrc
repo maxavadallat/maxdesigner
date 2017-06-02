@@ -9,7 +9,6 @@
         <file>qml/DActivityIndicator.qml</file>
         <file>qml/DAnimation.qml</file>
         <file>qml/DAssetContainer.qml</file>
-        <file>qml/DBuiltInComponentFactory.qml</file>
         <file>qml/DButton.qml</file>
         <file>qml/DButtonBase.qml</file>
         <file>qml/DCarousel.qml</file>

@@ -50,13 +50,6 @@ DSection {
         spacing: DStyle.defaultSpacing
         move: Transition { }
 
-//        Rectangle {
-//            width: sizeAndPosColumn.width
-//            height: 16
-//            color: "transparent"
-//            border.color: "teal"
-//        }
-
         Row {
             id: posRow
             height: {

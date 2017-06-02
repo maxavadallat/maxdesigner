@@ -194,10 +194,16 @@ public:
     // Get Component By File Path
     Q_INVOKABLE ComponentInfo* getComponentByPath(const QString& aFilePath);
 
-    // Create Live Code
-    QString generateLiveCode(const QString& aName, const QString& aContent);
+    // Generate Live Code
+    Q_INVOKABLE QString generateLiveCode(ComponentInfo* aComponent, const bool& aGenerateChildren = false);
+    // Generate Component Code For Live
+    Q_INVOKABLE QString generateComponentCode(ComponentInfo* aComponent, const bool& aGenerateChildren = false);
     // Delete Live Code
-    void removeLiveCode(const QString& aName);
+    Q_INVOKABLE void removeLiveCode(const QString& aName);
+    // Remove Live Temp File
+    Q_INVOKABLE void removeLiveTempFile(const QString& aFileName);
+    // Clear All Files From Live Temp Dir
+    Q_INVOKABLE void clearLiveTemp();
 
     // Destructor
     ~ProjectModel();

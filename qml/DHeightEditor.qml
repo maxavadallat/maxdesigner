@@ -129,10 +129,10 @@ DPaneBase {
         // Check If Number
         if (Number(pheText) === Number.NaN) {
             // Set Height Editor New text
-            heightEditorRoot.newPosX = "$" + pheText.trim();
+            heightEditorRoot.newHeight = "$" + pheText.trim();
         } else {
             // Set Height Editor New text
-            heightEditorRoot.newPosX = pheText.trim();
+            heightEditorRoot.newHeight = pheText.trim();
         }
 
         return true;

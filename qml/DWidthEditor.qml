@@ -129,10 +129,10 @@ DPaneBase {
         // Check If Number
         if (Number(pweText) === Number.NaN) {
             // Set Width Editor New text
-            widthEditorRoot.newPosX = "$" + pweText.trim();
+            widthEditorRoot.newWidth = "$" + pweText.trim();
         } else {
             // Set Width Editor New text
-            widthEditorRoot.newPosX = pweText.trim();
+            widthEditorRoot.newWidth = pweText.trim();
         }
 
         return true;

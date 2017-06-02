@@ -1,3 +1,3 @@
 # maxdesigner
 
-QML Designer for da masses! X )
+UI Designer for da masses! X )

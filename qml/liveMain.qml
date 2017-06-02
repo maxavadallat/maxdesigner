@@ -71,7 +71,7 @@ Item {
             // Switch Status
             switch (status) {
                 case Loader.Ready:
-
+                    console.log("liveMain.contentLoader.onStatusChanged - READY!");
                 break;
 
                 case Loader.Error:
@@ -87,10 +87,18 @@ Item {
 
     DImage {
         anchors.centerIn: parent
-        source: "qrc:/assets/images/dashboard.png"
+        //source: "qrc:/assets/images/dashboard.png"
+        source: "file://" + propertiesController.currentProject.dashboard
+        //visible: settingsController.showDashboard
     }
 
     DStateSelector {
         id: stateSelector
+
+        onSelectedStateChanged: {
+            console.log("liveMain.stateSelector.onSelectedStateChanged - selectedState: " + stateSelector.selectedState);
+
+            // Set State
+        }
     }
 }

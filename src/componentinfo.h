@@ -15,7 +15,7 @@ class ComponentsModel;
 class ViewsModel;
 class DataSourcesModel;
 class MainWindow;
-class QMLParser;
+class LiveWindow;
 
 class ComponentImportsModel;
 class ComponentAnchorsModel;
@@ -370,9 +370,10 @@ public:
     Q_INVOKABLE void clearObjectID(const QString& aID);
     // Get Child Object By ID
     Q_INVOKABLE QObject* getChildObject(const QString& aID);
-
-    // Generate Live Code
-    Q_INVOKABLE QString generateLiveCode(const bool& aLiveRoot = true, const bool& aGenerateChildren = true, const QString& aIndent = "");
+        // Generate Live Code
+    Q_INVOKABLE QString generateLiveCode(const bool& aLiveRoot = true, const bool& aGenerateChildren = true, const QString& aIndent = "", const bool& aComponentCode = false);
+        // Generate Component Code
+    Q_INVOKABLE QString generateComponentCode(const bool& aGenerateChildren = true);
 
     // Get Layout Base
     Q_INVOKABLE QString layoutBase();
@@ -573,7 +574,7 @@ protected:
     friend class ViewsModel;
     friend class DataSourcesModel;
     friend class MainWindow;
-    friend class QMLParser;
+    friend class LiveWindow;
     friend class PropertiesController;
 
     // Constructor
@@ -651,10 +652,13 @@ protected:
     // Find Root Component
     ComponentInfo* findRoot(ComponentInfo* aComponent);
 
+    // Get Index
+    int getChildIndex();
+
     // Generate Component ID
     QString liveCodeGenerateID(const bool& aLiveRoot = true);
     // Format Imports
-    QString liveCodeFormatImports(const bool& aLiveRoot = true);
+    QString liveCodeFormatImports();
     // Format Component Name
     QString liveCodeFormatName(const QString& aIndent = "");
     // Format ID
@@ -668,25 +672,32 @@ protected:
     // Format Anchors
     QString liveCodeFormatAnchors(const QString& aIndent = "");
     // Format Own Properties
-    QString liveCodeFormatOwnProperties(QStringList& aOPHooks, QStringList& aEnumHooks, const QString& aID, const QStringList& aFPKeys, const QString& aIndent = "");
+    QString liveCodeFormatOwnProperties(QStringList& aOPHooks, QStringList& aEnumHooks, const QString& aID, const QStringList& aFPKeys, const QString& aIndent = "", const bool& aComponentCode = false);
     // Format Properties
-    QString liveCodeFormatInheritedProperties(QStringList& aPHooks, QStringList& aEnumHooks, const QString& aID, const QStringList& aFPKeys, const QString& aIndent = "");
+    QString liveCodeFormatInheritedProperties(QStringList& aPHooks, QStringList& aEnumHooks, const QString& aID, const QStringList& aFPKeys, const QString& aIndent = "", const bool& aComponentCode = false);
     // Format Signals
-    QString liveCodeFormatSignals(const QStringList& aOPKeys, const QStringList& pKeys, const QString& aIndent = "");
+    QString liveCodeFormatSignals(const QStringList& aOPKeys = QStringList(), const QStringList& pKeys = QStringList(), const QString& aIndent = "", const bool& aComponentCode = false);
     // Format Slots
-    QString liveCodeFormatSlots(const QStringList& aOPKeys, const QStringList& pKeys, const QString& aIndent = "");
+    QString liveCodeFormatSlots(const QStringList& aOPKeys = QStringList(), const QStringList& pKeys = QStringList(), const QString& aIndent = "", const bool& aComponentCode = false);
+    // Format Hooks
+    QString liveCodeFormatHooks(const QStringList& aOPHooks, const QStringList& aPHooks, const QStringList& aEnumHooks, const QString& aIndent = "");
     // Format Functions
-    QString liveCodeFormatFunctions(const QStringList& aOPHooks, const QStringList& aPHooks, const QStringList& aEnumHooks, const QString& aIndent = "");
+    QString liveCodeFormatFunctions(const QString& aIndent = "");
     // Format Children
-    QString liveCodeFormatChildren(const bool& aGenerateChildren, const QString& aIndent = "");
+    QString liveCodeFormatChildren(const bool& aGenerateChildren = false, const QString& aIndent = "", const bool& aComponentCode = false);
     // Format States
     QString liveCodeFormatState(const int& aIndex, const QString& aIndent = "");
     // Format States
     QString liveCodeFormatStates(const QString& aIndent = "");
+    // Format Transition
+    QString liveCodeFormatTransition(const int& aIndex, const QString& aIndent = "");
     // Format Transitions
     QString liveCodeFormatTransitions(const QString& aIndent = "");
     // Generate Enum Value Live Code Cases
     QStringList liveCodeGenerateEnumValueCases(const QStringList& aEnumValues, const QString& aIndent = "");
+
+    // Generate Child Component Code
+    QString generateChildComponentCode(const QString& aIndent = "");
 
 protected slots:
     // Base Components Dir Changed Slot

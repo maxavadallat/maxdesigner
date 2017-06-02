@@ -4,6 +4,8 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDir>
+#include <QDirIterator>
+#include <QDateTime>
 #include <QDebug>
 
 #include "projectmodel.h"
@@ -557,6 +559,9 @@ bool ProjectModel::saveProject(const QString& aFileName)
 void ProjectModel::closeProject(const bool& aSave)
 {
     //qDebug() << "ProjectModel::closeProject - aSave: " << aSave;
+
+    // Clear Live Temp
+    clearLiveTemp();
 
     // Check Save
     if (aSave) {
@@ -1468,17 +1473,20 @@ ComponentInfo* ProjectModel::getComponentByPath(const QString& aFilePath)
 //==============================================================================
 // Generate Live Code
 //==============================================================================
-QString ProjectModel::generateLiveCode(const QString& aName, const QString& aContent)
+QString ProjectModel::generateLiveCode(ComponentInfo* aComponent, const bool& aGenerateChildren)
 {
-    // Check Content
-    if (aContent.isEmpty() || aName.isEmpty()) {
+    // Check Component
+    if (!aComponent) {
         return "";
     }
 
-    qDebug() << "ProjectModel::generateLiveCode - aName: " << aName;
+    // Get Component Name
+    QString componentName = QString("%1_%2").arg(aComponent->mName).arg(QDateTime::currentMSecsSinceEpoch());
+
+    qDebug() << "ProjectModel::generateLiveCode - componentName: " << componentName;
 
     // Init Live Code File Name
-    QString fileName = QString(DEFAULT_LIVE_FILE_NAME_PATTERN).arg(liveTempDir()).arg(aName).arg(DEFAULT_QML_SUFFIX);
+    QString fileName = QString(DEFAULT_LIVE_FILE_NAME_PATTERN).arg(liveTempDir()).arg(componentName).arg(DEFAULT_QML_SUFFIX);
 
     // Init Live Code File
     QFile liveFile(fileName);
@@ -1489,12 +1497,58 @@ QString ProjectModel::generateLiveCode(const QString& aName, const QString& aCon
         QTextStream liveStream(&liveFile);
 
         // Write Content
-        liveStream << aContent;
+        liveStream << aComponent->generateLiveCode(true, aGenerateChildren);
 
         // Close File
         liveFile.close();
 
         return fileName;
+    } else {
+        qWarning() << "ProjectModel::generateLiveCode - fileName: " << fileName << " - CAN NOT OPEN FILE FOR WRITING";
+    }
+
+    // ...
+
+    return "";
+}
+
+//==============================================================================
+// Generate Component Code For Live
+//==============================================================================
+QString ProjectModel::generateComponentCode(ComponentInfo* aComponent, const bool& aGenerateChildren)
+{
+    // Check Component
+    if (!aComponent) {
+        return "";
+    }
+
+    // Check If Built in
+    if (aComponent->mBuiltIn) {
+        return "";
+    }
+
+    qDebug() << "ProjectModel::generateComponentCode - mName: " << aComponent->mName;
+
+    // Init Component Code File Name
+    QString fileName = QString(DEFAULT_COMPONENT_FILE_NAME_PATTERN).arg(liveTempDir()).arg(aComponent->mName).arg(DEFAULT_QML_SUFFIX);
+
+    // Init Component Code File
+    QFile componentFile(fileName);
+
+    // Open File
+    if (componentFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        // Init Text Stream
+        QTextStream componentStream(&componentFile);
+
+        // Write Content
+        componentStream << aComponent->generateComponentCode(aGenerateChildren);
+
+        // Close File
+        componentFile.close();
+
+        return fileName;
+    } else {
+        qWarning() << "ProjectModel::generateComponentCode - fileName: " << fileName << " - CAN NOT OPEN FILE FOR WRITING";
     }
 
     // ...
@@ -1517,13 +1571,45 @@ void ProjectModel::removeLiveCode(const QString& aName)
     // Init Live Code File Name
     QString fileName = QString(DEFAULT_LIVE_FILE_NAME_PATTERN).arg(liveTempDir()).arg(aName).arg(DEFAULT_QML_SUFFIX);
 
-    // Init Live Code File
-    QFile liveFile(fileName);
+    // Remove Live Temp File
+    removeLiveTempFile(fileName);
+}
 
-    // Check If File Exists
-    if (liveFile.exists()) {
+//==============================================================================
+// Remove Live Temp File
+//==============================================================================
+void ProjectModel::removeLiveTempFile(const QString& aFileName)
+{
+    // Init File Info
+    QFile tempFile(aFileName);
+
+    // Check If Exists
+    if (tempFile.exists()) {
+        qDebug() << "ProjectModel::removeLiveTempFile - aFileName: " << aFileName;
         // Remove File
-        liveFile.remove();
+        tempFile.remove();
+    }
+}
+
+//==============================================================================
+// Clear All Files From Live Temp Dir
+//==============================================================================
+void ProjectModel::clearLiveTemp()
+{
+    qDebug() << "ProjectModel::clearLiveTemp";
+
+    // Init Live Temp Dir
+    QDir ltDir(liveTempDir());
+    // Set Filters
+    ltDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
+    // Init Dir Iterator
+    QDirIterator ltIterator(ltDir);
+    // Iterate Through Dir
+    while (ltIterator.hasNext()) {
+        // Get To Next
+        ltIterator.next();
+        // Remove File
+        ltDir.remove(ltIterator.fileName());
     }
 }
 

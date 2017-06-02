@@ -521,6 +521,9 @@ void MainWindow::openProject(const QString& aFilePath)
         // Set Window Title
         setWindowTitle(QString("Max Designer - %1").arg(mProjectModel->projectName()));
 
+        // Add Live Temp To Import Paths
+        addImportPath(mProjectModel->liveTempDir());
+
         // Enable Project Properties Menu Item
         ui->actionProjectProperties->setEnabled(true);
         // Enable Close Project Menu Item
@@ -1115,6 +1118,9 @@ void MainWindow::createNewProject()
         // Set Window Title
         setWindowTitle(QString("Max Designer - %1").arg(mProjectModel->projectName()));
 
+        // Add Import Path
+        addImportPath(mProjectModel->liveTempDir());
+
         // Enable Project Properties Menu Item
         ui->actionProjectProperties->setEnabled(true);
         // Enable Close Project Menu Item
@@ -1369,14 +1375,10 @@ void MainWindow::closeProject()
         return;
     }
 
-    //qDebug() << "MainWindow::closeProject";
+    qDebug() << "MainWindow::closeProject";
 
     // Remove Import Path
-    QStringList ipList  = ui->mainQuickWidget->engine()->importPathList();
-    // Remove Live Temp Dir
-    ipList.removeAt(ipList.indexOf(mProjectModel->liveTempDir()));
-    // Set Import Paths
-    ui->mainQuickWidget->engine()->setImportPathList(ipList);
+    removeImportPath(mProjectModel->liveTempDir());
 
     // Save Project
     saveProject();
@@ -1508,10 +1510,17 @@ void MainWindow::addImportPath(const QString& aDirPath)
     // Set Context Properties
     QQmlContext* ctx = ui->mainQuickWidget->rootContext();
     // Get Engine
-    QQmlEngine* engine = ctx->engine();
+    QQmlEngine* engine = ctx ? ctx->engine() : NULL;
 
-    // Add Import Path
-    engine->addImportPath(aDirPath);
+    // Check Engine
+    if (engine) {
+        qDebug() << "#### MainWindow::addImportPath - aDirPath: " << aDirPath;
+
+        // Add Import Path
+        engine->addImportPath(aDirPath);
+
+        //qDebug() << "#### ipl: " << engine->importPathList();
+    }
 }
 
 //==============================================================================
@@ -1522,18 +1531,23 @@ void MainWindow::removeImportPath(const QString& aDirPath)
     // Set Context Properties
     QQmlContext* ctx = ui->mainQuickWidget->rootContext();
     // Get Engine
-    QQmlEngine* engine = ctx->engine();
+    QQmlEngine* engine = ctx ? ctx->engine() : NULL;
 
-    // Get Import Path List
-    QStringList ipList = engine->importPathList();
-    // Get Index Of Import Path
-    int ipIndex = ipList.indexOf(aDirPath);
-    // Check Import Path Index
-    if (ipIndex >= 0) {
-        // Remove Import Path
-        ipList.removeAt(ipIndex);
-        // Set Import Path List
-        engine->setImportPathList(ipList);
+    // Check Engine
+    if (engine) {
+        // Get Import Path List
+        QStringList ipList = engine->importPathList();
+        // Get Index Of Import Path
+        int ipIndex = ipList.indexOf(aDirPath);
+        // Check Import Path Index
+        if (ipIndex >= 0) {
+            qDebug() << "#### MainWindow::removeImportPath - aDirPath: " << aDirPath;
+
+            // Remove Import Path
+            ipList.removeAt(ipIndex);
+            // Set Import Path List
+            engine->setImportPathList(ipList);
+        }
     }
 }
 
@@ -1545,10 +1559,15 @@ void MainWindow::addPluginPath(const QString& aDirPath)
     // Set Context Properties
     QQmlContext* ctx = ui->mainQuickWidget->rootContext();
     // Get Engine
-    QQmlEngine* engine = ctx->engine();
+    QQmlEngine* engine = ctx ? ctx->engine() : NULL;
 
-    // Add Plugin Path
-    engine->addPluginPath(aDirPath);
+    // Check Engine
+    if (engine) {
+        qDebug() << "MainWindow::addPluginPath - aDirPath: " << aDirPath;
+
+        // Add Plugin Path
+        engine->addPluginPath(aDirPath);
+    }
 }
 
 //==============================================================================
@@ -1559,18 +1578,23 @@ void MainWindow::removePluginPath(const QString& aDirPath)
     // Set Context Properties
     QQmlContext* ctx = ui->mainQuickWidget->rootContext();
     // Get Engine
-    QQmlEngine* engine = ctx->engine();
+    QQmlEngine* engine = ctx ? ctx->engine() : NULL;
 
-    // Get Plugin Path List
-    QStringList ppList = engine->pluginPathList();
-    // Get Index Of Plugin Path
-    int ppIndex = ppList.indexOf(aDirPath);
-    // Check Import Path Index
-    if (ppIndex >= 0) {
-        // Remove Import Path
-        ppList.removeAt(ppIndex);
-        // Set Plugin Path List
-        engine->setPluginPathList(ppList);
+    // Check Engine
+    if (engine) {
+        // Get Plugin Path List
+        QStringList ppList = engine->pluginPathList();
+        // Get Index Of Plugin Path
+        int ppIndex = ppList.indexOf(aDirPath);
+        // Check Import Path Index
+        if (ppIndex >= 0) {
+            qDebug() << "MainWindow::removePluginPath - aDirPath: " << aDirPath;
+
+            // Remove Import Path
+            ppList.removeAt(ppIndex);
+            // Set Plugin Path List
+            engine->setPluginPathList(ppList);
+        }
     }
 }
 
@@ -1586,7 +1610,7 @@ void MainWindow::importPathAdded(const QString& aImportPath)
 
     // Check Engine
     if (engine) {
-        //qDebug() << "MainWindow::importPathAdded - aImportPath: " << aImportPath;
+        qDebug() << "MainWindow::importPathAdded - aImportPath: " << aImportPath;
 
         // Add Import Path
         engine->addImportPath(aImportPath);
@@ -1611,7 +1635,7 @@ void MainWindow::importPathRemoved(const QString& aImportPath)
         int ipIndex = ipList.indexOf(aImportPath);
         // Check Import Path Index
         if (ipIndex >= 0) {
-            //qDebug() << "MainWindow::importPathRemoved - aImportPath: " << aImportPath;
+            qDebug() << "MainWindow::importPathRemoved - aImportPath: " << aImportPath;
             // Remove Import Path
             ipList.removeAt(ipIndex);
             // Set Import Path List
@@ -1632,7 +1656,7 @@ void MainWindow::importPathsChanged(const QStringList& aImportPaths)
 
     // Check Engine
     if (engine) {
-        //qDebug() << "MainWindow::importPathsChanged - aImportPaths: " << aImportPaths;
+        qDebug() << "MainWindow::importPathsChanged - aImportPaths: " << aImportPaths;
         // Set Import Paths
         engine->setImportPathList(aImportPaths);
     }
@@ -1650,7 +1674,7 @@ void MainWindow::pluginPathAdded(const QString& aPluginPath)
 
     // Check Engine
     if (engine) {
-        //qDebug() << "MainWindow::pluginPathAdded - aPluginPath: " << aPluginPath;
+        qDebug() << "MainWindow::pluginPathAdded - aPluginPath: " << aPluginPath;
         // Add Plugin Path
         engine->addPluginPath(aPluginPath);
     }
@@ -1674,7 +1698,7 @@ void MainWindow::pluginPathRemoved(const QString& aPluginPath)
         int ppIndex = ppList.indexOf(aPluginPath);
         // Check Import Path Index
         if (ppIndex >= 0) {
-            //qDebug() << "MainWindow::pluginPathRemoved - aPluginPath: " << aPluginPath;
+            qDebug() << "MainWindow::pluginPathRemoved - aPluginPath: " << aPluginPath;
             // Remove Import Path
             ppList.removeAt(ppIndex);
             // Set Plugin Path List
@@ -1695,7 +1719,7 @@ void MainWindow::pluginPathsChanged(const QStringList& aPluginPaths)
 
     // Check Engine
     if (engine) {
-        //qDebug() << "MainWindow::pluginPathsChanged - aPluginPaths: " << aPluginPaths;
+        qDebug() << "MainWindow::pluginPathsChanged - aPluginPaths: " << aPluginPaths;
         // Set Plugin Paths
         engine->setPluginPathList(aPluginPaths);
     }

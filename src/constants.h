@@ -124,6 +124,8 @@
 
 // Default Live File Name Pattern
 #define DEFAULT_LIVE_FILE_NAME_PATTERN                      "%1/%2_live.%3"
+// Default Component File Name Pattern
+#define DEFAULT_COMPONENT_FILE_NAME_PATTERN                 "%1/%2.%3"
 
 // Default Dirs & File Names
 #define DEFAULT_PROJECT_NAME                                "myproject"

@@ -10,6 +10,7 @@
 #include "constants.h"
 #include "componentinfo.h"
 #include "projectmodel.h"
+#include "propertiescontroller.h"
 
 //==============================================================================
 // Constructor
@@ -19,8 +20,10 @@ LiveWindow::LiveWindow(ProjectModel* aProject, QWidget* aParent)
     , ui(new Ui::LiveWindow)
     , mSettings(SettingsController::getInstance())
     , mProjectModel(aProject)
+    , mPropertiesController(aProject ? aProject->propertiesController() : NULL)
     , mComponent(NULL)
     , mLiveFileName("")
+    , mBusy(false)
 {
     qDebug() << "LiveWindow created.";
 
@@ -46,6 +49,9 @@ void LiveWindow::init()
 
     // Set Context Properties - Settings
     ctx->setContextProperty(DEFAULT_GLOBAL_SETTINGS_CONTROLLER, mSettings);
+
+    // Set Context Properties - Properties Controller
+    ctx->setContextProperty(DEFAULT_PROPERTIES_CONTROLLER, mPropertiesController);
 
     // Set QML Source
     ui->quickLiveWidget->setSource(QUrl(DEFAULT_LIVE_QMLFILE_URL));
@@ -91,6 +97,36 @@ void LiveWindow::restoreUI()
 }
 
 //==============================================================================
+// Get Current Component
+//==============================================================================
+ComponentInfo* LiveWindow::currentComponent()
+{
+    return mComponent;
+}
+
+//==============================================================================
+// Get Live Main File Name
+//==============================================================================
+QString LiveWindow::liveMain()
+{
+    return mLiveFileName;
+}
+
+//==============================================================================
+// Set Live Main File Name
+//==============================================================================
+void LiveWindow::setLiveMain(const QString& aLiveMain)
+{
+    // Check Live Main
+    if (mLiveFileName != aLiveMain) {
+        // Set Live Main
+        mLiveFileName = aLiveMain;
+        // Emit Live Main File Changed Signal
+        emit liveMainChanged(mLiveFileName);
+    }
+}
+
+//==============================================================================
 // Get Screen Width
 //==============================================================================
 int LiveWindow::screenWidth()
@@ -107,6 +143,14 @@ int LiveWindow::screenHeight()
 }
 
 //==============================================================================
+// Get Busy State
+//==============================================================================
+bool LiveWindow::busy()
+{
+    return mBusy;
+}
+
+//==============================================================================
 // Setup Live
 //==============================================================================
 void LiveWindow::setupLive()
@@ -117,10 +161,13 @@ void LiveWindow::setupLive()
         qDebug() << "LiveWindow::setupLive";
 
         // Generate Live Code For Base Components
-        mLiveFileName = mProjectModel->generateLiveCode(mComponent->componentName(), mComponent->generateLiveCode());
+        generateLiveCodeForBaseComponents(mComponent);
 
-        // Generate Live Code For Base Components
-        generateLiveCodeForBaseComponents();
+        // Generate Live Code
+        QString newMainLive = mProjectModel->generateLiveCode(mComponent, true);
+
+        // Set Live Main
+        setLiveMain(newMainLive);
 
         // ...
     }
@@ -145,28 +192,62 @@ void LiveWindow::shutDown()
 //==============================================================================
 void LiveWindow::setLiveContent()
 {
-    // Check Live File Name
-    if (!mLiveFileName.isEmpty()) {
-        qDebug() << "LiveWindow::setLiveContent";
+//    // Check Live File Name
+//    if (!mLiveFileName.isEmpty()) {
+//        qDebug() << "LiveWindow::setLiveContent";
 
-        // Emit Load Content Signal
-        emit loadContent(QString("%1%2").arg(DEFAULT_FILE_URL_PREFIX).arg(mLiveFileName));
+//        // Emit Load Content Signal
+//        emit loadContent(QString("%1%2").arg(DEFAULT_FILE_URL_PREFIX).arg(mLiveFileName));
 
-        // ...
+//        // ...
+//    }
+}
+
+//==============================================================================
+// Set Busy State
+//==============================================================================
+void LiveWindow::setBusy(const bool& aBusy)
+{
+    // Check Busy State
+    if (mBusy != aBusy) {
+        // Set Busy State
+        mBusy = aBusy;
+        // Emit Busy State Changed Signal
+        emit busyChanged(mBusy);
     }
 }
 
 //==============================================================================
 // Generate Live Code For Base Components
 //==============================================================================
-void LiveWindow::generateLiveCodeForBaseComponents()
+void LiveWindow::generateLiveCodeForBaseComponents(ComponentInfo* aComponent)
 {
-    // Check Currnt Component
-    if (mComponent) {
-        qDebug() << "LiveWindow::generateLiveCodeForBaseComponents";
+    // Check Component
+    if (!aComponent) {
+        return;
+    }
 
-        // ...
+    qDebug() << "LiveWindow::generateLiveCodeForBaseComponents - mName: " << aComponent->componentName();
 
+    // Check Base
+    if (aComponent->mBase && !aComponent->mBuiltIn) {
+        // Generate Clean Live Code For Base
+        generateLiveCodeForBaseComponents(aComponent->mBase);
+    }
+
+    // Check If Component Built in
+    if (!aComponent->mBuiltIn) {
+        // Generate Clean Live Code For Component
+
+    }
+
+    // Get Child Count
+    int cCount = aComponent->childCount();
+
+    // Iterate Through Childrent
+    for (int i=0; i<cCount; i++) {
+        // Generate Clean Live Code For Child
+        generateLiveCodeForBaseComponents(aComponent->childInfo(i));
     }
 }
 
@@ -177,22 +258,30 @@ void LiveWindow::setComponent(ComponentInfo* aComponent)
 {
     // Check Component
     if (mComponent != aComponent) {
+        // Set Busy
+        setBusy(true);
         // Shut Down
         shutDown();
         // Set Component
         mComponent = aComponent;
+
+        // Emit Current Component Changed Signal
+        emit currentComponentChanged(mComponent);
 
         // Check Component
         if (mComponent && mComponent->isRoot()) {
             // Setup Live
             setupLive();
 
-            // Check If Window Shown
-            if (isVisible()) {
-                // Set Live Content
-                setLiveContent();
-            }
+//            // Check If Window Shown
+//            if (isVisible()) {
+//                // Set Live Content
+//                setLiveContent();
+//            }
         }
+
+        // Reset Busy State
+        setBusy(false);
     }
 }
 
