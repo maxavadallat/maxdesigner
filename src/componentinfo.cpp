@@ -2716,19 +2716,20 @@ QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGene
     }
 
     // Check Child Count
-    if (childCount() > 0) {
+    if (/*childCount() > 0 ||*/ mIsRoot) {
         // Generate Component Code First
         mProject->generateComponentCode(this, aGenerateChildren);
     } else {
-        // Check Root
-        if (!mIsRoot) {
-            // Get Component ProtoType
-            ComponentInfo* proto = mProject->getComponentByName(mName, mType);
-            // Check Proto
-            if (proto) {
-                // Generate Component Code
-                mProject->generateComponentCode(proto, true);
-            }
+        // Get Component ProtoType
+        ComponentInfo* proto = mProject->getComponentByName(mName, mType);
+        // Check Proto
+        if (proto) {
+            // Generate Component Code
+            mProject->generateComponentCode(proto, true);
+        } else {
+            qWarning() << "ComponentInfo::generateLiveCode - mName: " << mName << " - NO PROTOTYPE COMPONENT!!";
+            // NO PROTOTYPE!!!
+            return "";
         }
     }
 

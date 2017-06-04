@@ -52,23 +52,85 @@ Item {
     }
 
     // Create New Asset Root Container
-    function createNewAssetRoot(fileName) {
+    function createNewAssetRoot(filePath) {
+        // Incubate Object
+        var incubator = assetRootFactory.incubateObject(mainGrabArea);
+        // Check Status
+        if (incubator.status !== Component.Ready) {
+            // Connect To Status Changed
+            incubator.onStatusChanged = function(status) {
+                // Check Status
+                if (status === Component.Ready) {
+                    //console.log("assetRootFactory - object: ", incubator.object, " ready!");
+                    // Launch Asset Root
+                    launchAssetRoot(incubator.object, filePath);
 
+                } else if (status === Component.Error) {
+                    console.log("assetRootFactory - object: ", incubator.object, " ERROR: " + assetRootFactory.errorString());
+                }
+            }
+        } else {
+            //console.log("assetRootFactory - object: ", incubator.object, " immediately ready!");
+            // Launch Root Component
+            launchAssetRoot(incubator.object, filePath);
+        }
     }
 
     // Launch Asset Root Container
-    function launchAssetRoot(object, fileName, width, height) {
+    function launchAssetRoot(object, filePath, width, height) {
 
+        // Set File Path
+        object.filePath = filePath;
+
+        // Set Object Width & Height
+        object.width = width > 0 ? width : CONSTS.defaultAssetContainerWidth;
+        object.height = height > 0 ? height : CONSTS.defaultAssetContainerHeight;
+
+        // ...
+
+        // Show
+        object.show();
     }
 
     // Create New Source Root Container
-    function createNewSourceRoot(fileName) {
+    function createNewSourceRoot(filePath) {
+        // Incubate Object
+        var incubator = sourceRootFactory.incubateObject(mainGrabArea);
+        // Check Status
+        if (incubator.status !== Component.Ready) {
+            // Connect To Status Changed
+            incubator.onStatusChanged = function(status) {
+                // Check Status
+                if (status === Component.Ready) {
+                    //console.log("sourceRootFactory - object: ", incubator.object, " ready!");
+                    // Launch Source Root
+                    launchSourceRoot(incubator.object, filePath);
 
+                } else if (status === Component.Error) {
+                    console.log("sourceRootFactory - object: ", incubator.object, " ERROR: " + sourceRootFactory.errorString());
+                }
+            }
+        } else {
+            //console.log("sourceRootFactory - object: ", incubator.object, " immediately ready!");
+            // Launch Source Root
+            launchSourceRoot(incubator.object, filePath);
+        }
     }
 
     // Launch Source Container Root
-    function launchSourceRoot(object, fileName, width, height) {
+    function launchSourceRoot(object, filePath, width, height) {
 
+        // Set File Path
+        object.filePath = filePath;
+
+        // Set Object Width & Height
+        object.width = width > 0 ? width : CONSTS.defaultSourceContainerWidth;
+        object.height = height > 0 ? height : CONSTS.defaultSourceContainerHeight;
+
+        // ...
+
+        // Show
+        object.show();
     }
 
     // Background Container
@@ -151,6 +213,12 @@ Item {
             //createNewComponentRoot(aComponent, aWidth, aHeight);
         }
 
+        onDataSourceCreated: {
+            // Show Project Pane
+            projectPane.show();
+
+        }
+
         // ...
     }
 
@@ -227,7 +295,16 @@ Item {
         DAssetContainer {
             id: newAssetRootContainer
 
-            // ...
+            parentWidth: mainGrabArea.width
+            parentHeight: mainGrabArea.height
+
+            initialX: projectPane.x + projectPane.width
+            initialY: Math.max(Math.min(mainGrabArea.height / 2, projectPane.y + projectPane.height - DStyle.defaultMargin), projectPane.y + DStyle.defaultMargin)
+
+            creationX: parentWidth * 0.5 - creationWidth * 0.5
+            creationY: parentHeight * 0.5 - creationHeight * 0.5
+
+            state: stateCreate
         }
     }
 
@@ -237,7 +314,16 @@ Item {
         DSourceContainer {
             id: newSourceRootContainer
 
-            // ...
+            parentWidth: mainGrabArea.width
+            parentHeight: mainGrabArea.height
+
+            initialX: projectPane.x + projectPane.width
+            initialY: Math.max(Math.min(mainGrabArea.height / 2, projectPane.y + projectPane.height - DStyle.defaultMargin), projectPane.y + DStyle.defaultMargin)
+
+            creationX: parentWidth * 0.5 - creationWidth * 0.5
+            creationY: parentHeight * 0.5 - creationHeight * 0.5
+
+            state: stateCreate
         }
     }
 
@@ -531,7 +617,9 @@ Item {
                                                                  propertyEditor.propertyMin,
                                                                  propertyEditor.propertyMax,
                                                                  propertyEditor.propertyEnums,
-                                                                 propertyEditor.propertyDefault);
+                                                                 propertyEditor.propertyDefault,
+                                                                 propertyEditor.propertyReadOnly,
+                                                                 propertyEditor.propertyDefaultAlias);
                     // Reset New Property
                     propertyEditor.newProperty = false;
                 } else {

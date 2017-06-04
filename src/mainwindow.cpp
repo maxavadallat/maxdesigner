@@ -1039,6 +1039,29 @@ void MainWindow::launchLiveWindow()
 }
 
 //==============================================================================
+// Clear Component Cache
+//==============================================================================
+void MainWindow::clearQMLComponentCache()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    qDebug() << "MainWindow::clearQMLComponentCache";
+
+    // Get Root QML Context
+    QQmlContext* ctx = ui->mainQuickWidget->rootContext();
+    // Get Engine
+    QQmlEngine* engine = ctx ? ctx->engine() : NULL;
+    // Check Engine
+    if (engine) {
+        // Clear Component Cache
+        engine->clearComponentCache();
+    }
+}
+
+//==============================================================================
 // Toggle Show Tracers
 //==============================================================================
 void MainWindow::toggleShowTracers()
@@ -2135,6 +2158,9 @@ MainWindow::~MainWindow()
 {
     // Close Project
     closeProject();
+
+    // Clear QML Component Cache
+    clearQMLComponentCache();
 
     // Delete UI
     delete ui->mainQuickWidget;

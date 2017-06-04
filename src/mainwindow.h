@@ -83,6 +83,9 @@ public:
     // Launch Live Window
     Q_INVOKABLE void launchLiveWindow();
 
+    // Clear Component Cache
+    Q_INVOKABLE void clearQMLComponentCache();
+
     // Destructor
     ~MainWindow();
 

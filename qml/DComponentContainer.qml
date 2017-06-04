@@ -579,6 +579,9 @@ Item {
             // Generate Live Code
             var cFileName = propertiesController.currentProject.generateLiveCode(ccRoot.componentInfo, false);
 
+            // CLEAR THE FUCKING QML COMPONENT CACHE BECAUSE THEY FUCKED IT UP!
+            mainController.clearQMLComponentCache();
+
             // Create Component
             var component  = Qt.createComponent("file://" + cFileName);
             // Check Status

@@ -160,9 +160,6 @@ void LiveWindow::setupLive()
 
         qDebug() << "LiveWindow::setupLive";
 
-        // Generate Live Code For Base Components
-        generateLiveCodeForBaseComponents(mComponent);
-
         // Generate Live Code
         QString newMainLive = mProjectModel->generateLiveCode(mComponent, true);
 

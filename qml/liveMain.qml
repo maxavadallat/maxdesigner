@@ -15,18 +15,15 @@ Item {
     Connections {
         target: liveController
 
-        onLoadContent: {
-            // Set Source
-            contentLoader.source = liveContent;
-            // Set Active
-            contentLoader.active = true;
-        }
-
-        onClearContent: {
-            // Reset Active
-            contentLoader.active = false;
-            // Reset Source
-            contentLoader.source = "";
+        onLiveMainChanged: {
+            // Check Live Main
+            if (liveController.liveMain !== "") {
+                // Set Active
+                contentLoader.active = true;
+            } else {
+                // Set Active
+                contentLoader.active = false;
+            }
         }
     }
 
@@ -67,6 +64,9 @@ Item {
         anchors.centerIn: parent
         anchors.verticalCenterOffset: screenBorderRect.anchors.verticalCenterOffset
         anchors.horizontalCenterOffset: screenBorderRect.anchors.horizontalCenterOffset
+
+        source: "file://" + liveController.liveMain
+
         onStatusChanged: {
             // Switch Status
             switch (status) {
