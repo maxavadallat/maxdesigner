@@ -51,6 +51,13 @@ var componentSuffix                             = ".json"
 var defaultNonVisualComponentWidth              = 320;
 var defaultNonVisualComponentHeight             = 200;
 
+// Default Asset Container Size
+var defaultAssetContainerWidth                  = 600;
+var defaultAssetContainerHeight                 = 400;
+
+var defaultSourceContainerWidth                 = 600;
+var defaultSourceContainerHeight                = 800;
+
 // Default Disc Size
 var defaultDiscWidth                            = 56;
 var defaultDiscHeight                           = defaultDiscWidth;

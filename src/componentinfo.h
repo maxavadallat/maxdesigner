@@ -779,29 +779,31 @@ protected: // Data
     ComponentInfo*          mProtoType;
 
     // Children
-    QList<ComponentInfo*>   mChildren;
+    QList<ComponentInfo*>   mChildComponents;
 
     // Component Id Map
     QMap<QString, QObject*> mIDMap;
 
-    // Own Properties
-    QJsonObject             mOwnProperties;
+    // Imports
+    QJsonArray              mImports;
     // Anchors
     QJsonObject             mAnchors;
+    // Own Properties
+    QJsonObject             mOwnProperties;
     // Properties
     QJsonObject             mProperties;
     // Signals
     QJsonArray              mSignals;
     // Slots
     QJsonArray              mSlots;
+    // Functions
+    QJsonArray              mFunctions;
+    // Children
+    QJsonArray              mChildren;
     // States
     QJsonArray              mStates;
     // Transitions
     QJsonArray              mTransitions;
-    // Functions
-    QJsonArray              mFunctions;
-    // Imports
-    QJsonArray              mImports;
 };
 
 #endif // COMPONENTINFO_H

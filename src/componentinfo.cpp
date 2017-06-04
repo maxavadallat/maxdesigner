@@ -146,9 +146,9 @@ void ComponentInfo::clear()
 void ComponentInfo::clearChildren()
 {
     // Iterate Through Children
-    while (mChildren.count() > 0) {
+    while (mChildComponents.count() > 0) {
         // Delete Last
-        delete mChildren.takeLast();
+        delete mChildComponents.takeLast();
     }
 }
 
@@ -1307,7 +1307,7 @@ QJsonObject ComponentInfo::toJSONObject(const bool& aChild)
     }
 
     // Get Children Count
-    int cCount = mChildren.count();
+    int cCount = mChildComponents.count();
 
     // Check Children
     if (cCount > 0) {
@@ -1317,7 +1317,7 @@ QJsonObject ComponentInfo::toJSONObject(const bool& aChild)
         // Iterate Through Children Array
         for (int i=0; i<cCount; i++) {
             // Append Child
-            cArray << mChildren[i]->toJSONObject(true);
+            cArray << mChildComponents[i]->toJSONObject(true);
         }
 
         // Save Children
@@ -1435,17 +1435,17 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject, const bool aCreat
     // Transitions
     mTransitions = aObject[JSON_KEY_COMPONENT_TRANSITIONS].toArray();
 
-    // Set Children
-    QJsonArray childrenArray = aObject[JSON_KEY_COMPONENT_CHILDREN].toArray();
+    // Children
+    mChildren = aObject[JSON_KEY_COMPONENT_CHILDREN].toArray();
     // Get Children Array Count
-    int caCount = childrenArray.count();
+    int caCount = mChildren.count();
 
     // Check To Create Children
     if (aCreateChildren && caCount > 0) {
         // Iterate Through Children Array
         for (int i=0; i<caCount; i++) {
             // Get Array Item
-            QJsonObject childObject = childrenArray[i].toObject();
+            QJsonObject childObject = mChildren[i].toObject();
 
             // Get Child Component Name
             QString ccName = childObject[JSON_KEY_COMPONENT_NAME].toString();
@@ -1651,7 +1651,7 @@ int ComponentInfo::getChildIndex()
         return -1;
     }
 
-    return mParent->mChildren.indexOf(this);
+    return mParent->mChildComponents.indexOf(this);
 }
 
 //==============================================================================
@@ -2164,14 +2164,19 @@ QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks, Q
             bool readOnly = pType.indexOf(JSON_VALUE_PROPERTY_TYPE_PREFIX_READONLY) >= 0;
             // Get Value
             QString pValue = componentProperty(pKeys[k]).toString();
+            // Init Value Is Binding/Formula
+            bool pIsBinding = (pValue[0] == '$');
 
             // Check readOnly
             if (!readOnly) {
                 // Check Key
                 if (aFPKeys.indexOf(pKeys[k]) == -1) {
-
-                    // Check Type
-                    if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING) {
+                    // Check If Binding
+                    if (pIsBinding) {
+                        // Remove $ Sign
+                        pValue = pValue.mid(1);
+                    // Check For String Type
+                    } else if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING) {
                         // Set Value
                         pValue = QString("\"%1\"").arg(pValue);
                     }
@@ -2337,6 +2342,19 @@ QString ComponentInfo::liveCodeFormatHooks(const QStringList& aOPHooks, const QS
     // Init Live Code
     QString liveCode = "";
 
+    // Add Property Changed Signal =============================================
+
+    // Check Properties
+    if (aOPHooks.count() > 0 || aPHooks.count() > 0) {
+        // Add New Line
+        liveCode += "\n";
+
+        // Add Comment Line
+        liveCode += QString("%1// Property Changed Signal for All Property Changes\n").arg(aIndent);
+        // Add Property Changed Signal
+        liveCode += QString("%1signal property__Changed(var aKey, var aValue)\n").arg(aIndent);
+    }
+
     // Add Enum Value Hooks ====================================================
 
     // Get Enum Value Hooks Count
@@ -2475,15 +2493,15 @@ QString ComponentInfo::liveCodeFormatChildren(const bool& aGenerateChildren, con
     QString liveCode = "";
 
     // Check Children
-    if (aGenerateChildren && mChildren.count() > 0) {
+    if (aGenerateChildren && mChildComponents.count() > 0) {
         // Add Comment
         liveCode += QString("\n%1// Children\n\n").arg(aIndent);
         // Get Number Of Children
-        int cCount = mChildren.count();
+        int cCount = mChildComponents.count();
         // Iterate Through Children
         for (int i=0; i<cCount; i++) {
             // Get Child Object
-            liveCode += mChildren[i]->generateLiveCode(false, aGenerateChildren, aIndent, aComponentCode);
+            liveCode += mChildComponents[i]->generateLiveCode(false, aGenerateChildren, aIndent, aComponentCode);
             // Add New Line
             liveCode += "\n";
         }
@@ -2697,8 +2715,22 @@ QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGene
         return "";
     }
 
-    // Generate Component Code First
-    mProject->generateComponentCode(this, aGenerateChildren);
+    // Check Child Count
+    if (childCount() > 0) {
+        // Generate Component Code First
+        mProject->generateComponentCode(this, aGenerateChildren);
+    } else {
+        // Check Root
+        if (!mIsRoot) {
+            // Get Component ProtoType
+            ComponentInfo* proto = mProject->getComponentByName(mName, mType);
+            // Check Proto
+            if (proto) {
+                // Generate Component Code
+                mProject->generateComponentCode(proto, true);
+            }
+        }
+    }
 
     qDebug() << "ComponentInfo::generateLiveCode - path: " << componentPath() << " - aLiveRoot: " << aLiveRoot << " - aGenerateChildren: " << aGenerateChildren;
 
@@ -3412,7 +3444,7 @@ bool ComponentInfo::propertyIsFormula(const QString& aName)
 //==============================================================================
 int ComponentInfo::childCount()
 {
-    return mChildren.count();
+    return mChildComponents.count();
 }
 
 //==============================================================================
@@ -3434,8 +3466,8 @@ int ComponentInfo::depth()
 ComponentInfo* ComponentInfo::childInfo(const int& aIndex)
 {
     // Check Index
-    if (aIndex >= 0 && aIndex < mChildren.count()) {
-        return mChildren[aIndex];
+    if (aIndex >= 0 && aIndex < mChildComponents.count()) {
+        return mChildComponents[aIndex];
     }
 
     return NULL;
@@ -3456,15 +3488,15 @@ void ComponentInfo::addChild(ComponentInfo* aChild)
         // Set Parent
         aChild->mParent = this;
         // Append Child
-        mChildren << aChild;
+        mChildComponents << aChild;
         // Add ID To ID Map
         setChildObjectID(aChild, aChild->componentID());
         // Set Dirty
         setDirty(true);
         // Emit Child Added
-        emit childAdded(mChildren.count() - 1);
+        emit childAdded(mChildComponents.count() - 1);
         // Emit Child Count Changed Signal
-        emit childCountChanged(mChildren.count());
+        emit childCountChanged(mChildComponents.count());
     }
 }
 
@@ -3486,13 +3518,13 @@ void ComponentInfo::insertChild(const int& aIndex, ComponentInfo* aChild)
         // Add ID To ID Map
         setChildObjectID(aChild, aChild->componentID());
         // Insert Child
-        mChildren.insert(aIndex, aChild);
+        mChildComponents.insert(aIndex, aChild);
         // Set Dirty
         setDirty(true);
         // Emit Child Added
         emit childAdded(aIndex);
         // Emit Child Cound Changed Signal
-        emit childCountChanged(mChildren.count());
+        emit childCountChanged(mChildComponents.count());
     }
 }
 
@@ -3504,11 +3536,11 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
     // Check Child
     if (aChild) {
         // Get Child Index
-        int cIndex = mChildren.indexOf(aChild);
+        int cIndex = mChildComponents.indexOf(aChild);
         // Check Child Index
-        if (cIndex >= 0 && cIndex < mChildren.count()) {
+        if (cIndex >= 0 && cIndex < mChildComponents.count()) {
             // Get Child Component Info
-            ComponentInfo* childComponent = mChildren[cIndex];
+            ComponentInfo* childComponent = mChildComponents[cIndex];
             // Emit Child About To Be Removed
             emit childComponent->childAboutToBeRemoved(childComponent);
 
@@ -3520,10 +3552,10 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
             // Check Delete
             if (aDelete) {
                 // Delete Child
-                delete mChildren.takeAt(cIndex);
+                delete mChildComponents.takeAt(cIndex);
             } else {
                 // Remove Child
-                mChildren.removeAt(cIndex);
+                mChildComponents.removeAt(cIndex);
             }
 
             // Set Dirty
@@ -3532,7 +3564,7 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
             // Emit Child Removed Signal
             emit childRemoved(cIndex);
             // Emit Child Count Changed Signal
-            emit childCountChanged(mChildren.count());
+            emit childCountChanged(mChildComponents.count());
 
         } else {
             qWarning() << "ComponentInfo::removeChild - aChild: " << aChild << " - CHILD COMPONENT NOT FOUND!";
@@ -3559,7 +3591,7 @@ void ComponentInfo::moveChild(const int& aIndex, const int& aTargetIndex)
     qDebug() << "ComponentInfo::moveChild - aIndex: " << aIndex << " -> " << newTargetIndex;
 
     // Move Child
-    mChildren.move(aIndex, newTargetIndex);
+    mChildComponents.move(aIndex, newTargetIndex);
 
     // Emit Child Moved Signal
     emit childMoved(aIndex, newTargetIndex);
@@ -3604,9 +3636,9 @@ void ComponentInfo::moveChild(ComponentInfo* aChildInfo, const int& aIndex, Comp
 ComponentInfo* ComponentInfo::takeChild(const int& aIndex)
 {
     // Check Index
-    if (aIndex >= 0 && aIndex < mChildren.count()) {
+    if (aIndex >= 0 && aIndex < mChildComponents.count()) {
         // Take Child
-        ComponentInfo* takenChild = mChildren.takeAt(aIndex);
+        ComponentInfo* takenChild = mChildComponents.takeAt(aIndex);
         // Check Taken Child
         if (takenChild) {
             qDebug() << "ComponentInfo::takeChild - path: " << componentPath() << " - aIndex: " << aIndex;
@@ -3621,7 +3653,7 @@ ComponentInfo* ComponentInfo::takeChild(const int& aIndex)
             // Emmit Child Removed Signal
             emit childRemoved(aIndex);
             // Emit Child Cound Changed Signal
-            emit childCountChanged(mChildren.count());
+            emit childCountChanged(mChildComponents.count());
 
             return takenChild;
         }
@@ -3636,13 +3668,13 @@ ComponentInfo* ComponentInfo::takeChild(const int& aIndex)
 int ComponentInfo::takeChild(ComponentInfo* aChildInfo)
 {
     // Get Child Index
-    int cIndex = mChildren.indexOf(aChildInfo);
+    int cIndex = mChildComponents.indexOf(aChildInfo);
     // Find Index
     if (cIndex >= 0) {
         qDebug() << "ComponentInfo::takeChild - path: " << componentPath() << " - mName: " << aChildInfo->mName;
 
         // Take Child
-        ComponentInfo* takenChild = mChildren.takeAt(cIndex);
+        ComponentInfo* takenChild = mChildComponents.takeAt(cIndex);
 
         // Remove Child Object From ID Map
         setChildObjectID(takenChild, "");
@@ -3655,7 +3687,7 @@ int ComponentInfo::takeChild(ComponentInfo* aChildInfo)
         // Emmit Child Removed Signal
         emit childRemoved(cIndex);
         // Emit Child Cound Changed Signal
-        emit childCountChanged(mChildren.count());
+        emit childCountChanged(mChildComponents.count());
 
         return cIndex;
     }

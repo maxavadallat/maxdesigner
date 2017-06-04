@@ -1529,6 +1529,12 @@ QString ProjectModel::generateComponentCode(ComponentInfo* aComponent, const boo
 
     qDebug() << "ProjectModel::generateComponentCode - mName: " << aComponent->mName;
 
+    // Check Component Base
+    if (aComponent->mBase) {
+        // Generate Component Code For Base
+        generateComponentCode(aComponent->mBase, true);
+    }
+
     // Init Component Code File Name
     QString fileName = QString(DEFAULT_COMPONENT_FILE_NAME_PATTERN).arg(liveTempDir()).arg(aComponent->mName).arg(DEFAULT_QML_SUFFIX);
 

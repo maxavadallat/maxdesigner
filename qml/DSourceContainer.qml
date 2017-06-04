@@ -8,26 +8,6 @@ import "style"
 DPaneBase {
     id: sourceContainerRoot
 
-    title: "Source"
-
-    enablePosOverlay: false
-    enableSizeOverlay: false
-
-    enableScaling: false
-
-    hideToSide: hideToBottom
-
-    showTitle: true
-    showBackground: false
-
-    clipContent: true
-
-    isRootContainer: true
-
-    focusOnShow: true
-
-    titleLabel.opacity: 1.0
-
     property string filePath: ""
 
     property Connections openfilesConnection: Connections {
@@ -53,6 +33,26 @@ DPaneBase {
             }
         }
     }
+
+    title: "Source"
+
+    enablePosOverlay: false
+    enableSizeOverlay: false
+
+    enableScaling: false
+
+    hideToSide: hideToBottom
+
+    showTitle: true
+    showBackground: false
+
+    clipContent: true
+
+    isRootContainer: true
+
+    focusOnShow: true
+
+    titleLabel.opacity: 1.0
 
     DSourceCodeEditor {
         id: sourceCodeEditor
