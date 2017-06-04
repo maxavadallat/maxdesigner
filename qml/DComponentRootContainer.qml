@@ -64,6 +64,8 @@ DPaneBase {
 
             // Check Component Info
             if (crcRoot.componentInfo === aComponent) {
+                // Set Update Component Info Enabled
+                componentContainer.updateComponentInfoEnabled = false;
                 // Reset
                 crcRoot.reset(true);
             }
@@ -74,6 +76,8 @@ DPaneBase {
 
             // Check File Path
             if (crcRoot.componentInfo && crcRoot.componentInfo.infoPath === aFilePath) {
+                // Set Update Component Info Enabled
+                componentContainer.updateComponentInfoEnabled = false;
                 // Reset
                 crcRoot.reset(true);
             }

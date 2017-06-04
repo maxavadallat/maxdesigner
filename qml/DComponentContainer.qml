@@ -376,6 +376,9 @@ Item {
     // Drag Keys
     property string dragKey: ""
 
+    // Root Container State
+    property string rootContainerState: rootComponentContainer ? rootComponentContainer.state : ""
+
     // New Component Dropped Signal
     signal newComponentDropped(var dropSource, var posX, var posY)
     // Component Need Destroy Signal
@@ -454,6 +457,16 @@ Item {
         if (ccRoot.rootComponentContainer.hoverContainer !== null) {
             // Check Drag Source by Current Hovered Container
             ccRoot.rootComponentContainer.hoverContainer.componentContainer.checkDragSource(ccRoot.dragSource, ccRoot.dragKey);
+        }
+    }
+
+    // On Root Container State Changed Slot
+    onRootContainerStateChanged: {
+        //console.log("DComponentContainer.onRootContainerStateChanged - rootContainerState: " + rootContainerState);
+        // Check Root Container State
+        if (ccRoot.rootContainerState === ccRoot.rootComponentContainer.stateCreate) {
+            // Disable Update Component Info
+            ccRoot.updateComponentInfoEnabled = false;
         }
     }
 

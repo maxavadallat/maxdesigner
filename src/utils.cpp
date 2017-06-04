@@ -21,13 +21,13 @@ QString Utils::composeTypeAndValue(const QString& aType,
                                    const QString& aMax,
                                    const QString& aEnums,
                                    const bool& aReadOnly,
-                                   const bool& aDefault)
+                                   const bool& aDefaultAlias)
 {
     // Init New Type
     QString newType = aReadOnly ? QString("%1 %2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_READONLY).arg(aType) : aType;
 
     // Check Default
-    if (aDefault && !aReadOnly) {
+    if (aDefaultAlias && !aReadOnly) {
         // Set New Type
         newType = QString("%1 %2").arg(JSON_VALUE_PROPERTY_TYPE_PREFIX_DEFAULT).arg(aType);
     }

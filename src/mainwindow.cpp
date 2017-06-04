@@ -1000,7 +1000,7 @@ void MainWindow::launchCreateDataSource()
     // Exec Dialog
     if (mCreateDataSourceDialog->exec()) {
         // Create New Data Source Component
-        createNewComponent(mCreateDataSourceDialog->dataSourceName(), COMPONENT_TYPE_DATASOURCE, "", COMPONENT_CATEGORY_NONVISUAL, false);
+        createNewComponent(mCreateDataSourceDialog->dataSourceName(), COMPONENT_TYPE_DATASOURCE, "QtObject", COMPONENT_CATEGORY_NONVISUAL, false);
     }
 }
 
@@ -1514,7 +1514,7 @@ void MainWindow::addImportPath(const QString& aDirPath)
 
     // Check Engine
     if (engine) {
-        qDebug() << "#### MainWindow::addImportPath - aDirPath: " << aDirPath;
+        //qDebug() << "MainWindow::addImportPath - aDirPath: " << aDirPath;
 
         // Add Import Path
         engine->addImportPath(aDirPath);
@@ -1541,7 +1541,7 @@ void MainWindow::removeImportPath(const QString& aDirPath)
         int ipIndex = ipList.indexOf(aDirPath);
         // Check Import Path Index
         if (ipIndex >= 0) {
-            qDebug() << "#### MainWindow::removeImportPath - aDirPath: " << aDirPath;
+            //qDebug() << "MainWindow::removeImportPath - aDirPath: " << aDirPath;
 
             // Remove Import Path
             ipList.removeAt(ipIndex);
@@ -1563,7 +1563,7 @@ void MainWindow::addPluginPath(const QString& aDirPath)
 
     // Check Engine
     if (engine) {
-        qDebug() << "MainWindow::addPluginPath - aDirPath: " << aDirPath;
+        //qDebug() << "MainWindow::addPluginPath - aDirPath: " << aDirPath;
 
         // Add Plugin Path
         engine->addPluginPath(aDirPath);
@@ -1588,7 +1588,7 @@ void MainWindow::removePluginPath(const QString& aDirPath)
         int ppIndex = ppList.indexOf(aDirPath);
         // Check Import Path Index
         if (ppIndex >= 0) {
-            qDebug() << "MainWindow::removePluginPath - aDirPath: " << aDirPath;
+            //qDebug() << "MainWindow::removePluginPath - aDirPath: " << aDirPath;
 
             // Remove Import Path
             ppList.removeAt(ppIndex);
@@ -1610,8 +1610,7 @@ void MainWindow::importPathAdded(const QString& aImportPath)
 
     // Check Engine
     if (engine) {
-        qDebug() << "MainWindow::importPathAdded - aImportPath: " << aImportPath;
-
+        //qDebug() << "MainWindow::importPathAdded - aImportPath: " << aImportPath;
         // Add Import Path
         engine->addImportPath(aImportPath);
     }
@@ -1635,7 +1634,7 @@ void MainWindow::importPathRemoved(const QString& aImportPath)
         int ipIndex = ipList.indexOf(aImportPath);
         // Check Import Path Index
         if (ipIndex >= 0) {
-            qDebug() << "MainWindow::importPathRemoved - aImportPath: " << aImportPath;
+            //qDebug() << "MainWindow::importPathRemoved - aImportPath: " << aImportPath;
             // Remove Import Path
             ipList.removeAt(ipIndex);
             // Set Import Path List
@@ -1656,7 +1655,7 @@ void MainWindow::importPathsChanged(const QStringList& aImportPaths)
 
     // Check Engine
     if (engine) {
-        qDebug() << "MainWindow::importPathsChanged - aImportPaths: " << aImportPaths;
+        //qDebug() << "MainWindow::importPathsChanged - aImportPaths: " << aImportPaths;
         // Set Import Paths
         engine->setImportPathList(aImportPaths);
     }
@@ -1674,7 +1673,7 @@ void MainWindow::pluginPathAdded(const QString& aPluginPath)
 
     // Check Engine
     if (engine) {
-        qDebug() << "MainWindow::pluginPathAdded - aPluginPath: " << aPluginPath;
+        //qDebug() << "MainWindow::pluginPathAdded - aPluginPath: " << aPluginPath;
         // Add Plugin Path
         engine->addPluginPath(aPluginPath);
     }
@@ -1698,7 +1697,7 @@ void MainWindow::pluginPathRemoved(const QString& aPluginPath)
         int ppIndex = ppList.indexOf(aPluginPath);
         // Check Import Path Index
         if (ppIndex >= 0) {
-            qDebug() << "MainWindow::pluginPathRemoved - aPluginPath: " << aPluginPath;
+            //qDebug() << "MainWindow::pluginPathRemoved - aPluginPath: " << aPluginPath;
             // Remove Import Path
             ppList.removeAt(ppIndex);
             // Set Plugin Path List
@@ -1719,7 +1718,7 @@ void MainWindow::pluginPathsChanged(const QStringList& aPluginPaths)
 
     // Check Engine
     if (engine) {
-        qDebug() << "MainWindow::pluginPathsChanged - aPluginPaths: " << aPluginPaths;
+        //qDebug() << "MainWindow::pluginPathsChanged - aPluginPaths: " << aPluginPaths;
         // Set Plugin Paths
         engine->setPluginPathList(aPluginPaths);
     }

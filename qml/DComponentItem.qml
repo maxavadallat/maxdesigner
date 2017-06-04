@@ -16,7 +16,7 @@ Item {
     property bool visual: true
     property bool dirty: false
 
-    property QtObject componentInfo: null
+    property ComponentInfo componentInfo: null
 
     property bool grabbed: false
 
@@ -137,7 +137,18 @@ Item {
         DRectangle {
             id: dragContainerBG
             anchors.fill: parent
-            color: componentItemRoot.visual ? DStyle.colorBG : "transparent"
+
+            color: {
+                // Check Component Info
+                if (componentItemRoot.componentInfo !== null && componentItemRoot.componentInfo.builtIn) {
+                    return DStyle.colorComponentBuiltIn;
+                }
+
+                // TODO: Add Colors for different Component Types
+
+                return "transparent";
+            }
+
             border.color: dragContainer.focus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
         }
 
@@ -209,6 +220,7 @@ Item {
         ]
     }
 
+    // Dirty Indicator
     Rectangle {
         width: 4
         height: 4

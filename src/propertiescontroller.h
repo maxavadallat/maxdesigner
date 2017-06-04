@@ -158,7 +158,9 @@ public:
                                              const QString& aMin = "",
                                              const QString& aMax = "",
                                              const QString& aEnumValues = "",
-                                             const QVariant& aDefaultValue = QVariant());
+                                             const QVariant& aDefaultValue = QVariant(),
+                                             const bool& aReadOnly = false,
+                                             const bool& aDefaultAlias = false);
     // Remove Own Property
     Q_INVOKABLE void removeComponentProperty(const QString& aName);
 

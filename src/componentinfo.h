@@ -630,7 +630,9 @@ protected:
                               const QString& aMin = "",
                               const QString& aMax = "",
                               const QString& aEnumValues = "",
-                              const QVariant& aDefaultValue = QVariant());
+                              const QVariant& aDefaultValue = QVariant(),
+                              const bool& aReadOnly = false,
+                              const bool& aDefaultAlias = false);
 
     // Remove Property
     void removeComponentProperty(const QString& aName);
@@ -695,9 +697,6 @@ protected:
     QString liveCodeFormatTransitions(const QString& aIndent = "");
     // Generate Enum Value Live Code Cases
     QStringList liveCodeGenerateEnumValueCases(const QStringList& aEnumValues, const QString& aIndent = "");
-
-    // Generate Child Component Code
-    QString generateChildComponentCode(const QString& aIndent = "");
 
 protected slots:
     // Base Components Dir Changed Slot

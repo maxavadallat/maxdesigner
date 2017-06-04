@@ -23,7 +23,7 @@ public:
                                        const QString& aMax = "",
                                        const QString& aEnums = "",
                                        const bool& aReadOnly = false,
-                                       const bool& aDefault = false);
+                                       const bool& aDefaultAlias = false);
 
     // Parse Component Property Type
     static QString parseType(const QString& aTypeAndValue, bool& readOnly, bool& defaultAlias, const bool& aTypeOnly = false);

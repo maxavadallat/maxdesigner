@@ -36,7 +36,9 @@ public:
                                           const QString& aMin = "",
                                           const QString& aMax = "",
                                           const QString& aEnumValues = "",
-                                          const QVariant& aDefaultValue = QVariant());
+                                          const QVariant& aDefaultValue = QVariant(),
+                                          const bool& aReadOnly = false,
+                                          const bool& aDefaultAlias = false);
 
     // Set Component Property Value
     Q_INVOKABLE void setComponentProperty(const int& aIndex, const QVariant& aValue);

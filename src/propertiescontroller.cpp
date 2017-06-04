@@ -920,12 +920,14 @@ void PropertiesController::addOwnComponentProperty(const QString& aName,
                                                    const QString& aMin,
                                                    const QString& aMax,
                                                    const QString& aEnumValues,
-                                                   const QVariant& aDefaultValue)
+                                                   const QVariant& aDefaultValue,
+                                                   const bool& aReadOnly,
+                                                   const bool& aDefaultAlias)
 {
     // Check Component Own Properties Model
     if (mComponentOwnProperties) {
         // Add Property
-        mComponentOwnProperties->addComponentProperty(aName, aType, aMin, aMax, aEnumValues, aDefaultValue);
+        mComponentOwnProperties->addComponentProperty(aName, aType, aMin, aMax, aEnumValues, aDefaultValue, aReadOnly, aDefaultAlias);
     }
 }
 

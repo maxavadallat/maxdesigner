@@ -79,6 +79,12 @@ QtObject {
     readonly property string colorCancelHighLight:          configArray[styleIndex].colorCancelHighLight    //"#AAAA0000"
     readonly property string colorCancelSelected:           configArray[styleIndex].colorCancelSelected     //"#77AA0000"
 
+    readonly property string colorComponentBuiltIn:         "#22770000"
+    readonly property string colorComponentBase:            "#22007700"
+    readonly property string colorComponentRegular:         "#22007777"
+    readonly property string colorComponentData:            "#22770077"
+    readonly property string colorComponentView:            "#22000077"
+
     // Default Radius
     readonly property int defaultRadius:                    4
     // Default Margin

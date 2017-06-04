@@ -25,7 +25,7 @@ DPaneBase {
 
     property var enumValues: []
 
-    property int labelsWidth: 66
+    property int labelsWidth: 78
 
     property Connections enumValueEditorConnections: Connections {
         target: childPane

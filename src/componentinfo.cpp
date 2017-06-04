@@ -2769,10 +2769,10 @@ QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGene
 
     // Add Pos =================================================================
 
-//    // Check Live Root
-//    if (!aLiveRoot) {
-//        liveCode += liveCodeFormatPosition(indent);
-//    }
+    // Check Live Root
+    if (!aLiveRoot) {
+        liveCode += liveCodeFormatPosition(indent);
+    }
 
     // Add Size ================================================================
 
@@ -2780,10 +2780,10 @@ QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGene
 
     // Add Anchors =============================================================
 
-//    // Check Live Root
-//    if (!aLiveRoot) {
-//        liveCode += liveCodeFormatAnchors(indent);
-//    }
+    // Check Live Root
+    if (!aLiveRoot) {
+        liveCode += liveCodeFormatAnchors(indent);
+    }
 
     // =========================================================================
 
@@ -3004,7 +3004,9 @@ bool ComponentInfo::addComponentProperty(const QString& aName,
                                          const QString& aMin,
                                          const QString& aMax,
                                          const QString& aEnumValues,
-                                         const QVariant& aDefaultValue)
+                                         const QVariant& aDefaultValue,
+                                         const bool& aReadOnly,
+                                         const bool& aDefaultAlias)
 {
     // Check Owh Property Keys
     if (mOwnProperties.keys().indexOf(aName) >= 0) {
@@ -3017,34 +3019,34 @@ bool ComponentInfo::addComponentProperty(const QString& aName,
     switch (aType) {
         default:
         case ComponentInfo::EPropertyType::EPTString:
-            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING, aDefaultValue.toString());
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING, aDefaultValue.toString(), "", "", "", aReadOnly);
         break;
         case ComponentInfo::EPropertyType::EPTBool:
-            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_BOOL, aDefaultValue.toString());
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_BOOL, aDefaultValue.toString(), "", "", "", aReadOnly);
         break;
         case ComponentInfo::EPropertyType::EPTInt:
-            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_INT, aDefaultValue.toString(), aMin, aMax);
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_INT, aDefaultValue.toString(), aMin, aMax, "", aReadOnly);
         break;
         case ComponentInfo::EPropertyType::EPTDouble:
-            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_DOUBLE, aDefaultValue.toString(), aMin, aMax);
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_DOUBLE, aDefaultValue.toString(), aMin, aMax, "", aReadOnly);
         break;
         case ComponentInfo::EPropertyType::EPTReal:
-            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_REAL, aDefaultValue.toString(), aMin, aMax);
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_REAL, aDefaultValue.toString(), aMin, aMax, "", aReadOnly);
         break;
         case ComponentInfo::EPropertyType::EPTVar:
-            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_VAR, aDefaultValue.toString());
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_VAR, aDefaultValue.toString(), "", "", "", aReadOnly);
         break;
         case ComponentInfo::EPropertyType::EPTQtObject:
-            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_OBJECT, aDefaultValue.toString());
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_OBJECT, aDefaultValue.toString(), "", "", "", aReadOnly);
         break;
         case ComponentInfo::EPropertyType::EPTQtObjectList:
-            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_LIST, aDefaultValue.toString());
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_LIST, aDefaultValue.toString(), "", "", "", aReadOnly);
         break;
         case ComponentInfo::EPropertyType::EPTEnum:
-            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM, aDefaultValue.toString(), "", "", aEnumValues);
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM, aDefaultValue.toString(), "", "", aEnumValues, aReadOnly);
         break;
         case ComponentInfo::EPropertyType::EPTAlias:
-            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_ALIAS, aDefaultValue.toString());
+            mOwnProperties[aName] = Utils::composeTypeAndValue(JSON_VALUE_PROPERTY_TYPE_PREFIX_ALIAS, aDefaultValue.toString(), "", "", "", aReadOnly, aDefaultAlias);
         break;
     }
 
