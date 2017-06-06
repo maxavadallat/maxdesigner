@@ -16,8 +16,8 @@ DMouseArea {
     property int minWidth: 0
     property int minHeight: 0
 
-    property int maxWidth: Number.MAX_VALUE
-    property int maxHeight: Number.MAX_VALUE
+    property int maxWidth: 8192
+    property int maxHeight: 8192
 
     property bool showBackground: true
     property bool enableSizeOverlay: true

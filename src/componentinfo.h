@@ -341,6 +341,8 @@ public:
 
     // Get Child Info
     Q_INVOKABLE ComponentInfo* childInfo(const int& aIndex);
+    // Get Child Info By Child Index Map
+    Q_INVOKABLE ComponentInfo* childInfo(const QString& aMap);
 
     // Add Child
     Q_INVOKABLE void addChild(ComponentInfo* aChild);
@@ -377,6 +379,9 @@ public:
 
     // Get Layout Base
     Q_INVOKABLE QString layoutBase();
+
+    // Get Global Child Index Map
+    Q_INVOKABLE QString getGlobalChildIndexMap();
 
     // Destructor
     ~ComponentInfo();

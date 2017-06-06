@@ -601,7 +601,7 @@ DContainer {
                 ScriptAction {
                     script: {
                         // Reset Cliping Content
-                        paneBaseRoot.clipContent = true;
+                        //paneBaseRoot.clipContent = true;
                         // Emit Transition Finished Signal
                         paneBaseRoot.transitionFinished(stateShown);
                     }

@@ -182,6 +182,9 @@ void ProjectModel::createInitialComponents()
             ComponentInfo* newComponent = new ComponentInfo("", "", "", this);
             // From JSON Object
             newComponent->fromJSONObject(baseComponents[i].toObject());
+            // Set New Component ID
+            newComponent->setComponentID(generateID(newComponent->mName));
+
             // Add Base Component
             if (!mBaseComponents->addBaseComponent(newComponent)) {
                 // Set Dirty Flag
@@ -201,6 +204,9 @@ void ProjectModel::createInitialComponents()
             ComponentInfo* newComponent = new ComponentInfo("", "", "", this);
             // From JSON Object
             newComponent->fromJSONObject(components[i].toObject());
+            // Set New Component ID
+            newComponent->setComponentID(generateID(newComponent->mName));
+
             // Add Component
             if (!mComponents->addComponent(newComponent)) {
                 // Set Dirty Flag
@@ -220,6 +226,15 @@ void ProjectModel::createInitialComponents()
             ComponentInfo* newComponent = new ComponentInfo("", "", "", this);
             // From JSON Object
             newComponent->fromJSONObject(views[i].toObject());
+            // Set New Component ID
+            newComponent->setComponentID(generateID(newComponent->mName));
+            // Check Component Name For Main View
+            if (newComponent->mName == "MainView") {
+                // Set Initial Size
+                newComponent->mProperties[JSON_KEY_COMPONENT_PROPERTY_WIDTH] = mProperties.value(JSON_KEY_PROJECT_SCREEN_WIDTH).toString();
+                newComponent->mProperties[JSON_KEY_COMPONENT_PROPERTY_HEIGHT] = mProperties.value(JSON_KEY_PROJECT_SCREEN_HEIGHT).toString();
+            }
+
             // Add View Component
             if (!mViews->addView(newComponent)) {
                 // Set Dirty Flag
@@ -239,6 +254,9 @@ void ProjectModel::createInitialComponents()
             ComponentInfo* newComponent = new ComponentInfo("", "", "", this);
             // From JSON Object
             newComponent->fromJSONObject(dataSources[i].toObject());
+            // Set New Component ID
+            newComponent->setComponentID(generateID(newComponent->mName));
+
             // Add Data Source Base Component
             if (!mDataSources->addDataSource(newComponent)) {
                 // Set Dirty Flag
@@ -363,6 +381,24 @@ void ProjectModel::updateBaseComponents()
     }
 
     // ...
+}
+
+//==============================================================================
+// Generate Root ID From Name
+//==============================================================================
+QString ProjectModel::generateID(const QString& aName)
+{
+    // Check Name
+    if (aName.isEmpty()) {
+        return "";
+    }
+
+    // Init New ID
+    QString newID = QString("%1Root").arg(aName);
+    // Set First Char To Lower Case
+    newID[0] = newID[0].toLower();
+
+    return newID;
 }
 
 //==============================================================================
@@ -689,6 +725,9 @@ ComponentInfo* ProjectModel::createBaseComponent(const QString& aName,
     // Create New Component
     ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_BASECOMPONENT, aCategory, this, aBaseName, aBuiltIn);
 
+    // Set New Component ID
+    newComponent->setComponentID(generateID(aName));
+
     // Check Width & Height
     if (aWidth > 0 && aHeight > 0) {
         // Set Width & Height
@@ -727,6 +766,9 @@ ComponentInfo* ProjectModel::createComponent(const QString& aName, const QString
 
     // Create New Component
     ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_COMPONENT, aCategory, this, aBaseName);
+
+    // Set New Component ID
+    newComponent->setComponentID(generateID(aName));
 
     // Check Width & Height
     if (aWidth > 0 && aHeight > 0) {
@@ -767,6 +809,9 @@ ComponentInfo* ProjectModel::createView(const QString& aName, const QString& aBa
     // Create New Component
     ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_VIEW, COMPONENT_CATEGORY_VISUAL, this, aBaseName);
 
+    // Set New Component ID
+    newComponent->setComponentID(generateID(aName));
+
     // Set Width & Height
     newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
     newComponent->setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
@@ -799,6 +844,9 @@ ComponentInfo* ProjectModel::createDataSource(const QString& aName, const QStrin
 
     // Create New Data Source Component
     ComponentInfo* newComponent = new ComponentInfo(aName, COMPONENT_TYPE_DATASOURCE, COMPONENT_CATEGORY_NONVISUAL, this, aBaseName);
+
+    // Set New Component ID
+    newComponent->setComponentID(generateID(aName));
 
     // Add Data Source
     mDataSources->addDataSource(newComponent);

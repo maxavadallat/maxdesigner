@@ -14,7 +14,6 @@
         <file>qml/DCarousel.qml</file>
         <file>qml/DCarouselDelegate.qml</file>
         <file>qml/DCheckBox.qml</file>
-        <file>qml/DComponentChildContainer.qml</file>
         <file>qml/DComponentItem.qml</file>
         <file>qml/DComponentRootContainer.qml</file>
         <file>qml/DConstants.js</file>
@@ -115,7 +114,6 @@
         <file>qml/DTransitionTree.qml</file>
         <file>qml/DTransitionTreeNode.qml</file>
         <file>qml/DTransitionTreeEmptyNode.qml</file>
-        <file>qml/DComponentContainer.qml</file>
         <file>qml/DDropArea.qml</file>
         <file>assets/json/builtincomponents.json</file>
         <file>qml/DPosXEditor.qml</file>
@@ -124,5 +122,6 @@
         <file>qml/DHeightEditor.qml</file>
         <file>qml/DStateItem.qml</file>
         <file>qml/DTransitionItem.qml</file>
+        <file>qml/DComponentHandler.qml</file>
     </qresource>
 </RCC>

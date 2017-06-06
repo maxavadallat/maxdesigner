@@ -65,7 +65,7 @@ DPaneBase {
             // Check Component Info
             if (crcRoot.componentInfo === aComponent) {
                 // Set Update Component Info Enabled
-                componentContainer.updateComponentInfoEnabled = false;
+                //componentContainer.updateComponentInfoEnabled = false;
                 // Reset
                 crcRoot.reset(true);
             }
@@ -77,31 +77,43 @@ DPaneBase {
             // Check File Path
             if (crcRoot.componentInfo && crcRoot.componentInfo.infoPath === aFilePath) {
                 // Set Update Component Info Enabled
-                componentContainer.updateComponentInfoEnabled = false;
+                //componentContainer.updateComponentInfoEnabled = false;
                 // Reset
                 crcRoot.reset(true);
             }
         }
     }
 
-    // New Child Component Child Container
-    property Component newComponentChildContainer: Component {
-        DComponentChildContainer {
+//    // New Child Component Child Container
+//    property Component newComponentChildContainer: Component {
+//        DComponentChildContainer {
+//            width: CONSTS.componentItemWidth
+//            height: CONSTS.componentItemHeight
+//            rootComponentContainer: crcRoot
+//            parentComponentContainer: crcRoot
+//        }
+//    }
+
+    // Component Handler Factory
+    property Component componentHandlerFactory: Component {
+        DComponentHandler {
             width: CONSTS.componentItemWidth
             height: CONSTS.componentItemHeight
-            rootComponentContainer: crcRoot
-            parentComponentContainer: crcRoot
+            rootContainer: crcRoot
         }
     }
 
     // Wait For Nodes To Close
     property bool waitForNodesToClose: false
 
-    // Content Container Alias
-    property alias componentContainer: componentContainer
+    // Component Content Created
+    property bool componentContentCreated: false
 
-    // Current Hover Container
-    property QtObject hoverContainer: null
+//    // Content Container Alias
+//    property alias componentContainer: componentContainer
+
+    // Current Hover Handler
+    property QtObject hoverHandler: null
     // Hover Pos X
     property int hoverPosX: 0
     // Hover Pos Y
@@ -120,7 +132,7 @@ DPaneBase {
     showTitle: false
     showBackground: false
 
-    clipContent: true
+    clipContent: false
 
     isRootContainer: true
 
@@ -133,17 +145,19 @@ DPaneBase {
     enableScaling: true
 
     borderColor: {
-        // Check If Hovering
-        if (componentContainer.dropHovering) {
-            return componentContainer.dropHoverOK ? DStyle.colorBorderHoverOK : DStyle.colorBorderHoverNOK;
-        }
+//        // Check If Hovering
+//        if (componentContainer.dropHovering) {
+//            return componentContainer.dropHoverOK ? DStyle.colorBorderHoverOK : DStyle.colorBorderHoverNOK;
+//        }
 
-        // Check Focused Component
-        if (crcRoot.componentInfo !== null && propertiesController.focusedComponent === crcRoot.componentInfo) {
-            return DStyle.colorBorder;
-        }
+//        // Check Focused Component
+//        if (crcRoot.componentInfo !== null && propertiesController.focusedComponent === crcRoot.componentInfo) {
+//            return DStyle.colorBorder;
+//        }
 
-        return DStyle.colorBorderNoFocus;
+//        return DStyle.colorBorderNoFocus;
+
+        return "transparent";
     }
 
     borderMargins: -1
@@ -152,7 +166,12 @@ DPaneBase {
 
     enableDragByPaneButton: true
 
+    Component.onDestruction: {
+
+    }
+
     Keys.onReleased: {
+        // Switch Key
         switch (event.key) {
             case Qt.Key_N:
                 // Toggle Nodes
@@ -198,9 +217,10 @@ DPaneBase {
     onTransitionStarted: {
         //console.log("DComponentRootContainer.onTransitionStarted - newState: " + newState);
         if (destroyOnResetFinished) {
+            // Remove Handlers
+            crcRoot.removeComponentHandlers();
             // Destroy Content
-            componentContainer.removeChildComponents();
-            componentContainer.removeRootComponent();
+            crcRoot.removeComponentQMLContent();
         }
 
         // Check State
@@ -230,16 +250,16 @@ DPaneBase {
 
         // Check State
         if (newState === crcRoot.stateShown) {
-            // Create Main Component
-            componentContainer.createRootComponent();
-            // Create Children Components
-            componentContainer.createChildComponents();
+            // Create Component Content
+            crcRoot.createComponentQMLContent();
+            // Create Handlers
+            crcRoot.createComponentHandlers(rootComponentHandler);
 
             // Set Focus
             crcRoot.focus = true;
 
-            // Set Update Component Info Enabled
-            componentContainer.updateComponentInfoEnabled = (crcRoot.componentInfo !== null);
+//            // Set Update Component Info Enabled
+//            componentContainer.updateComponentInfoEnabled = (crcRoot.componentInfo !== null);
 
             // Check Component Info
             if (crcRoot.componentInfo !== null) {
@@ -250,8 +270,8 @@ DPaneBase {
             }
 
         } else {
-            // Reset Update Component Info Enabled
-            componentContainer.updateComponentInfoEnabled = false;
+//            // Reset Update Component Info Enabled
+//            componentContainer.updateComponentInfoEnabled = false;
         }
     }
 
@@ -259,7 +279,7 @@ DPaneBase {
         // Check State
         if (crcRoot.state !== crcRoot.stateShown) {
             // Reset Update Component Info Enabled
-            componentContainer.updateComponentInfoEnabled = false;
+            //componentContainer.updateComponentInfoEnabled = false;
         }
     }
 
@@ -300,6 +320,143 @@ DPaneBase {
         }
     }
 
+    // Create Component QML Content
+    function createComponentQMLContent() {
+        // Check Component Info
+        if (crcRoot.componentInfo !== null && !crcRoot.componentContentCreated) {
+            console.log("DComponentRootContainer.createComponentQMLContent - name: " + crcRoot.componentInfo.componentName);
+
+            // Set Component Content Created
+            crcRoot.componentContentCreated = true;
+
+            // Generate Live Code
+            var cFileName = propertiesController.currentProject.generateLiveCode(crcRoot.componentInfo, true);
+
+            // CLEAR THE FUCKING QML COMPONENT CACHE BECAUSE THEY FUCKED IT UP! BUT THIS WILL CAUSE A CRASH AT SHUTDOWN!!!
+            //mainController.clearQMLComponentCache();
+
+            // Create Component
+            var component  = Qt.createComponent("file://" + cFileName);
+
+            // Check Status
+            if (component.status === Component.Ready) {
+                // Create New Root Object
+                rootComponentHandler.componentObject = component.createObject(rootComponentHandler.rootContentContainer);
+
+                // Remove Live Temp File
+                //propertiesController.currentProject.removeLiveTempFile(cFileName);
+
+            } else {
+                console.error("DComponentRootContainer.createComponentQMLContent - ERROR CREATING ROOT COMPONENT!! - error: " + component.errorString());
+                return;
+            }
+
+            // Check New Root Object
+            if (rootComponentHandler.componentObject === null) {
+                console.error("DComponentRootContainer.createComponentQMLContent - ERROR CREATING ROOT OBJECT!!");
+            }
+
+            // ...
+        }
+    }
+
+    // Remove Component QML Content
+    function removeComponentQMLContent() {
+        // Check Root Component Object
+        if (rootComponentHandler.componentObject !== null) {
+            // Destroy
+            rootComponentHandler.componentObject.destroy();
+        }
+
+        // Reset Component Content Created
+        crcRoot.componentContentCreated = false;
+    }
+
+    // Create Component Handlers
+    function createComponentHandlers(parentHandler) {
+        // Check Parent Handler Content Object
+        if (parentHandler.componentObject !== null) {
+
+            // Get Children Count
+            var cCount = parentHandler.componentObject.children.length;
+
+            console.log("DComponentRootContainer.createComponentHandlers - cCount: " + cCount);
+
+            for (var i=0; i<cCount; i++) {
+                // Get Child`Object
+                var childObject = parentHandler.componentObject.children[i];
+
+                //console.log("DComponentRootContainer.createComponentHandlers - childObject[" + i + "]: " + childObject);
+
+                // Check If Has Property
+                if (childObject.hasOwnProperty("__childMap")) {
+                    console.log("DComponentRootContainer.createComponentHandlers - __childMap: " + childObject.__childMap);
+
+                    // Get Child Component Info
+                    var childInfo = crcRoot.componentInfo.childInfo(childObject.__childMap);
+
+                    // Check Child Info
+                    if (childInfo !== null) {
+                        console.log("DComponentRootContainer.createComponentHandlers - componentName: " + childInfo.componentName);
+
+                        // Create Handler For Child
+                        var newComponentHandler = componentHandlerFactory.createObject(parentHandler.childHandlersContainer);
+
+                        // Check New Component Handler
+                        if (newComponentHandler !== null) {
+                            // Set Parent Handler
+                            newComponentHandler.rootContainer = crcRoot;
+                            // Set Parent Handler
+                            newComponentHandler.parentHandler = parentHandler;
+                            // Set Index Map
+                            newComponentHandler.childIndexMap = childObject.__childMap;
+                            // Set Component Info
+                            newComponentHandler.componentInfo = childInfo;
+                            // Set Component Object
+                            newComponentHandler.componentObject = childObject;
+
+                            // Set Pos
+                            newComponentHandler.x = childObject.x;
+                            newComponentHandler.y = childObject.y;
+                            // Set Size
+                            newComponentHandler.width = childObject.width;
+                            newComponentHandler.height = childObject.height;
+
+                            // ...
+
+                            // Create Handlers For Children
+                            createComponentHandlers(newComponentHandler);
+
+                            // ...
+
+                        } else {
+
+                            console.error("DComponentRootContainer.createComponentHandlers - ERROR CREATING NEW COMPONENT HANDLER!");
+
+                        }
+                    } else {
+
+                        console.error("DComponentRootContainer.createComponentHandlers - NULL CHILD INFO FOR NEW COMPONENT HANDLER!");
+
+                    }
+                }
+            }
+        }
+    }
+
+    // Remove Component Handlers
+    function removeComponentHandlers() {
+        // Get Component Handlers Count
+        var chCount = rootComponentHandler.childHandlersContainer.children.length;
+
+        console.log("#### DComponentRootContainer.removeComponentHandlers - chCount: " + chCount);
+
+        // Remove Component Handlers
+
+        // ...
+
+    }
+
     // Zoom Area
     DMouseArea {
         id: wheelArea
@@ -334,33 +491,16 @@ DPaneBase {
         }
     }
 
-    // Component Container
-    DComponentContainer {
-        id: componentContainer
+    // Root Component Handler
+    DComponentHandler {
+        id: rootComponentHandler
         anchors.fill: parent
+        rootContainer: crcRoot
         componentInfo: crcRoot.componentInfo
-        rootComponentContainer: crcRoot
-        parentComponentContainer: crcRoot
-
-        onImplicitSizeChanged: {
-            console.log("DComponentRootContainer.componentContainer.onImplicitSizeChanged - [" + iWidth + "x" + iHeight + "]");
-
-            // Resize
-
-            // Check Width
-            if (crcRoot.width !== iWidth) {
-                // Set Implicit Width
-                crcRoot.width = iWidth;
-            }
-
-            // Check Height
-            if (crcRoot.height !== iHeight) {
-                // Set Implicit Height
-                crcRoot.height = iHeight;
-            }
-
-            // ...
-        }
+        enablePosOverlay: false
+        enableSizeOverlay: false
+        enableDrag: false
+        enableResize: false
     }
 
     // No Content Placeholder
@@ -368,8 +508,8 @@ DPaneBase {
         id: noContentCanvas
         anchors.fill: parent
         visible: {
-            // Check If Root Component Created
-            if (componentContainer.rootComponentCreated && componentContainer.rootLiveQMLComponent !== null) {
+            // Check Root Component Handler
+            if (rootComponentHandler.componentObject !== null) {
                 return false;
             }
 

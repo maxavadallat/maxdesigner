@@ -312,6 +312,9 @@ protected:
     // Update Base Components
     void updateBaseComponents();
 
+    // Generate Root ID From Name
+    QString generateID(const QString& aName);
+
 private: // Data
     // Project File Name
     QString                 mName;

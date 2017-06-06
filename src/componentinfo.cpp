@@ -1655,6 +1655,30 @@ int ComponentInfo::getChildIndex()
 }
 
 //==============================================================================
+// Get Global Child Index Map
+//==============================================================================
+QString ComponentInfo::getGlobalChildIndexMap()
+{
+    // Check Root
+    if (mIsRoot) {
+        return mName;
+    }
+
+    // Init Global Child Index Map
+    QString gciMap = "";
+
+    // Check Parent
+    if (mParent) {
+        // Get Child Index
+        int cIndex = getChildIndex();
+        // Set Global Child Index Map
+        gciMap = QString("%1.%2").arg(mParent->getGlobalChildIndexMap()).arg(cIndex);
+    }
+
+    return gciMap;
+}
+
+//==============================================================================
 // Generate Component ID
 //==============================================================================
 QString ComponentInfo::liveCodeGenerateID(const bool& aLiveRoot)
@@ -1715,30 +1739,7 @@ QString ComponentInfo::liveCodeFormatName(const QString& aIndent)
     QString liveCode = "";
 
     // Add Name
-    liveCode += QString("%1%2 {\n").arg(aIndent).arg(mName);
-
-//    // Check Component Type
-//    if (mType == COMPONENT_TYPE_DATASOURCE) {
-//        // Add Type
-//        liveCode += QString("%1%2").arg(aIndent).arg("QtObject {\n");
-//    } else {
-
-//        // Check If build In
-//        if (mBuiltIn) {
-//            // Add Name
-//            liveCode += QString("%1%2 {\n").arg(aIndent).arg(mName);
-//        } else {
-
-//            // Check Base Component
-//            if (!mBase) {
-//                qCritical() << "ComponentInfo::liveCodeFormatName - NO BASE COMPONENT!!";
-//                return "";
-//            }
-
-//            // Add Type
-//            liveCode += QString("%1%2 {\n").arg(aIndent).arg(mBase->mName);
-//        }
-//    }
+    liveCode += QString("%1%2 {\n").arg(aIndent).arg(mIsRoot ? mBaseName : mName);
 
     return liveCode;
 }
@@ -2716,9 +2717,10 @@ QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGene
     }
 
     // Check Child Count
-    if (/*childCount() > 0 ||*/ mIsRoot) {
+    if (mIsRoot) {
         // Generate Component Code First
-        mProject->generateComponentCode(this, aGenerateChildren);
+        mProject->generateComponentCode(mBase, aGenerateChildren);
+
     } else {
         // Get Component ProtoType
         ComponentInfo* proto = mProject->getComponentByName(mName, mType);
@@ -2830,6 +2832,12 @@ QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGene
     // Get Filtered Property Keys
     QStringList fpKeys = mProject->filteredProperties();
 
+    // Check If Component Code
+    if (!aComponentCode) {
+        // Add Global Child Index Map
+        liveCode += QString("\n%1%2property string %3: \"%4\"\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(DEFAULT_COMPONENT_CHILD_MAP).arg(getGlobalChildIndexMap());
+    }
+
     // Add Own Properties ======================================================
 
     liveCode += liveCodeFormatOwnProperties(opvHookList, enumHookList, cID, fpKeys, indent, aComponentCode);
@@ -2852,19 +2860,19 @@ QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGene
 
     // Add Functions ===========================================================
 
-    //liveCode += liveCodeFormatFunctions(indent);
+    liveCode += liveCodeFormatFunctions(indent);
 
     // Add Children ============================================================
 
-    //liveCode += liveCodeFormatChildren(aGenerateChildren, indent, aComponentCode);
+    liveCode += liveCodeFormatChildren(aGenerateChildren, indent, aComponentCode);
 
     // Add States ==============================================================
 
-    //liveCode += liveCodeFormatStates(indent);
+    liveCode += liveCodeFormatStates(indent);
 
     // Add Transitions =========================================================
 
-    //liveCode += liveCodeFormatTransitions(indent);
+    liveCode += liveCodeFormatTransitions(indent);
 
     //==========================================================================
 
@@ -3475,6 +3483,47 @@ ComponentInfo* ComponentInfo::childInfo(const int& aIndex)
 }
 
 //==============================================================================
+// Get Child Info By Child Index Map
+//==============================================================================
+ComponentInfo* ComponentInfo::childInfo(const QString& aMap)
+{
+    // Check Map
+    if (aMap.isEmpty()) {
+        return NULL;
+    }
+
+    // Split Map
+    QStringList mapList = aMap.split(".");
+
+    // Check Map
+    if (mapList[0] != mName) {
+        return NULL;
+    }
+
+    // Check Map List
+    if (mapList.count() < 2) {
+        return NULL;
+    }
+
+    // Get Map Count
+    int mCount = mapList.count();
+
+    // Init Temp Info
+    ComponentInfo* tempInfo = childInfo(mapList[1].toInt());
+
+    // Iterate Through Map List
+    for (int i=2; i<mCount; i++) {
+        // Check Temp Info
+        if (tempInfo) {
+            // Set Temp Info
+            tempInfo = tempInfo->childInfo(mapList[i].toInt());
+        }
+    }
+
+    return tempInfo;
+}
+
+//==============================================================================
 // Add Child
 //==============================================================================
 void ComponentInfo::addChild(ComponentInfo* aChild)
@@ -3621,10 +3670,7 @@ void ComponentInfo::moveChild(ComponentInfo* aChildInfo, const int& aIndex, Comp
         takenChild->setPosY(QString("4"));
 
         // Reset Anchors
-        while (!takenChild->mAnchors.empty()) {
-            // Remove Last
-            takenChild->mAnchors.erase(takenChild->mAnchors.end());
-        }
+        takenChild->mAnchors = QJsonObject();
 
         // Insert Child
         aTargetChildInfo->insertChild(aTargetIndex, takenChild);

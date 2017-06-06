@@ -103,6 +103,9 @@
 // File Name Mask
 #define DEFAULT_FILE_NAME_MASK                              "."
 
+// Default Component Child Info Map Name
+#define DEFAULT_COMPONENT_CHILD_MAP                         "__childMap"
+
 // Default Source Indent
 #define DEFAULT_SOURCE_INDENT                               "    "
 
