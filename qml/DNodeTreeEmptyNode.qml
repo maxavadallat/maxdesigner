@@ -85,6 +85,9 @@ Item {
                 // Accept Drag
                 drag.accept();
             }
+
+            // Set Hovering Node Parent
+            nodeTree.hoverindNodeParent = parentNode;
         }
 
         onDropped: {
@@ -108,7 +111,7 @@ Item {
                     // TODO: More Checking
 
                     // Add Child To Parent Node Component
-                    parentNode.componentInfo.insertChild(emptyNodeRoot.childIndex, draggedComponentInfo.clone());
+                    parentNode.componentInfo.insertChild(emptyNodeRoot.childIndex, draggedComponentInfo.clone(), false);
 
                 // Drop Another Child Node
                 } else if (drop.keys[0] === CONSTS.childComponentDragKey) {

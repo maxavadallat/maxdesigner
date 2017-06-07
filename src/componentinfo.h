@@ -119,8 +119,10 @@ class ComponentInfo : public QObject
     // Vertical Center Offset
     Q_PROPERTY(QString anchorsVerticalOffset READ anchorsVerticalOffset NOTIFY anchorsVerticalOffsetChanged)
 
+    // Layer/Component Visible
     Q_PROPERTY(bool layerVisible READ layerVisible WRITE setLayerVisible NOTIFY layerVisibleChanged)
 
+    // Component Dirty
     Q_PROPERTY(bool dirty READ getDirty NOTIFY dirtyChanged)
 
 public:
@@ -296,6 +298,9 @@ public:
     // Vertical Center Offset
     QString anchorsVerticalOffset();
 
+    // Reset Anchors
+    Q_INVOKABLE void resetAnchors();
+
     // Get Layer Visible
     bool layerVisible();
     // Set Layer Visible
@@ -347,9 +352,9 @@ public:
     // Add Child
     Q_INVOKABLE void addChild(ComponentInfo* aChild);
     // Insert Child
-    Q_INVOKABLE void insertChild(const int& aIndex, ComponentInfo* aChild);
+    Q_INVOKABLE void insertChild(const int& aIndex, ComponentInfo* aChild, const bool& aMove);
     // Take Child Info
-    Q_INVOKABLE ComponentInfo* takeChild(const int& aIndex);
+    Q_INVOKABLE ComponentInfo* takeChild(const int& aIndex, const bool& aMove);
     // Take Child Info
     Q_INVOKABLE int takeChild(ComponentInfo* aChildInfo);
     // Remove Child
@@ -425,7 +430,7 @@ signals:
     // Child Added Signal
     void childAdded(const int& aIndex);
     // Child Moved Signal
-    void childMoved(const int& aIndex, const int& aTarget);
+    void childMoved(ComponentInfo* aParentComponent, const int& aIndex, ComponentInfo* aTargetComponent, const int& aTargetIndex);
     // Child Removed Signal
     void childRemoved(const int& aIndex);
 

@@ -11,7 +11,7 @@ import "system"
 DContainer {
     id: demoContainerRoot
 
-    width: 1200
+    width: 1400
     height: 800
 
     clip: true
@@ -21,7 +21,7 @@ DContainer {
 
     drag.filterChildren: false
 
-    minWidth: 1200
+    minWidth: 800
     minHeight: 800
 
     property int contentWidth: 400

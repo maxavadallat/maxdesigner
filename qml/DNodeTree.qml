@@ -24,6 +24,8 @@ Item {
 
     property DNodeTreeNode currentNode: null
 
+    property DNodeTreeNode hoverindNodeParent: null
+
     property alias nodeGrabbedState: grabbedNode.dragActive
     property alias grabbedIndex: grabbedNode.childIndex
     property alias scrolling: scrollTimer.scrolling

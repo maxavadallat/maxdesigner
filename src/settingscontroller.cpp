@@ -34,6 +34,7 @@ SettingsController::SettingsController(QObject* aParent)
     , mTracerVisible(DEFAULT_SETTINGS_VALUE_TRACER_VISIBLE)
     , mBorderVisible(DEFAULT_SETTINGS_VALUE_BORDER_VISIBLE)
     , mComponentNamesVisible(DEFAULT_SETTINGS_VALUE_COMPONENT_NAMES_VISIBLE)
+    , mClipComponentRoot(DEFAULT_SETTINGS_VALUE_CLIP_COMPONENT_ROOT)
     , mSlowMotion(DEFAULT_SETTINGS_VALUE_SLOW_MOTION)
     , mMainWindowState(DEFAULT_SETTINGS_VALUE_MAIN_WINDOW_STATE)
     , mDesignerMode(DEFAULT_SETTINGS_VALUE_DESIGNER_MODE)
@@ -75,6 +76,7 @@ void SettingsController::loadSettings()
     setTracerVisible(mSettings.value(SETTINGS_KEY_TRACER_VISIBLE, DEFAULT_SETTINGS_VALUE_TRACER_VISIBLE).toBool());
     setBorderVisible(mSettings.value(SETTINGS_KEY_BORDER_VISIBLE, DEFAULT_SETTINGS_VALUE_BORDER_VISIBLE).toBool());
     setComponentNamesVisible(mSettings.value(SETTINGS_KEY_COMPONENT_NAMES_VISIBLE, DEFAULT_SETTINGS_VALUE_COMPONENT_NAMES_VISIBLE).toBool());
+    setClipComponentRoot(mSettings.value(SETTINGS_KEY_CLIP_COMPONENT_ROOT, DEFAULT_SETTINGS_VALUE_CLIP_COMPONENT_ROOT).toBool());
 
     setMainWindowState(mSettings.value(SETTINGS_KEY_MAIN_WINDOW_STATE, DEFAULT_SETTINGS_VALUE_MAIN_WINDOW_STATE).toInt());
     setDesignerMode(mSettings.value(SETTINGS_KEY_DESIGNER_MODE, DEFAULT_SETTINGS_VALUE_DESIGNER_MODE).toString());
@@ -119,6 +121,7 @@ void SettingsController::saveSettings()
     mSettings.setValue(SETTINGS_KEY_TRACER_VISIBLE, mTracerVisible);
     mSettings.setValue(SETTINGS_KEY_BORDER_VISIBLE, mBorderVisible);
     mSettings.setValue(SETTINGS_KEY_COMPONENT_NAMES_VISIBLE, mComponentNamesVisible);
+    mSettings.setValue(SETTINGS_KEY_CLIP_COMPONENT_ROOT, mClipComponentRoot);
     mSettings.setValue(SETTINGS_KEY_MAIN_WINDOW_STATE, mMainWindowState);
     mSettings.setValue(SETTINGS_KEY_DESIGNER_MODE, mDesignerMode);
 
@@ -159,6 +162,8 @@ void SettingsController::restoreDefaults()
 
     setTracerVisible(DEFAULT_SETTINGS_VALUE_TRACER_VISIBLE);
     setBorderVisible(DEFAULT_SETTINGS_VALUE_BORDER_VISIBLE);
+    setComponentNamesVisible(DEFAULT_SETTINGS_VALUE_COMPONENT_NAMES_VISIBLE);
+    setClipComponentRoot(DEFAULT_SETTINGS_VALUE_CLIP_COMPONENT_ROOT);
     setMainWindowState(DEFAULT_SETTINGS_VALUE_TRACER_VISIBLE);
     setDesignerMode(DEFAULT_SETTINGS_VALUE_DESIGNER_MODE);
 
@@ -327,6 +332,28 @@ void SettingsController::setComponentNamesVisible(const bool& aNamesVisible)
         emit componentNamesVisibleChanged(mComponentNamesVisible);
         // Set Dirty
         setDirty(true);
+    }
+}
+
+//==============================================================================
+// Get Clip Component Root
+//==============================================================================
+bool SettingsController::clipComponentRoot()
+{
+    return mClipComponentRoot;
+}
+
+//==============================================================================
+// Set Clip Component Root
+//==============================================================================
+void SettingsController::setClipComponentRoot(const bool& aClip)
+{
+    // Check Clip Component Root
+    if (mClipComponentRoot != aClip) {
+        // Set Clip Component Root
+        mClipComponentRoot = aClip;
+        // Emit Clip Component Root Changed Signal
+        emit clipComponentRootChanged(mClipComponentRoot);
     }
 }
 

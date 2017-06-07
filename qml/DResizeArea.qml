@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.5
 
 import "style"
 import "system"
@@ -204,8 +204,6 @@ MouseArea {
     onPositionChanged: {
         // Check Pressed State
         if (pressed && target !== null && resizePos !== "") {
-            console.log("#### DResizeArea.onPositionChanged");
-
             // Calculate Delta X
             var deltaX = pressPosX - mouse.x;
             // Calculate New Width

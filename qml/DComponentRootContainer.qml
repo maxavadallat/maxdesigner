@@ -109,15 +109,19 @@ DPaneBase {
     // Component Content Created
     property bool componentContentCreated: false
 
-//    // Content Container Alias
-//    property alias componentContainer: componentContainer
-
     // Current Hover Handler
     property QtObject hoverHandler: null
     // Hover Pos X
     property int hoverPosX: 0
     // Hover Pos Y
     property int hoverPosY: 0
+    // Drag Source
+    property ComponentInfo dragSource: null
+    // Drag Key
+    property string dragKey: ""
+
+    // Root Component Handler
+    property alias rootComponentHandler: rootComponentHandler
 
 //    // Exploding Mode
 //    property bool explodingMode: false
@@ -128,6 +132,8 @@ DPaneBase {
 
     enablePosOverlay: false
     enableSizeOverlay: false
+
+    enableResize: true
 
     showTitle: false
     showBackground: false
@@ -140,27 +146,11 @@ DPaneBase {
 
     setFocusOnResize: true
 
-    enableSizeOverlayOnShow: true
+    enableSizeOverlayOnShow: false
 
     enableScaling: true
 
-    borderColor: {
-//        // Check If Hovering
-//        if (componentContainer.dropHovering) {
-//            return componentContainer.dropHoverOK ? DStyle.colorBorderHoverOK : DStyle.colorBorderHoverNOK;
-//        }
-
-//        // Check Focused Component
-//        if (crcRoot.componentInfo !== null && propertiesController.focusedComponent === crcRoot.componentInfo) {
-//            return DStyle.colorBorder;
-//        }
-
-//        return DStyle.colorBorderNoFocus;
-
-        return "transparent";
-    }
-
-    borderMargins: -1
+    //borderColor: "transparent"
 
     radius: 0
 
@@ -232,8 +222,9 @@ DPaneBase {
             }
 
         } else if (newState === crcRoot.stateCreate) {
-            // Check If Destroy
-            //if ()
+            // Reset Root Container Border Color
+            crcRoot.borderColor = DStyle.colorBorderNoFocus;
+
             // Check Node Pane Loader Item
             if (nodePaneLoader.item) {
                 // Close Node Pane
@@ -250,6 +241,8 @@ DPaneBase {
 
         // Check State
         if (newState === crcRoot.stateShown) {
+            // Set Root Container Border Color
+            crcRoot.borderColor = "transparent";
             // Create Component Content
             crcRoot.createComponentQMLContent();
             // Create Handlers
@@ -258,8 +251,8 @@ DPaneBase {
             // Set Focus
             crcRoot.focus = true;
 
-//            // Set Update Component Info Enabled
-//            componentContainer.updateComponentInfoEnabled = (crcRoot.componentInfo !== null);
+            // Set Update Component Info Enabled
+            crcRoot.rootComponentHandler.updateComponentInfoEnabled = (crcRoot.componentInfo !== null);
 
             // Check Component Info
             if (crcRoot.componentInfo !== null) {
@@ -280,6 +273,28 @@ DPaneBase {
         if (crcRoot.state !== crcRoot.stateShown) {
             // Reset Update Component Info Enabled
             //componentContainer.updateComponentInfoEnabled = false;
+        }
+    }
+
+    onWidthChanged: {
+        // Check Root Component Handler Component Object
+        if (rootComponentHandler.componentObject !== null) {
+            // Check Width
+            if (rootComponentHandler.componentObject.width !== crcRoot.width) {
+                // Set Width
+                rootComponentHandler.componentObject.width = crcRoot.width;
+            }
+        }
+    }
+
+    onHeightChanged: {
+        // Check Root Component Handler Component Object
+        if (rootComponentHandler.componentObject !== null) {
+            // Check Height
+            if (rootComponentHandler.componentObject.height !== crcRoot.height) {
+                // Set Height
+                rootComponentHandler.componentObject.height = crcRoot.height;
+            }
         }
     }
 
@@ -322,41 +337,19 @@ DPaneBase {
 
     // Create Component QML Content
     function createComponentQMLContent() {
-        // Check Component Info
-        if (crcRoot.componentInfo !== null && !crcRoot.componentContentCreated) {
-            console.log("DComponentRootContainer.createComponentQMLContent - name: " + crcRoot.componentInfo.componentName);
-
-            // Set Component Content Created
+        // Check If Component Content Created
+        if (!crcRoot.componentContentCreated) {
+            // Set Compoennt Content Created
             crcRoot.componentContentCreated = true;
 
-            // Generate Live Code
-            var cFileName = propertiesController.currentProject.generateLiveCode(crcRoot.componentInfo, true);
-
-            // CLEAR THE FUCKING QML COMPONENT CACHE BECAUSE THEY FUCKED IT UP! BUT THIS WILL CAUSE A CRASH AT SHUTDOWN!!!
-            //mainController.clearQMLComponentCache();
-
-            // Create Component
-            var component  = Qt.createComponent("file://" + cFileName);
-
-            // Check Status
-            if (component.status === Component.Ready) {
-                // Create New Root Object
-                rootComponentHandler.componentObject = component.createObject(rootComponentHandler.rootContentContainer);
-
-                // Remove Live Temp File
-                //propertiesController.currentProject.removeLiveTempFile(cFileName);
-
-            } else {
-                console.error("DComponentRootContainer.createComponentQMLContent - ERROR CREATING ROOT COMPONENT!! - error: " + component.errorString());
-                return;
-            }
+            // Create New Root Object
+            rootComponentHandler.componentObject = rootComponentHandler.createComponentObject(crcRoot.componentInfo, rootComponentHandler.rootContentContainer, true);
 
             // Check New Root Object
             if (rootComponentHandler.componentObject === null) {
                 console.error("DComponentRootContainer.createComponentQMLContent - ERROR CREATING ROOT OBJECT!!");
             }
 
-            // ...
         }
     }
 
@@ -405,7 +398,7 @@ DPaneBase {
                         // Check New Component Handler
                         if (newComponentHandler !== null) {
                             // Set Parent Handler
-                            newComponentHandler.rootContainer = crcRoot;
+                            //newComponentHandler.rootContainer = crcRoot;
                             // Set Parent Handler
                             newComponentHandler.parentHandler = parentHandler;
                             // Set Index Map
@@ -426,6 +419,9 @@ DPaneBase {
 
                             // Create Handlers For Children
                             createComponentHandlers(newComponentHandler);
+
+                            // Set Update Component Info Enabled
+                            newComponentHandler.updateComponentInfoEnabled = true;
 
                             // ...
 
@@ -501,6 +497,8 @@ DPaneBase {
         enableSizeOverlay: false
         enableDrag: false
         enableResize: false
+        enablePanByKeys: false
+        borderMargins: -1
     }
 
     // No Content Placeholder

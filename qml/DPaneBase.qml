@@ -601,7 +601,7 @@ DContainer {
                 ScriptAction {
                     script: {
                         // Reset Cliping Content
-                        //paneBaseRoot.clipContent = true;
+                        paneBaseRoot.clipContent = false;
                         // Emit Transition Finished Signal
                         paneBaseRoot.transitionFinished(stateShown);
                     }
@@ -709,7 +709,7 @@ DContainer {
                 ScriptAction {
                     script: {
                         // Reset Cliping Content
-                        paneBaseRoot.clipContent = true;
+                        paneBaseRoot.clipContent = false;
                         // Emit Transition Finished Signal
                         paneBaseRoot.transitionFinished(stateShown);
                     }
@@ -727,6 +727,8 @@ DContainer {
                     script: {
                         // Emit Transition Started
                         paneBaseRoot.transitionStarted(stateHidden);
+                        // Reset Cliping Content
+                        paneBaseRoot.clipContent = true;
                     }
                 }
 

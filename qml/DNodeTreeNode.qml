@@ -64,10 +64,25 @@ Item {
         }
 
         onChildMoved: {
-            //console.log("DNodeTreeNode.componentInfoConnections.onChildMoved - aIndex: " + aIndex + " - aTarget: " + aTarget);
+            //console.log("DNodeTreeNode.componentInfoConnections.onChildMoved - parent: " + aParentComponent.componentPath + " - aIndex: " + aIndex + " - aTarget: " + aTargetComponent.componentPath + " - aTargetIndex: " + aTargetIndex);
 
-            // Move Node
-            moveNode(aIndex, aTarget);
+            // Check Parent & Target Component
+            if (aParentComponent === aTargetComponent) {
+                // Move Node
+                moveNode(aIndex, aTargetIndex);
+            } else {
+                // Remove Node
+                removeNode(aIndex);
+                // Check Hovering Node Parent
+                if (nodeTree.hoverindNodeParent) {
+                    // Insert Node
+                    nodeTree.hoverindNodeParent.insertNode(aTargetIndex);
+                    // Reset Hovering Parent Node
+                    nodeTree.hoverindNodeParent = null;
+                } else {
+                    console.log("DNodeTreeNode.componentInfoConnections.onChildMoved - NULL HOVERING PARENT NODE!!");
+                }
+            }
         }
 
         onChildRemoved: {
@@ -310,6 +325,7 @@ Item {
     function takeNode(nodeIndex) {
         // Get Node Object
         var nodeObject = childNodesModel.get(nodeIndex);
+
         // Check Node Object
         if (nodeObject !== null) {
             console.log("DNodeTreeNode.takeNode - nodeIndex: " + nodeIndex);
@@ -335,6 +351,7 @@ Item {
 
         // Move Item
         childNodesModel.move(nodeIndex, targetIndex);
+
         // Update Child Indexes
         updateChildIndexes(0);
     }
@@ -374,7 +391,8 @@ Item {
         }
 
         //console.log("DNodeTreeNode.insertEmptyNode - newNodeIndex: " + newNodeIndex + " - grabbedChildIndex: " + nodeRoot.grabbedChildIndex);
-
+        // Set Current Node For Animating Height
+        nodeTree.currentNode = nodeRoot;
         // Insert Empty Node
         childNodesModel.insert(newNodeIndex, emptyNode);
         // Set Child Index
@@ -494,6 +512,9 @@ Item {
 
                     }
                 }
+
+                // Set Hovering Parent Node
+                nodeTree.hoverindNodeParent = nodeRoot;
 
                 // Emit Remove Empty Node Signal
                 nodeTree.removeEmptyNode();
@@ -691,11 +712,13 @@ Item {
                         // Emit Node Pressed Signal
                         nodeTree.nodePressed(Math.round(mouse.x), Math.round(mouse.y), nodeMouseArea);
                         // Set Current Node For Animating Height
-                        nodeTree.currentNode = nodeRoot;
+                        //nodeTree.currentNode = nodeRoot;
                     }
                 }
 
                 onClicked: {
+                    // Set Current Node For Animating Height
+                    nodeTree.currentNode = nodeRoot;
                     // Set Focused Component
                     propertiesController.focusedComponent = nodeRoot.componentInfo;
                 }

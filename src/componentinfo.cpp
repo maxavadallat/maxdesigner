@@ -617,6 +617,8 @@ void ComponentInfo::setComponentID(const QString& aID)
         mProperties[JSON_KEY_COMPONENT_PROPERTY_ID] = aID;
         // Set Child Object ID
         setChildObjectID(this, aID);
+        // Set Dirty
+        setDirty(true);
         // Emit Component ID Changed Signal
         emit componentIDChanged(componentID());
     }
@@ -639,6 +641,8 @@ void ComponentInfo::setComponentObjectName(const QString& aObjectName)
     if (componentObjectName() != aObjectName) {
         // Set Object Name Directly to Inherited Properties
         mProperties[JSON_KEY_COMPONENT_PROPERTY_OBJECT_NAME] = aObjectName;
+        // Set Dirty
+        setDirty(true);
         // Emit Object Name Changed Signal
         emit componentObjectNameChanged(componentObjectName());
     }
@@ -953,6 +957,62 @@ QString ComponentInfo::anchorsHorizontalOffset()
 QString ComponentInfo::anchorsVerticalOffset()
 {
     return mAnchors.value(JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER_OFFS).toString();
+}
+
+//==============================================================================
+// Reset Anchors
+//==============================================================================
+void ComponentInfo::resetAnchors()
+{
+    qDebug() << "ComponentInfo::resetAnchors";
+
+    // Reset Anchors
+    mAnchors = QJsonObject();
+
+    // Emit Anchors Changed Signals
+
+    // Left Anchor Changed Signal
+    emit anchorsLeftChanged("");
+    // Left Anchor Margin Changed Signal
+    emit anchorsLeftMarginChanged("0");
+
+    // Right Anchor Changed Signal
+    emit anchorsRightChanged("");
+    // Right Anchor Margin Changed Signal
+    emit anchorsRightMarginChanged("0");
+
+    // Top Anchor Changed Signal
+    emit anchorsTopChanged("");
+    // Top Anchor Margin Changed Signal
+    emit anchorsTopMarginChanged("0");
+
+    // Bottom Anchor Changed Signal
+    emit anchorsBottomChanged("");
+    // Bottom Anchor Margin Changed Signal
+    emit anchorsBottomMarginChanged("0");
+
+    // Anchor Margin Changed Signal
+    emit anchorsMarginsChanged("0");
+
+    // Fill Anchor Changed Signal
+    emit anchorsFillChanged("");
+
+    // Center Anchor Changed Signal
+    emit anchorsCenterInChanged("");
+
+    // Horizontal Center Anchor Changed Signal
+    emit anchorsHorizontalCenterChanged("");
+    // Vertical Center Anchor Changed Signal
+    emit anchorsVerticalCenterChanged("");
+
+    // Horizontal Center Anchor Offset Changed Signal
+    emit anchorsHorizontalOffsetChanged("0");
+    // Vertical Center Anchor Offset Changed Signal
+    emit anchorsVerticalOffsetChanged("0");
+
+    // ...
+
+
 }
 
 //==============================================================================
@@ -3553,7 +3613,7 @@ void ComponentInfo::addChild(ComponentInfo* aChild)
 //==============================================================================
 // Insert Child
 //==============================================================================
-void ComponentInfo::insertChild(const int& aIndex, ComponentInfo* aChild)
+void ComponentInfo::insertChild(const int& aIndex, ComponentInfo* aChild, const bool& aMove)
 {
     // Check Child Info
     if (aChild) {
@@ -3571,8 +3631,11 @@ void ComponentInfo::insertChild(const int& aIndex, ComponentInfo* aChild)
         mChildComponents.insert(aIndex, aChild);
         // Set Dirty
         setDirty(true);
-        // Emit Child Added
-        emit childAdded(aIndex);
+        // Check If Move
+        if (!aMove) {
+            // Emit Child Added
+            emit childAdded(aIndex);
+        }
         // Emit Child Cound Changed Signal
         emit childCountChanged(mChildComponents.count());
     }
@@ -3644,7 +3707,7 @@ void ComponentInfo::moveChild(const int& aIndex, const int& aTargetIndex)
     mChildComponents.move(aIndex, newTargetIndex);
 
     // Emit Child Moved Signal
-    emit childMoved(aIndex, newTargetIndex);
+    emit childMoved(this, aIndex, this, newTargetIndex);
 
     // Set Dirty
     setDirty(true);
@@ -3661,7 +3724,7 @@ void ComponentInfo::moveChild(ComponentInfo* aChildInfo, const int& aIndex, Comp
         aChildInfo->moveChild(aIndex, aTargetIndex);
     } else {
         // Take Child
-        ComponentInfo* takenChild = aChildInfo->takeChild(aIndex);
+        ComponentInfo* takenChild = aChildInfo->takeChild(aIndex, true);
 
         qDebug() << "ComponentInfo::moveChild - mName: " << takenChild->mName << " -> " << aTargetChildInfo->componentPath() << " - aTargetIndex: " << aTargetIndex;
 
@@ -3670,17 +3733,20 @@ void ComponentInfo::moveChild(ComponentInfo* aChildInfo, const int& aIndex, Comp
         takenChild->setPosY(QString("4"));
 
         // Reset Anchors
-        takenChild->mAnchors = QJsonObject();
+        resetAnchors();
 
         // Insert Child
-        aTargetChildInfo->insertChild(aTargetIndex, takenChild);
+        aTargetChildInfo->insertChild(aTargetIndex, takenChild, true);
+
+        // Emit Child Moved Signal
+        emit childMoved(this, aIndex, aTargetChildInfo, aTargetIndex);
     }
 }
 
 //==============================================================================
 // Take Child Info
 //==============================================================================
-ComponentInfo* ComponentInfo::takeChild(const int& aIndex)
+ComponentInfo* ComponentInfo::takeChild(const int& aIndex, const bool& aMove)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < mChildComponents.count()) {
@@ -3697,8 +3763,11 @@ ComponentInfo* ComponentInfo::takeChild(const int& aIndex)
             setChildObjectID(takenChild, "");
             // Set Dirty
             setDirty(true);
-            // Emmit Child Removed Signal
-            emit childRemoved(aIndex);
+            // Check If Moved
+            if (!aMove) {
+                // Emmit Child Removed Signal
+                emit childRemoved(aIndex);
+            }
             // Emit Child Cound Changed Signal
             emit childCountChanged(mChildComponents.count());
 

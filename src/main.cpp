@@ -32,6 +32,8 @@ int main(int argc, char* argv[])
     app.setOrganizationName(DEFAULT_ORGANIZATION_NAME);
     // Set Organization Domain
     app.setOrganizationDomain(DEFAULT_ORGANIZATION_DOMAIN);
+    // Set Application Version
+    app.setApplicationVersion(DEFAULT_APPLICATION_VERSION);
 
     // Main Window
     MainWindow w;

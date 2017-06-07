@@ -13,9 +13,10 @@ class SettingsController : public QObject
     Q_OBJECT
 
     Q_PROPERTY(bool tracerVisible READ tracerVisible WRITE setTracerVisible NOTIFY tracerVisibleChanged)
-    Q_PROPERTY(bool borderVisible READ borderVisible WRITE setBorderVisible NOTIFY borderVisibleChanged)
     Q_PROPERTY(bool slowMotion READ slowMotion WRITE setSlowMotion NOTIFY slowMotionChanged)
+    Q_PROPERTY(bool borderVisible READ borderVisible WRITE setBorderVisible NOTIFY borderVisibleChanged)
     Q_PROPERTY(bool componentNamesVisible READ componentNamesVisible WRITE setComponentNamesVisible NOTIFY componentNamesVisibleChanged)
+    Q_PROPERTY(bool clipComponentRoot READ clipComponentRoot WRITE setClipComponentRoot NOTIFY clipComponentRootChanged)
 
     Q_PROPERTY(int mainWindowState READ mainWindowState WRITE setMainWindowState NOTIFY mainWindowStateChanged)
 
@@ -88,6 +89,11 @@ public:
     bool componentNamesVisible();
     // Set Component Names Visible
     void setComponentNamesVisible(const bool& aNamesVisible);
+
+    // Get Clip Component Root
+    bool clipComponentRoot();
+    // Set Clip Component Root
+    void setClipComponentRoot(const bool& aClip);
 
     // Get Main Window State
     int mainWindowState();
@@ -176,6 +182,8 @@ signals:
     void slowMotionChanged(const bool& aSlowMotion);
     // Component names Visible Changed Signal
     void componentNamesVisibleChanged(const bool& aNamesVisible);
+    // Clip Component Root Changed Signal
+    void clipComponentRootChanged(const bool& aClip);
     // Main Window State Changed Signal
     void mainWindowStateChanged(const int& aWindowState);
     // Designer Mode Changed Signal
@@ -233,6 +241,8 @@ private:
     bool            mBorderVisible;
     // Component Names Visible
     bool            mComponentNamesVisible;
+    // Clip Component Root
+    bool            mClipComponentRoot;
     // Slow Motion
     bool            mSlowMotion;
 

@@ -7,6 +7,9 @@
 #define DEFAULT_ORGANIZATION_NAME                           "MySoft"
 #define DEFAULT_ORGANIZATION_DOMAIN                         "mysoft.com"
 
+// Application Version
+#define DEFAULT_APPLICATION_VERSION                         "0.1"
+
 // Main Window QML Widget QML File
 #define DEFAULT_MAIN_QMLFILE_URL                            "qrc:/qml/main.qml"
 // Live Window QML Widget QML File

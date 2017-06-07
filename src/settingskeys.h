@@ -4,6 +4,7 @@
 #define SETTINGS_KEY_TRACER_VISIBLE                         "tracerVisible"
 #define SETTINGS_KEY_BORDER_VISIBLE                         "borderVisible"
 #define SETTINGS_KEY_COMPONENT_NAMES_VISIBLE                "showComponentNames"
+#define SETTINGS_KEY_CLIP_COMPONENT_ROOT                    "clipComponentRoot"
 #define SETTINGS_KEY_SLOW_MOTION                            "slowMotion"
 
 #define SETTINGS_KEY_MAIN_WINDOW_STATE                      "mainWindowState"
