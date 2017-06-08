@@ -69,6 +69,8 @@ DPane {
         onComponentOpened: {
             //console.log("ProjectPane.openFilesModelConnection.onComponentOpened - aComponent: " + aComponent);
 
+            // Open Open Files Section
+            openFilesSection.open();
         }
 
         onFileOpened: {
@@ -92,6 +94,9 @@ DPane {
                     }
                 }
             }
+
+            // Open Open Files Section
+            openFilesSection.open();
         }
 
         onFileClosed: {

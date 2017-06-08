@@ -77,6 +77,10 @@ Item {
                 if (nodeTree.hoverindNodeParent) {
                     // Insert Node
                     nodeTree.hoverindNodeParent.insertNode(aTargetIndex);
+                    // Set Current Node For Animating Height
+                    nodeTree.currentNode = nodeTree.hoverindNodeParent;
+                    // Expand
+                    nodeTree.hoverindNodeParent.expand();
                     // Reset Hovering Parent Node
                     nodeTree.hoverindNodeParent = null;
                 } else {

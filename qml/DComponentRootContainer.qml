@@ -156,6 +156,10 @@ DPaneBase {
 
     enableDragByPaneButton: true
 
+    signal componentWidthChanged(var newWidth)
+    signal componentHeightChanged(var newHeight)
+    signal rebuildContent()
+
     Component.onDestruction: {
 
     }
@@ -204,14 +208,18 @@ DPaneBase {
         }
     }
 
+    onStateChanged: {
+        //console.log("DComponentRootContainer.onStateChanged - state: " + crcRoot.state);
+
+        // Check State
+        if (crcRoot.state !== crcRoot.stateShown) {
+            // Reset Update Compoennt Info Enabled
+            rootComponentHandler.updateComponentInfoEnabled = false;
+        }
+    }
+
     onTransitionStarted: {
         //console.log("DComponentRootContainer.onTransitionStarted - newState: " + newState);
-        if (destroyOnResetFinished) {
-            // Remove Handlers
-            crcRoot.removeComponentHandlers();
-            // Destroy Content
-            crcRoot.removeComponentQMLContent();
-        }
 
         // Check State
         if (newState === crcRoot.stateHidden) {
@@ -222,6 +230,14 @@ DPaneBase {
             }
 
         } else if (newState === crcRoot.stateCreate) {
+            // Check Destroy
+            if (destroyOnResetFinished) {
+                // Remove Handlers
+                crcRoot.removeComponentHandlers();
+                // Destroy Content
+                crcRoot.removeComponentQMLContent();
+            }
+
             // Reset Root Container Border Color
             crcRoot.borderColor = DStyle.colorBorderNoFocus;
 
@@ -268,14 +284,6 @@ DPaneBase {
         }
     }
 
-    onStateChanged: {
-        // Check State
-        if (crcRoot.state !== crcRoot.stateShown) {
-            // Reset Update Component Info Enabled
-            //componentContainer.updateComponentInfoEnabled = false;
-        }
-    }
-
     onWidthChanged: {
         // Check Root Component Handler Component Object
         if (rootComponentHandler.componentObject !== null) {
@@ -296,6 +304,36 @@ DPaneBase {
                 rootComponentHandler.componentObject.height = crcRoot.height;
             }
         }
+    }
+
+    onComponentWidthChanged: {
+        // Check  Width
+        if (crcRoot.width !== newWidth) {
+            // Get Center Pos X
+            var centerPosX = crcRoot.x + crcRoot.width * 0.5;
+            // Set New Pos X
+            crcRoot.x = centerPosX - newWidth * 0.5;
+            // Set New Width
+            crcRoot.width = newWidth;
+        }
+    }
+
+    onComponentHeightChanged: {
+        // Check  Height
+        if (crcRoot.height !== newHeight) {
+            // Get Center Pos Y
+            var centerPosY = crcRoot.y + crcRoot.height * 0.5;
+            // Set New Pos Y
+            crcRoot.y = centerPosY - newHeight * 0.5;
+            // Set New Height
+            crcRoot.height = newHeight;
+        }
+    }
+
+    onRebuildContent: {
+        console.log("#### DComponentRootContainer.onRebuildContent");
+
+        // ...
     }
 
     // Hide/Show/Pane Button Function
@@ -349,7 +387,6 @@ DPaneBase {
             if (rootComponentHandler.componentObject === null) {
                 console.error("DComponentRootContainer.createComponentQMLContent - ERROR CREATING ROOT OBJECT!!");
             }
-
         }
     }
 
@@ -373,7 +410,7 @@ DPaneBase {
             // Get Children Count
             var cCount = parentHandler.componentObject.children.length;
 
-            console.log("DComponentRootContainer.createComponentHandlers - cCount: " + cCount);
+            //console.log("DComponentRootContainer.createComponentHandlers - cCount: " + cCount);
 
             for (var i=0; i<cCount; i++) {
                 // Get Child`Object
@@ -383,14 +420,14 @@ DPaneBase {
 
                 // Check If Has Property
                 if (childObject.hasOwnProperty("__childMap")) {
-                    console.log("DComponentRootContainer.createComponentHandlers - __childMap: " + childObject.__childMap);
+                    //console.log("DComponentRootContainer.createComponentHandlers - __childMap: " + childObject.__childMap);
 
                     // Get Child Component Info
                     var childInfo = crcRoot.componentInfo.childInfo(childObject.__childMap);
 
                     // Check Child Info
                     if (childInfo !== null) {
-                        console.log("DComponentRootContainer.createComponentHandlers - componentName: " + childInfo.componentName);
+                        //console.log("DComponentRootContainer.createComponentHandlers - componentName: " + childInfo.componentName);
 
                         // Create Handler For Child
                         var newComponentHandler = componentHandlerFactory.createObject(parentHandler.childHandlersContainer);
@@ -426,14 +463,10 @@ DPaneBase {
                             // ...
 
                         } else {
-
                             console.error("DComponentRootContainer.createComponentHandlers - ERROR CREATING NEW COMPONENT HANDLER!");
-
                         }
                     } else {
-
                         console.error("DComponentRootContainer.createComponentHandlers - NULL CHILD INFO FOR NEW COMPONENT HANDLER!");
-
                     }
                 }
             }
@@ -442,6 +475,9 @@ DPaneBase {
 
     // Remove Component Handlers
     function removeComponentHandlers() {
+        // Reset Update Component Info Enabled
+        rootComponentHandler.updateComponentInfoEnabled = false;
+
         // Get Component Handlers Count
         var chCount = rootComponentHandler.childHandlersContainer.children.length;
 
@@ -499,6 +535,7 @@ DPaneBase {
         enableResize: false
         enablePanByKeys: false
         borderMargins: -1
+        borderVisible: true
     }
 
     // No Content Placeholder

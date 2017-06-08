@@ -189,15 +189,6 @@ void LiveWindow::shutDown()
 //==============================================================================
 void LiveWindow::setLiveContent()
 {
-//    // Check Live File Name
-//    if (!mLiveFileName.isEmpty()) {
-//        qDebug() << "LiveWindow::setLiveContent";
-
-//        // Emit Load Content Signal
-//        emit loadContent(QString("%1%2").arg(DEFAULT_FILE_URL_PREFIX).arg(mLiveFileName));
-
-//        // ...
-//    }
 }
 
 //==============================================================================

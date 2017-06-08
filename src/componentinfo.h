@@ -49,7 +49,7 @@ class ComponentInfo : public QObject
     // Component Path
     Q_PROPERTY(QString componentPath READ componentPath NOTIFY componentPathChanged)
     // QML Container
-    Q_PROPERTY(QObject* componentContainer READ componentContainer WRITE setComponentContainer NOTIFY componentContainerChanged)
+    Q_PROPERTY(QObject* componentHandler READ componentHandler WRITE setComponentHandler NOTIFY componentContainerChanged)
     // Prototype
     Q_PROPERTY(bool protoType READ protoType NOTIFY protoTypeChanged)
     // Focused
@@ -189,9 +189,9 @@ public:
     QString componentPath();
 
     // Get QML Container
-    QObject* componentContainer();
-    // Set QML Container
-    void setComponentContainer(QObject* aContainer);
+    QObject* componentHandler();
+    // Set QML Component Handler
+    void setComponentHandler(QObject* aContainer);
 
     // Get Focused State
     bool focused();
@@ -387,6 +387,9 @@ public:
 
     // Get Global Child Index Map
     Q_INVOKABLE QString getGlobalChildIndexMap();
+
+    // Find Root Component
+    Q_INVOKABLE ComponentInfo* findRoot(ComponentInfo* aComponent);
 
     // Destructor
     ~ComponentInfo();
@@ -661,9 +664,6 @@ protected:
     // Set Base Component
     void setBaseComponent(ComponentInfo* aBase);
 
-    // Find Root Component
-    ComponentInfo* findRoot(ComponentInfo* aComponent);
-
     // Get Index
     int getChildIndex();
 
@@ -778,8 +778,8 @@ protected: // Data
     // Groupped
     bool                    mGroupped;
 
-    // QML Container Object
-    QObject*                mContainer;
+    // QML Handler Object
+    QObject*                mComponentHandler;
 
     // Base Component Info
     ComponentInfo*          mBase;

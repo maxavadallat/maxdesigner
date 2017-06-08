@@ -426,11 +426,13 @@ void MainWindow::setCurrentComponent(ComponentInfo* aComponent)
 //==============================================================================
 void MainWindow::componentDirtyChanged(const bool& aDirty)
 {
+    Q_UNUSED(aDirty);
+
     // Get Sender Component
     ComponentInfo* senderComponent = static_cast<ComponentInfo*>(sender());
     // Check Sender Component
     if (senderComponent) {
-        qDebug() << "MainWindow::componentDirtyChanged - mName: " << senderComponent->mName << " - aDirty: " << aDirty;
+        //qDebug() << "MainWindow::componentDirtyChanged - mName: " << senderComponent->mName << " - aDirty: " << aDirty;
 
         // Check Current Component
         if (senderComponent->getDirty()) {
@@ -1054,6 +1056,7 @@ void MainWindow::clearQMLComponentCache()
     QQmlContext* ctx = ui->mainQuickWidget->rootContext();
     // Get Engine
     QQmlEngine* engine = ctx ? ctx->engine() : NULL;
+
     // Check Engine
     if (engine) {
         // Clear Component Cache
@@ -1290,7 +1293,7 @@ void MainWindow::saveComponent(const QString& aFilePath)
     }
 
     // Save Current Component
-    mCurrentComponent->save(aFilePath);
+    mCurrentComponent->findRoot(mCurrentComponent)->save(aFilePath);
 }
 
 //==============================================================================

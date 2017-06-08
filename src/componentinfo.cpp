@@ -86,7 +86,7 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mLayerVisible(true)
     , mIsRoot(true)
     , mGroupped(false)
-    , mContainer(NULL)
+    , mComponentHandler(NULL)
     , mBase(NULL)
     , mParent(NULL)
     , mProtoType(NULL)
@@ -464,23 +464,23 @@ QString ComponentInfo::componentPath()
 //==============================================================================
 // Get QML Container
 //==============================================================================
-QObject* ComponentInfo::componentContainer()
+QObject* ComponentInfo::componentHandler()
 {
-    return mContainer;
+    return mComponentHandler;
 }
 
 //==============================================================================
 // Set QML Container
 //==============================================================================
-void ComponentInfo::setComponentContainer(QObject* aContainer)
+void ComponentInfo::setComponentHandler(QObject* aContainer)
 {
     // Check Container
-    if (mContainer != aContainer) {
+    if (mComponentHandler != aContainer) {
         //qDebug() << "ComponentInfo::setComponentContainer - aContainer: " << aContainer;
         // Set QML Container
-        mContainer = aContainer;
+        mComponentHandler = aContainer;
         // Emit QML Container Changed Signal
-        emit componentContainerChanged(mContainer);
+        emit componentContainerChanged(mComponentHandler);
     }
 }
 
@@ -964,7 +964,7 @@ QString ComponentInfo::anchorsVerticalOffset()
 //==============================================================================
 void ComponentInfo::resetAnchors()
 {
-    qDebug() << "ComponentInfo::resetAnchors";
+    //qDebug() << "ComponentInfo::resetAnchors";
 
     // Reset Anchors
     mAnchors = QJsonObject();
@@ -1077,6 +1077,8 @@ QStringList ComponentInfo::inheritedPropertyKeys()
     if (mBase) {
         // Add Properties
         propertyKeys += mBase->componentOwnPropertyKeys();
+        // Add Inherited Property Heys
+        propertyKeys += mBase->inheritedPropertyKeys();
     }
 
     // Remove Duplicates
@@ -1097,6 +1099,11 @@ void ComponentInfo::setDirty(const bool& aDirty)
         // Set Dirty
         mDirty = aDirty;
 
+        // Check Drity
+        if (mDirty) {
+            qDebug() << "####" << componentPath() << " DIRTY! ####";
+        }
+
         // Emit Dirty Changed Signal
         emit dirtyChanged(mDirty);
 
@@ -1104,6 +1111,16 @@ void ComponentInfo::setDirty(const bool& aDirty)
         if (mParent && mDirty) {
             // Set Dirty
             mParent->setDirty(true);
+
+        } else if (!mDirty) {
+            // Get Children Count
+            int cCount = childCount();
+
+            // Iterate Through Children
+            for (int i=0; i<cCount; i++) {
+                // Reset Dirty State
+                childInfo(i)->setDirty(false);
+            }
         }
     }
 }
@@ -3617,8 +3634,6 @@ void ComponentInfo::insertChild(const int& aIndex, ComponentInfo* aChild, const 
 {
     // Check Child Info
     if (aChild) {
-        qDebug() << "ComponentInfo::addChild - path: " <<  componentPath() << " <- " << aChild->mName << " - aIndex: " << aIndex;
-
         // Reset ProtoType Flag
         aChild->mIsProtoType = false;
         // Set Parent
@@ -3633,6 +3648,7 @@ void ComponentInfo::insertChild(const int& aIndex, ComponentInfo* aChild, const 
         setDirty(true);
         // Check If Move
         if (!aMove) {
+            qDebug() << "ComponentInfo::insertChild - path: " <<  componentPath() << " <- " << aChild->mName << " - aIndex: " << aIndex;
             // Emit Child Added
             emit childAdded(aIndex);
         }
@@ -3754,10 +3770,12 @@ ComponentInfo* ComponentInfo::takeChild(const int& aIndex, const bool& aMove)
         ComponentInfo* takenChild = mChildComponents.takeAt(aIndex);
         // Check Taken Child
         if (takenChild) {
-            qDebug() << "ComponentInfo::takeChild - path: " << componentPath() << " - aIndex: " << aIndex;
-
-            // Emit Child About To Be Removed
-            emit takenChild->childAboutToBeRemoved(takenChild);
+            // Check If Move
+            if (!aMove) {
+                qDebug() << "ComponentInfo::takeChild - path: " << componentPath() << " - aIndex: " << aIndex;
+                // Emit Child About To Be Removed
+                emit takenChild->childAboutToBeRemoved(takenChild);
+            }
 
             // Remove Child Object From ID Map
             setChildObjectID(takenChild, "");

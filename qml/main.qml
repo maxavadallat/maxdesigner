@@ -185,6 +185,21 @@ Item {
         }
     }
 
+    // Properties Controller Connections
+    Connections {
+        target: propertiesController
+
+        onFocusedComponentChanged: {
+            // Chek Focused Component
+            if (propertiesController.focusedComponent !== null) {
+                // Get Root Component
+                var rootComponent = propertiesController.focusedComponent.findRoot(propertiesController.focusedComponent);
+                // Set Focused File
+                openFilesModel.focusedFile = rootComponent.infoPath;
+            }
+        }
+    }
+
     // Connections - Current Project
     Connections {
         target: mainController.currentProject

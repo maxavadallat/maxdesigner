@@ -46,6 +46,9 @@ DMouseArea {
     // Enable Pos Overlay
     property bool enablePosOverlay: true
 
+    // Border Visibility
+    property bool borderVisible: settingsController.borderVisible
+
     // Border Color
     property string borderColor: {
         // Check If Selected
@@ -64,7 +67,7 @@ DMouseArea {
         }
 
         // Check If Borders Visible
-        if (!settingsController.borderVisible || !chRoot.updateComponentInfoEnabled) {
+        if (!chRoot.borderVisible || !chRoot.updateComponentInfoEnabled) {
             return "transparent";
         }
 
@@ -157,7 +160,7 @@ DMouseArea {
             var newComponentObject = createComponentObject(newChildInfo, newHandlerDummyParent, true);
 
             // Add Compoennt Object
-            addComponentObject(aIndex, chRoot.componentObject, newComponentObject, 4, 4);
+            addComponentObject(aIndex, chRoot.componentObject, newComponentObject, newChildInfo.posX, newChildInfo.posY);
 
             // Create Component Handler
             var newComponentHandler = createComponentHandler(newComponentObject, newChildInfo, newHandlerDummyParent);
@@ -170,16 +173,51 @@ DMouseArea {
 
         // On Child Moved Slot
         onChildMoved: {
-            console.log("DComponentHandler.componentInfoConnections.onChildMoved - aIndex: " + aIndex + " - aTargetIndex: " + aTargetIndex);
+            console.log("DComponentHandler.componentInfoConnections.onChildMoved - aParentComponent: " +  aParentComponent.componentPath + " - aIndex: " + aIndex + " - aTargetComponent: " + aTargetComponent.componentPath + " - aTargetIndex: " + aTargetIndex);
 
-            // Move Component Object
+            // Check Parent & Target Component Info
+            if (aParentComponent === aTargetComponent) {
+                // Move Child Component Object
+                moveComponentObject(aIndex, aTargetIndex);
+                // Move Child Component Handler
+                moveComponentHandler(aIndex, aTargetIndex);
 
-            // Move Child Handler
+            } else {
+                // Get Target Component Handler From Target Component Info
+                var targetComponentHandler = aTargetComponent.componentHandler;
+
+                console.log("DComponentHandler.componentInfoConnections.onChildMoved - targetComponentHandler: " + targetComponentHandler.componentInfo.componentPath);
+
+                // Get Target Component Object Parent
+                var targetComponentObject = targetComponentHandler.componentObject;
+
+                console.log("DComponentHandler.componentInfoConnections.onChildMoved - componentPath: " + chRoot.componentInfo.componentPath);
+
+                // Remove Component Handler
+                removeComponentHandler(aIndex);
+
+                // Take Component Object
+                var componentObject = takeComponentObject(aIndex);
+
+                // Insert Component Object
+                targetComponentHandler.addComponentObject(aTargetIndex, targetComponentObject, componentObject, 4, 4);
+
+                // Get Target Component Child Info
+                var targetComponentInfo = aTargetComponent.childInfo(aTargetIndex);
+
+                // Create New Handler For The Moved Child Component Object
+                var newComponentHandler = targetComponentHandler.createComponentHandler(componentObject, targetComponentInfo, null);
+
+                // Add Component Handler
+                targetComponentHandler.addComponentHandler(aTargetIndex, targetComponentHandler, newComponentHandler);
+
+                // ...
+            }
         }
 
         // On Child Removed Slot
         onChildRemoved: {
-            console.log("DComponentHandler.componentInfoConnections.onChildRemoved - aIndex: " + aIndex);
+            //console.log("DComponentHandler.componentInfoConnections.onChildRemoved - aIndex: " + aIndex);
 
             // No Need, Taken Care By onChildAboutToBeRemoved
 
@@ -188,7 +226,7 @@ DMouseArea {
 
         // On Child About To Be Removed Slot
         onChildAboutToBeRemoved: {
-            console.log("DComponentHandler.componentInfoConnections.onChildAboutToBeRemoved");
+            //console.log("DComponentHandler.componentInfoConnections.onChildAboutToBeRemoved");
 
             // Chek Component Object
             if (chRoot.componentObject) {
@@ -203,7 +241,7 @@ DMouseArea {
         // On Pos X Changed Slot
         onPosXChanged: {
             // Check Component Object Position
-            if (chRoot.componentObject.x !== aPosX && chRoot.updateComponentInfoEnabled) {
+            if (chRoot.componentObject !== null && chRoot.componentObject.x !== aPosX && chRoot.updateComponentInfoEnabled) {
                 // Set Positin
                 chRoot.componentObject.x = aPosX;
             }
@@ -212,7 +250,7 @@ DMouseArea {
         // On Pos Y Changed Slot
         onPosYChanged: {
             // Check Component Object Position
-            if (chRoot.componentObject.y !== aPosY && chRoot.updateComponentInfoEnabled) {
+            if (chRoot.componentObject !== null && chRoot.componentObject.y !== aPosY && chRoot.updateComponentInfoEnabled) {
                 // Set Positin
                 chRoot.componentObject.y = aPosY;
             }
@@ -221,7 +259,7 @@ DMouseArea {
         // On Pos Z Changed Slot
         onPosZChanged: {
             // Check Component Object Position
-            if (chRoot.componentObject.z !== aPosZ && chRoot.updateComponentInfoEnabled) {
+            if (chRoot.componentObject !== null && chRoot.componentObject.z !== aPosZ && chRoot.updateComponentInfoEnabled) {
                 // Set Positin
                 chRoot.componentObject.z = aPosZ;
             }
@@ -230,18 +268,30 @@ DMouseArea {
         // On Width Changed Slot
         onWidthChanged: {
             // Check Component Object Width
-            if (chRoot.componentObject.width !== aWidth && chRoot.updateComponentInfoEnabled) {
+            if (chRoot.componentObject !== null && chRoot.componentObject.width !== aWidth && chRoot.updateComponentInfoEnabled) {
                 // Set Component Object Width
                 chRoot.componentObject.width = aWidth;
+
+                // Check If Root
+                if (chRoot.componentInfo.isRoot) {
+                    // Emit Component Width Changed Signal
+                    chRoot.rootContainer.componentWidthChanged(aWidth);
+                }
             }
         }
 
         // On Height Changed Slot
         onHeightChanged: {
             // Check Component Object Height
-            if (chRoot.componentObject.height !== aHeight && chRoot.updateComponentInfoEnabled) {
+            if (chRoot.componentObject !== null && chRoot.componentObject.height !== aHeight && chRoot.updateComponentInfoEnabled) {
                 // Set Component Object Height
                 chRoot.componentObject.height = aHeight;
+
+                // Check If Root
+                if (chRoot.componentInfo.isRoot) {
+                    // Emit Component Height Changed Signal
+                    chRoot.rootContainer.componentHeightChanged(aHeight);
+                }
             }
         }
 
@@ -457,6 +507,8 @@ DMouseArea {
     // Drag Filter Children
     drag.filterChildren: true
 
+    clip: componentObject !== null ? componentObject.clip : false
+
     // Resize Pressed Signal
     signal resizePressed()
 
@@ -478,7 +530,7 @@ DMouseArea {
         // Check Component Info
         if (chRoot.componentInfo !== null) {
             // Set Container/Handler
-            chRoot.componentInfo.componentContainer = chRoot;
+            chRoot.componentInfo.componentHandler = chRoot;
         }
     }
 
@@ -495,18 +547,6 @@ DMouseArea {
     onReleased: {
         // reset Drag Target
         drag.target = undefined;
-    }
-
-    // On Clicked Slot
-    onClicked: {
-//        // Check Component Info
-//        if (chRoot.componentInfo !== null) {
-//            // Set Focused Component
-//            propertiesController.focusedComponent = chRoot.componentInfo;
-//        }
-
-        // Set Focus
-        //chRoot.focus = true;
     }
 
     // On Focus Changed Slot
@@ -655,56 +695,89 @@ DMouseArea {
     }
 
     // On Pos X Changed Slot
-    onXChanged: {
-
-    }
+    onXChanged: updateComponentPosX(chRoot.x)
 
     // On Pos Y Changed Slot
-    onYChanged: {
-
-    }
+    onYChanged: updateComponentPosY(chRoot.y)
 
     // On Width Changed Slot
-    onWidthChanged: {
-
-    }
+    onWidthChanged: updateComponentWidth(chRoot.width)
 
     // On Height Changed Slot
-    onHeightChanged: {
+    onHeightChanged: updateComponentHeight(chRoot.height)
 
+    // Update Component Pos X
+    function updateComponentPosX(posX) {
+        // Check Upadte Component Info Enabled
+        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null) {
+            // Check If Root
+            if (!chRoot.componentInfo.isRoot) {
+                // Check Pos X
+                if (chRoot.componentInfo.posX !== posX) {
+
+                    // TODO: Check For Bindings
+
+                    // Set Pos X
+                    chRoot.componentInfo.setPosX(posX);
+                }
+            }
+        }
     }
 
-//    // Update Component Pos X
-//    function updateComponentPosX(posX) {
-//        // Check Upadte Component Info Enabled
-//        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null) {
+    // Update Component Pos Y
+    function updateComponentPosY(posY) {
+        // Check Upadte Component Info Enabled
+        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null) {
+            // Check If Root
+            if (!chRoot.componentInfo.isRoot) {
+                // Check Pos X
+                if (chRoot.componentInfo.posY !== posY) {
 
-//        }
-//    }
+                    // TODO: Check For Bindings
 
-//    // Update Component Pos Y
-//    function updateComponentPosY(posY) {
-//        // Check Upadte Component Info Enabled
-//        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null) {
+                    // Set Pos Y
+                    chRoot.componentInfo.setPosY(posY);
+                }
+            }
+        }
+    }
 
-//        }
-//    }
+    // Update Component Width
+    function updateComponentWidth(width) {
+        // Check Upadte Component Info Enabled
+        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null) {
+            // Check Width
+            if (chRoot.componentInfo.width !== width) {
 
-//    // Update Component Width
-//    function updateComponentWidth(width) {
-//        // Check Upadte Component Info Enabled
-//        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null) {
+                // TODO: Check For Bindings
 
-//        }
-//    }
+                // Set Width
+                chRoot.componentInfo.setWidth(width);
+            }
+        }
+    }
 
-//    // Update Component Height
-//    function updateComponentHeight(height) {
-//        // Check Upadte Component Info Enabled
-//        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null) {
+    // Update Component Height
+    function updateComponentHeight(height) {
+        // Check Upadte Component Info Enabled
+        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null) {
+            // Check Height
+            if (chRoot.componentInfo.height !== height) {
 
-//        }
-//    }
+                // TODO: Check For Bindings
+
+                // Set Width
+                chRoot.componentInfo.setHeight(height);
+            }
+        }
+    }
+
+    // Array Move
+    function arrayMove(ref, from, to) {
+        var element = ref.array[from];
+        ref.array.splice(from, 1);
+        ref.array.splice(to, 0, element);
+    }
 
     // Set Anchoring
     function setAnchoring() {
@@ -805,7 +878,7 @@ DMouseArea {
             // TODO: Double Check!!
 
             // Get Anchor Target
-            anchorTarget = targetComponent !== null ? targetComponent.componentContainer.componentObject : undefined;
+            anchorTarget = targetComponent !== null ? targetComponent.componentHandler.componentObject : undefined;
         }
 
         // Check Anchor Target
@@ -842,21 +915,6 @@ DMouseArea {
         }
 
         return anchorPoint;
-    }
-
-    // Insert Child Component
-    function insertChild(childIndex) {
-
-    }
-
-    // Remove Child Component
-    function removeChild(childIndex) {
-
-    }
-
-    // Move Child Component
-    function moveChild(childIndex, targetIndex) {
-
     }
 
     // Get Hovering Handler
@@ -1026,6 +1084,10 @@ DMouseArea {
         // Set New Component Object Parent
         componentObject.parent = parentObject;
 
+        // Set Pos
+        componentObject.x = posX;
+        componentObject.y = posY;
+
         // Get Taken Child Component Objects Count
         var tccoCount = handlersDummyParent.children.length;
 
@@ -1039,28 +1101,57 @@ DMouseArea {
     }
 
     // Take Component Object
-    function takeComponentObject(componentObject) {
-        // Check Component Object & Component Info
-        if (componentObject === null) {
-            console.warn("DComponentHandler.takeComponentObject - NULL COMPONENT OBJECT!!");
-            return null;
+    function takeComponentObject(childIndex) {
+        // Check Component Object
+        if (chRoot.componentObject === null) {
+            return;
         }
 
-        // Set Component Object Parent
-        componentObject.parent = newHandlerDummyParent;
+        // Get Componet Handlers Count
+        var chCount = childHandlersContainer.children.length;
 
-        // ...
+        // Check Child Index
+        if (childIndex >= 0 && childIndex < chCount) {
+            // Get Component Object
+            var componentObject = childHandlersContainer.children[childIndex].componentObject;
 
-        return componentObject;
+            // Set Dummy Parent
+            componentObject.parent = newHandlerDummyParent;
+
+            return componentObject;
+        }
+
+        return null;
     }
 
     // Take Component Handler
-    function takeComponentHandler(componentHandler) {
-        // Check Component Handler
-        if (componentHandler !== null) {
+    function takeComponentHandler(childIndex) {
+        // Get Componet Handlers Count
+        var chCount = childHandlersContainer.children.length;
 
-            // ...
+        // Check Child Index
+        if (childIndex >= 0 && childIndex < chCount) {
 
+            // Get Component Handler
+            var componentHandler = childHandlersContainer.children[childIndex];
+            // Set Dummy Parent
+            componentHandler.parent = newHandlerDummyParent;
+
+            return componentHandler;
+        }
+
+        return null;
+    }
+
+    // Remove Component Handler
+    function removeComponentHandler(childIndex) {
+        // Get Componet Handlers Count
+        var chCount = childHandlersContainer.children.length;
+
+        // Check Child Index
+        if (childIndex >= 0 && childIndex < chCount) {
+            // Destroy
+            childHandlersContainer.children[childIndex].destroy();
         }
     }
 
@@ -1143,6 +1234,76 @@ DMouseArea {
         }
 
         // ...
+    }
+
+    // Move Child Component Object
+    function moveComponentObject(childIndex, targetIndex) {
+        // Get Component Child Count
+        var ccCount = chRoot.componentObject.children.length;
+
+        // Get Bottom Index
+        var bottomIndex = Math.min(childIndex, targetIndex);
+
+//        console.log("DComponentHandler.moveComponentObject -     ccCount : " + ccCount);
+//        console.log("DComponentHandler.moveComponentObject - bottomIndex : " + bottomIndex);
+
+        // Init Temp Array For Child Containers
+        var ccTemp = { "array": [] };
+
+        // Move Child Containers To Dummy Parent
+        for (var i=bottomIndex; i<ccCount; i++) {
+            // Push To Temp Array
+            ccTemp.array.push(chRoot.componentObject.children[bottomIndex]);
+            // Set Item\s Parent to Dummy Parent
+            chRoot.componentObject.children[bottomIndex].parent = handlersDummyParent;
+        }
+
+        // Move Items
+        arrayMove(ccTemp, childIndex - bottomIndex, targetIndex - bottomIndex);
+
+        // Move Back Rearranged Items To ContentContainer
+        for (var n=0; n<ccTemp.array.length; n++) {
+            // Set Parent
+            ccTemp.array[n].parent = chRoot.componentObject;
+        }
+
+        // Clear Temp Array
+        ccTemp.array.splice(0, ccTemp.array.length);
+    }
+
+    // Move Child Compoennt Handler
+    function moveComponentHandler(childIndex, targetIndex) {
+        // Get Component Handlers Count
+        var chCount = chRoot.childHandlersContainer.children.length;
+
+        // Get Bottom Index
+        var bottomIndex = Math.min(childIndex, targetIndex);
+
+//        console.log("DComponentHandler.moveComponentObject -     chCount : " + chCount);
+//        console.log("DComponentHandler.moveComponentObject - bottomIndex : " + bottomIndex);
+
+        // Init Temp Array For Child Containers
+        var ccTemp = { "array": [] };
+
+        // Move Child Containers To Dummy Parent
+        for (var i=bottomIndex; i<chCount; i++) {
+            // Push To Temp Array
+            ccTemp.array.push(chRoot.childHandlersContainer.children[bottomIndex]);
+            // Set Item\s Parent to Dummy Parent
+            chRoot.childHandlersContainer.children[bottomIndex].parent = handlersDummyParent;
+        }
+
+        // Move Items
+        arrayMove(ccTemp, childIndex - bottomIndex, targetIndex - bottomIndex);
+
+        // Move Back Rearranged Items To ContentContainer
+        for (var n=0; n<ccTemp.array.length; n++) {
+            // Set Parent
+            ccTemp.array[n].parent = chRoot.childHandlersContainer;
+        }
+
+        // Clear Temp Array
+        ccTemp.array.splice(0, ccTemp.array.length);
     }
 
 //    // Update Layout Spacing
