@@ -149,6 +149,33 @@ DMouseArea {
     property Connections componentInfoConnections: Connections {
         target: chRoot.componentInfo
 
+        onOwnPropertyAdded: {
+            console.log("#### DComponentHandler.componentInfoConnections.onOwnPropertyAdded - aName: " + aName);
+
+            // ...
+
+            // Emit Rebuild Content Signal
+            chRoot.rootContainer.rebuildContent();
+        }
+
+        onOwnPropertyRemoved: {
+            console.log("#### DComponentHandler.componentInfoConnections.onOwnPropertyRemoved - aName: " + aName);
+
+            // ...
+
+            // Emit Rebuild Content Signal
+            chRoot.rootContainer.rebuildContent();
+        }
+
+        onNeedRefresh: {
+            console.log("#### DComponentHandler.componentInfoConnections.onNeedRefresh");
+
+            // ...
+
+            // Emit Rebuild Content Signal
+            chRoot.rootContainer.rebuildContent();
+        }
+
         // On Child Added
         onChildAdded: {
             console.log("DComponentHandler.componentInfoConnections.onChildAdded - aIndex: " + aIndex);

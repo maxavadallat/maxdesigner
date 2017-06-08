@@ -1292,8 +1292,13 @@ void MainWindow::saveComponent(const QString& aFilePath)
         return;
     }
 
+    // Get Root Component
+    ComponentInfo* rootComponent = mCurrentComponent->findRoot(mCurrentComponent);
+
+    qDebug() << "MainWindow::saveComponent - rootComponent: " << rootComponent->componentName();
+
     // Save Current Component
-    mCurrentComponent->findRoot(mCurrentComponent)->save(aFilePath);
+    rootComponent->save(aFilePath);
 }
 
 //==============================================================================

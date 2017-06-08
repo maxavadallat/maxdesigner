@@ -22,11 +22,11 @@ DPaneBase {
 
     hideToSide: hideToRight
 
-    creationWidth: 358
-    creationHeight: 122
+    creationWidth: 400
+    creationHeight: 200
 
-    minWidth: 358
-    minHeight: 122
+    minWidth: 400
+    minHeight: 200
 
     enablePosOverlay: false
     enableSizeOverlay: false
@@ -94,7 +94,7 @@ DPaneBase {
         var pValue = formulaEditorRoot.componentInfo.propertyValue(formulaEditorRoot.propertyName, true);
 
         // Set Formula Editor Text
-        formulaEditor.setText(formulaEditorRoot.propertyName + ": " + pValue);
+        formulaEditor.setText(formulaEditorRoot.propertyName + ": " + (pValue.charCodeAt(0) === 16 ? pValue.substr(1) : pValue));
 
         // ...
     }
@@ -104,18 +104,29 @@ DPaneBase {
         // Init Formula Text
         var formulaText = formulaEditor.getText();
         //formulaText
-        console.log("DFormulaEditor.formulaSourceValid - formulaText: " + formulaText);
+        //console.log("DFormulaEditor.formulaSourceValid - formulaText: " + formulaText);
+
+        // Check Formula Text
+        if (!formulaText.startsWith(formulaEditorRoot.propertyName)) {
+            return false;
+        }
+
+        // Get Colon First Index
+        var cfIndex = formulaText.indexOf(":");
+
+        // Check Colon Index
+        if (cfIndex === -1) {
+            return false;
+        }
+
+        // TODO: More Checking
+
+        // Set Property Formula
+        formulaEditorRoot.propertyFormula = String.fromCharCode(16) + formulaText.substr(cfIndex + 1).trim();
 
         // ...
 
-        return false;
-    }
-
-    // Update Property Value
-    function updatePropertyValue() {
-
-
-
+        return true;
     }
 
     DSourceCodeEditor {

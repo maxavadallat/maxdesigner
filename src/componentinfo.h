@@ -578,6 +578,9 @@ signals:
     // Request Close Container Signal
     void requestContainerClose();
 
+    // Need Refresh Live Code Signal
+    void needRefresh();
+
     // ...
 
 protected:
@@ -684,15 +687,32 @@ protected:
     // Format Anchors
     QString liveCodeFormatAnchors(const QString& aIndent = "");
     // Format Own Properties
-    QString liveCodeFormatOwnProperties(QStringList& aOPHooks, QStringList& aEnumHooks, const QString& aID, const QStringList& aFPKeys, const QString& aIndent = "", const bool& aComponentCode = false);
+    QString liveCodeFormatOwnProperties(QStringList& aOPHooks,
+                                        QStringList& aEnumHooks,
+                                        QStringList& aPCHookList,
+                                        const QString& aID,
+                                        const QStringList& aFPKeys,
+                                        const QString& aIndent = "",
+                                        const bool& aComponentCode = false);
     // Format Properties
-    QString liveCodeFormatInheritedProperties(QStringList& aPHooks, QStringList& aEnumHooks, const QString& aID, const QStringList& aFPKeys, const QString& aIndent = "", const bool& aComponentCode = false);
+    QString liveCodeFormatInheritedProperties(QStringList& aPHooks,
+                                              QStringList& aEnumHooks,
+                                              QStringList& aPCHookList,
+                                              const QString& aID,
+                                              const QStringList& aFPKeys,
+                                              const QString& aIndent = "",
+                                              const bool& aComponentCode = false);
     // Format Signals
-    QString liveCodeFormatSignals(const QStringList& aOPKeys = QStringList(), const QStringList& pKeys = QStringList(), const QString& aIndent = "", const bool& aComponentCode = false);
+    QString liveCodeFormatSignals(const QString& aIndent = "");
     // Format Slots
-    QString liveCodeFormatSlots(const QStringList& aOPKeys = QStringList(), const QStringList& pKeys = QStringList(), const QString& aIndent = "", const bool& aComponentCode = false);
+    QString liveCodeFormatSlots(const QStringList& aPCHookList = QStringList(),
+                                const QString& aIndent = "",
+                                const bool& aComponentCode = false);
     // Format Hooks
-    QString liveCodeFormatHooks(const QStringList& aOPHooks, const QStringList& aPHooks, const QStringList& aEnumHooks, const QString& aIndent = "");
+    QString liveCodeFormatHooks(const QStringList& aOPHooks,
+                                const QStringList& aPHooks,
+                                const QStringList& aEnumHooks,
+                                const QString& aIndent = "");
     // Format Functions
     QString liveCodeFormatFunctions(const QString& aIndent = "");
     // Format Children

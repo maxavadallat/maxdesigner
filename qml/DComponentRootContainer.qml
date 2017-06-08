@@ -150,8 +150,6 @@ DPaneBase {
 
     enableScaling: true
 
-    //borderColor: "transparent"
-
     radius: 0
 
     enableDragByPaneButton: true
@@ -386,7 +384,15 @@ DPaneBase {
             // Check New Root Object
             if (rootComponentHandler.componentObject === null) {
                 console.error("DComponentRootContainer.createComponentQMLContent - ERROR CREATING ROOT OBJECT!!");
+                return;
             }
+
+            // Set Root Handler Width
+            rootComponentHandler.width = rootComponentHandler.componentObject.width;
+            // Set Root Component Handler Height
+            rootComponentHandler.height = rootComponentHandler.componentObject.height;
+
+            // ...
         }
     }
 
@@ -526,7 +532,6 @@ DPaneBase {
     // Root Component Handler
     DComponentHandler {
         id: rootComponentHandler
-        anchors.fill: parent
         rootContainer: crcRoot
         componentInfo: crcRoot.componentInfo
         enablePosOverlay: false

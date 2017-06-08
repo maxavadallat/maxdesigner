@@ -1816,7 +1816,7 @@ QString ComponentInfo::liveCodeFormatName(const QString& aIndent)
     QString liveCode = "";
 
     // Add Name
-    liveCode += QString("%1%2 {\n").arg(aIndent).arg(mIsRoot ? mBaseName : mName);
+    liveCode += QString("%1%2 {\n").arg(aIndent).arg(mIsRoot && !mBuiltIn? mBaseName : mName);
 
     return liveCode;
 }
@@ -2111,7 +2111,13 @@ QString ComponentInfo::liveCodeFormatAnchors(const QString& aIndent)
 //==============================================================================
 // Format Own Properties
 //==============================================================================
-QString ComponentInfo::liveCodeFormatOwnProperties(QStringList& aOPHooks, QStringList& aEnumHooks, const QString& aID, const QStringList& aFPKeys, const QString& aIndent, const bool& aComponentCode)
+QString ComponentInfo::liveCodeFormatOwnProperties(QStringList& aOPHooks,
+                                                   QStringList& aEnumHooks,
+                                                   QStringList& aPCHookList,
+                                                   const QString& aID,
+                                                   const QStringList& aFPKeys,
+                                                   const QString& aIndent,
+                                                   const bool& aComponentCode)
 {
     // Init Live Code
     QString liveCode = "";
@@ -2143,9 +2149,16 @@ QString ComponentInfo::liveCodeFormatOwnProperties(QStringList& aOPHooks, QStrin
                 // Get Type
                 QString pType = Utils::parseType(typeAndValue, readOnly, defaultAlias);
                 // Get Value
-                QString pValue = Utils::parseValue(typeAndValue);
+                QString pValue = Utils::parseValue(typeAndValue, true);
+                // Init Value Is Binding/Formula
+                bool pIsBinding = (pValue[0] == QChar(16));
 
                 // TODO: Handle Formulas And Bindigs!!!
+
+                if (pIsBinding) {
+                    // Remove Char Code 16
+                    pValue = pValue.mid(1);
+                }
 
                 // Check Type
                 if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING) {
@@ -2175,6 +2188,16 @@ QString ComponentInfo::liveCodeFormatOwnProperties(QStringList& aOPHooks, QStrin
                             // Append Live Code
                             liveCode += QString("%1property %2 %3: %4\n").arg(aIndent).arg(pType).arg(pName).arg(pValue);
                         }
+                    }
+
+                    // Check Proprty Name
+                    if (!aComponentCode && opKeys[i].indexOf(".") == -1) {
+                        // Init Property Change Slot Name
+                        QString pcSlotName = QString("on%1Changed").arg(opKeys[i]);
+                        // UpperCase 3rd Char
+                        pcSlotName[2] = pcSlotName[2].toUpper();
+                        // Add To Property Change Hook List
+                        aPCHookList << pcSlotName;
                     }
                 }
 
@@ -2206,8 +2229,6 @@ QString ComponentInfo::liveCodeFormatOwnProperties(QStringList& aOPHooks, QStrin
                             }
                         }
                     }
-
-                    // TODO: Handle Property Changes -> Add propertyChanged Slots
                 }
             }
         }
@@ -2219,7 +2240,13 @@ QString ComponentInfo::liveCodeFormatOwnProperties(QStringList& aOPHooks, QStrin
 //==============================================================================
 // Format Properties
 //==============================================================================
-QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks, QStringList& aEnumHooks, const QString& aID, const QStringList& aFPKeys, const QString& aIndent, const bool& aComponentCode)
+QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks,
+                                                         QStringList& aEnumHooks,
+                                                         QStringList& aPCHookList,
+                                                         const QString& aID,
+                                                         const QStringList& aFPKeys,
+                                                         const QString& aIndent,
+                                                         const bool& aComponentCode)
 {
     // Init Live Code
     QString liveCode = "";
@@ -2243,7 +2270,7 @@ QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks, Q
             // Get Value
             QString pValue = componentProperty(pKeys[k]).toString();
             // Init Value Is Binding/Formula
-            bool pIsBinding = (pValue[0] == '$');
+            bool pIsBinding = (pValue[0] == QChar(16));
 
             // Check readOnly
             if (!readOnly) {
@@ -2251,7 +2278,7 @@ QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks, Q
                 if (aFPKeys.indexOf(pKeys[k]) == -1) {
                     // Check If Binding
                     if (pIsBinding) {
-                        // Remove $ Sign
+                        // Remove Char 16
                         pValue = pValue.mid(1);
                     // Check For String Type
                     } else if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING) {
@@ -2265,6 +2292,7 @@ QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks, Q
 
                 // Check Property Key
                 if (pKeys[k] != JSON_KEY_COMPONENT_PROPERTY_ID && !aComponentCode) {
+
                     // Check Property Type
                     if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM) {
 
@@ -2295,6 +2323,15 @@ QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks, Q
 
             // TODO: Handle Property Changes -> PropertyChanged Slot
 
+            // Check Proprty Name
+            if (!aComponentCode && aFPKeys.indexOf(pKeys[k]) == -1 && pKeys[k].indexOf(".") == -1) {
+                // Init Property Change Slot Name
+                QString pcSlotName = QString("on%1Changed").arg(pKeys[k]);
+                // UpperCase 3rd Char
+                pcSlotName[2] = pcSlotName[2].toUpper();
+                // Add To Property Change Hook List
+                aPCHookList << pcSlotName;
+            }
         }
 
         // Add New Line
@@ -2307,11 +2344,8 @@ QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks, Q
 //==============================================================================
 // Format Signals
 //==============================================================================
-QString ComponentInfo::liveCodeFormatSignals(const QStringList& aOPKeys, const QStringList& pKeys, const QString& aIndent, const bool& aComponentCode)
+QString ComponentInfo::liveCodeFormatSignals(const QString& aIndent)
 {
-    Q_UNUSED(aOPKeys);
-    Q_UNUSED(pKeys);
-
     // Init Live Code
     QString liveCode = "";
 
@@ -2361,14 +2395,6 @@ QString ComponentInfo::liveCodeFormatSignals(const QStringList& aOPKeys, const Q
         }
     }
 
-    if (!aComponentCode) {
-        // TODO: Add Property Changes Signal
-
-        // Own Properties
-
-        // Inherited Properties
-    }
-
     // ...
 
     return liveCode;
@@ -2377,10 +2403,15 @@ QString ComponentInfo::liveCodeFormatSignals(const QStringList& aOPKeys, const Q
 //==============================================================================
 // Format Slots
 //==============================================================================
-QString ComponentInfo::liveCodeFormatSlots(const QStringList& /*aOPKeys*/, const QStringList& /*pKeys*/, const QString& aIndent, const bool& aComponentCode)
+QString ComponentInfo::liveCodeFormatSlots(const QStringList& aPCHookList,
+                                           const QString& aIndent,
+                                           const bool& aComponentCode)
 {
     // Init Live Code
     QString liveCode = "";
+
+    // Init Used Property Change Hook Slot Names
+    QStringList upchListt = QStringList();
 
     // Check Slots
     if (!mSlots.isEmpty()) {
@@ -2396,17 +2427,68 @@ QString ComponentInfo::liveCodeFormatSlots(const QStringList& /*aOPKeys*/, const
             QJsonObject slotObject = mSlots[n].toObject();
             // Get Slot Name
             QString slotName = slotObject.value(JSON_KEY_COMPONENT_SLOT_NAME).toString();
-            // Get Source
-            QString slotSource = slotObject.value(JSON_KEY_COMPONENT_SLOT_SOURCE).toString();
-            // Append To Live Code
-            liveCode += QString("%1%2: %3\n\n").arg(aIndent).arg(slotName).arg(slotSource);
+            // Init Slot Source
+            QString slotSource = "";
+
+            // Add To Live Code
+            liveCode += QString("%1%2: {\n").arg(aIndent).arg(slotName);
+
+            // Get Property Change Hook Lost Index
+            int pchlIndex = aPCHookList.indexOf(slotName);
+
+            // Check Slot Hook List
+            if (pchlIndex != -1 && !aComponentCode) {
+                // Get Property Name From Property Change Slot Name
+                QString pName = aPCHookList[pchlIndex].mid(2);
+                // Lower Case First Char
+                pName[0] = pName[0].toLower();
+                // Cut Of Changed Parth
+                pName = pName.left(pName.length() - 7);
+
+                // Set Slot Source
+                slotSource += QString("%1%2property__Changed(\"%3\", %3);\n\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(pName);
+                // Add User Slot Source
+                slotSource += slotObject.value(JSON_KEY_COMPONENT_SLOT_SOURCE).toString();
+
+                // Add To Used Property Change Hook List
+                upchListt << slotName;
+            } else {
+                // Get Source
+                slotSource = slotObject.value(JSON_KEY_COMPONENT_SLOT_SOURCE).toString();
+            }
+
+            liveCode += QString("%1}\n").arg(aIndent);
         }
     }
 
     if (!aComponentCode) {
-        // TODO: Add Property Value Changed Slots
+        // Get Property Change Hook List Count
+        int pchlCount = aPCHookList.count();
 
-        // TODO: Add Property Value Changed Signal
+        // Check Count
+        if (pchlCount > 0) {
+            // Add New Line
+            liveCode += "\n";
+
+            // Add Comment
+            liveCode += QString("%1// Property Change Hook Slots\n").arg(aIndent);
+
+
+            // Iterate Through Property Change Hook List
+            for (int m=0; m<pchlCount; m++) {
+                // Check If Not Used Already
+                if (upchListt.indexOf(aPCHookList[m]) == -1) {
+                    // Get Property Name From Property Change Slot Name
+                    QString pName = aPCHookList[m].mid(2);
+                    // Lower Case First Char
+                    pName[0] = pName[0].toLower();
+                    // Cut Of Changed Parth
+                    pName = pName.left(pName.length() - 7);
+                    // Add To Live Code
+                    liveCode += QString("%1%2: property__Changed(\"%3\", %3);\n").arg(aIndent).arg(aPCHookList[m]).arg(pName);
+                }
+            }
+        }
     }
 
     return liveCode;
@@ -2905,6 +2987,8 @@ QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGene
     QStringList pvHookList = QStringList();
     // Init Enum Hook List
     QStringList enumHookList = QStringList();
+    // Init Property Change Hook List
+    QStringList pcHookList = QStringList();
 
     // Get Filtered Property Keys
     QStringList fpKeys = mProject->filteredProperties();
@@ -2917,19 +3001,24 @@ QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGene
 
     // Add Own Properties ======================================================
 
-    liveCode += liveCodeFormatOwnProperties(opvHookList, enumHookList, cID, fpKeys, indent, aComponentCode);
+    liveCode += liveCodeFormatOwnProperties(opvHookList, enumHookList, pcHookList, cID, fpKeys, indent, aComponentCode);
 
     // Add Inherited Properties ================================================
 
-    liveCode += liveCodeFormatInheritedProperties(pvHookList, enumHookList, cID, fpKeys, indent, aComponentCode);
+    liveCode += liveCodeFormatInheritedProperties(pvHookList, enumHookList, pcHookList, cID, fpKeys, indent, aComponentCode);
+
+    // =========================================================================
+
+    // Remove Duplicates
+    pcHookList.removeDuplicates();
 
     // Add Signals =============================================================
 
-    liveCode += liveCodeFormatSignals(componentOwnPropertyKeys(), inheritedPropertyKeys(), indent, aComponentCode);
+    liveCode += liveCodeFormatSignals(indent);
 
     // Add Slots ===============================================================
 
-    liveCode += liveCodeFormatSlots(componentOwnPropertyKeys(), inheritedPropertyKeys(), indent, aComponentCode);
+    liveCode += liveCodeFormatSlots(pcHookList, indent, aComponentCode);
 
     // Add Hooks for Property Getters And Setters ==============================
 
@@ -3009,25 +3098,26 @@ QString ComponentInfo::generateComponentCode(const bool& aGenerateChildren)
     QStringList ophDummy;
     QStringList phDummy;
     QStringList ehDummy;
+    QStringList pcDummy;
 
     // Get Filtered Property Keys
     QStringList fpKeys = mProject->filteredProperties();
 
     // Add Own Properties ======================================================
 
-    componentCode += liveCodeFormatOwnProperties(ophDummy, ehDummy, idTemp, fpKeys, indent, true);
+    componentCode += liveCodeFormatOwnProperties(ophDummy, ehDummy, pcDummy, idTemp, fpKeys, indent, true);
 
     // Add Inherited Properties ================================================
 
-    componentCode += liveCodeFormatInheritedProperties(phDummy, ehDummy, idTemp, fpKeys, indent, true);
+    componentCode += liveCodeFormatInheritedProperties(phDummy, ehDummy, pcDummy, idTemp, fpKeys, indent, true);
 
     // Add Signals =============================================================
 
-    componentCode += liveCodeFormatSignals(QStringList(), QStringList(), indent, true);
+    componentCode += liveCodeFormatSignals(indent);
 
     // Add Slots ===============================================================
 
-    componentCode += liveCodeFormatSlots(QStringList(), QStringList(), indent, true);
+    componentCode += liveCodeFormatSlots(pcDummy, indent, true);
 
     // Add Functions ===========================================================
 

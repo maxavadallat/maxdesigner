@@ -164,16 +164,6 @@ QString Utils::parseValue(const QString& aTypeAndValue, const bool& aRaw)
 //==============================================================================
 QString Utils::parseFormula(const QString& aTypeAndValue)
 {
-//    // Get Biding Pos
-//    int bPos = hasBinding(aTypeAndValue);
-//    // Int Formula Pos
-//    int fPos = hasFormula(aTypeAndValue, bPos);
-
-//    // Check Formula Pos
-//    if (fPos > 0) {
-//        return aTypeAndValue.mid(fPos + 1, aTypeAndValue.lastIndexOf("}") - fPos);
-//    }
-
     // Get Formula Pos
     int fPos = hasFormula(aTypeAndValue);
 
@@ -226,5 +216,5 @@ int Utils::hasFormula(const QString& aTypeAndValue, const int& aStart)
 //==============================================================================
 int Utils::hasBinding(const QString& aTypeAndValue)
 {
-    return aTypeAndValue.indexOf("$");
+    return aTypeAndValue.indexOf(QChar(16));
 }

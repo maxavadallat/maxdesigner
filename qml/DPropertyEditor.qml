@@ -55,10 +55,10 @@ DPaneBase {
 
     hideToSide: hideToRight
 
-    creationWidth: 360
+    creationWidth: 400
     creationHeight: propertyFieldsColumn.height + 48//148
 
-    minWidth: 360
+    minWidth: 400
     minHeight: propertyFieldsColumn.height + 48//148
 
     enableResize: true
@@ -106,7 +106,7 @@ DPaneBase {
 
     // Reset Property Editor
     function resetPropertyEditor() {
-        console.log("DPropertyEditor.resetPropertyEditor");
+        //console.log("DPropertyEditor.resetPropertyEditor");
         // Reset Type Option
         typeOption.currentIndex = 0;
         // Reset Property Name
