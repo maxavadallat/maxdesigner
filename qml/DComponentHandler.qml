@@ -94,27 +94,104 @@ DMouseArea {
     // Set Focus On resize
     property bool setFocusOnResize: false
 
+    // Parent Handler Layout
+    property string parentHandlerLayout: {
+        // Check Parent Handler
+        if (chRoot.parentHandler !== null && chRoot.parentHandler.componentInfo !== null) {
+            return chRoot.parentHandler.componentInfo.layoutBase();
+        }
+
+        return "";
+    }
+
     // Resize Left Enabled
-    property bool resizeLeftEnabled: true
+    property bool resizeLeftEnabled: {
+        // Check Parent Handler Layout
+        if (parentHandlerLayout === "Row" || parentHandlerLayout === "Flow") {
+            // Check Parent Handler Component Object
+            if (chRoot.parentHendler.componentObject.layoutDirection === Qt.LeftToRigh) {
+                return false;
+            }
+        }
+
+        // Check Compoent Info
+        if (chRoot.componentInfo !== null) {
+            // Check Anchor Fill
+            if (chRoot.componentInfo.anchorsFill !== "" || chRoot.componentInfo.anchorsLeft !== "") {
+                return false;
+            }
+        }
+
+        // ...
+
+        return true;
+    }
+
     // Resize Top Enabled
-    property bool resizeTopEnabled: true
+    property bool resizeTopEnabled: {
+        // Check Parent Layout Base
+        if (parentHandlerLayout === "Column" || parentHandlerLayout === "Flow") {
+            return false;
+        }
+
+        // Check Compoent Info
+        if (chRoot.componentInfo !== null) {
+            // Check Anchor Fill
+            if (chRoot.componentInfo.anchorsFill !== "" || chRoot.componentInfo.anchorsTop !== "") {
+                return false;
+            }
+        }
+
+        // ...
+
+        return true;
+    }
+
     // Resize Right Enabled
-    property bool resizeRightEnabled: true
+    property bool resizeRightEnabled: {
+        // Check Parent Handler Layout
+        if (parentHandlerLayout === "Row" || parentHandlerLayout === "Flow") {
+            // Check Parent Handler Component Object
+            if (chRoot.parentHendler.componentObject.layoutDirection === Qt.RightToLeft) {
+                return false;
+            }
+        }
+
+        // Check Compoent Info
+        if (chRoot.componentInfo !== null) {
+            // Check Anchor Fill
+            if (chRoot.componentInfo.anchorsFill !== "" || chRoot.componentInfo.anchorsRight !== "") {
+                return false;
+            }
+        }
+
+        // ...
+
+        return true;
+    }
+
     // Resize Bottom Enabled
-    property bool resizeBottomEnabled: true
+    property bool resizeBottomEnabled: {
+        // Check Parent Layout Base
+
+        // Check Compoent Info
+        if (chRoot.componentInfo !== null) {
+            // Check Anchor Fill
+            if (chRoot.componentInfo.anchorsFill !== "" || chRoot.componentInfo.anchorsBottom !== "") {
+                return false;
+            }
+        }
+
+        // ...
+
+        return true;
+    }
 
     // Manual Resize Flag
     property bool manualResize: false
 
     // Component Layout
     property string componentLayout: ""//componentInfo.layoutBase()  // Column, Row, Flow
-
-//    // Layout Width
-//    property int layoutWidth: updateHorizontalLayout()
-//    // Layout Height
-//    property int layoutHeight: updateVerticalLayout()
-//    // Layout Spacing
-//    property int layoutSpacing: updateLayoutSpacing()
 
     // Child Handlers Count
     property int count: childHandlersContainer.children.length
@@ -149,31 +226,66 @@ DMouseArea {
     property Connections componentInfoConnections: Connections {
         target: chRoot.componentInfo
 
+        // Emit Component ID Map Changed Signal
+        onComponentIDMapChanged: {
+            // Check If Update Component Info Enabled
+            if (chRoot.updateComponentInfoEnabled) {
+                console.log("#### DComponentHandler.componentInfoConnections.onComponentIDMapChanged");
+
+                // ...
+
+                // Emit Rebuild Content Signal
+                chRoot.rootContainer.rebuildContent();
+            }
+        }
+
+        // On Own Property Added Slot
         onOwnPropertyAdded: {
-            console.log("#### DComponentHandler.componentInfoConnections.onOwnPropertyAdded - aName: " + aName);
+            // Check If Update Component Info Enabled
+            if (chRoot.updateComponentInfoEnabled) {
+                console.log("#### DComponentHandler.componentInfoConnections.onOwnPropertyAdded - aName: " + aName);
 
-            // ...
+                // ...
 
-            // Emit Rebuild Content Signal
-            chRoot.rootContainer.rebuildContent();
+                // Emit Rebuild Content Signal
+                chRoot.rootContainer.rebuildContent();
+            }
         }
 
+        // On Own Property Removed Slot
         onOwnPropertyRemoved: {
-            console.log("#### DComponentHandler.componentInfoConnections.onOwnPropertyRemoved - aName: " + aName);
+            // Check If Update Component Info Enabled
+            if (chRoot.updateComponentInfoEnabled) {
+                console.log("#### DComponentHandler.componentInfoConnections.onOwnPropertyRemoved - aName: " + aName);
 
-            // ...
+                // ...
 
-            // Emit Rebuild Content Signal
-            chRoot.rootContainer.rebuildContent();
+                // Emit Rebuild Content Signal
+                chRoot.rootContainer.rebuildContent();
+            }
         }
 
+        // On Need Refresh Slot
         onNeedRefresh: {
-            console.log("#### DComponentHandler.componentInfoConnections.onNeedRefresh");
+            // Check If Update Component Info Enabled
+            if (chRoot.updateComponentInfoEnabled) {
+                console.log("#### DComponentHandler.componentInfoConnections.onNeedRefresh");
 
-            // ...
+                // ...
 
-            // Emit Rebuild Content Signal
-            chRoot.rootContainer.rebuildContent();
+                // Emit Rebuild Content Signal
+                chRoot.rootContainer.rebuildContent();
+            }
+        }
+
+        onComponentStateChanged: {
+            // Check Component Object
+            if (chRoot.componentObject !== null && chRoot.updateComponentInfoEnabled) {
+                //console.log("DComponentHandler.componentInfoConnections.onComponentStateChanged - aState: " + aState);
+
+                // Set State
+                //chRoot.componentObject.state = aState;
+            }
         }
 
         // On Child Added
@@ -471,11 +583,12 @@ DMouseArea {
         onComponentPropertyChanged: {
             // Check If Update Component Info Enabled
             if (chRoot.updateComponentInfoEnabled) {
+                console.log("DComponentHandler.componentInfoConnections.onComponentPropertyChanged - aName: " + aName + " - aValue: " + aValue);
+
                 // Set Component Property
                 chRoot.componentObject.__setProperty(aName, aValue);
             }
         }
-
 
         // ...
 
@@ -519,12 +632,16 @@ DMouseArea {
 
     // Drag Axis
     drag.axis: {
-        // Check Component Info
-        if (chRoot.componentInfo !== null) {
+        //console.log("DComponentHandler.drag.axis - parentHandlerLayout: " + parentHandlerLayout);
 
-            // ...
-
+        // Switch Layout Base
+        switch (parentHandlerLayout) {
+            case "Column":  return Drag.XAxis;
+            case "Row":     return Drag.YAxis;
+            case "Flow":    return Drag.None;
         }
+
+        // ...
 
         return Drag.XandYAxis;
     }
@@ -534,22 +651,16 @@ DMouseArea {
     // Drag Filter Children
     drag.filterChildren: true
 
-    clip: componentObject !== null ? componentObject.clip : false
+    clip: componentObject !== null && componentInfo !== null && !componentInfo.isRoot ? componentObject.clip : false
 
     // Resize Pressed Signal
     signal resizePressed()
 
     Component.onDestruction: {
         // Set Update Component Info Enabled
-        chRoot.updateComponentInfoEnabled = false;
+        chRoot.disableComponentInfoUpdates();
 
         // ...
-
-//        // Check Component Info
-//        if (chRoot.componentInfo !== null) {
-//            // Remove From Parent
-//            chRoot.componentInfo.removeFromParent();
-//        }
     }
 
     // On Component Info Changed Slot
@@ -1049,7 +1160,7 @@ DMouseArea {
             var cFileName = propertiesController.currentProject.generateLiveCode(componentInfo, createChildren);
 
             // CLEAR THE FUCKING QML COMPONENT CACHE BECAUSE THEY FUCKED IT UP! BUT THIS WILL CAUSE A CRASH AT SHUTDOWN!!!
-            //mainController.clearQMLComponentCache();
+            mainController.clearQMLComponentCache();
 
             // Create Component
             var component  = Qt.createComponent("file://" + cFileName);
@@ -1333,20 +1444,18 @@ DMouseArea {
         ccTemp.array.splice(0, ccTemp.array.length);
     }
 
-//    // Update Layout Spacing
-//    function updateLayoutSpacing() {
-
-//    }
-
-//    // Update Horizontal Layout
-//    function updateHorizontalLayout() {
-
-//    }
-
-//    // Update Vertical Layout
-//    function updateVerticalLayout() {
-
-//    }
+    // Disable Component Info Updates
+    function disableComponentInfoUpdates() {
+        // Reset Update Component Info Update
+        chRoot.updateComponentInfoEnabled = false;
+        // Get Child handlers Count
+        var chCount = childHandlersContainer.children.length;
+        // Iterate Through Child Handlers
+        for (var i=0; i<chCount; i++) {
+            // Disable Component Info Updates
+            childHandlersContainer.children[i].disableComponentInfoUpdates();
+        }
+    }
 
     // Border Rectangle
     DRectangle {

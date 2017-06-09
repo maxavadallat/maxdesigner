@@ -84,16 +84,6 @@ DPaneBase {
         }
     }
 
-//    // New Child Component Child Container
-//    property Component newComponentChildContainer: Component {
-//        DComponentChildContainer {
-//            width: CONSTS.componentItemWidth
-//            height: CONSTS.componentItemHeight
-//            rootComponentContainer: crcRoot
-//            parentComponentContainer: crcRoot
-//        }
-//    }
-
     // Component Handler Factory
     property Component componentHandlerFactory: Component {
         DComponentHandler {
@@ -122,9 +112,6 @@ DPaneBase {
 
     // Root Component Handler
     property alias rootComponentHandler: rootComponentHandler
-
-//    // Exploding Mode
-//    property bool explodingMode: false
 
     title: "Component" + (crcRoot.componentInfo !== null ? (" - " + crcRoot.componentInfo.componentName) : "")
 
@@ -212,7 +199,7 @@ DPaneBase {
         // Check State
         if (crcRoot.state !== crcRoot.stateShown) {
             // Reset Update Compoennt Info Enabled
-            rootComponentHandler.updateComponentInfoEnabled = false;
+            rootComponentHandler.disableComponentInfoUpdates();
         }
     }
 
@@ -329,7 +316,22 @@ DPaneBase {
     }
 
     onRebuildContent: {
-        console.log("#### DComponentRootContainer.onRebuildContent");
+        console.log("DComponentRootContainer.onRebuildContent");
+
+        // Remove Component Handlers
+        removeComponentHandlers();
+
+        // Remove Component QML Content
+        removeComponentQMLContent();
+
+        // Create Component QML Content
+        createComponentQMLContent();
+
+        // Create Component Handlers
+        createComponentHandlers(rootComponentHandler);
+
+        // Set Update Component Info Enabled
+        rootComponentHandler.updateComponentInfoEnabled = (crcRoot.componentInfo !== null);
 
         // ...
     }
@@ -378,6 +380,11 @@ DPaneBase {
             // Set Compoennt Content Created
             crcRoot.componentContentCreated = true;
 
+            // Set Root Handler Width
+            rootComponentHandler.width = crcRoot.componentInfo.width;
+            // Set Root Component Handler Height
+            rootComponentHandler.height = crcRoot.componentInfo.height;
+
             // Create New Root Object
             rootComponentHandler.componentObject = rootComponentHandler.createComponentObject(crcRoot.componentInfo, rootComponentHandler.rootContentContainer, true);
 
@@ -386,11 +393,6 @@ DPaneBase {
                 console.error("DComponentRootContainer.createComponentQMLContent - ERROR CREATING ROOT OBJECT!!");
                 return;
             }
-
-            // Set Root Handler Width
-            rootComponentHandler.width = rootComponentHandler.componentObject.width;
-            // Set Root Component Handler Height
-            rootComponentHandler.height = rootComponentHandler.componentObject.height;
 
             // ...
         }
@@ -487,9 +489,15 @@ DPaneBase {
         // Get Component Handlers Count
         var chCount = rootComponentHandler.childHandlersContainer.children.length;
 
-        console.log("#### DComponentRootContainer.removeComponentHandlers - chCount: " + chCount);
+        //console.log("DComponentRootContainer.removeComponentHandlers - chCount: " + chCount);
 
         // Remove Component Handlers
+        for (var i=chCount-1; i>=0; i--) {
+            // Reset Update Component Info Enabled
+            rootComponentHandler.childHandlersContainer.children[i].updateComponentInfoEnabled = false;
+            // Destroy Children
+            rootComponentHandler.childHandlersContainer.children[i].destroy();
+        }
 
         // ...
 
@@ -499,7 +507,7 @@ DPaneBase {
     DMouseArea {
         id: wheelArea
         anchors.fill: parent
-        visible: crcRoot.focus
+        visible: rootComponentHandler.focus
 
         property real scaleMin: 1.0
         property real scaleMax: 2.0

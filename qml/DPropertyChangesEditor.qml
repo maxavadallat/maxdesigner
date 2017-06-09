@@ -20,10 +20,10 @@ DPaneBase {
 
     hideToSide: hideToTop
 
-    creationWidth: 320
+    creationWidth: 400
     creationHeight: 152
 
-    minWidth: 320
+    minWidth: 400
     minHeight: 152
 
     enableResize: true

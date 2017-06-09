@@ -1023,7 +1023,10 @@ void MainWindow::launchLiveWindow()
     // Check Live Window
     if (!mLiveWindow) {
         // Create Live Window
-        mLiveWindow = new LiveWindow(mProjectModel);
+        mLiveWindow = new LiveWindow(mProjectModel, this);
+
+        // Conenct Signal
+        connect(mLiveWindow, SIGNAL(liveViewClosed()), this, SLOT(liveViewClosed()));
 
         // Check Properties Controller
         if (mPropertiesController) {
@@ -1861,6 +1864,23 @@ void MainWindow::componentOpened(ComponentInfo* )
         // Set Menu Items Enabled State
         ui->actionCloseAllComponents->setEnabled(true);
         ui->actionCloseComponent->setEnabled(true);
+    }
+}
+
+//==============================================================================
+// Live View Closed Slot
+//==============================================================================
+void MainWindow::liveViewClosed()
+{
+    qDebug() << "MainWindow::liveViewClosed";
+
+    // Check Live Window
+    if (mLiveWindow) {
+        // Disconenct Signal
+        disconnect(mLiveWindow, SIGNAL(liveViewClosed()), this, SLOT(liveViewClosed()));
+        // Delete Live Window
+        delete mLiveWindow;
+        mLiveWindow = NULL;
     }
 }
 

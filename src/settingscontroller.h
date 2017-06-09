@@ -16,6 +16,7 @@ class SettingsController : public QObject
     Q_PROPERTY(bool slowMotion READ slowMotion WRITE setSlowMotion NOTIFY slowMotionChanged)
     Q_PROPERTY(bool borderVisible READ borderVisible WRITE setBorderVisible NOTIFY borderVisibleChanged)
     Q_PROPERTY(bool componentNamesVisible READ componentNamesVisible WRITE setComponentNamesVisible NOTIFY componentNamesVisibleChanged)
+    Q_PROPERTY(bool showDashboard READ showDashboard WRITE setShowDashboard NOTIFY showDashboardChanged)
     Q_PROPERTY(bool clipComponentRoot READ clipComponentRoot WRITE setClipComponentRoot NOTIFY clipComponentRootChanged)
 
     Q_PROPERTY(int mainWindowState READ mainWindowState WRITE setMainWindowState NOTIFY mainWindowStateChanged)
@@ -89,6 +90,11 @@ public:
     bool componentNamesVisible();
     // Set Component Names Visible
     void setComponentNamesVisible(const bool& aNamesVisible);
+
+    // Get Show Dashboard
+    bool showDashboard();
+    // Set Show Dashboard
+    void setShowDashboard(const bool& aShowDashboard);
 
     // Get Clip Component Root
     bool clipComponentRoot();
@@ -182,6 +188,8 @@ signals:
     void slowMotionChanged(const bool& aSlowMotion);
     // Component names Visible Changed Signal
     void componentNamesVisibleChanged(const bool& aNamesVisible);
+    // Show Dashboard Changed Signal
+    void showDashboardChanged(const bool& aShowDashboard);
     // Clip Component Root Changed Signal
     void clipComponentRootChanged(const bool& aClip);
     // Main Window State Changed Signal
@@ -241,6 +249,8 @@ private:
     bool            mBorderVisible;
     // Component Names Visible
     bool            mComponentNamesVisible;
+    // Show Dashboard
+    bool            mShowDashboard;
     // Clip Component Root
     bool            mClipComponentRoot;
     // Slow Motion

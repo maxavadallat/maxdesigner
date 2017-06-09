@@ -27,6 +27,7 @@ Item {
         }
     }
 
+    // Background Rect
     Rectangle {
         anchors.fill: parent
         color: "black"
@@ -49,23 +50,25 @@ Item {
 //        }
 //    }
 
+    // Screen Border Rect
     Rectangle {
         id: screenBorderRect
         width: liveController.screenWidth
         height: liveController.screenHeight
         anchors.centerIn: parent
-        anchors.verticalCenterOffset: -20
+        anchors.verticalCenterOffset: -22
         color: "transparent"
         border.color: DStyle.colorBorderNoFocus
     }
 
+    // Content Loader
     DLoader {
         id: contentLoader
         anchors.centerIn: parent
         anchors.verticalCenterOffset: screenBorderRect.anchors.verticalCenterOffset
         anchors.horizontalCenterOffset: screenBorderRect.anchors.horizontalCenterOffset
 
-        source: "file://" + liveController.liveMain
+        source: liveController.liveMain.length > 0 ? "file://" + liveController.liveMain : ""
 
         onStatusChanged: {
             // Switch Status
@@ -85,20 +88,35 @@ Item {
         }
     }
 
+    // Error Text
+    DText {
+        anchors.centerIn: parent
+        font.pixelSize: DStyle.fontSizeXXL
+        text: "Error Loading Live Content... X ("
+        visible: contentLoader.status === Loader.Error
+    }
+
+    // Dashboard Image
     DImage {
         anchors.centerIn: parent
         //source: "qrc:/assets/images/dashboard.png"
         source: "file://" + propertiesController.currentProject.dashboard
-        //visible: settingsController.showDashboard
+        visible: settingsController.showDashboard
     }
 
+    // State Selector
     DStateSelector {
         id: stateSelector
 
-        onSelectedStateChanged: {
-            console.log("liveMain.stateSelector.onSelectedStateChanged - selectedState: " + stateSelector.selectedState);
+        componentInfo: liveController.currentComponent
 
-            // Set State
+        onSelectedStateChanged: {
+            // Check Content Loader's Item
+            if (contentLoader.item !== null) {
+                console.log("liveMain.stateSelector.onSelectedStateChanged - selectedState: " + stateSelector.selectedState);
+                // Set State
+                contentLoader.item.state = stateSelector.selectedState;
+            }
         }
     }
 }

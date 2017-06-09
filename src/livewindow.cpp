@@ -15,10 +15,11 @@
 //==============================================================================
 // Constructor
 //==============================================================================
-LiveWindow::LiveWindow(ProjectModel* aProject, QWidget* aParent)
+LiveWindow::LiveWindow(ProjectModel* aProject, MainWindow* aMainWindow, QWidget* aParent)
     : QMainWindow(aParent)
     , ui(new Ui::LiveWindow)
     , mSettings(SettingsController::getInstance())
+    , mMainWindow(aMainWindow)
     , mProjectModel(aProject)
     , mPropertiesController(aProject ? aProject->propertiesController() : NULL)
     , mComponent(NULL)
@@ -74,6 +75,12 @@ void LiveWindow::init()
         // ...
     }
 
+    // Check Properties Controller
+    if (mPropertiesController) {
+        // Connect Signals
+        connect(mPropertiesController, SIGNAL(focusedComponentChanged(ComponentInfo*)), this, SLOT(setComponent(ComponentInfo*)));
+    }
+
     // ...
 
     // Restore UI
@@ -90,8 +97,17 @@ void LiveWindow::restoreUI()
     // Set Focuse Policy
     ui->quickLiveWidget->setFocusPolicy(Qt::StrongFocus);
 
-    // resize To Project Screen Size
-    resize(screenWidth(), screenHeight() + 30);
+    // Resize To Project Screen Size
+    //resize(screenWidth(), screenHeight() + 22);
+
+    // Init Meu Bar Height
+    int menuBarHeight = 22;
+
+    // Set Geometry
+    setGeometry((mMainWindow->width() - screenWidth()) / 2 + mMainWindow->x(),
+                (mMainWindow->height() - screenHeight() + menuBarHeight) / 2 + menuBarHeight / 2 + mMainWindow->y(),
+                screenWidth(),
+                screenHeight() + menuBarHeight);
 
     // ...
 }
@@ -177,6 +193,9 @@ void LiveWindow::shutDown()
 {
     qDebug() << "LiveWindow::shutDown";
 
+    // Reset Live Main
+    setLiveMain("");
+
     // Emit Clear Content Signal
     emit clearContent();
 
@@ -185,10 +204,12 @@ void LiveWindow::shutDown()
 }
 
 //==============================================================================
-// Set Content
+// Toggle Show Dashboard
 //==============================================================================
-void LiveWindow::setLiveContent()
+void LiveWindow::toggleDashBoard()
 {
+    // Toggle Show Dashboard
+    mSettings->setShowDashboard(!mSettings->showDashboard());
 }
 
 //==============================================================================
@@ -202,40 +223,6 @@ void LiveWindow::setBusy(const bool& aBusy)
         mBusy = aBusy;
         // Emit Busy State Changed Signal
         emit busyChanged(mBusy);
-    }
-}
-
-//==============================================================================
-// Generate Live Code For Base Components
-//==============================================================================
-void LiveWindow::generateLiveCodeForBaseComponents(ComponentInfo* aComponent)
-{
-    // Check Component
-    if (!aComponent) {
-        return;
-    }
-
-    qDebug() << "LiveWindow::generateLiveCodeForBaseComponents - mName: " << aComponent->componentName();
-
-    // Check Base
-    if (aComponent->mBase && !aComponent->mBuiltIn) {
-        // Generate Clean Live Code For Base
-        generateLiveCodeForBaseComponents(aComponent->mBase);
-    }
-
-    // Check If Component Built in
-    if (!aComponent->mBuiltIn) {
-        // Generate Clean Live Code For Component
-
-    }
-
-    // Get Child Count
-    int cCount = aComponent->childCount();
-
-    // Iterate Through Childrent
-    for (int i=0; i<cCount; i++) {
-        // Generate Clean Live Code For Child
-        generateLiveCodeForBaseComponents(aComponent->childInfo(i));
     }
 }
 
@@ -257,15 +244,12 @@ void LiveWindow::setComponent(ComponentInfo* aComponent)
         emit currentComponentChanged(mComponent);
 
         // Check Component
-        if (mComponent && mComponent->isRoot()) {
+        if (mComponent /*&& mComponent->isRoot()*/) {
             // Setup Live
             setupLive();
-
-//            // Check If Window Shown
-//            if (isVisible()) {
-//                // Set Live Content
-//                setLiveContent();
-//            }
+        } else {
+            // Shut Down
+            shutDown();
         }
 
         // Reset Busy State
@@ -280,8 +264,6 @@ void LiveWindow::showEvent(QShowEvent* aShowEvent)
 {
     QMainWindow::showEvent(aShowEvent);
 
-    // Set Live Content
-    setLiveContent();
 }
 
 //==============================================================================
@@ -299,6 +281,9 @@ void LiveWindow::closeEvent(QCloseEvent* aCloseEvent)
     // Save Size
 
     // ...
+
+    // Emit Live View Closed Signal
+    emit liveViewClosed();
 }
 
 //==============================================================================
@@ -312,8 +297,15 @@ void LiveWindow::componentUpdated()
     shutDown();
     // Set up Live
     setupLive();
-    // Set Live Content
-    setLiveContent();
+}
+
+//==============================================================================
+// On Action Show Dashboard Triggered Slot
+//==============================================================================
+void LiveWindow::on_actionShowDashboard_triggered()
+{
+    // Toggle Dashboard
+    toggleDashBoard();
 }
 
 //==============================================================================
@@ -325,6 +317,7 @@ void LiveWindow::on_actionClose_triggered()
     // ...
 
     // Normalize Window
+
     showNormal();
     // Close
     close();

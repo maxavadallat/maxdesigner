@@ -31,7 +31,7 @@ class LiveWindow : public QMainWindow
 
 public:
     // Constructor
-    explicit LiveWindow(ProjectModel* aProject, QWidget* aParent = NULL);
+    explicit LiveWindow(ProjectModel* aProject, MainWindow* aMainWindow, QWidget* aParent = NULL);
 
     // Get Current Component
     ComponentInfo* currentComponent();
@@ -70,6 +70,9 @@ signals:
     // Busy State Changed Signal
     void busyChanged(const bool& aBusy);
 
+    // Live View Closed Signal
+    void liveViewClosed();
+
 protected:
     // Init
     void init();
@@ -84,14 +87,11 @@ protected:
     // Shut Down Live
     void shutDown();
 
-    // Set Content
-    void setLiveContent();
+    // Toggle Show Dashboard
+    void toggleDashBoard();
 
     // Set Busy
     void setBusy(const bool& aBusy);
-
-    // Generate Live Code For Base Components
-    void generateLiveCodeForBaseComponents(ComponentInfo* aComponent);
 
 public: // from QMainWindow
     // Show Event
@@ -102,6 +102,9 @@ public: // from QMainWindow
 private slots:
     // Component Updated Slot
     void componentUpdated();
+
+    // On Action Show Dashboard Triggered Slot
+    void on_actionShowDashboard_triggered();
     // Action Close Triggered Slot
     void on_actionClose_triggered();
 
@@ -110,6 +113,8 @@ private:
     Ui::LiveWindow*         ui;
     // Settings Controller
     SettingsController*     mSettings;
+    // Main Window
+    MainWindow*             mMainWindow;
     // Project Model
     ProjectModel*           mProjectModel;
     // Properties Controller

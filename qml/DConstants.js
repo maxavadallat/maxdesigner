@@ -94,7 +94,7 @@ var propertyTypes                               = ["string", "bool", "int", "dou
 // Default Node Tree Item Height
 var defaultNodeTreeItemHeight                   = 48;
 // Default Node Scale Ratio
-var defaultNodeScaleRatio                       = 0.95;
+var defaultNodeScaleRatio                       = 0.90;
 
 // Tool Bar Size
 var defaultToolBarWidth                         = 80;

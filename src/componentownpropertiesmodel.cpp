@@ -605,10 +605,10 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
         QString opType = Utils::parseType(opTypeAndValue, opReadOnly, opDefaultAlias, true);
 
         // Get Formula
-        bool opFormula = Utils::hasFormula(opTypeAndValue) > 0;
+        bool opFormula = Utils::hasFormula(opTypeAndValue) >= 0;
 
         // Get Property Bind
-        bool opBind = Utils::hasBinding(opTypeAndValue) > 0;
+        bool opBind = Utils::hasBinding(opTypeAndValue) >= 0;
 
         // Get Enum Values
         QString opEnumValues = Utils::parseEnumValuesToString(opTypeAndValue);

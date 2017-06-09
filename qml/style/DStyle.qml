@@ -104,6 +104,9 @@ QtObject {
     readonly property int fontSizeM:                        16
     readonly property int fontSizeL:                        20
     readonly property int fontSizeXL:                       28
+    readonly property int fontSizeXXL:                      36
+    readonly property int fontSizeXXXL:                     48
+    readonly property int fontSizeMFXL:                     72
 
     // Default Anim Duration
     readonly property int animDuration:                     200 * (settingsController.slowMotion ? 10 : 1)

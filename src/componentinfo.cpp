@@ -159,6 +159,9 @@ void ComponentInfo::clearIDMap()
 {
     // Clear ID Map
     mIDMap.clear();
+
+    // Emit Component ID Map Changed
+    emit componentIDMapChanged();
 }
 
 //==============================================================================
@@ -1038,6 +1041,28 @@ void ComponentInfo::setLayerVisible(const bool& aLayerVisible)
 }
 
 //==============================================================================
+// Get Component State
+//==============================================================================
+QString ComponentInfo::componentState()
+{
+    return componentProperty(JSON_KEY_COMPONENT_PROPERTY_STATE).toString();
+}
+
+//==============================================================================
+// Get Component State
+//==============================================================================
+void ComponentInfo::setComponentState(const QString& aState)
+{
+    // Check Component state
+    if (componentState() != aState) {
+        // Set Component State
+        setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_STATE, aState);
+        // Emit Component State Changed Signal
+        emit componentStateChanged(componentState());
+    }
+}
+
+//==============================================================================
 // Get Property Keys
 //==============================================================================
 QStringList ComponentInfo::componentOwnPropertyKeys()
@@ -1643,6 +1668,9 @@ void ComponentInfo::setChildObjectID(QObject* aObject, const QString& aID)
     if (!cidKey.isEmpty()) {
         // Remove Key
         rootInfo->mIDMap.remove(cidKey);
+
+        // Emit Component ID Map Changed Signal
+        emit componentIDMapChanged();
     }
 
     // Check ID
@@ -1658,6 +1686,9 @@ void ComponentInfo::setChildObjectID(QObject* aObject, const QString& aID)
 
         // Add Object ID
         rootInfo->mIDMap[aID] = aObject;
+
+        // Emit Component ID Map Changed Signal
+        emit componentIDMapChanged();
 
         //qDebug() << "ComponentInfo::setChildObjectID - mIDMap: " << mIDMap;
 
@@ -2567,6 +2598,8 @@ QString ComponentInfo::liveCodeFormatHooks(const QStringList& aOPHooks, const QS
         liveCode += QString("%1// Property Set Hook\n").arg(aIndent);
         // Init Property Update Hook Function Code
         QString propertyHooks = QString("%1function __setProperty(key, value) {\n").arg(aIndent);
+        // Add Console Log
+        propertyHooks += QString("%1%2console.log(\"__setProperty - key: \" + key + \" - value: \" + value);\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT);
         // Add Key Switch
         propertyHooks += QString("%1%2switch (key) {\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT);
         // Add Default Hook
@@ -2815,6 +2848,9 @@ QString ComponentInfo::liveCodeFormatTransitions(const QString& aIndent)
         // Add New Line
         liveCode += "\n";
 
+        // Add Comment
+        liveCode += QString("%1// Transitions\n").arg(aIndent);
+
         // Add To Live Code
         liveCode += QString("%1transitions: [").arg(aIndent);
 
@@ -2835,6 +2871,19 @@ QString ComponentInfo::liveCodeFormatTransitions(const QString& aIndent)
 
         // Add To Live Code
         liveCode += QString("%1]\n\n").arg(aIndent);
+    } else {
+
+        // TEMPORARY
+
+        // Check States
+        if (!mStates.isEmpty()) {
+
+            liveCode += QString("%1transitions: Transition {\n%1%2PropertyAnimation { properties: \"width, height\"; duration: %3 }\n%1}\n\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(200);
+
+        }
+
+        // TEMPORARY
+
     }
 
     return liveCode;

@@ -185,6 +185,9 @@
 // Initial Component JSON File Path
 #define DEFAULT_INITIAL_COMPONENTS_JSON_FILE                ":/assets/json/builtincomponents.json"
 
+// Filtered Properties
+#define DEFAULT_FILTERED_PROPERTIES                         "id,objectName,x,y,z,width,height,state,states,transitions,children"
+
 // Transition Types
 #define JSON_VALUE_TRANSITION_NODE_TYPE_PARALLEL            "parallel"
 #define JSON_VALUE_TRANSITION_NODE_TYPE_SQUENTIAL           "sequential"
@@ -285,6 +288,8 @@
 #define JSON_KEY_COMPONENT_PROPERTY_Z                       "z"
 #define JSON_KEY_COMPONENT_PROPERTY_WIDTH                   "width"
 #define JSON_KEY_COMPONENT_PROPERTY_HEIGHT                  "height"
+
+#define JSON_KEY_COMPONENT_PROPERTY_STATE                   "state"
 
 #define JSON_KEY_COMPONENT_PROPERTY_ANCHORS_FILL            "anchors.fill"
 #define JSON_KEY_COMPONENT_PROPERTY_ANCHORS_CENTERIN        "anchors.centerIn"

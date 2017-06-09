@@ -5,7 +5,7 @@ Loader {
     asynchronous: true
     active: false
 
-    onStatusChanged: {
-        //console.log("DLoader.onStatusChanged - status: " + status);
-    }
+//    onStatusChanged: {
+//        //console.log("DLoader.onStatusChanged - status: " + status);
+//    }
 }

@@ -226,6 +226,9 @@ private slots:
     // Component Opened Slot
     void componentOpened(ComponentInfo* aComponent);
 
+    // Live View Closed Slot
+    void liveViewClosed();
+
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
 

@@ -28,8 +28,12 @@ DMouseArea {
         height: parent.height
         anchors.left: parent.left
         anchors.leftMargin: DStyle.defaultMargin
+        anchors.right: parent.right
+        anchors.rightMargin: DStyle.defaultMargin * 2
 
         spacing: DStyle.defaultSpacing
+
+        clip: true
 
         DText {
             anchors.verticalCenter: parent.verticalCenter

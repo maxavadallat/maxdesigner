@@ -8,7 +8,7 @@ import "DConstants.js" as CONSTS
 DRectangle {
     id: stateSelectorRoot
 
-    width: 300
+    width: 400
     height: 96
 
     anchors.horizontalCenter: parent.horizontalCenter
@@ -24,7 +24,65 @@ DRectangle {
     property string selectedState: ""
 
     onComponentInfoChanged: {
+        //console.log("DStateSelector.onComponentInfoChanged - componentInfo: " + (componentInfo !== null ? componentInfo.componentName : "NULL"));
+
+        // Clear States
+        clearStates();
+        // Build States
+        buildStates();
+
         // ...
+    }
+
+    // Build States
+    function buildStates() {
+        // Check Component Info
+        if (stateSelectorRoot.componentInfo !== null) {
+            // Get States Count
+            var sCount = propertiesController.statesModel.rowCount();
+
+            // Add Empty State
+            statesModel.append({ "stateName": "" });
+
+
+            console.log("DStateSelector.buildStates - sCount: " + sCount);
+
+            // Iterate Through States
+            for (var i=0; i<sCount; i++) {
+                // Get Component State
+                var componentState = propertiesController.statesModel.getState(i);
+
+                // Add To States Model
+                statesModel.append({ "stateName": componentState.stateName });
+
+                // ...
+            }
+
+            // Get Current State
+            var currentState = stateSelectorRoot.componentInfo.componentState;
+
+            // Get States Model Count
+            var smCount = statesModel.count;
+
+            // Iterate Through States Model
+            for (var n=0; n<smCount; n++) {
+                // Get Model Data
+                var smData = statesModel.get(n);
+                // Check State Name
+                if (smData.stateName === currentState) {
+                    // Set Carousel Current Index
+                    stateCarousel.currentIndex = n;
+
+                    return;
+                }
+            }
+        }
+    }
+
+    // Clear States
+    function clearStates() {
+        // Clear States Model
+        statesModel.clear();
     }
 
     DMouseArea {
@@ -77,6 +135,8 @@ DRectangle {
         id: stateCarousel
 
         anchors.fill: parent
+        anchors.leftMargin: DStyle.defaultMargin * 4
+        anchors.rightMargin: DStyle.defaultMargin * 4
 
         itemScale: 0.3
         delegateScale: 0.3
@@ -85,23 +145,33 @@ DRectangle {
 
         model: statesModel
 
+        visible: statesModel.count > 1
+
         contentDelegate: DCarouselDelegate {
             itemTitle: itemData ? itemData.stateName : ""
 
             DRectangle {
                 anchors.fill: parent
-                color: Qt.hsla(Math.random(), Math.random(), 0.5, 0.5)
+                anchors.topMargin: DStyle.defaultMargin
+                anchors.bottomMargin: DStyle.defaultMargin
+                color: Qt.hsla(Math.random(), Math.random(), 0.5, 0.2)
             }
 
             DText {
                 anchors.centerIn: parent
-                text: itemData ? itemData.stateName : ""
+                text: itemData ? itemData.stateName.length > 0 ? itemData.stateName : "Default"  : ""
             }
         }
 
         onCurrentItemChanged: {
             // Set Selected State
-            stateSelectorRoot.selectedState = currentItem.itemData.stateName
+            stateSelectorRoot.selectedState = currentItem.itemData.stateName;
         }
+    }
+
+    DText {
+        anchors.centerIn: parent
+        text: "No States Defined"
+        visible: statesModel.count <= 1
     }
 }

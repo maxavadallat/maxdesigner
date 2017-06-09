@@ -78,7 +78,7 @@ DPaneBase {
         }
     }
 
-    // Check If Slot Source Valid
+    // Check If Slot Source Valid And Update Slot Source Property
     function slotSourceValid() {
         // Get Source Text
         var sText = slotSourceEditor.getText().trim();

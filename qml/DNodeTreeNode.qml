@@ -25,6 +25,7 @@ Item {
             }
         }
     }
+
     // Collapsed Height
     property int collapsedHeight: CONSTS.defaultNodeTreeItemHeight + DStyle.defaultSpacing
     // Expanded Height
@@ -36,7 +37,19 @@ Item {
     // Node is Root
     property bool rootNode: false
     // Node Title Text
-    property string title: componentInfo !== null ? ("[" + childIndex + "]: " + componentInfo.componentPath) : "Title test"
+    property string title: {
+        // Check Component Info
+        if (componentInfo !== null) {
+            // Check Component ID
+            if (componentInfo.componentID !== "") {
+                return componentInfo.componentID + ":" + componentInfo.componentName;
+            }
+
+            return componentInfo.componentName;
+        }
+
+        return "";
+    }
     // Node Child Index
     property int childIndex: -1
     // Node's Grabbed Child Index
@@ -227,9 +240,6 @@ Item {
     function buildNodeTree() {
         // Check Component Info
         if (nodeRoot.componentInfo !== null && nodeRoot.nodeTree !== null) {
-            // Set Title
-            //nodeRoot.title = nodeRoot.componentInfo.componentPath;
-
             // Get Children Count
             var cCount = nodeRoot.componentInfo.childCount;
 
@@ -265,7 +275,7 @@ Item {
             // Set Width
             newNode.width = Qt.binding(function() { return nodeRoot.width * CONSTS.defaultNodeScaleRatio; });
             // Set Anchor
-            newNode.anchors.right = newNode.parent.right;
+            newNode.anchors.right = childrenColumn.right;
             // Set Parent Node
             newNode.parentNode = nodeRoot;
             // Set Child Index
@@ -294,13 +304,9 @@ Item {
             // Set Width
             newNode.width = Qt.binding(function() { return nodeRoot.width * CONSTS.defaultNodeScaleRatio; });
             // Set Anchor
-            newNode.anchors.right = newNode.parent.right;
+            newNode.anchors.right = childrenColumn.right;
             // Set Parent Node
             newNode.parentNode = nodeRoot;
-            // Set Child Index
-            //newNode.childIndex = newNode.index;
-            // Hide Swipe
-            //newNode.hideSwipe();
 
             // Update Child Indexes
             updateChildIndexes(0);
@@ -817,6 +823,7 @@ Item {
     Column {
         id: childrenColumn
         width: parent.width
+        anchors.right: parent.right
         anchors.top: nodeContainer.bottom
 
         Repeater {

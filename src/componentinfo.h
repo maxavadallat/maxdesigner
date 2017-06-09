@@ -122,6 +122,9 @@ class ComponentInfo : public QObject
     // Layer/Component Visible
     Q_PROPERTY(bool layerVisible READ layerVisible WRITE setLayerVisible NOTIFY layerVisibleChanged)
 
+    // Component State
+    Q_PROPERTY(QString componentState READ componentState WRITE setComponentState NOTIFY componentStateChanged)
+
     // Component Dirty
     Q_PROPERTY(bool dirty READ getDirty NOTIFY dirtyChanged)
 
@@ -306,6 +309,11 @@ public:
     // Set Layer Visible
     void setLayerVisible(const bool& aLayerVisible);
 
+    // Get Component State
+    QString componentState();
+    // Get Component State
+    void setComponentState(const QString& aState);
+
     // Get Own Property Keys
     Q_INVOKABLE QStringList componentOwnPropertyKeys();
 
@@ -470,6 +478,9 @@ signals:
     // Use Implicit Size Changed Signal
     void useImplictSizeChanged(const bool& aUseImplicitSize);
 
+    // Component State Changed Signal
+    void componentStateChanged(const QString& aState);
+
     // Dirty Changed Signal
     void dirtyChanged(const bool& aDirty);
 
@@ -577,6 +588,9 @@ signals:
     void dynamicPropertiesChanged();
     // Request Close Container Signal
     void requestContainerClose();
+
+    // Components ID Map Has Changed
+    void componentIDMapChanged();
 
     // Need Refresh Live Code Signal
     void needRefresh();

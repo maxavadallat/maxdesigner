@@ -53,7 +53,7 @@ void PropertiesController::init()
     }
 
     // Set Filtered Properties
-    setFilteredProperties(QString("id,objectName,x,y,z,width,height,states,transitions,children").split(","));
+    setFilteredProperties(QString(DEFAULT_FILTERED_PROPERTIES).split(","));
     // Set Filtered Property Changes
     setFilteredPropertyChanges(QString("x,y,z").split(","));
 
@@ -898,13 +898,18 @@ void PropertiesController::clearComponentProperty(const QString& aName)
 
     // Check Component Properties Model
     if (mComponentProperties) {
+        // Get Current Property Value
+        QString currentValue = componentProperty(aName).toString();
         // Set Component Property Value
         if (mComponentProperties->clearComponentProperty(aName)) {
             qDebug() << "PropertiesController::clearComponentProperty - aName: " << aName << " - BASE";
             // Get Base Component Property
-            QVariant baseValue = componentProperty(aName);
-            // Emit Component Property Changed Signal
-            emit mFocusedComponent->componentPropertyChanged(aName, baseValue);
+            QString baseValue = componentProperty(aName).toString();
+            // Check Base Value
+            if (baseValue != currentValue) {
+                // Emit Component Property Changed Signal
+                emit mFocusedComponent->componentPropertyChanged(aName, baseValue);
+            }
             return;
         }
     }
