@@ -12,6 +12,17 @@
             }
         },
         {
+            "componentBase": "",
+            "componentBuiltIn": true,
+            "componentCategory": "Animation",
+            "componentName": "Animation",
+            "componentType": "BaseComponent",
+            "componentOwnProperties": {
+                "id": "string::::",
+                "objectName": "string::::"
+            }
+        },
+        {
             "componentBase": "QtObject",
             "componentBuiltIn": true,
             "componentCategory": "Visual",

@@ -14,6 +14,10 @@ DPaneBase {
 
     // Component Info
     property ComponentInfo componentInfo: null
+    // Component Yype
+    property string componentType: componentInfo ? componentInfo.componentType : ""
+    // Component Category
+    property string componentCategory: componentInfo ? componentInfo.componentCategory : ""
 
     // Open Files Model Connection
     property Connections openFilesModelConnection: Connections {
@@ -256,7 +260,7 @@ DPaneBase {
             crcRoot.rootComponentHandler.updateComponentInfoEnabled = (crcRoot.componentInfo !== null);
 
             // Check Component Info
-            if (crcRoot.componentInfo !== null) {
+            if (crcRoot.componentInfo !== null && crcRoot.componentInfo.componentType !== "DataSource") {
                 // Set Node Pane Loader Active
                 nodePaneLoader.active = true;
                 // Set Node Pane opacity
@@ -271,22 +275,32 @@ DPaneBase {
 
     onWidthChanged: {
         // Check Root Component Handler Component Object
-        if (rootComponentHandler.componentObject !== null) {
-            // Check Width
-            if (rootComponentHandler.componentObject.width !== crcRoot.width) {
-                // Set Width
-                rootComponentHandler.componentObject.width = crcRoot.width;
+        if (rootComponentHandler.componentObject !== null && rootComponentHandler.componentInfo !== null) {
+            // Check Type
+            if (crcRoot.componentCategory !== "NonVisual" && crcRoot.componentCategory !== "Animation") {
+                // Check Width
+                if (rootComponentHandler.componentObject.width !== crcRoot.width) {
+                    // Set Width
+                    rootComponentHandler.componentObject.width = crcRoot.width;
+                }
+            } else {
+
             }
         }
     }
 
     onHeightChanged: {
         // Check Root Component Handler Component Object
-        if (rootComponentHandler.componentObject !== null) {
-            // Check Height
-            if (rootComponentHandler.componentObject.height !== crcRoot.height) {
-                // Set Height
-                rootComponentHandler.componentObject.height = crcRoot.height;
+        if (rootComponentHandler.componentObject !== null && rootComponentHandler.componentInfo !== null) {
+            // Check Type
+            if (crcRoot.componentCategory !== "NonVisual" && crcRoot.componentCategory !== "Animation") {
+                // Check Height
+                if (rootComponentHandler.componentObject.height !== crcRoot.height) {
+                    // Set Height
+                    rootComponentHandler.componentObject.height = crcRoot.height;
+                }
+            } else {
+
             }
         }
     }
@@ -380,10 +394,13 @@ DPaneBase {
             // Set Compoennt Content Created
             crcRoot.componentContentCreated = true;
 
-            // Set Root Handler Width
-            rootComponentHandler.width = crcRoot.componentInfo.width;
-            // Set Root Component Handler Height
-            rootComponentHandler.height = crcRoot.componentInfo.height;
+            // Check Component Category
+            if (crcRoot.componentCategory !== "NonVisual" && crcRoot.componentCategory !== "Animation") {
+                // Set Root Handler Width
+                rootComponentHandler.width = crcRoot.componentInfo.width;
+                // Set Root Component Handler Height
+                rootComponentHandler.height = crcRoot.componentInfo.height;
+            }
 
             // Create New Root Object
             rootComponentHandler.componentObject = rootComponentHandler.createComponentObject(crcRoot.componentInfo, rootComponentHandler.rootContentContainer, true);
@@ -416,7 +433,7 @@ DPaneBase {
         if (parentHandler.componentObject !== null) {
 
             // Get Children Count
-            var cCount = parentHandler.componentObject.children.length;
+            var cCount = parentHandler.componentObject.children !== undefined ? parentHandler.componentObject.children.length : 0;
 
             //console.log("DComponentRootContainer.createComponentHandlers - cCount: " + cCount);
 
@@ -540,6 +557,8 @@ DPaneBase {
     // Root Component Handler
     DComponentHandler {
         id: rootComponentHandler
+        width: crcRoot.width
+        height: crcRoot.height
         rootContainer: crcRoot
         componentInfo: crcRoot.componentInfo
         enablePosOverlay: false

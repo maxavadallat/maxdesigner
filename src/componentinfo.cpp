@@ -295,9 +295,52 @@ bool ComponentInfo::save(const QString& aFilePath)
         // Reset Dirty
         setDirty(false);
 
+        // Check Component Type
+        if (mType == COMPONENT_TYPE_DATASOURCE) {
+            // Save Live Data Source
+            return saveLiveDataSource();
+        }
+
         return true;
     } else {
         qWarning() << "ComponentInfo::load - mInfoPath: " << mInfoPath << " - ERROR LOADING COMPONENT INFO!";
+    }
+
+    return false;
+}
+
+//==============================================================================
+// Save Live data Source
+//==============================================================================
+bool ComponentInfo::saveLiveDataSource()
+{
+    // Check Project Model
+    if (!mProject) {
+        return false;
+    }
+
+    // Check Type
+    if (mType != COMPONENT_TYPE_DATASOURCE) {
+        return false;
+    }
+
+    // Init Data Source File
+    QFile liveDataSourceFile(mProject->liveTempDir() + "/" + DEFAULT_PROJECT_DATASOURCES_DIR_NAME + "/" + mName + ".qml");
+
+    // Open Live Data Source File
+    if (liveDataSourceFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        // Init Text Stream
+        QTextStream textStream(&liveDataSourceFile);
+        // Generate Component Code
+        QString content = generateComponentCode();
+        // Add To Text Stream
+        textStream << content;
+        // Flush Text Stream
+        textStream.flush();
+        // Close Live Data Source File
+        liveDataSourceFile.close();
+
+        return true;
     }
 
     return false;
@@ -1832,6 +1875,7 @@ QString ComponentInfo::liveCodeFormatImports()
             liveCode += QString("import %1\n").arg(mImports[i].toString());
         }
     }
+
     // Add New Line
     liveCode += "\n";
 
@@ -1898,7 +1942,7 @@ QString ComponentInfo::liveCodeFormatPosition(const QString& aIndent)
     QString liveCode = "";
 
     // Check Component Category
-    if (mCategory != COMPONENT_CATEGORY_NONVISUAL) {
+    if (mCategory != COMPONENT_CATEGORY_NONVISUAL && mCategory != COMPONENT_CATEGORY_ANIMATION) {
         // Get Pos X
         QString cpX = posX();
         // Check Pos X
@@ -1936,7 +1980,7 @@ QString ComponentInfo::liveCodeFormatSize(const QString& aIndent)
     QString liveCode = "";
 
     // Check Component Category
-    if (mCategory != COMPONENT_CATEGORY_NONVISUAL) {
+    if (mCategory != COMPONENT_CATEGORY_NONVISUAL && mCategory != COMPONENT_CATEGORY_ANIMATION ) {
         // Get Width
         QString cWidth = width();
         // Check Width
@@ -2442,7 +2486,7 @@ QString ComponentInfo::liveCodeFormatSlots(const QStringList& aPCHookList,
     QString liveCode = "";
 
     // Init Used Property Change Hook Slot Names
-    QStringList upchListt = QStringList();
+    QStringList upchList = QStringList();
 
     // Check Slots
     if (!mSlots.isEmpty()) {
@@ -2482,13 +2526,21 @@ QString ComponentInfo::liveCodeFormatSlots(const QStringList& aPCHookList,
                 slotSource += slotObject.value(JSON_KEY_COMPONENT_SLOT_SOURCE).toString();
 
                 // Add To Used Property Change Hook List
-                upchListt << slotName;
+                upchList << slotName;
             } else {
+
                 // Get Source
                 slotSource = slotObject.value(JSON_KEY_COMPONENT_SLOT_SOURCE).toString();
+
             }
 
-            liveCode += QString("%1}\n").arg(aIndent);
+            // Add Slot Source
+            liveCode += slotSource.trimmed();
+            // Add Line Break;
+            liveCode += "\n";
+
+            // Add Closing Bracket
+            liveCode += QString("%1}\n\n").arg(aIndent);
         }
     }
 
@@ -2508,7 +2560,7 @@ QString ComponentInfo::liveCodeFormatSlots(const QStringList& aPCHookList,
             // Iterate Through Property Change Hook List
             for (int m=0; m<pchlCount; m++) {
                 // Check If Not Used Already
-                if (upchListt.indexOf(aPCHookList[m]) == -1) {
+                if (upchList.indexOf(aPCHookList[m]) == -1) {
                     // Get Property Name From Property Change Slot Name
                     QString pName = aPCHookList[m].mid(2);
                     // Lower Case First Char
@@ -3119,6 +3171,12 @@ QString ComponentInfo::generateComponentCode(const bool& aGenerateChildren)
     // Init Component Code
     QString componentCode = QString("// %1 Component\n").arg(mName);
 
+    // Check Type
+    if (mType == COMPONENT_TYPE_DATASOURCE) {
+        // Add Singleton Marker
+        componentCode += QString("pragma Singleton\n");
+    }
+
     // Add Imports =============================================================
 
     componentCode += liveCodeFormatImports();
@@ -3192,12 +3250,177 @@ QString ComponentInfo::generateComponentCode(const bool& aGenerateChildren)
 
     // =========================================================================
 
+    componentCode += QString("%1Component.onCompleted: {\n").arg(indent);
+    componentCode += QString("%1%1console.log(\"#### %2 onCompleted\");\n").arg(indent).arg(mName);
+    componentCode += QString("%1}\n\n").arg(indent);
+
+    componentCode += QString("%1Component.onDestruction: {\n").arg(indent);
+    componentCode += QString("%1%1console.log(\"#### %2 onDestruction\");\n").arg(indent).arg(mName);
+    componentCode += QString("%1}\n").arg(indent);
+
     // Add Closing Bracket
     componentCode += QString("}\n");
 
     // ...
 
     return componentCode;
+}
+
+//==============================================================================
+// Generate Data Source Live Code
+//==============================================================================
+QString ComponentInfo::generateDataSourceLiveCode()
+{
+    // Check Type
+    if (mType != COMPONENT_TYPE_DATASOURCE) {
+        return "";
+    }
+
+    qDebug() << "ComponentInfo::generateDataSourceLiveCode - mName: " << mName;
+
+    // Init Indent
+    QString indent = DEFAULT_SOURCE_INDENT;
+
+    // Init Live Code
+    QString liveCode = QString("// %1 Component Live Code\n").arg(mName);;
+
+    // Init Component Code
+    liveCode = liveCodeFormatImports();
+
+    // Add Data Sources Import =================================================
+
+    liveCode += QString("import datasources 0.1\n\n");
+
+    // Add Item As Name
+    liveCode += QString("Item {\n");
+
+    // Add Root ID =============================================================
+
+    // Get ID
+    QString idTemp = componentID();
+    // Check ID Temp
+    if (idTemp.isEmpty()) {
+        // Set ID Temp
+        idTemp = QString("%1LiveViewerRoot").arg(mName);
+        // Set First Char Lovercase
+        idTemp[0] = idTemp[0].toLower();
+    }
+
+    liveCode += QString("%1id: %2\n\n").arg(indent).arg(idTemp);
+
+    // Add Column For Properties ===============================================
+
+    liveCode += QString("%1Column {\n").arg(indent);
+    liveCode += QString("%1%1anchors.fill: parent\n").arg(indent);
+    liveCode += QString("%1%1anchors.margins: 16\n").arg(indent);
+    liveCode += QString("%1%1spacing: 16\n\n").arg(indent);
+
+    // Add Title
+
+    liveCode += QString("%1%1Text {\n").arg(indent);
+
+    liveCode += QString("%1%1%1font.pixelSize: 32\n").arg(indent);
+    liveCode += QString("%1%1%1color: \"#AAFFFFFF\"\n").arg(indent);
+
+    liveCode += QString("%1%1%1text: \"%2\"\n").arg(indent).arg(mName);
+
+    liveCode += QString("%1%1}\n\n").arg(indent);
+
+
+    // List Data Source Properties
+
+    // Get Property Keys
+    QStringList pKeys = componentOwnPropertyKeys();
+    // Get Filtered Property Keys
+    QStringList fpKeys = mProject->filteredProperties();
+    // Init Property Set Hooks
+    QStringList spHooks = QStringList();
+
+    // Get Property Keys Count
+    int pkCount = pKeys.count();
+
+    // Iterate Through Property Keys
+    for (int i=0; i<pkCount; i++) {
+        // Check Property Key
+        if (fpKeys.indexOf(pKeys[i]) == -1) {
+            // Get Property Value
+            QString pValue = propertyValue(pKeys[i], true).toString();
+            // Add Property To List
+
+            liveCode += QString("%1%1Text {\n").arg(indent);
+
+            liveCode += QString("%1%1%1font.pixelSize: 24\n").arg(indent);
+            liveCode += QString("%1%1%1color: \"#77FFFFFF\"\n").arg(indent);
+
+            liveCode += QString("%1%1%1text: \"%2: \" + %3.%2\n").arg(indent).arg(pKeys[i]).arg(mName);
+
+            // ...
+
+            liveCode += QString("%1%1}\n\n").arg(indent);
+
+            // Add Value Setting Hook
+            spHooks << QString("%1%1%1case \"%2\": %3.%2 = value; break;\n").arg(indent).arg(pKeys[i]).arg(mName);
+        }
+    }
+
+    // ...
+
+    // Closing Bracket For Column
+    liveCode += QString("%1}\n").arg(indent);
+
+    // ....
+
+    // Add Column For Signals ==================================================
+
+    // Add Column For Slots ====================================================
+
+    // Add Property Setting Hooks ==============================================
+
+    // Get Set Property Hook Count
+    int sphCount = spHooks.count();
+
+    // Check Set Property Hooks Count
+    if (sphCount > 0) {
+        // Add New Line
+        liveCode += "\n";
+        // Comment Line
+        liveCode += QString("%1// Property Set Hook\n").arg(indent);
+        // Init Property Update Hook Function Code
+        QString propertyHooks = QString("%1function __setProperty(key, value) {\n").arg(indent);
+        // Add Console Log
+        propertyHooks += QString("%1%1console.log(\"__setProperty - key: \" + key + \" - value: \" + value);\n").arg(indent);
+        // Add Key Switch
+        propertyHooks += QString("%1%1switch (key) {\n").arg(indent);
+        // Add Default Hook
+        propertyHooks += QString("%1%1%1default: console.log(\"__setProperty property:\" + key + \" IS NOT DEFINED!\"); break;\n").arg(indent);
+
+        // Iterate Through Own Property Value Hooks
+        for (int i=0; i<sphCount; i++) {
+            // Append Own Property Vlaue Hook
+            propertyHooks += spHooks[i];
+        }
+
+        // Add Switch Closing Bracket
+        propertyHooks += QString("%1%1}\n").arg(indent);
+        // Add Final Bracket
+        propertyHooks += QString("%1}\n").arg(indent);
+
+        // Append Property Hooks To Live Code
+        liveCode += propertyHooks;
+
+        // Add New Line
+        liveCode += "\n";
+
+    }
+
+    // Add Column For Functions ================================================
+
+    // ....
+
+    // Add Closing Bracket
+    liveCode += QString("}\n");
+
+    return liveCode;
 }
 
 //==============================================================================

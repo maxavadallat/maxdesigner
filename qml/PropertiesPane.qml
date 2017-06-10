@@ -39,7 +39,8 @@ DPane {
                 noFocusedComponentContainer.opacity = 0.0;
 
                 // Check Focused Component
-                if (propertiesController.focusedComponent.componentCategory === "NonVisual") {
+                if (propertiesController.focusedComponent.componentCategory === "NonVisual" ||
+                    propertiesController.focusedComponent.componentCategory === "Animation") {
                     // Hide Size And Pos Section
                     sizeAndPosSection.hide();
                     // Hide Anchors Section

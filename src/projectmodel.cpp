@@ -445,6 +445,16 @@ bool ProjectModel::initProject(const QString& aName, const QString& aDir)
             return false;
         }
 
+        // Init Live Data Sources Dir
+        QString liveDataSourcesDir = QString("%1/%2").arg(DEFAULT_PROJECT_LIVE_TEMP_DIR_NAME).arg(DEFAULT_PROJECT_DATASOURCES_DIR_NAME);
+
+        // Create Live Data Sources Dir
+        if (!pDir.exists(liveDataSourcesDir) && !pDir.mkdir(liveDataSourcesDir)) {
+            qWarning() << "ProjectModel::initProject - livetemp/datasources: " << liveDataSourcesDir << " - ERROR CREATING PATH!!";
+
+            return false;
+        }
+
         // Create Base Components Model
         createBaseComponentsModel();
         // Create Components Model
@@ -1543,10 +1553,10 @@ QString ProjectModel::generateLiveCode(ComponentInfo* aComponent, const bool& aG
     if (liveFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         // Init Text Stream
         QTextStream liveStream(&liveFile);
-
         // Write Content
         liveStream << aComponent->generateLiveCode(true, aGenerateChildren);
-
+        // Flush Stream
+        liveStream.flush();
         // Close File
         liveFile.close();
 
@@ -1554,8 +1564,6 @@ QString ProjectModel::generateLiveCode(ComponentInfo* aComponent, const bool& aG
     } else {
         qWarning() << "ProjectModel::generateLiveCode - fileName: " << fileName << " - CAN NOT OPEN FILE FOR WRITING";
     }
-
-    // ...
 
     return "";
 }
@@ -1593,10 +1601,10 @@ QString ProjectModel::generateComponentCode(ComponentInfo* aComponent, const boo
     if (componentFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         // Init Text Stream
         QTextStream componentStream(&componentFile);
-
         // Write Content
         componentStream << aComponent->generateComponentCode(aGenerateChildren);
-
+        // Flush Stream
+        componentStream.flush();
         // Close File
         componentFile.close();
 
@@ -1605,7 +1613,50 @@ QString ProjectModel::generateComponentCode(ComponentInfo* aComponent, const boo
         qWarning() << "ProjectModel::generateComponentCode - fileName: " << fileName << " - CAN NOT OPEN FILE FOR WRITING";
     }
 
-    // ...
+    return "";
+}
+
+//==============================================================================
+// Generate Data Source Component Live Code
+//==============================================================================
+QString ProjectModel::generateDataSourceLiveCode(ComponentInfo* aComponent)
+{
+    // Check Component
+    if (!aComponent) {
+        return "";
+    }
+
+    // Check If Data Source
+    if (aComponent->mType != COMPONENT_TYPE_DATASOURCE) {
+        return "";
+    }
+
+    // Get Component Name
+    QString componentName = QString("%1_%2").arg(aComponent->mName).arg(QDateTime::currentMSecsSinceEpoch());
+
+    qDebug() << "ProjectModel::generateDataSourceLiveCode - componentName: " << componentName;
+
+    // Init Live Code File Name
+    QString fileName = QString(DEFAULT_LIVE_FILE_NAME_PATTERN).arg(liveTempDir()).arg(componentName).arg(DEFAULT_QML_SUFFIX);
+
+    // Init Component Code File
+    QFile componentFile(fileName);
+
+    // Open File
+    if (componentFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        // Init Text Stream
+        QTextStream componentStream(&componentFile);
+        // Write Content
+        componentStream << aComponent->generateDataSourceLiveCode();
+        // Flush Stream
+        componentStream.flush();
+        // Close File
+        componentFile.close();
+
+        return fileName;
+    } else {
+        qWarning() << "ProjectModel::generateComponentCode - fileName: " << fileName << " - CAN NOT OPEN FILE FOR WRITING";
+    }
 
     return "";
 }

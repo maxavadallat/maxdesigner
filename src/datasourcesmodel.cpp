@@ -93,11 +93,14 @@ void DataSourcesModel::loadDataSources()
             // Create Data Source
             ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
             // Add Data Source
-            addDataSource(newComponent);
+            addDataSource(newComponent, false);
         } else {
             qDebug() << "DataSourcesModel::loadDataSources - itemName: " << itemName << " - Component Already Added.";
         }
     }
+
+    // Update Live Data Sources QML Dir
+    updateLiveDataSourcesQMLDir();
 }
 
 //==============================================================================
@@ -142,6 +145,48 @@ void DataSourcesModel::saveAllComponents()
 }
 
 //==============================================================================
+// Update Live Data Sources QML Dir
+//==============================================================================
+bool DataSourcesModel::updateLiveDataSourcesQMLDir()
+{
+    // Check Project Model
+    if (!mProjectModel)  {
+        return false;
+    }
+
+    // Init Live Data Sources QML Dir File Name
+    QString ldsQMLDirFileName = QString("%1/%2/qmldir").arg(mProjectModel->liveTempDir()).arg(DEFAULT_PROJECT_DATASOURCES_DIR_NAME);
+    // Init Live Data Sources QML Dir File
+    QFile ldsQMLDirFile(ldsQMLDirFileName);
+
+    // Open Live Data Sources QML Dir File
+    if (ldsQMLDirFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        // Init Text Stream
+        QTextStream textStream(&ldsQMLDirFile);
+        // Init Content
+        QString content = "";
+        // Get Data Sources Count
+        int dsCount = rowCount();
+        // Iterate Through Data Sources
+        for (int i=0; i<dsCount; i++) {
+            // Add Data Source
+            content += QString("singleton %1 0.1 %1.qml\n").arg(mDataSources.keys()[i]);
+        }
+
+        // Add To Text Stream
+        textStream << content;
+        // Flush Text Stream
+        textStream.flush();
+        // Close Live Data Sources QMLDir  File
+        ldsQMLDirFile.close();
+
+        return true;
+    }
+
+    return false;
+}
+
+//==============================================================================
 // Component Dirty State Changed Slot
 //==============================================================================
 void DataSourcesModel::componentDirtyChanged(const bool& aDirty)
@@ -182,7 +227,7 @@ void DataSourcesModel::setDataSourcesDir(const QString& aDirPath)
 //==============================================================================
 // Add Data Source
 //==============================================================================
-bool DataSourcesModel::addDataSource(ComponentInfo* aDataSource)
+bool DataSourcesModel::addDataSource(ComponentInfo* aDataSource, const bool& aUpdateLiveQMLDir)
 {
     // Check Data Source
     if (aDataSource) {
@@ -215,6 +260,12 @@ bool DataSourcesModel::addDataSource(ComponentInfo* aDataSource)
         // End Insert Rows
         endInsertRows();
 
+        // Check Update Live QML Dir
+        if (aUpdateLiveQMLDir) {
+            // Update Live Data Sources QML Dir
+            updateLiveDataSourcesQMLDir();
+        }
+
         return true;
     }
 
@@ -224,7 +275,7 @@ bool DataSourcesModel::addDataSource(ComponentInfo* aDataSource)
 //==============================================================================
 // Remove Data Source
 //==============================================================================
-bool DataSourcesModel::removeDataSource(const int& aIndex)
+bool DataSourcesModel::removeDataSource(const int& aIndex, const bool& aUpdateLiveQMLDir)
 {
     // Get Data Sources Count
     int dsCount = rowCount();
@@ -251,6 +302,12 @@ bool DataSourcesModel::removeDataSource(const int& aIndex)
         }
         // End Remove Rows
         endRemoveRows();
+
+        // Check Update Live QML Dir
+        if (aUpdateLiveQMLDir) {
+            // Update Live Data Sources QML Dir
+            updateLiveDataSourcesQMLDir();
+        }
 
         return true;
     }

@@ -12,15 +12,13 @@ DMouseArea {
 
     property int itemIndex: -1
 
-    property alias text: itemTextLabel.text
+    property string text: "option"
 
     property bool subMenuItem: false
 
     property bool selected: false
 
     property bool checked: false
-
-    property int textWidth: itemTextLabel.text !== "-" ? itemTextLabel.width : DStyle.defaultPopupWidth
 
     hoverEnabled: true
 
@@ -59,14 +57,14 @@ DMouseArea {
 
     DText {
         id: itemTextLabel
-        width: popupItemRoot.width - (checkedIndicator.visible ? height : DStyle.defaultMargin * 2)
-        height: popupItemRoot.height
+        width: popupItemRoot.width - (checkedIndicator.visible ? popupItemRoot.height : DStyle.defaultMargin * 2)
         anchors.left: parent.left
         anchors.leftMargin: DStyle.defaultMargin
         anchors.verticalCenter: parent.verticalCenter
         visible: text !== "-"
         elide: Text.ElideMiddle
         wrapMode: Text.NoWrap
+        text: popupItemRoot.text
     }
 
     DText {

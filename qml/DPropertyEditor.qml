@@ -135,6 +135,10 @@ DPaneBase {
         readOnlySwitch.checked = false;
         // Reset Default ALias Switch
         defaultAliasSwitch.checked = false;
+        // Reset Invalid Value
+        nameEditor.invalidValue = false;
+        // Reset Invalid Value
+        defaultOption.invalidValue = false;
 
         // ...
     }
@@ -147,6 +151,17 @@ DPaneBase {
             if (defaultEditor.editedText.length === 0) {
                 // Set Default Value Invalid
                 defaultEditor.invalidValue = true;
+
+                return false;
+            }
+        }
+
+        // Check Type Option
+        if (typeOption.currentIndex === 8) {
+            // Check Default Optin
+            if (defaultOption.count === 0) {
+                // Set Invalid Value
+                defaultOption.invalidValue = true;
 
                 return false;
             }
@@ -336,16 +351,16 @@ DPaneBase {
                 anchors.verticalCenter: parent.verticalCenter
 
                 model: [
-                    { text: CONSTS.propertyTypes[0] },
-                    { text: CONSTS.propertyTypes[1] },
-                    { text: CONSTS.propertyTypes[2] },
-                    { text: CONSTS.propertyTypes[3] },
-                    { text: CONSTS.propertyTypes[4] },
-                    { text: CONSTS.propertyTypes[5] },
-                    { text: CONSTS.propertyTypes[6] },
-                    { text: CONSTS.propertyTypes[7] },
-                    { text: CONSTS.propertyTypes[8] },
-                    { text: CONSTS.propertyTypes[9] }
+                    { text: CONSTS.propertyTypes[0], checked: false },
+                    { text: CONSTS.propertyTypes[1], checked: false },
+                    { text: CONSTS.propertyTypes[2], checked: false },
+                    { text: CONSTS.propertyTypes[3], checked: false },
+                    { text: CONSTS.propertyTypes[4], checked: false },
+                    { text: CONSTS.propertyTypes[5], checked: false },
+                    { text: CONSTS.propertyTypes[6], checked: false },
+                    { text: CONSTS.propertyTypes[7], checked: false },
+                    { text: CONSTS.propertyTypes[8], checked: false },
+                    { text: CONSTS.propertyTypes[9], checked: false }
                 ]
 
                 onZChanged: {
@@ -523,9 +538,9 @@ DPaneBase {
 
         DButton {
             id: addEnumValueButton
+            x: nameEditor.x
             width: nameEditor.width//enumValuesFlow.width
             height: typeOption.currentIndex === 8 ? CONSTS.defaultButtonHeight : 0
-            anchors.right: parent.right
             Behavior on height { DAnimation { } }
             visible: height > 0
             text: "Add Enum Value"
@@ -623,6 +638,13 @@ DPaneBase {
                             nameEditor.setEditorFocus(true, true);
                         break;
                     }
+                }
+
+                onCountChanged: {
+                    // Reset Invalid Value
+                    defaultOption.invalidValue = false;
+                    // Reset Invalid Value
+                    nameEditor.invalidValue = false;
                 }
             }
 

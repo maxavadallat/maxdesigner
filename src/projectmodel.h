@@ -198,6 +198,8 @@ public:
     Q_INVOKABLE QString generateLiveCode(ComponentInfo* aComponent, const bool& aGenerateChildren = false);
     // Generate Component Code For Live
     Q_INVOKABLE QString generateComponentCode(ComponentInfo* aComponent, const bool& aGenerateChildren = false);
+    // Generate Data Source Component Live Code
+    Q_INVOKABLE QString generateDataSourceLiveCode(ComponentInfo* aComponent);
     // Delete Live Code
     Q_INVOKABLE void removeLiveCode(const QString& aName);
     // Remove Live Temp File

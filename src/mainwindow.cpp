@@ -1225,7 +1225,7 @@ void MainWindow::createNewComponent(const QString& aName,
         } else if (aType == COMPONENT_TYPE_DATASOURCE) {
 
             // Create New Data Source
-            newComponent = mProjectModel->createDataSource(aName);
+            newComponent = mProjectModel->createDataSource(aName, "QtObject");
 
         } else {
             qWarning() << "MainWindow::createNewComponent - UNSUPPORTED COMPONENT TYPE!";
@@ -2190,8 +2190,9 @@ MainWindow::~MainWindow()
     // Clear QML Component Cache
     clearQMLComponentCache();
 
-    // Delete UI
+    // Delete Main Quick Widget
     delete ui->mainQuickWidget;
+    // Delete UI
     delete ui;
 
     // Release Settings

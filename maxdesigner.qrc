@@ -123,5 +123,6 @@
         <file>qml/DStateItem.qml</file>
         <file>qml/DTransitionItem.qml</file>
         <file>qml/DComponentHandler.qml</file>
+        <file>qml/assetBrowserMain.qml</file>
     </qresource>
 </RCC>

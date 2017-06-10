@@ -19,9 +19,9 @@ public:
     void setDataSourcesDir(const QString& aDirPath);
 
     // Add Data Source
-    bool addDataSource(ComponentInfo* aComponent);
+    bool addDataSource(ComponentInfo* aComponent, const bool& aUpdateLiveQMLDir = true);
     // Remove Data Source
-    bool removeDataSource(const int& aIndex);
+    bool removeDataSource(const int& aIndex, const bool& aUpdateLiveQMLDir = true);
 
     // Get Data Source Index By Name
     int getDataSourceIndex(const QString& aName);
@@ -50,6 +50,9 @@ protected:
 
     // Save All Components
     void saveAllComponents();
+
+    // Update Live Data Sources QML Dir
+    bool updateLiveDataSourcesQMLDir();
 
 protected slots:
     // Component Dirty State Changed Slot

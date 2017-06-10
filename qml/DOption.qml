@@ -28,6 +28,8 @@ DControl {
 
     property int optionOffset: currentIndex * (DStyle.popupItemHeight + 1) + DStyle.defaultMargin
 
+    property bool invalidValue: false
+
     state: stateClosed
 
     signal itemSelected(var itemIndex)
@@ -216,6 +218,7 @@ DControl {
     // Set Value
     function setValue(value) {
         //console.log("DOption.setValue - value: " + value);
+
         // Check If Option Init Completed
         if (optionRoot.optionInitCompleted) {
             // Iterate Through Model Items
@@ -246,7 +249,13 @@ DControl {
         width: optionRoot.width
         height: optionRoot.height
 
-        border.color: focus ? DStyle.colorBorder : DStyle.colorBorderNoFocus
+        border.color: {
+            if (optionRoot.invalidValue) {
+                return "red";
+            }
+
+            return focus ? DStyle.colorBorder : DStyle.colorBorderNoFocus;
+        }
 
         onFocusChanged: {
             if (!optionPopup.focus) {

@@ -385,10 +385,12 @@ public:
     Q_INVOKABLE void clearObjectID(const QString& aID);
     // Get Child Object By ID
     Q_INVOKABLE QObject* getChildObject(const QString& aID);
-        // Generate Live Code
+    // Generate Live Code
     Q_INVOKABLE QString generateLiveCode(const bool& aLiveRoot = true, const bool& aGenerateChildren = true, const QString& aIndent = "", const bool& aComponentCode = false);
-        // Generate Component Code
+    // Generate Component Code
     Q_INVOKABLE QString generateComponentCode(const bool& aGenerateChildren = true);
+    // Generate Data Source Live Code
+    Q_INVOKABLE QString generateDataSourceLiveCode();
 
     // Get Layout Base
     Q_INVOKABLE QString layoutBase();
@@ -633,6 +635,9 @@ protected:
     bool load(const QString& aFilePath = "", const bool aCreateChildren = true);
     // Save
     bool save(const QString& aFilePath = "");
+
+    // Save Live data Source
+    bool saveLiveDataSource();
 
     // Get JSON Object
     QJsonObject toJSONObject(const bool& aChild = false);

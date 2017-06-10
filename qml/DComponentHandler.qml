@@ -381,8 +381,11 @@ DMouseArea {
         onPosXChanged: {
             // Check Component Object Position
             if (chRoot.componentObject !== null && chRoot.componentObject.x !== aPosX && chRoot.updateComponentInfoEnabled) {
-                // Set Positin
-                chRoot.componentObject.x = aPosX;
+                // Check Component Category
+                if (chRoot.componentInfo.componentCategory !== "NonVisual" && chRoot.componentInfo.componentCategory !== "Animation") {
+                    // Set Positin
+                    chRoot.componentObject.x = aPosX;
+                }
             }
         }
 
@@ -390,8 +393,11 @@ DMouseArea {
         onPosYChanged: {
             // Check Component Object Position
             if (chRoot.componentObject !== null && chRoot.componentObject.y !== aPosY && chRoot.updateComponentInfoEnabled) {
-                // Set Positin
-                chRoot.componentObject.y = aPosY;
+                // Check Component Category
+                if (chRoot.componentInfo.componentCategory !== "NonVisual" && chRoot.componentInfo.componentCategory !== "Animation") {
+                    // Set Positin
+                    chRoot.componentObject.y = aPosY;
+                }
             }
         }
 
@@ -399,8 +405,11 @@ DMouseArea {
         onPosZChanged: {
             // Check Component Object Position
             if (chRoot.componentObject !== null && chRoot.componentObject.z !== aPosZ && chRoot.updateComponentInfoEnabled) {
-                // Set Positin
-                chRoot.componentObject.z = aPosZ;
+                // Check Component Category
+                if (chRoot.componentInfo.componentCategory !== "NonVisual" && chRoot.componentInfo.componentCategory !== "Animation") {
+                    // Set Positin
+                    chRoot.componentObject.z = aPosZ;
+                }
             }
         }
 
@@ -408,8 +417,11 @@ DMouseArea {
         onWidthChanged: {
             // Check Component Object Width
             if (chRoot.componentObject !== null && chRoot.componentObject.width !== aWidth && chRoot.updateComponentInfoEnabled) {
-                // Set Component Object Width
-                chRoot.componentObject.width = aWidth;
+                // Check Component Category
+                if (chRoot.componentInfo.componentCategory !== "NonVisual" && chRoot.componentInfo.componentCategory !== "Animation") {
+                    // Set Component Object Width
+                    chRoot.componentObject.width = aWidth;
+                }
 
                 // Check If Root
                 if (chRoot.componentInfo.isRoot) {
@@ -423,8 +435,11 @@ DMouseArea {
         onHeightChanged: {
             // Check Component Object Height
             if (chRoot.componentObject !== null && chRoot.componentObject.height !== aHeight && chRoot.updateComponentInfoEnabled) {
-                // Set Component Object Height
-                chRoot.componentObject.height = aHeight;
+                // Check Component Category
+                if (chRoot.componentInfo.componentCategory !== "NonVisual" && chRoot.componentInfo.componentCategory !== "Animation") {
+                    // Set Component Object Height
+                    chRoot.componentObject.height = aHeight;
+                }
 
                 // Check If Root
                 if (chRoot.componentInfo.isRoot) {
@@ -582,9 +597,8 @@ DMouseArea {
         // Component Property Changed Slot
         onComponentPropertyChanged: {
             // Check If Update Component Info Enabled
-            if (chRoot.updateComponentInfoEnabled) {
+            if (chRoot.updateComponentInfoEnabled && chRoot.componentObject) {
                 console.log("DComponentHandler.componentInfoConnections.onComponentPropertyChanged - aName: " + aName + " - aValue: " + aValue);
-
                 // Set Component Property
                 chRoot.componentObject.__setProperty(aName, aValue);
             }
@@ -597,6 +611,7 @@ DMouseArea {
     // Component Object Connections
     property Connections componentObjectConnections: Connections {
         target: componentObject
+        ignoreUnknownSignals: true
 
         onXChanged: {
             // Set Handler Pos X
@@ -657,6 +672,8 @@ DMouseArea {
     signal resizePressed()
 
     Component.onDestruction: {
+        //console.log("DComponentHandler.onDestruction");
+
         // Set Update Component Info Enabled
         chRoot.disableComponentInfoUpdates();
 
@@ -1156,8 +1173,17 @@ DMouseArea {
     function createComponentObject(componentInfo, parent, createChildren) {
         // Check Component Info
         if (componentInfo !== null) {
-            // Generate Live Code
-            var cFileName = propertiesController.currentProject.generateLiveCode(componentInfo, createChildren);
+            // Init Component File Name
+            var cFileName = "";
+
+            // Check Component Type
+            if (componentInfo.componentType === "DataSource") {
+                // Generate Data Source Live Code
+                cFileName = propertiesController.currentProject.generateDataSourceLiveCode(componentInfo);
+            } else {
+                // Generate Live Code
+                cFileName = propertiesController.currentProject.generateLiveCode(componentInfo, createChildren);
+            }
 
             // CLEAR THE FUCKING QML COMPONENT CACHE BECAUSE THEY FUCKED IT UP! BUT THIS WILL CAUSE A CRASH AT SHUTDOWN!!!
             mainController.clearQMLComponentCache();
