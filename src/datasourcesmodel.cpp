@@ -91,7 +91,7 @@ void DataSourcesModel::loadDataSources()
             QString itemPath = dsIterator.filePath();
             //qDebug() << "DataSourcesModel::loadDataSources - itemPath: " << itemPath;
             // Create Data Source
-            ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
+            ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel, false);
             // Add Data Source
             addDataSource(newComponent, false);
         } else {
@@ -135,12 +135,33 @@ void DataSourcesModel::saveAllComponents()
 {
     // Get Components Count
     int dsCount = rowCount();
-    // Iterate Through Base Components
+    // Iterate Through Data Sources Components
     for (int i=0; i<dsCount; i++) {
         // Get Component
         ComponentInfo* dataSource = mDataSources.value(mDataSources.keys()[i]);
         // Save
         dataSource->save();
+    }
+}
+
+//==============================================================================
+// Clear All Children
+//==============================================================================
+void DataSourcesModel::clearAllChildren(const bool& aClosing)
+{
+    // Get Base Components Count
+    int bcCount = rowCount();
+    // Iterate Through Base Components
+    for (int i=0; i<bcCount; i++) {
+        // Get Component
+        ComponentInfo* component = mDataSources.value(mDataSources.keys()[i]);
+        // Check Closing
+        if (aClosing) {
+            // Set Closing State
+            component->setClosing(aClosing);
+        }
+        // Clear Children
+        component->clearChildren();
     }
 }
 
@@ -349,7 +370,7 @@ ComponentInfo* DataSourcesModel::getDataSource(const QString& aName, const bool&
         qDebug() << "DataSourcesModel::getDataSource - dsFilePath: " << dsFilePath << " - Trying to Load...";
 
         // Try To Load Component From Info File
-        dsInfo = ComponentInfo::fromInfoFile(dsFilePath, mProjectModel);
+        dsInfo = ComponentInfo::fromInfoFile(dsFilePath, mProjectModel, false);
 
         // Check Data Source Info
         if (dsInfo) {

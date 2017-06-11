@@ -91,6 +91,8 @@ QtObject {
     readonly property int defaultMargin:                    8
     // Default Spacing
     readonly property int defaultSpacing:                   8
+    // Default Pane Separator Width
+    readonly property int defaultPaneSeparatorWidth:        12
     // Default Glow Radius
     readonly property int defaultGlowRadius:                24
     // Default Glow Samples

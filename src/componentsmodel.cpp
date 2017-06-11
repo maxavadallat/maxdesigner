@@ -88,7 +88,7 @@ void ComponentsModel::loadComponents()
             QString itemPath = cIterator.filePath();
             //qDebug() << "ComponentsModel::loadComponents - itemPath: " << itemPath;
             // Create New Component Info
-            ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
+            ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel, false);
             // Add Component
             addComponent(newComponent);
         } else {
@@ -135,6 +135,27 @@ void ComponentsModel::saveAllComponents()
         ComponentInfo* component = mComponents.value(mComponents.keys()[i]);
         // Save
         component->save();
+    }
+}
+
+//==============================================================================
+// Clear All Children
+//==============================================================================
+void ComponentsModel::clearAllChildren(const bool& aClosing)
+{
+    // Get Base Components Count
+    int bcCount = rowCount();
+    // Iterate Through Base Components
+    for (int i=0; i<bcCount; i++) {
+        // Get Component
+        ComponentInfo* component = mComponents.value(mComponents.keys()[i]);
+        // Check Closing
+        if (aClosing) {
+            // Set Closing
+            component->setClosing(aClosing);
+        }
+        // Clear Children
+        component->clearChildren();
     }
 }
 
@@ -288,7 +309,7 @@ ComponentInfo* ComponentsModel::getComponent(const QString& aName, const bool& a
         qDebug() << "ComponentsModel::getComponent - cFilePath: " << cFilePath << " - Trying to Load...";
 
         // Try To Load Component From Info File
-        cInfo = ComponentInfo::fromInfoFile(cFilePath, mProjectModel);
+        cInfo = ComponentInfo::fromInfoFile(cFilePath, mProjectModel, false);
 
         // Check Component Info
         if (cInfo) {

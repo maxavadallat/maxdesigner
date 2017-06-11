@@ -40,7 +40,9 @@ SOURCES             += src/settingscontroller.cpp \
                     src/componentfunctionsmodel.cpp \
                     src/componentslotsmodel.cpp \
                     src/componentimportsmodel.cpp \
-                    src/datasourcesmodel.cpp
+                    src/datasourcesmodel.cpp \
+                    src/assetlistmodel.cpp \
+                    src/assetstreemodel.cpp
 
 # Views/Dialog Sources
 SOURCES             += src/mainwindow.cpp \
@@ -54,7 +56,8 @@ SOURCES             += src/mainwindow.cpp \
                     src/createviewdialog.cpp \
                     src/qmleditorwindow.cpp \
                     src/resourceviewerdialog.cpp \
-                    src/createdatasourcedialog.cpp
+                    src/createdatasourcedialog.cpp \
+                    src/assetbrowserwindow.cpp
 
 # Headers
 HEADERS             += src/designerapplication.h \
@@ -91,7 +94,9 @@ HEADERS             += src/settingscontroller.h \
                     src/componentfunctionsmodel.h \
                     src/componentslotsmodel.h \
                     src/componentimportsmodel.h \
-                    src/datasourcesmodel.h
+                    src/datasourcesmodel.h \
+                    src/assetlistmodel.h \
+                    src/assetstreemodel.h
 
 # View/Dialog Headers
 HEADERS             += src/mainwindow.h \
@@ -105,7 +110,8 @@ HEADERS             += src/mainwindow.h \
                     src/createviewdialog.h \
                     src/qmleditorwindow.h \
                     src/resourceviewerdialog.h \
-                    src/createdatasourcedialog.h
+                    src/createdatasourcedialog.h \
+                    src/assetbrowserwindow.h
 
 # Forms
 FORMS               += ui/mainwindow.ui \
@@ -119,7 +125,8 @@ FORMS               += ui/mainwindow.ui \
                     ui/createviewdialog.ui \
                     ui/resourceviewerdialog.ui \
                     ui/livewindow.ui \
-                    ui/createdatasourcedialog.ui
+                    ui/createdatasourcedialog.ui \
+                    ui/assetbrowserwindow.ui
 
 # Resources
 RESOURCES           += maxdesigner.qrc \

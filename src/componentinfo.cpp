@@ -83,9 +83,11 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mImplicitWidth(false)
     , mImplicitHeight(false)
     , mFocused(false)
+    , mClosing(false)
     , mLayerVisible(true)
     , mIsRoot(true)
     , mGroupped(false)
+    , mChildrenLoaded(false)
     , mComponentHandler(NULL)
     , mBase(NULL)
     , mParent(NULL)
@@ -145,11 +147,19 @@ void ComponentInfo::clear()
 //==============================================================================
 void ComponentInfo::clearChildren()
 {
-    // Iterate Through Children
-    while (mChildComponents.count() > 0) {
-        // Delete Last
-        delete mChildComponents.takeLast();
+    // Check Child Component Count
+    if (mChildComponents.count() > 0) {
+        qDebug() << "#### ComponentInfo::clearChildren";
+
+        // Iterate Through Children
+        while (mChildComponents.count() > 0) {
+            // Delete Last
+            delete mChildComponents.takeLast();
+        }
     }
+
+    // Reset Children Loaded
+    setChildrenLoaded(false);
 }
 
 //==============================================================================
@@ -157,6 +167,8 @@ void ComponentInfo::clearChildren()
 //==============================================================================
 void ComponentInfo::clearIDMap()
 {
+    qDebug() << "ComponentInfo::clearIDMap";
+
     // Clear ID Map
     mIDMap.clear();
 
@@ -264,6 +276,9 @@ bool ComponentInfo::save(const QString& aFilePath)
         return false;
     }
 
+    // Save Children
+    saveChildren();
+
     // Init File Info
     QFileInfo fileInfo(aFilePath.isEmpty() ? mInfoPath : aFilePath);
     // Init File Info Dir
@@ -307,6 +322,104 @@ bool ComponentInfo::save(const QString& aFilePath)
     }
 
     return false;
+}
+
+//==============================================================================
+// Load Children
+//==============================================================================
+void ComponentInfo::loadChildren()
+{
+    // Check Children Loaded
+    if (!mChildrenLoaded) {
+        // Set Children Loaded
+        setChildrenLoaded(true);
+
+        // Get Children Array Count
+        int caCount = mChildren.count();
+
+        // Check To Create Children
+        if (caCount > 0) {
+            qDebug() << "#### ComponentInfo::loadChildren";
+
+            // Iterate Through Children Array
+            for (int i=0; i<caCount; i++) {
+                // Get Array Item
+                QJsonObject childObject = mChildren[i].toObject();
+
+                // Get Child Component Name
+                QString ccName = childObject[JSON_KEY_COMPONENT_NAME].toString();
+                // Get Child Component Type
+                QString ccType = childObject[JSON_KEY_COMPONENT_TYPE].toString();
+
+                // Get Child Compoennt ProtoType
+                ComponentInfo* componentProtoType = mProject ? mProject->getComponentByName(ccName, ccType, true) : NULL;
+
+                // Check Child Component
+                if (componentProtoType) {
+                    //qDebug() << "ComponentInfo::fromJSONObject - componentProtoType: " << componentProtoType->mName;
+                    // Clone Component
+                    ComponentInfo* childComponent = componentProtoType->clone();
+                    // Set Parent FIRST!!! Needed for the Recursive call of fromJSONObject
+                    childComponent->mParent = this;
+                    // Emit Depth Changed Signal
+                    emit childComponent->depthChanged(childComponent->depth());
+                    // Set Up/Update Child Component from JSON Object
+                    childComponent->fromJSONObject(childObject, true);
+                    // Add Child
+                    addChild(childComponent, true);
+
+                } else {
+                    qWarning() << "ComponentInfo::fromJSONObject - ccName: " << ccName << " - NO COMPONENT!!";
+                }
+            }
+        }
+    }
+}
+
+//==============================================================================
+// Save Children Components To Children JSON Array
+//==============================================================================
+void ComponentInfo::saveChildren()
+{
+    // Init New JSON Array
+    QJsonArray newChildArray;
+
+    // Get Children Components Count
+    int cCount = mChildComponents.count();
+
+    // Check Children JSON Array Count
+    if (mChildren.count() > 0 && !mChildrenLoaded && cCount > 0) {
+        qWarning() << "#### ComponentInfo::saveChildren - CHILD COMPOENNTS WERE NOT LOADED!!!";
+
+        // NEVER SHOULD GET HERE!!!
+
+        return;
+    }
+
+    qDebug() << "#### ComponentInfo::saveChildren";
+
+    // Iterate Through Children Array
+    for (int i=0; i<cCount; i++) {
+        // Append Child
+        newChildArray << mChildComponents[i]->toJSONObject(true);
+    }
+
+    // Set Children JSON Array
+    mChildren = newChildArray;
+}
+
+//==============================================================================
+// Set Children Loaded
+//==============================================================================
+void ComponentInfo::setChildrenLoaded(const bool& aChildrenLoaded)
+{
+    // Check Children Loaded
+    if (mChildrenLoaded != aChildrenLoaded) {
+        // Set Children Loaded
+        mChildrenLoaded = aChildrenLoaded;
+        // Emit Children Loaded Changed Signal
+        emit childrenLoadedChanged(mChildrenLoaded);
+    }
 }
 
 //==============================================================================
@@ -549,6 +662,28 @@ void ComponentInfo::setFocused(const bool& aFocused)
         mFocused = aFocused;
         // Emit Focused State Changed Signal
         emit focusedChanged(mFocused);
+    }
+}
+
+//==============================================================================
+// Get Closing State
+//==============================================================================
+bool ComponentInfo::closing()
+{
+    return mClosing;
+}
+
+//==============================================================================
+// Set Closing State
+//==============================================================================
+void ComponentInfo::setClosing(const bool& aClosing)
+{
+    // Check Closing State
+    if (mClosing != aClosing) {
+        // Set Closing State Changed
+        mClosing = aClosing;
+        // Emit Closing State Changed Signal
+        emit closingChanged(mClosing);
     }
 }
 
@@ -1451,22 +1586,13 @@ QJsonObject ComponentInfo::toJSONObject(const bool& aChild)
         ciObject[JSON_KEY_COMPONENT_TRANSITIONS] = mTransitions;
     }
 
-    // Get Children Count
-    int cCount = mChildComponents.count();
+    // Save Children
+    saveChildren();
 
-    // Check Children
-    if (cCount > 0) {
-        // Init Children Array
-        QJsonArray cArray;
-
-        // Iterate Through Children Array
-        for (int i=0; i<cCount; i++) {
-            // Append Child
-            cArray << mChildComponents[i]->toJSONObject(true);
-        }
-
+    // Check Child Array
+    if (!mChildren.isEmpty()) {
         // Save Children
-        ciObject[JSON_KEY_COMPONENT_CHILDREN] = cArray;
+        ciObject[JSON_KEY_COMPONENT_CHILDREN] = mChildren;
     }
 
     // ...
@@ -1582,43 +1708,14 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject, const bool aCreat
 
     // Children
     mChildren = aObject[JSON_KEY_COMPONENT_CHILDREN].toArray();
-    // Get Children Array Count
-    int caCount = mChildren.count();
 
-    // Check To Create Children
-    if (aCreateChildren && caCount > 0) {
-        // Iterate Through Children Array
-        for (int i=0; i<caCount; i++) {
-            // Get Array Item
-            QJsonObject childObject = mChildren[i].toObject();
-
-            // Get Child Component Name
-            QString ccName = childObject[JSON_KEY_COMPONENT_NAME].toString();
-            // Get Child Component Type
-            QString ccType = childObject[JSON_KEY_COMPONENT_TYPE].toString();
-
-            // Get Child Compoennt ProtoType
-            ComponentInfo* componentProtoType = mProject ? mProject->getComponentByName(ccName, ccType, true) : NULL;
-
-            // Check Child Component
-            if (componentProtoType) {
-                //qDebug() << "ComponentInfo::fromJSONObject - componentProtoType: " << componentProtoType->mName;
-                // Clone Component
-                ComponentInfo* childComponent = componentProtoType->clone();
-                // Set Parent FIRST!!! Needed for the Recursive call of fromJSONObject
-                childComponent->mParent = this;
-                // Emit Depth Changed Signal
-                emit childComponent->depthChanged(childComponent->depth());
-                // Set Up/Update Child Component from JSON Object
-                childComponent->fromJSONObject(childObject);
-                // Add Child
-                addChild(childComponent);
-
-            } else {
-                qWarning() << "ComponentInfo::fromJSONObject - ccName: " << ccName << " - NO COMPONENT!!";
-            }
-        }
+    // Check If Load Children
+    if (aCreateChildren) {
+        // Load Children
+        loadChildren();
     }
+
+    // ...
 }
 
 //==============================================================================
@@ -3251,11 +3348,11 @@ QString ComponentInfo::generateComponentCode(const bool& aGenerateChildren)
     // =========================================================================
 
     componentCode += QString("%1Component.onCompleted: {\n").arg(indent);
-    componentCode += QString("%1%1console.log(\"#### %2 onCompleted\");\n").arg(indent).arg(mName);
+    componentCode += QString("%1%1console.log(\"%2 onCompleted\");\n").arg(indent).arg(mName);
     componentCode += QString("%1}\n\n").arg(indent);
 
     componentCode += QString("%1Component.onDestruction: {\n").arg(indent);
-    componentCode += QString("%1%1console.log(\"#### %2 onDestruction\");\n").arg(indent).arg(mName);
+    componentCode += QString("%1%1console.log(\"%2 onDestruction\");\n").arg(indent).arg(mName);
     componentCode += QString("%1}\n").arg(indent);
 
     // Add Closing Bracket
@@ -3888,6 +3985,14 @@ bool ComponentInfo::propertyIsFormula(const QString& aName)
 }
 
 //==============================================================================
+// Get Children Loaded
+//==============================================================================
+bool ComponentInfo::childrenLoaded()
+{
+    return mChildrenLoaded;
+}
+
+//==============================================================================
 // Get Child Count
 //==============================================================================
 int ComponentInfo::childCount()
@@ -3965,7 +4070,7 @@ ComponentInfo* ComponentInfo::childInfo(const QString& aMap)
 //==============================================================================
 // Add Child
 //==============================================================================
-void ComponentInfo::addChild(ComponentInfo* aChild)
+void ComponentInfo::addChild(ComponentInfo* aChild, const bool& aLoadChildren)
 {
     // Check Child
     if (aChild) {
@@ -3980,8 +4085,11 @@ void ComponentInfo::addChild(ComponentInfo* aChild)
         mChildComponents << aChild;
         // Add ID To ID Map
         setChildObjectID(aChild, aChild->componentID());
-        // Set Dirty
-        setDirty(true);
+        // Check If Loading Children
+        if (!aLoadChildren) {
+            // Set Dirty
+            setDirty(true);
+        }
         // Emit Child Added
         emit childAdded(mChildComponents.count() - 1);
         // Emit Child Count Changed Signal

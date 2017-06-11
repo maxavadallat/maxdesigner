@@ -51,6 +51,9 @@ protected:
     // Save All Components
     void saveAllComponents();
 
+    // Clear All Children
+    void clearAllChildren(const bool& aClosing = false);
+
     // Update Live Data Sources QML Dir
     bool updateLiveDataSourcesQMLDir();
 

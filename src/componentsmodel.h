@@ -52,6 +52,9 @@ protected:
     // Save All Components
     void saveAllComponents();
 
+    // Clear All Children
+    void clearAllChildren(const bool& aClosing = false);
+
 protected slots:
     // Component Dirty State Changed Slot
     void componentDirtyChanged(const bool& aDirty);

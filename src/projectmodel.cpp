@@ -181,7 +181,7 @@ void ProjectModel::createInitialComponents()
             // Create New Component
             ComponentInfo* newComponent = new ComponentInfo("", "", "", this);
             // From JSON Object
-            newComponent->fromJSONObject(baseComponents[i].toObject());
+            newComponent->fromJSONObject(baseComponents[i].toObject(), false);
             // Set New Component ID
             newComponent->setComponentID(generateID(newComponent->mName));
 
@@ -203,7 +203,7 @@ void ProjectModel::createInitialComponents()
             // Create New Component
             ComponentInfo* newComponent = new ComponentInfo("", "", "", this);
             // From JSON Object
-            newComponent->fromJSONObject(components[i].toObject());
+            newComponent->fromJSONObject(components[i].toObject(), false);
             // Set New Component ID
             newComponent->setComponentID(generateID(newComponent->mName));
 
@@ -225,7 +225,7 @@ void ProjectModel::createInitialComponents()
             // Create New Component
             ComponentInfo* newComponent = new ComponentInfo("", "", "", this);
             // From JSON Object
-            newComponent->fromJSONObject(views[i].toObject());
+            newComponent->fromJSONObject(views[i].toObject(), false);
             // Set New Component ID
             newComponent->setComponentID(generateID(newComponent->mName));
             // Check Component Name For Main View
@@ -253,7 +253,7 @@ void ProjectModel::createInitialComponents()
             // Create New Component
             ComponentInfo* newComponent = new ComponentInfo("", "", "", this);
             // From JSON Object
-            newComponent->fromJSONObject(dataSources[i].toObject());
+            newComponent->fromJSONObject(dataSources[i].toObject(), false);
             // Set New Component ID
             newComponent->setComponentID(generateID(newComponent->mName));
 
@@ -378,6 +378,40 @@ void ProjectModel::updateBaseComponents()
     if (mDataSources) {
         // Update Base Components
         mDataSources->updateBaseComponents();
+    }
+
+    // ...
+}
+
+//==============================================================================
+// Clear All Children
+//==============================================================================
+void ProjectModel::clearAllChildren(const bool& aClosing)
+{
+    qDebug() << "ProjectModel::clearAllChildren";
+
+    // Check Base Components
+    if (mBaseComponents) {
+        // Clear All Children
+        mBaseComponents->clearAllChildren(aClosing);
+    }
+
+    // Check Components
+    if (mComponents) {
+        // Clear All Children
+        mComponents->clearAllChildren(aClosing);
+    }
+
+    // Check Views
+    if (mViews) {
+        // Clear All Children
+        mViews->clearAllChildren(aClosing);
+    }
+
+    // Check Data Sources
+    if (mDataSources) {
+        // Clear All Children
+        mDataSources->clearAllChildren(aClosing);
     }
 
     // ...

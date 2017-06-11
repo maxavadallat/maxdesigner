@@ -314,6 +314,9 @@ protected:
     // Update Base Components
     void updateBaseComponents();
 
+    // Clear All Children
+    void clearAllChildren(const bool& aClosing = false);
+
     // Generate Root ID From Name
     QString generateID(const QString& aName);
 

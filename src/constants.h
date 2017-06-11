@@ -13,7 +13,9 @@
 // Main Window QML Widget QML File
 #define DEFAULT_MAIN_QMLFILE_URL                            "qrc:/qml/main.qml"
 // Live Window QML Widget QML File
-#define DEFAULT_LIVE_QMLFILE_URL                            "qrc:/qml/liveMain.qml"
+#define DEFAULT_LIVE_QMLFILE_URL                            "qrc:/qml/live/liveMain.qml"
+// Asset Browser Window QML Widget QML File
+#define DEFAULT_ASSETBROWSER_QMLFILE_URL                    "qrc:/qml/assetbrowser/assetBrowserMain.qml"
 
 // Main Window QML Widget Custom Components Import URI
 #define DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS       "enginecomponents"
@@ -75,6 +77,8 @@
 #define DEFAULT_MAIN_CONTROLLER_NAME                        "mainController"
 // Live Window Controller Name
 #define DEFAULT_LIVE_CONTROLLER_NAME                        "liveController"
+// Asset Browser Controller
+#define DEFAULT_ASSET_BROWSER_CONTROLLER_NAME               "assetBrowserController"
 // Settings Controller Name
 #define DEFAULT_GLOBAL_SETTINGS_CONTROLLER                  "settingsController"
 // Properties Controller Name
@@ -88,12 +92,16 @@
 #define MODEL_NAME_VIEWS                                    "viewsModel"
 // Project Tree Item Model Name
 #define MODEL_NAME_PROJECT_TREE                             "projectTreeModel"
+// Assets Tree Item Model Name
+#define MODEL_NAME_ASSETS_TREE                              "assetsTreeModel"
 // Open Files List Model Name
 #define MODEL_NAME_OPEN_FILES                               "openFilesModel"
 // Open Files List Model Name
 #define MODEL_NAME_MINIMIZED_COMPONENTS                     "minimizedComponentsModel"
 // Open Project Model Name
 #define MODEL_NAME_RECENT_PROJECTS                          "recentProjectsModel"
+// Assets List Model Name
+#define MODEL_NAME_ASSETS_LIST                              "assetsListModel"
 
 // JSON File Extension
 #define DEFAULT_JSON_SUFFIX                                 "json"

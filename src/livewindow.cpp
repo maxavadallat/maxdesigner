@@ -317,7 +317,6 @@ void LiveWindow::on_actionClose_triggered()
     // ...
 
     // Normalize Window
-
     showNormal();
     // Close
     close();

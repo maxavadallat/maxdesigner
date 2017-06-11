@@ -24,7 +24,7 @@ QImage DesignerImageProvider::requestImage(const QString& aID, QSize* , const QS
     QFileInfo fileInfo(fileName);
 
     // Get Icon Image
-    QImage iconImage = mFileIconProvider.icon(fileInfo).pixmap(QSize(16, 16)).toImage();
+    QImage iconImage = mFileIconProvider.icon(fileInfo).pixmap(QSize(64, 64)).toImage();
 
     // Check Image
     if (!iconImage.isNull()) {

@@ -54,10 +54,14 @@ class ComponentInfo : public QObject
     Q_PROPERTY(bool protoType READ protoType NOTIFY protoTypeChanged)
     // Focused
     Q_PROPERTY(bool focused READ focused NOTIFY focusedChanged)
+    // Closing
+    Q_PROPERTY(bool closing READ closing WRITE setClosing NOTIFY closingChanged)
     // Is Root
     Q_PROPERTY(bool isRoot READ isRoot NOTIFY isRootChanged)
     // Built In
     Q_PROPERTY(bool builtIn READ builtIn NOTIFY builtInChanged)
+    // Children Loaded
+    Q_PROPERTY(bool childrenLoaded READ childrenLoaded NOTIFY childrenLoadedChanged)
     // Child Count
     Q_PROPERTY(int childCount READ childCount NOTIFY childCountChanged)
     // Child Depth
@@ -200,6 +204,11 @@ public:
     bool focused();
     // Set Focused State
     void setFocused(const bool& aFocused);
+
+    // Get Closing State
+    bool closing();
+    // Set Closing State
+    void setClosing(const bool& aClosing);
 
     // Get Is Root
     bool isRoot();
@@ -347,6 +356,12 @@ public:
     // Get Property Is Formula or Binding for Value
     Q_INVOKABLE bool propertyIsFormula(const QString& aName);
 
+    // Get Children Loaded
+    bool childrenLoaded();
+
+    // Load Children
+    Q_INVOKABLE void loadChildren();
+
     // Get Child Count
     int childCount();
     // Child Depth
@@ -358,7 +373,7 @@ public:
     Q_INVOKABLE ComponentInfo* childInfo(const QString& aMap);
 
     // Add Child
-    Q_INVOKABLE void addChild(ComponentInfo* aChild);
+    Q_INVOKABLE void addChild(ComponentInfo* aChild, const bool& aLoadChildren = false);
     // Insert Child
     Q_INVOKABLE void insertChild(const int& aIndex, ComponentInfo* aChild, const bool& aMove);
     // Take Child Info
@@ -427,10 +442,15 @@ signals:
     void infoPathChanged(const QString& aInfoPath);
     // Focused State Changed Signal
     void focusedChanged(const bool& aFocused);
+    // Closing State Changed Signal
+    void closingChanged(const bool& aClosing);
     // Is Root changed Signal
     void isRootChanged(const bool& aRoot);
     // Built In Changed Signal
     void builtInChanged(const bool& aBuiltIn);
+
+    // Children Loaded Changed Signal
+    void childrenLoadedChanged(const bool& aChildrenLoaded);
 
     // Child Count Changed Signal
     void childCountChanged(const int& aCount);
@@ -600,6 +620,7 @@ signals:
     // ...
 
 protected:
+    friend class OpenFilesModel;
     friend class ProjectModel;
     friend class BaseComponentsModel;
     friend class ComponentsModel;
@@ -635,6 +656,12 @@ protected:
     bool load(const QString& aFilePath = "", const bool aCreateChildren = true);
     // Save
     bool save(const QString& aFilePath = "");
+
+    // Save Children
+    void saveChildren();
+
+    // Set Children Loaded
+    void setChildrenLoaded(const bool& aChildrenLoaded);
 
     // Save Live data Source
     bool saveLiveDataSource();
@@ -809,6 +836,8 @@ protected: // Data
 
     // Focused State
     bool                    mFocused;
+    // Closing State
+    bool                    mClosing;
     // Layer Visible
     bool                    mLayerVisible;
     // Is Root
@@ -816,6 +845,9 @@ protected: // Data
 
     // Groupped
     bool                    mGroupped;
+
+    // Children Loaded
+    bool                    mChildrenLoaded;
 
     // QML Handler Object
     QObject*                mComponentHandler;

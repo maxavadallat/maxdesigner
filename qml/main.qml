@@ -2,9 +2,13 @@ import QtQuick 2.0
 
 import enginecomponents 0.1
 
-import "DConstants.js" as CONSTS
+import "system/DConstants.js" as CONSTS
 import "style"
 import "system"
+import "mainview"
+import "projectpane"
+import "propertiespane"
+import "controls"
 
 Item {
     id: mainRoot
@@ -40,6 +44,13 @@ Item {
     // Launch Component Root
     function launchComponentRoot(object, componentInfo, width, height) {
         //console.log("launchComponentRoot - componentName: " + componentInfo.componentName + " - width: " + width + " - height: " + height);
+
+        // Check If Children Loaded
+        if (componentInfo !== null && !componentInfo.childrenLoaded) {
+            // Load Children
+            componentInfo.loadChildren();
+        }
+
         // Set Component Info
         object.componentInfo = componentInfo;
 
@@ -260,6 +271,7 @@ Item {
                 if (component !== null) {
                     // Open Component
                     createNewComponentRoot(component, component.width, component.height);
+
                 } else {
                     // Open Other Files
 

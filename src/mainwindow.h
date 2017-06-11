@@ -31,6 +31,7 @@ class CreateViewDialog;
 class CreateDataSourceDialog;
 class LiveWindow;
 class MinimizedComponents;
+class AssetBrowserWindow;
 
 //==============================================================================
 // Main Window Class
@@ -82,6 +83,9 @@ public:
 
     // Launch Live Window
     Q_INVOKABLE void launchLiveWindow();
+
+    // Launch Asset Browser Window
+    Q_INVOKABLE void launchAssetBrowser();
 
     // Clear Component Cache
     Q_INVOKABLE void clearQMLComponentCache();
@@ -229,6 +233,9 @@ private slots:
     // Live View Closed Slot
     void liveViewClosed();
 
+    // Asset Browser Window Closed Slot
+    void assetBrowserClosed();
+
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
 
@@ -285,6 +292,8 @@ private slots:
     void on_actionShowComponentNames_triggered();
     // Action Slow Motion Triggered Slot
     void on_actionSlowMotion_triggered();
+    // On Show Asset Browser Action Triggered Slot
+    void on_actionShowAssetBrowser_triggered();
     // Action Quit Triggered Slot
     void on_actionQuit_triggered();
 
@@ -332,6 +341,8 @@ private:
     CreateDataSourceDialog*     mCreateDataSourceDialog;
     // Live Window
     LiveWindow*                 mLiveWindow;
+    // Asset Browser Window
+    AssetBrowserWindow*         mAssetBrowser;
 
     // Properties Controller
     PropertiesController*       mPropertiesController;

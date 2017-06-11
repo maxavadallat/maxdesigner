@@ -25,6 +25,7 @@
 #include "createviewdialog.h"
 #include "createdatasourcedialog.h"
 #include "livewindow.h"
+#include "assetbrowserwindow.h"
 
 #include "basecomponentsmodel.h"
 #include "componentsmodel.h"
@@ -77,6 +78,7 @@ MainWindow::MainWindow(QWidget* aParent)
     , mCreateViewDialog(NULL)
     , mCreateDataSourceDialog(NULL)
     , mLiveWindow(NULL)
+    , mAssetBrowser(NULL)
 
     , mPropertiesController(NULL)
 
@@ -90,10 +92,10 @@ MainWindow::MainWindow(QWidget* aParent)
     , mCurrentComponent(NULL)
     , mScreenShotMode(false)
 {
+    qDebug() << "MainWindow created.";
+
     // Setup UI
     ui->setupUi(this);
-
-    qDebug() << "MainWindow created.";
 
     // Init
     init();
@@ -1044,6 +1046,35 @@ void MainWindow::launchLiveWindow()
 }
 
 //==============================================================================
+// Launch Asset Browser Window
+//==============================================================================
+void MainWindow::launchAssetBrowser()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    if (!mPropertiesController) {
+        return;
+    }
+
+    // Check Asset Browser
+    if (!mAssetBrowser) {
+        // Create Asset Browser Window
+        mAssetBrowser = new AssetBrowserWindow(this, mProjectModel);
+
+        // Conenct Signal
+        connect(mAssetBrowser, SIGNAL(assetBrowserClosed()), this, SLOT(assetBrowserClosed()));
+
+        // ...
+    }
+
+    // Show Asset Browser Window
+    mAssetBrowser->show();
+}
+
+//==============================================================================
 // Clear Component Cache
 //==============================================================================
 void MainWindow::clearQMLComponentCache()
@@ -1471,7 +1502,7 @@ void MainWindow::closeProject()
 //==============================================================================
 void MainWindow::closeComponent()
 {
-    //qDebug() << "MainWindow::closeComponent";
+    qDebug() << "MainWindow::closeComponent";
 
     // Save Component
     saveComponent();
@@ -1483,6 +1514,14 @@ void MainWindow::closeComponent()
             // Reset Focused Component
             mPropertiesController->setFocusedComponent(NULL);
         }
+    }
+
+    // Check Current Component
+    if (mCurrentComponent) {
+        // Set Closing State
+        mCurrentComponent->setClosing(true);
+        // Clear Children
+        mCurrentComponent->clearChildren();
     }
 
     // Check Open Files Model
@@ -1497,7 +1536,7 @@ void MainWindow::closeComponent()
 //==============================================================================
 void MainWindow::closeAllComponents()
 {
-    //qDebug() << "MainWindow::closeAllComponents";
+    qDebug() << "MainWindow::closeAllComponents";
 
     // Save All Components
     saveAllComponents();
@@ -1509,6 +1548,12 @@ void MainWindow::closeAllComponents()
             // Reset Focused Component
             mPropertiesController->setFocusedComponent(NULL);
         }
+    }
+
+    // Check Project Model
+    if (mProjectModel) {
+        // Clear All Children
+        mProjectModel->clearAllChildren(true);
     }
 
     // Check Open Files Model
@@ -1885,6 +1930,27 @@ void MainWindow::liveViewClosed()
 }
 
 //==============================================================================
+// Asset Browser Window Closed Slot
+//==============================================================================
+void MainWindow::assetBrowserClosed()
+{
+    qDebug() << "MainWindow::assetBrowserClosed";
+
+    // Check Asset Browser
+    if (mAssetBrowser) {
+
+        // Disconenct Signal
+        disconnect(mAssetBrowser, SIGNAL(assetBrowserClosed()), this, SLOT(assetBrowserClosed()));
+
+        // ...
+
+        // Delete Asset Browser
+        delete mAssetBrowser;
+        mAssetBrowser = NULL;
+    }
+}
+
+//==============================================================================
 // Action About Triggered Slot
 //==============================================================================
 void MainWindow::on_actionAbout_triggered()
@@ -2114,6 +2180,15 @@ void MainWindow::on_actionSlowMotion_triggered()
 }
 
 //==============================================================================
+// On Show Asset Browser Action Triggered Slot
+//==============================================================================
+void MainWindow::on_actionShowAssetBrowser_triggered()
+{
+    // Launch Asset Browswr
+    launchAssetBrowser();
+}
+
+//==============================================================================
 // Action Quit Triggered Slot
 //==============================================================================
 void MainWindow::on_actionQuit_triggered()
@@ -2283,6 +2358,11 @@ MainWindow::~MainWindow()
     if (mLiveWindow) {
         delete mLiveWindow;
         mLiveWindow = NULL;
+    }
+
+    if (mAssetBrowser) {
+        delete mAssetBrowser;
+        mAssetBrowser = NULL;
     }
 
     // ...

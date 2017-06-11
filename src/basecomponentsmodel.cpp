@@ -104,6 +104,27 @@ void BaseComponentsModel::saveAllComponents()
 }
 
 //==============================================================================
+// Clear All Children
+//==============================================================================
+void BaseComponentsModel::clearAllChildren(const bool& aClosing)
+{
+    // Get Base Components Count
+    int bcCount = rowCount();
+    // Iterate Through Base Components
+    for (int i=0; i<bcCount; i++) {
+        // Get Component
+        ComponentInfo* baseComponent = mBaseComponents.value(mBaseComponents.keys()[i]);
+        // Check Closing State
+        if (aClosing) {
+            // Set Closing State
+            baseComponent->setClosing(aClosing);
+        }
+        // Clear Children
+        baseComponent->clearChildren();
+    }
+}
+
+//==============================================================================
 // Component Dirty State Changed Slot
 //==============================================================================
 void BaseComponentsModel::componentDirtyChanged(const bool& aDirty)
@@ -158,7 +179,7 @@ void BaseComponentsModel::loadBaseComponents()
             QString itemPath = bcIterator.filePath();
             //qDebug() << "BaseComponentsModel::loadBaseComponents - itemPath: " << itemPath;
             // Create Base Component
-            ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
+            ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel, false);
             // Add Base Component
             addBaseComponent(newComponent);
 
@@ -311,7 +332,7 @@ ComponentInfo* BaseComponentsModel::getComponent(const QString& aName, const boo
         qDebug() << "BaseComponentsModel::getComponent - bcFilePath: " << bcFilePath << " - Trying to Load...";
 
         // Try To Load Component From Info File
-        bcInfo = ComponentInfo::fromInfoFile(bcFilePath, mProjectModel);
+        bcInfo = ComponentInfo::fromInfoFile(bcFilePath, mProjectModel, false);
 
         // Check Base Component Info
         if (bcInfo) {

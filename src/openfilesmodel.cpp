@@ -360,6 +360,8 @@ void OpenFilesModel::openComponent(ComponentInfo* aComponent)
 
     // Check Component
     if (aComponent) {
+        // Load Children
+        aComponent->loadChildren();
         // Get Opened File Index
         cIndex = openFile(aComponent->infoPath(), true);
         // Open File

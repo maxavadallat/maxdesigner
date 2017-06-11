@@ -77,19 +77,28 @@ int CreateViewDialog::viewHeight()
 //==============================================================================
 void CreateViewDialog::reset()
 {
+    // Clear Editor
     ui->viewNameEdit->clear();
+    // Set Focus
     ui->viewNameEdit->setFocus();
 
+    // Clear Editor
     ui->widthEdit->clear();
+    // Clear Editor
     ui->heightEdit->clear();
 
+    // Set Current Index
     ui->baseTypeTab->setCurrentIndex(0);
 
-    ui->baseTypeComboBox->setCurrentText("");
-    ui->baseTypeComboBox->setCurrentIndex(-1);
+    //ui->baseTypeComboBox->setCurrentText("");
+    ui->baseTypeComboBox->setCurrentIndex(0);
+    // Set Current Text
+    ui->baseTypeComboBox->setCurrentText(mBaseComponents->data(mBaseComponents->index(0)).toString());
 
-    ui->componentTypeComboBox->setCurrentText("");
-    ui->componentTypeComboBox->setCurrentIndex(-1);
+    //ui->componentTypeComboBox->setCurrentText("");
+    ui->componentTypeComboBox->setCurrentIndex(0);
+    // Set Current Text
+    ui->componentTypeComboBox->setCurrentText(mComponents->data(mComponents->index(0)).toString());
 
     // ...
 }

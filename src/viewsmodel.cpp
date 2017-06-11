@@ -90,7 +90,7 @@ void ViewsModel::loadViews()
             QString itemPath = vIterator.filePath();
             //qDebug() << "ViewsModel::loadViews - itemPath: " << itemPath;
             // Create View Info
-            ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel);
+            ComponentInfo* newComponent = ComponentInfo::fromInfoFile(itemPath, mProjectModel, false);
             // Add View
             addView(newComponent);
         } else {
@@ -137,6 +137,27 @@ void ViewsModel::saveAllComponents()
         ComponentInfo* view = mViews.value(mViews.keys()[i]);
         // Save
         view->save();
+    }
+}
+
+//==============================================================================
+// Clear All Children
+//==============================================================================
+void ViewsModel::clearAllChildren(const bool& aClosing)
+{
+    // Get Base Components Count
+    int bcCount = rowCount();
+    // Iterate Through Base Components
+    for (int i=0; i<bcCount; i++) {
+        // Get Component
+        ComponentInfo* component = mViews.value(mViews.keys()[i]);
+        // Check Closing
+        if (aClosing) {
+            // Set Closing State
+            component->setClosing(aClosing);
+        }
+        // Clear Children
+        component->clearChildren();
     }
 }
 
@@ -290,7 +311,7 @@ ComponentInfo* ViewsModel::getView(const QString& aName, const bool& aPreload)
         qDebug() << "ViewsModel::getView - vFilePath: " << vFilePath << " - Trying to Load...";
 
         // Try To Load Component From Info File
-        vInfo = ComponentInfo::fromInfoFile(vFilePath, mProjectModel);
+        vInfo = ComponentInfo::fromInfoFile(vFilePath, mProjectModel, false);
 
         // Check Base Component Info
         if (vInfo) {

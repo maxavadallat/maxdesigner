@@ -93,7 +93,7 @@
     </property>
     <addaction name="actionPreferences"/>
     <addaction name="separator"/>
-    <addaction name="actionGenerateQMLSources"/>
+    <addaction name="actionGenerateSources"/>
     <addaction name="separator"/>
     <addaction name="actionSwitchMode"/>
     <addaction name="actionShowBorders"/>
@@ -103,6 +103,7 @@
     <addaction name="separator"/>
     <addaction name="actionGoLive"/>
     <addaction name="separator"/>
+    <addaction name="actionShowAssetBrowser"/>
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
@@ -296,12 +297,12 @@
     <string>Remove View</string>
    </property>
   </action>
-  <action name="actionGenerateQMLSources">
+  <action name="actionGenerateSources">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Generate QML Sources</string>
+    <string>Generate Sources</string>
    </property>
   </action>
   <action name="actionDefineBaseComponent">
@@ -538,6 +539,11 @@
    </property>
    <property name="shortcut">
     <string>Backspace, Del</string>
+   </property>
+  </action>
+  <action name="actionShowAssetBrowser">
+   <property name="text">
+    <string>Asset Browser</string>
    </property>
   </action>
  </widget>

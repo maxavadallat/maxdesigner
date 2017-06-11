@@ -125,15 +125,25 @@ void CreateComponentDialog::setBuiltInVisibility(const bool& aVisible)
 //==============================================================================
 void CreateComponentDialog::reset()
 {
+    // Clear Name Edit
     ui->componentNameEdit->clear();
+    // Set Focus
     ui->componentNameEdit->setFocus();
+    // Set Component's Tab Index
     ui->baseTypeTab->setCurrentIndex(0);
-    ui->baseTypeComboBox->setCurrentIndex(-1);
-    ui->baseTypeComboBox->setCurrentText("");
-    ui->componentTypeComboBox->setCurrentIndex(-1);
-    ui->componentTypeComboBox->setCurrentText("");
+    // Set Current Index
+    ui->baseTypeComboBox->setCurrentIndex(0);
+    // Set Current Text
+    ui->baseTypeComboBox->setCurrentText(mBaseComponents->data(mBaseComponents->index(0)).toString());
+    // Set Current Index
+    ui->componentTypeComboBox->setCurrentIndex(0);
+    // Set Current Text
+    ui->componentTypeComboBox->setCurrentText(mComponents->data(mComponents->index(0)).toString());
+    //ui->componentTypeComboBox->setCurrentText("");
     ui->categoryComboBox->setCurrentIndex(0);
+    // Set Current Text
     ui->categoryComboBox->setCurrentText(ui->categoryComboBox->itemData(0).toString());
+    // Reset Checked
     ui->buildInCheckBox->setChecked(false);
 }
 
