@@ -542,6 +542,12 @@ void MainWindow::openProject(const QString& aFilePath)
         ui->actionCreateNewDataSource->setEnabled(true);
         // Set Component Names Visible Menu Item
         ui->actionShowComponentNames->setEnabled(true);
+        // Set Show Borders Enabled
+        ui->actionShowBorders->setEnabled(true);
+        // Set Go Live Action Enabled
+        ui->actionGoLive->setEnabled(true);
+        // Set Show Asset Browser Action Enabled
+        ui->actionShowAssetBrowser->setEnabled(true);
 
         // Add Impor Path To Main Quick Widget
         ui->mainQuickWidget->engine()->addImportPath(mProjectModel->liveTempDir());
@@ -1009,6 +1015,16 @@ void MainWindow::launchCreateDataSource()
 }
 
 //==============================================================================
+// Launch Generate Sources
+//==============================================================================
+void MainWindow::launchGenerateSources()
+{
+    qDebug() << "MainWindow::launchGenerateSources";
+
+    // ...
+}
+
+//==============================================================================
 // Launch Live Window
 //==============================================================================
 void MainWindow::launchLiveWindow()
@@ -1195,6 +1211,12 @@ void MainWindow::createNewProject()
         ui->actionCreateNewDataSource->setEnabled(true);
         // Set Component Names Visible Menu Item
         ui->actionShowComponentNames->setEnabled(true);
+        // Set Show Borders Enabled
+        ui->actionShowBorders->setEnabled(true);
+        // Set Go Live Action Enabled
+        ui->actionGoLive->setEnabled(true);
+        // Set Show Asset Browser Action Enabled
+        ui->actionShowAssetBrowser->setEnabled(true);
 
         // Check Project Tree Model
         if (mProjectTreeModel) {
@@ -1481,6 +1503,7 @@ void MainWindow::closeProject()
     ui->actionCreateComponent->setEnabled(false);
     ui->actionCreateView->setEnabled(false);
     ui->actionShowComponentNames->setEnabled(false);
+    ui->actionShowBorders->setEnabled(false);
     ui->actionSaveComponent->setEnabled(false);
     ui->actionSaveAllComponents->setEnabled(false);
     ui->actionCloseComponent->setEnabled(false);
@@ -1493,6 +1516,7 @@ void MainWindow::closeProject()
     ui->actionRenameComponent->setEnabled(false);
     ui->actionRenameView->setEnabled(false);
     ui->actionGoLive->setEnabled(false);
+    ui->actionShowAssetBrowser->setEnabled(false);
 
     // ...
 }
@@ -2186,6 +2210,15 @@ void MainWindow::on_actionShowAssetBrowser_triggered()
 {
     // Launch Asset Browswr
     launchAssetBrowser();
+}
+
+//==============================================================================
+// On Generate Sources Action triggered Slot
+//==============================================================================
+void MainWindow::on_actionGenerateSources_triggered()
+{
+    // Launch Generate Sources
+    launchGenerateSources();
 }
 
 //==============================================================================

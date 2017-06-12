@@ -72,6 +72,15 @@ DContainer {
 //        demoComponentRootContainer.show();
     }
 
+//    DPaneSeparator {
+//        id: paneSeparatorVertical
+//        vertical: true
+//    }
+
+//    DPaneSeparator {
+//        id: paneSeparatorHorizontal
+//    }
+
 //    DRectangle {
 //        id: demoRectangle
 

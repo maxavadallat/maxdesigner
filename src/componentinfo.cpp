@@ -88,6 +88,7 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mIsRoot(true)
     , mGroupped(false)
     , mChildrenLoaded(false)
+    , mRefCount(0)
     , mComponentHandler(NULL)
     , mBase(NULL)
     , mParent(NULL)
@@ -3532,6 +3533,34 @@ QString ComponentInfo::layoutBase()
 
     // Init Layout Base Name
     return mBase ? mBase->layoutBase() : "";
+}
+
+//==============================================================================
+// Inc Reference Count
+//==============================================================================
+void ComponentInfo::incRefCount()
+{
+    // Decrease Child Reference Count
+    mRefCount++;
+
+    qDebug() << "ComponentInfo::incRefCount - mName: " << mName << " - mRefCount: " << mRefCount;
+}
+
+//==============================================================================
+// Release Ref Count
+//==============================================================================
+void ComponentInfo::releaseRef()
+{
+    // Decrease Child Reference Count
+    mRefCount--;
+
+    qDebug() << "ComponentInfo::releaseChildRef - mName: " << mName << " - mRefCount: " << mRefCount;
+
+    // Check Ref Count
+    if (mRefCount == 0) {
+        // Clear Children
+        clearChildren();
+    }
 }
 
 //==============================================================================

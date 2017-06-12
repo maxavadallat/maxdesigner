@@ -13,23 +13,11 @@ DControl {
     property alias model: treeView.model
     property alias delegate: treeView.itemDelegate
     property alias rootIndex: treeView.rootIndex
-
-//    function isExpanded(x, y) {
-//        var mi = treeView.indexAt(a, y);
-//        return treeView.isExpanded(mi);
-//    }
-
-//    function expand(x, y) {
-//        var mi = treeView.indexAt(a, y);
-//        treeView.expand(mi);
-//    }
-
-//    function collapse(x, y) {
-//        var mi = treeView.indexAt(a, y);
-//        treeView.collapse(mi);
-//    }
+    property alias treeFocus: treeView.focus
+    property alias currentIndex: treeView.currentIndex
 
     signal itemDoubleClicked(var index)
+    signal itemClicked(var index)
 
     // Collapse All Items
     function collapseAll() {
@@ -41,25 +29,36 @@ DControl {
     TreeView {
         id: treeView
         anchors.fill: parent
+
         alternatingRowColors: false
         backgroundVisible: false
         headerVisible: false
+
         horizontalScrollBarPolicy: Qt.ScrollBarAsNeeded
         verticalScrollBarPolicy: Qt.ScrollBarAsNeeded
+        selectionMode: SelectionMode.SingleSelection
 
         style: TreeViewStyle {
             backgroundColor: "transparent"
             transientScrollBars: true
+
             frame: Item { }
+
             rowDelegate: Rectangle {
                 height: DStyle.listItemHeight
                 color: styleData.selected ? DStyle.colorSelectedHighLight : "transparent"
             }
+
             highlightedTextColor: DStyle.colorBorder
         }
 
         onCurrentIndexChanged: {
             //console.log("DTreeView.treeView.onCurrentIndexChanged - currentIndex: " + currentIndex);
+
+        }
+
+        onClicked: {
+            treeRoot.itemClicked(index);
         }
 
         onDoubleClicked: {
@@ -79,6 +78,7 @@ DControl {
         TableViewColumn {
             role: "filePath"
             width: treeView.contentItem.width
+            elideMode: Text.ElideMiddle
         }
     }
 

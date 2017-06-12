@@ -97,13 +97,14 @@
     <addaction name="separator"/>
     <addaction name="actionSwitchMode"/>
     <addaction name="actionShowBorders"/>
-    <addaction name="actionShowTracers"/>
     <addaction name="actionShowComponentNames"/>
+    <addaction name="actionShowTracers"/>
     <addaction name="actionSlowMotion"/>
+    <addaction name="separator"/>
+    <addaction name="actionShowAssetBrowser"/>
     <addaction name="separator"/>
     <addaction name="actionGoLive"/>
     <addaction name="separator"/>
-    <addaction name="actionShowAssetBrowser"/>
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
@@ -407,7 +408,7 @@
   </action>
   <action name="actionShowComponentNames">
    <property name="enabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>Show Component Names</string>
@@ -479,6 +480,9 @@
    </property>
   </action>
   <action name="actionShowBorders">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Show Borders</string>
    </property>
@@ -542,8 +546,14 @@
    </property>
   </action>
   <action name="actionShowAssetBrowser">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Asset Browser</string>
+   </property>
+   <property name="shortcut">
+    <string>F8</string>
    </property>
   </action>
  </widget>

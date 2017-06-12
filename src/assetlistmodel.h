@@ -16,12 +16,21 @@ class AssetListModel : public QAbstractListModel
 
 public:
     // Constructor
-    explicit AssetListModel(QObject* aParent = NULL);
+    explicit AssetListModel(const QString& aAssetsDir = "", QObject* aParent = NULL);
+
+    // Set Assets Dir
+    void setAssetsDir(const QString& aAssetsDir);
 
     // Get Current Dir
     QString currentDir();
     // Set Current Dir
     void setCurrentDir(const QString& aCurrentDir);
+
+    // Get Index By Name
+    Q_INVOKABLE int getIndexByName(const QString& aName);
+
+    // Get File Path By Index
+    Q_INVOKABLE QString getPathByIndex(const int& aIndex);
 
     // Destructor
     ~AssetListModel();
@@ -41,6 +50,10 @@ protected:
     // Load Assets
     void loadAssets();
 
+protected slots:
+    // Assets Dir Update
+    void assetsDirUpdate(const QString& aAssetsDir);
+
 public: // from QAbstractListModel
     // Row Count
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
@@ -59,6 +72,8 @@ protected: // Data
         EALRIsDir
     };
 
+    // Assets Dir
+    QString         mAssetsDir;
     // Current Dir
     QString         mCurrentDir;
     // File Info List

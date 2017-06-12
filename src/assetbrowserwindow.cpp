@@ -23,6 +23,9 @@ AssetBrowserWindow::AssetBrowserWindow(MainWindow* aMainWindow, ProjectModel* aP
     , mSettings(SettingsController::getInstance())
     , mAssetsTreeModel(NULL)
     , mAssetListModel(NULL)
+    , mCurrentDir("")
+    , mLastDirName("")
+    , mSelectedAsset("")
 {
     qDebug() << "AssetBrowserWindow created.";
 
@@ -45,16 +48,27 @@ void AssetBrowserWindow::init()
     if (!mAssetsTreeModel) {
         // Create Assets Tree Model
         mAssetsTreeModel = new AssetsTreeModel();
-
-        // ...
     }
 
     // Check Asset List Model
     if (!mAssetListModel) {
         // Create Assrt List Model
         mAssetListModel = new AssetListModel();
+    }
 
-        // ...
+    // Init Current File Info
+    mCurrentFileInfo = mProjectModel ? mProjectModel->assetsDir() : QFileInfo(QDir::homePath());
+    // Set Current Dir
+    mCurrentDir = mCurrentFileInfo.absoluteFilePath();
+    // Set Last Dir Name
+    mLastDirName = mCurrentFileInfo.fileName();
+
+    // Check Project Model
+    if (mProjectModel) {
+        // Set Current Path For Tree Model
+        mAssetsTreeModel->setCurrentPath(mProjectModel->assetsDir());
+        // Set Assets Dir
+        mAssetListModel->setAssetsDir(mProjectModel->assetsDir());
     }
 
     // Set Context Properties
@@ -87,9 +101,6 @@ void AssetBrowserWindow::init()
     // Set Focuse Policy
     ui->assetsQuickWidget->setFocusPolicy(Qt::StrongFocus);
 
-    // Grab Keyboard
-    //grabKeyboard();
-
     // ...
 
 }
@@ -101,11 +112,14 @@ void AssetBrowserWindow::restoreUI()
 {
     qDebug() << "AssetBrowserWindow::restoreUI";
 
+    // Set Window Title
+    setWindowTitle(QString("Asset Browser - %1").arg(mCurrentDir));
+
     // ...
 
-    // Set Current Dir
+    // Set Last Width & Height
 
-    // Check Project Model
+    //
 
 
 }
@@ -117,26 +131,95 @@ void AssetBrowserWindow::shutDown()
 {
     qDebug() << "AssetBrowserWindow::shutDown";
 
-    // Release Keyboard
-    releaseKeyboard();
-
     // ...
+}
+
+//==============================================================================
+// Close Window
+//==============================================================================
+void AssetBrowserWindow::closeWindow()
+{
+    // ...
+
+    // Normalize Window
+    showNormal();
+    // Close
+    close();
+}
+
+//==============================================================================
+// Set Assets Dir
+//==============================================================================
+void AssetBrowserWindow::setAssetsDir(const QString& aAssetsDir)
+{
+    // Check Asset Tree Model
+    if (mAssetsTreeModel) {
+        // Set Current Path
+        mAssetsTreeModel->setCurrentPath(aAssetsDir);
+    }
+
+    // Check Assets List Model
+    if (mAssetListModel) {
+        // Set Assets Dir
+        mAssetListModel->setAssetsDir(aAssetsDir);
+    }
 }
 
 //==============================================================================
 // Get Selected File
 //==============================================================================
-QString AssetBrowserWindow::selectedFile()
+QString AssetBrowserWindow::currentFile()
 {
-    return "";
+    return mCurrentFileInfo.absoluteFilePath();
 }
 
 //==============================================================================
 // Set Selected File
 //==============================================================================
-void AssetBrowserWindow::setSelectedFile(const QString& aFilePath)
+void AssetBrowserWindow::setCurrentFile(const QString& aFilePath)
 {
+    // Init Clean Path
+    QString cleanPath = QDir::cleanPath(aFilePath);
 
+    // Check Current File Info
+    if (mCurrentFileInfo.absoluteFilePath() != cleanPath) {
+        qDebug() << "AssetBrowserWindow::setCurrentFile - cleanPath: " << cleanPath;
+
+        // Set Current File Info
+        mCurrentFileInfo = QFileInfo(cleanPath);
+        // Emit Current File Changed Signal
+        emit currentFileChanged(mCurrentFileInfo.absoluteFilePath());
+        // Emit Current name Changed Signal
+        emit currentNameChanged(currentName());
+        // Emit Current Size Changed
+        emit currentSizeChanged(currentSize());
+        // Emit Current Is Dir Changed Signal
+        emit currentIsDirChanged(currentIsDir());
+    }
+}
+
+//==============================================================================
+// Get Current Name
+//==============================================================================
+QString AssetBrowserWindow::currentName()
+{
+    return mCurrentFileInfo.fileName();
+}
+
+//==============================================================================
+// Get Current File Size
+//==============================================================================
+int AssetBrowserWindow::currentSize()
+{
+    return mCurrentFileInfo.size() / 1024;
+}
+
+//==============================================================================
+// Get Current File Is Dir
+//==============================================================================
+bool AssetBrowserWindow::currentIsDir()
+{
+    return mCurrentFileInfo.isDir();
 }
 
 //==============================================================================
@@ -152,17 +235,72 @@ QString AssetBrowserWindow::currentDir()
 //==============================================================================
 void AssetBrowserWindow::setCurrentDir(const QString& aCurrentDir)
 {
-    // Check Assets Tree Model
-    if (mAssetsTreeModel) {
-        // Set Current Dir
-        mAssetsTreeModel->setCurrentPath(aCurrentDir);
+    // Init Clean Path
+    QString cleanPath = QDir::cleanPath(aCurrentDir);
+    // Check Clean Path
+    if (cleanPath == "/.."){
+        // Adjust Clean Path
+        cleanPath = "/";
     }
 
-    // Check Assets List Model
-    if (mAssetListModel) {
+    // Check Current Dir
+    if (mCurrentDir != cleanPath) {
+        qDebug() << "AssetBrowserWindow::setCurrentDir - cleanPath: " << cleanPath;
+
+        // Set Last Dir Name
+        mLastDirName = QFileInfo(mCurrentDir).fileName();
+
+        // Emit Last Dir Name Changed Signal
+        emit lastDirNameChanged(mLastDirName);
+
         // Set Current Dir
-        mAssetListModel->setCurrentDir(aCurrentDir);
+        mCurrentDir = cleanPath;
+
+        // Set Window Title
+        setWindowTitle(QString("Asset Browser - %1").arg(mCurrentDir));
+
+    //    // Check Assets Tree Model
+    //    if (mAssetsTreeModel) {
+    //        // Set Current Dir
+    //        mAssetsTreeModel->setCurrentPath(aCurrentDir);
+    //    }
+
+        // Check Assets List Model
+        if (mAssetListModel) {
+            // Set Current Dir
+            mAssetListModel->setCurrentDir(mCurrentDir);
+        }
+
+        // ...
+
+        // Emit Current Dir Changed
+        emit currentDirChanged(mCurrentDir);
     }
+}
+
+//==============================================================================
+// Get Last Dir Name
+//==============================================================================
+QString AssetBrowserWindow::lastDirName()
+{
+    return mLastDirName;
+}
+
+//==============================================================================
+// Asset Item Selected Callback
+//==============================================================================
+void AssetBrowserWindow::assetItemSelected(const QString& aAssetPath)
+{
+    // Set Selected Asset
+    mSelectedAsset = aAssetPath;
+
+    qDebug() << "AssetBrowserWindow::assetItemSelected - mSelectedAsset: " << mSelectedAsset;
+
+    // Emit Asset Selected Signal
+    emit assetSelected(mSelectedAsset);
+
+    // Close Window
+    closeWindow();
 
     // ...
 }
@@ -211,12 +349,11 @@ void AssetBrowserWindow::projectAssetsDirChanged(const QString& aAssetsDir)
 //==============================================================================
 void AssetBrowserWindow::on_actionClose_triggered()
 {
-    // ...
+    // Clear Selected Assetd
+    mSelectedAsset = "";
 
-    // Normalize Window
-    showNormal();
-    // Close
-    close();
+    // Close Window
+    closeWindow();
 }
 
 //==============================================================================

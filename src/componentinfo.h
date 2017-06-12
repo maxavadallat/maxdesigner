@@ -774,6 +774,11 @@ protected:
     // Generate Enum Value Live Code Cases
     QStringList liveCodeGenerateEnumValueCases(const QStringList& aEnumValues, const QString& aIndent = "");
 
+    // Inc Reference Count
+    void incRefCount();
+    // Release Ref Count From Child
+    void releaseRef();
+
 protected slots:
     // Base Components Dir Changed Slot
     void baseComponentsDirChanged(const QString& aBaseComponentsDir);
@@ -848,6 +853,9 @@ protected: // Data
 
     // Children Loaded
     bool                    mChildrenLoaded;
+
+    // Reference Count For Children
+    int                     mRefCount;
 
     // QML Handler Object
     QObject*                mComponentHandler;

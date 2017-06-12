@@ -1,7 +1,5 @@
 import QtQuick 2.0
 
-//import enginecomponents 0.1
-
 import "../style"
 import "../system/DConstants.js" as CONSTS
 import "../controls"
@@ -38,15 +36,6 @@ DMouseArea {
         // Reset Drag Target
         drag.target = undefined;
     }
-
-
-    Rectangle {
-        anchors.fill: parent
-        color: "transparent"
-        border.color: DStyle.colorBorderTransparent
-    }
-
-    // ...
 
     DText {
         anchors.centerIn: parent

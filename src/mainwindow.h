@@ -142,6 +142,8 @@ private:
     void launchCreateView();
     // Launch Create Data Source
     void launchCreateDataSource();
+    // Launch Generate Sources
+    void launchGenerateSources();
 
     // Toggle Show Tracers
     void toggleShowTracers();
@@ -296,6 +298,8 @@ private slots:
     void on_actionShowAssetBrowser_triggered();
     // Action Quit Triggered Slot
     void on_actionQuit_triggered();
+    // On Generate Sources Action triggered Slot
+    void on_actionGenerateSources_triggered();
 
 protected: // from QMainWindow
     // Key Release Event

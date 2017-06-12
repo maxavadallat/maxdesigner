@@ -27,6 +27,9 @@ public:
     // Get Root Index
     QModelIndex rootIndex();
 
+    // Get Index By Path
+    Q_INVOKABLE QModelIndex getIndexByPath(const QString& aFilePath);
+
     // Get Path By Index
     Q_INVOKABLE QString getPathByIndex(const QModelIndex& aIndex);
 

@@ -92,6 +92,14 @@ QModelIndex AssetsTreeModel::rootIndex()
 }
 
 //==============================================================================
+// Get Index By Path
+//==============================================================================
+QModelIndex AssetsTreeModel::getIndexByPath(const QString& aFilePath)
+{
+    return index(aFilePath);
+}
+
+//==============================================================================
 // Get Path By Index
 //==============================================================================
 QString AssetsTreeModel::getPathByIndex(const QModelIndex& aIndex)

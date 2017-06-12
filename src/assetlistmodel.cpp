@@ -9,9 +9,10 @@
 //==============================================================================
 // Constructor
 //==============================================================================
-AssetListModel::AssetListModel(QObject* aParent)
+AssetListModel::AssetListModel(const QString& aAssetsDir, QObject* aParent)
     : QAbstractListModel(aParent)
-    , mCurrentDir(QDir::homePath())
+    , mAssetsDir(aAssetsDir.isEmpty() ? QDir::homePath() : aAssetsDir)
+    , mCurrentDir(aAssetsDir.isEmpty() ? QDir::homePath() : aAssetsDir)
 {
     qDebug() << "AssetListModel created.";
 
@@ -80,11 +81,51 @@ void AssetListModel::loadAssets()
     // Init Assets Dir
     QDir assetsDir(mCurrentDir);
 
+    // Init Filters
+    QDir::Filters assetFilters = QDir::AllDirs | QDir::Files;
+
+    // Check Current Dir
+    if ((mCurrentDir == "/") || (mCurrentDir == mAssetsDir)) {
+        // Add No Dot And Dot Dot
+        assetFilters |= QDir::NoDotAndDotDot;
+    } else {
+        // Add No Dot
+        assetFilters |= QDir::NoDot;
+    }
+
     // Set File Info List
-    mFileList = assetsDir.entryInfoList(mNameFilters, QDir::AllDirs | QDir::NoDot | QDir::Files, QDir::Name | QDir::DirsFirst);
+    mFileList = assetsDir.entryInfoList(mNameFilters, assetFilters, QDir::Name | QDir::DirsFirst);
 
     // End Reset Model
     endResetModel();
+}
+
+//==============================================================================
+// Assets Dir Update
+//==============================================================================
+void AssetListModel::assetsDirUpdate(const QString& aAssetsDir)
+{
+    // Check Assets Dir
+    if (mAssetsDir != aAssetsDir) {
+        // Set Assets Dir
+        mAssetsDir = aAssetsDir;
+        // Set Current Dir
+        setCurrentDir(mAssetsDir);
+    }
+}
+
+//==============================================================================
+// Set Assets Dir
+//==============================================================================
+void AssetListModel::setAssetsDir(const QString& aAssetsDir)
+{
+    // Check Assets Dir
+    if (mAssetsDir != aAssetsDir) {
+        // Set Assets Dir
+        mAssetsDir = aAssetsDir;
+        // Set Current Dir
+        setCurrentDir(mAssetsDir);
+    }
 }
 
 //==============================================================================
@@ -100,15 +141,59 @@ QString AssetListModel::currentDir()
 //==============================================================================
 void AssetListModel::setCurrentDir(const QString& aCurrentDir)
 {
+    // Check Dir
+    if (aCurrentDir.isEmpty()) {
+        return;
+    }
+
     // Check Current Dir
     if (mCurrentDir != aCurrentDir) {
+        qDebug() << "AssetListModel::setCurrentDir - aCurrentDir: " << aCurrentDir;
+
         // Set Current Dir
         mCurrentDir = aCurrentDir;
         // Emit Current Dir Changed Signal
         emit currentDirChanged(mCurrentDir);
 
         // Reload
+        reload();
     }
+}
+
+//==============================================================================
+// Get Index By Name
+//==============================================================================
+int AssetListModel::getIndexByName(const QString& aName)
+{
+    // Check Name
+    if (aName.isEmpty()) {
+        return 0;
+    }
+
+    // Get Row Count
+    int rCount = rowCount();
+    // Iterate Through Items
+    for (int i=0; i<rCount; i++) {
+        // Check File Name
+        if (mFileList[i].fileName() == aName) {
+            return i;
+        }
+    }
+
+    return 0;
+}
+
+//==============================================================================
+// Get File Path By Index
+//==============================================================================
+QString AssetListModel::getPathByIndex(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        return mFileList[aIndex].absoluteFilePath();
+    }
+
+    return "";
 }
 
 //==============================================================================
@@ -134,7 +219,7 @@ QVariant AssetListModel::data(const QModelIndex& aIndex, int aRole) const
         // Switch Role
         switch (aRole) {
             case EALRName:          return mFileList[rIndex].fileName();
-            case EALRSize:          return mFileList[rIndex].size() / 1024;
+            case EALRSize:          return mFileList[rIndex].size();
             case EALRPath:          return mFileList[rIndex].absoluteFilePath();
             case EALRDimension:     return "";
             case EALRIsDir:         return mFileList[rIndex].isDir();
