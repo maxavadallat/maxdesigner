@@ -690,22 +690,6 @@ void MainWindow::launchCreateNewProject()
     // Set Project dir
     mProjectPropertiesDiaog->setProjectDir(QDir::homePath());
 
-    // Set Main QML File
-    //mProjectPropertiesDiaog->setMainQMLFile(QDir::homePath() + "/" + newProjectName + "/qml/main.qml");
-    // Set QML dir
-    //mProjectPropertiesDiaog->setQMLDir(QDir::homePath() + "/" + newProjectName + "/qml");
-    // Set JS Dir
-    //mProjectPropertiesDiaog->setJSDir(QDir::homePath() + "/" + newProjectName + "/qml");
-    // Set Images Dir
-    //mProjectPropertiesDiaog->setImagesDir(QDir::homePath() + "/" + newProjectName + "/qml");
-    // Set Components Dir
-    //mProjectPropertiesDiaog->setComponentsDir(QDir::homePath() + "/" + newProjectName + "/components");
-    // Set Views Dir
-    //mProjectPropertiesDiaog->setViewsDir(QDir::homePath() + "/" + newProjectName + "/views");
-
-    // Release Keyboard Focus
-    //releaseKeyboard();
-
     // Exec Dialog
     if (mProjectPropertiesDiaog->exec()) {
         // Create New Project
@@ -717,9 +701,6 @@ void MainWindow::launchCreateNewProject()
         // Close File
         mOpenFiles->closeFile(mProjectModel->absoluteProjectFilePath());
     }
-
-    // Grab Keyboard Focus
-    //grabKeyboard();
 }
 
 //==============================================================================
@@ -1082,6 +1063,7 @@ void MainWindow::launchAssetBrowser()
 
         // Conenct Signal
         connect(mAssetBrowser, SIGNAL(assetBrowserClosed()), this, SLOT(assetBrowserClosed()));
+        connect(mAssetBrowser, SIGNAL(assetSelected(QString)), this, SIGNAL(assetSelected(QString)));
 
         // ...
     }
@@ -1167,8 +1149,6 @@ void MainWindow::toggleSlowMotion()
 //==============================================================================
 void MainWindow::createNewProject()
 {
-    //qDebug() << "MainWindow::createNewProject";
-
     // Check Project Model
     if (!mProjectModel) {
         // Create Project Model
@@ -1180,8 +1160,15 @@ void MainWindow::createNewProject()
         connect(mProjectModel, SIGNAL(dataSourcesModelChanged(DataSourcesModel*)), this, SIGNAL(dataSourcesModelChanged(DataSourcesModel*)));
     }
 
+    // Get Screen Width
+    int sWidth = mProjectPropertiesDiaog->screenWidth();
+    // Get Screen Height
+    int sHeight = mProjectPropertiesDiaog->screenHeight();
+
+    qDebug() << "MainWindow::createNewProject - sWidth: " << sWidth << " - sHeight: " << sHeight;
+
     // Set Project Name
-    if (mProjectModel->initProject(mProjectPropertiesDiaog->projectName(), mProjectPropertiesDiaog->projectDir())) {
+    if (mProjectModel->initProject(mProjectPropertiesDiaog->projectName(), mProjectPropertiesDiaog->projectDir(), sWidth, sHeight)) {
 
         // Update Project
         updateProject();
@@ -1531,6 +1518,14 @@ void MainWindow::closeComponent()
     // Save Component
     saveComponent();
 
+    // Check Current Component
+    if (mCurrentComponent) {
+        // Set Closing State
+        mCurrentComponent->setClosing(true);
+        // Clear Children
+        mCurrentComponent->clearChildren();
+    }
+
     // Check Properties Controller
     if (mPropertiesController) {
         // Check Focused Component
@@ -1538,14 +1533,6 @@ void MainWindow::closeComponent()
             // Reset Focused Component
             mPropertiesController->setFocusedComponent(NULL);
         }
-    }
-
-    // Check Current Component
-    if (mCurrentComponent) {
-        // Set Closing State
-        mCurrentComponent->setClosing(true);
-        // Clear Children
-        mCurrentComponent->clearChildren();
     }
 
     // Check Open Files Model
@@ -1963,14 +1950,15 @@ void MainWindow::assetBrowserClosed()
     // Check Asset Browser
     if (mAssetBrowser) {
 
-        // Disconenct Signal
-        disconnect(mAssetBrowser, SIGNAL(assetBrowserClosed()), this, SLOT(assetBrowserClosed()));
+//        // Disconenct Signals
+//        disconnect(mAssetBrowser, SIGNAL(assetBrowserClosed()), this, SLOT(assetBrowserClosed()));
+//        disconnect(mAssetBrowser, SIGNAL(assetSelected(QString)), this, SIGNAL(assetSelected(QString)));
 
-        // ...
+//        // ...
 
-        // Delete Asset Browser
-        delete mAssetBrowser;
-        mAssetBrowser = NULL;
+//        // Delete Asset Browser
+//        delete mAssetBrowser;
+//        mAssetBrowser = NULL;
     }
 }
 

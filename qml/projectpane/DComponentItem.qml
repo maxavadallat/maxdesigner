@@ -2,10 +2,10 @@ import QtQuick 2.0
 
 import enginecomponents 0.1
 
-import "../style"
-import "../system/DConstants.js" as CONSTS
-import "../controls"
-import "../animations"
+import "qrc:/qml/style"
+import "qrc:/qml/system/DConstants.js" as CONSTS
+import "qrc:/qml/controls"
+import "qrc:/qml/animations"
 
 Item {
     id: componentItemRoot
@@ -164,10 +164,14 @@ Item {
 
         DText {
             id: componentTitleLabel
-            width: parent.width
+            width: parent.width - DStyle.defaultMargin
             anchors.centerIn: parent
-            font.pixelSize: DStyle.fontSizeS
+            //font.pixelSize: DStyle.fontSizeXS
+            fontSizeMode: Text.HorizontalFit
+            minimumPixelSize: DStyle.fontSizeXS
             horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.NoWrap
+            clip: true
             text: componentItemRoot.title
         }
 

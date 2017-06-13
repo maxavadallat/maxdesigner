@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "../animations"
+import "qrc:/qml/animations"
 
 MouseArea {
     id: mainGrabAreaRoot

@@ -2,9 +2,10 @@ import QtQuick 2.7
 
 import enginecomponents 0.1
 
-import "../system/DConstants.js" as CONSTS
-import "../style"
-import "../controls"
+import "qrc:/qml/system"
+import "qrc:/qml/system/DConstants.js" as CONSTS
+import "qrc:/qml/style"
+import "qrc:/qml/controls"
 
 DRectangle {
     id: sourceCodeEditorRoot
@@ -38,6 +39,12 @@ DRectangle {
 
     signal escapeClicked()
     signal sourceEditorActivated()
+
+    // Insert Text To The Current Cursor Position
+    function insertText(plainText) {
+        // Insert Text
+        sourceTextInput.insert(sourceTextInput.cursorPosition, plainText);
+    }
 
     // Set Text
     function setText(plainText) {
@@ -224,6 +231,14 @@ DRectangle {
                 // TODO: Syntax Highlighting, line numbers
 
                 // ...
+
+                onActiveFocusChanged: {
+                    // Check Active Focus
+                    if (activeFocus) {
+                        // Set Current Text Input
+                        DSystemModel.currentTextInput = sourceCodeEditorRoot;
+                    }
+                }
 
                 Keys.onReleased: {
                     if (event.key === Qt.Key_Escape) {

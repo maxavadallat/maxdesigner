@@ -361,6 +361,8 @@ public:
 
     // Load Children
     Q_INVOKABLE void loadChildren();
+    // Load Animations
+    Q_INVOKABLE void loadAnimations();
 
     // Get Child Count
     int childCount();
@@ -646,6 +648,8 @@ protected:
     void clear();
     // Clear Children
     void clearChildren();
+    // Clear Animations
+    void clearAnimations();
     // Clear ID Map
     void clearIDMap();
 
@@ -659,9 +663,13 @@ protected:
 
     // Save Children
     void saveChildren();
+    // Save Animations
+    void saveAnimations();
 
     // Set Children Loaded
     void setChildrenLoaded(const bool& aChildrenLoaded);
+    // Set Animations Loaded
+    void setAnimationsLoaded(const bool& aAnimationsLoaded);
 
     // Save Live data Source
     bool saveLiveDataSource();
@@ -853,6 +861,8 @@ protected: // Data
 
     // Children Loaded
     bool                    mChildrenLoaded;
+    // Animations Loaded
+    bool                    mAnimationsLoaded;
 
     // Reference Count For Children
     int                     mRefCount;
@@ -869,6 +879,8 @@ protected: // Data
 
     // Children
     QList<ComponentInfo*>   mChildComponents;
+    // Animations
+    QList<ComponentInfo*>   mAnimations;
 
     // Component Id Map
     QMap<QString, QObject*> mIDMap;

@@ -1,8 +1,9 @@
 import QtQuick 2.0
 import QtGraphicalEffects 1.0
 
-import "../style"
-import "../animations"
+import "qrc:/qml/style"
+import "qrc:/qml/animations"
+import "qrc:/qml/system"
 
 DMouseArea {
     id: textInputRoot
@@ -48,6 +49,12 @@ DMouseArea {
             // Set Text Input Text
             textInput.text = textInputRoot.text;
         }
+    }
+
+    // Insert Text To The Current Cursor Position
+    function insertText(plainText) {
+        // Insert Text
+        textInput.insert(textInput.cursorPosition, plainText);
     }
 
     // Set Editor Focus
@@ -114,6 +121,14 @@ DMouseArea {
         color: focus ? DStyle.colorFontLight : DStyle.colorFontDark
 
         clip: true
+
+        onActiveFocusChanged: {
+            // Check Active Focus
+            if (activeFocus) {
+                // Set Current Text Input
+                DSystemModel.currentTextInput = textInputRoot;
+            }
+        }
 
         onTextChanged: {
             //console.log("DTextInput.textInput.onTextChanged - text: " + textInput.text + " - userInput: " + textInputRoot.userInput);

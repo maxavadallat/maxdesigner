@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "../style"
+import "qrc:/qml/style"
 
 Loader {
     anchors.fill: parent

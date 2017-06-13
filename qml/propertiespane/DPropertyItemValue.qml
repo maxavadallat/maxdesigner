@@ -1,8 +1,8 @@
 import QtQuick 2.0
 
-import "../system/DConstants.js" as CONSTS
-import "../style"
-import "../controls"
+import "qrc:/qml/system/DConstants.js" as CONSTS
+import "qrc:/qml/style"
+import "qrc:/qml/controls"
 
 Item {
     id: propertyItemValueRoot

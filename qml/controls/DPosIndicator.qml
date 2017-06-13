@@ -1,8 +1,8 @@
 import QtQuick 2.0
 //import QtGraphicalEffects 1.0
 
-import "../style"
-import "../animations"
+import "qrc:/qml/style"
+import "qrc:/qml/animations"
 
 DRectangle {
     id: posIndicatorRoot

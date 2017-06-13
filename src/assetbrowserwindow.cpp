@@ -235,6 +235,16 @@ QString AssetBrowserWindow::currentDir()
 //==============================================================================
 void AssetBrowserWindow::setCurrentDir(const QString& aCurrentDir)
 {
+    // Check Assets List Model
+    if (mAssetListModel) {
+        // Check New Current Dir
+        if (aCurrentDir == QString("%1/..").arg(mAssetListModel->mAssetsDir)) {
+            // Lock To Assets Dir
+
+            return;
+        }
+    }
+
     // Init Clean Path
     QString cleanPath = QDir::cleanPath(aCurrentDir);
     // Check Clean Path

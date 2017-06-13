@@ -2,8 +2,8 @@ import QtQuick 2.0
 
 import enginecomponents 0.1
 
-import "../style"
-import "../controls"
+import "qrc:/qml/style"
+import "qrc:/qml/controls"
 
 DPaneBase {
     id: signalParameterEditorRoot

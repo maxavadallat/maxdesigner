@@ -1,8 +1,8 @@
 import QtQuick 2.0
 import QtGraphicalEffects 1.0
 
-import "../system/DConstants.js" as CONSTS
-import "../style"
+import "qrc:/qml/system/DConstants.js" as CONSTS
+import "qrc:/qml/style"
 
 Item {
     id: carouselRoot

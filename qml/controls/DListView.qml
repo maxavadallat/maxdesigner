@@ -1,7 +1,7 @@
 import QtQuick 2.0
 
-import "../style"
-import "../system/DConstants.js" as CONSTS
+import "qrc:/qml/style"
+import "qrc:/qml/system/DConstants.js" as CONSTS
 
 DControl {
     id: listViewRoot

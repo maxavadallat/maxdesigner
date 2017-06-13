@@ -1,8 +1,8 @@
 import QtQuick 2.0
 
 import "qrc:/qml/style"
-import "../system/DConstants.js" as CONSTS
-import "../controls"
+import "qrc:/qml/system/DConstants.js" as CONSTS
+import "qrc:/qml/controls"
 
 DMouseArea {
     id: assetItemDelegateRoot

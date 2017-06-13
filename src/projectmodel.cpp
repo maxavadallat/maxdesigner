@@ -179,18 +179,18 @@ void ProjectModel::createInitialComponents()
         // Iterate Through Base Components
         for (int i=0; i<bcCount; i++) {
             // Create New Component
-            ComponentInfo* newComponent = new ComponentInfo("", "", "", this);
+            ComponentInfo* newBaseComponent = new ComponentInfo("", "", "", this);
             // From JSON Object
-            newComponent->fromJSONObject(baseComponents[i].toObject(), false);
+            newBaseComponent->fromJSONObject(baseComponents[i].toObject(), false);
             // Set New Component ID
-            newComponent->setComponentID(generateID(newComponent->mName));
+            newBaseComponent->setComponentID(generateID(newBaseComponent->mName));
 
             // Add Base Component
-            if (!mBaseComponents->addBaseComponent(newComponent)) {
+            if (!mBaseComponents->addBaseComponent(newBaseComponent)) {
                 // Set Dirty Flag
-                newComponent->setDirty(false);
+                newBaseComponent->setDirty(false);
                 // Delete New Component
-                delete newComponent;
+                delete newBaseComponent;
             }
         }
 
@@ -223,24 +223,24 @@ void ProjectModel::createInitialComponents()
         // Iterate Through Base Components
         for (int i=0; i<vCount; i++) {
             // Create New Component
-            ComponentInfo* newComponent = new ComponentInfo("", "", "", this);
+            ComponentInfo* newView = new ComponentInfo("", "", "", this);
             // From JSON Object
-            newComponent->fromJSONObject(views[i].toObject(), false);
+            newView->fromJSONObject(views[i].toObject(), false);
             // Set New Component ID
-            newComponent->setComponentID(generateID(newComponent->mName));
+            newView->setComponentID(generateID(newView->mName));
             // Check Component Name For Main View
-            if (newComponent->mName == "MainView") {
+            if (newView->mName == "MainView") {
                 // Set Initial Size
-                newComponent->mProperties[JSON_KEY_COMPONENT_PROPERTY_WIDTH] = mProperties.value(JSON_KEY_PROJECT_SCREEN_WIDTH).toString();
-                newComponent->mProperties[JSON_KEY_COMPONENT_PROPERTY_HEIGHT] = mProperties.value(JSON_KEY_PROJECT_SCREEN_HEIGHT).toString();
+                newView->mProperties[JSON_KEY_COMPONENT_PROPERTY_WIDTH] = mProperties.value(JSON_KEY_PROJECT_SCREEN_WIDTH).toString();
+                newView->mProperties[JSON_KEY_COMPONENT_PROPERTY_HEIGHT] = mProperties.value(JSON_KEY_PROJECT_SCREEN_HEIGHT).toString();
             }
 
             // Add View Component
-            if (!mViews->addView(newComponent)) {
+            if (!mViews->addView(newView)) {
                 // Set Dirty Flag
-                newComponent->setDirty(false);
+                newView->setDirty(false);
                 // Delete New Component
-                delete newComponent;
+                delete newView;
             }
         }
 
@@ -251,18 +251,18 @@ void ProjectModel::createInitialComponents()
         // Iterate Through Base Components
         for (int i=0; i<dsCount; i++) {
             // Create New Component
-            ComponentInfo* newComponent = new ComponentInfo("", "", "", this);
+            ComponentInfo* newDataSourceComponent = new ComponentInfo("", "", "", this);
             // From JSON Object
-            newComponent->fromJSONObject(dataSources[i].toObject(), false);
+            newDataSourceComponent->fromJSONObject(dataSources[i].toObject(), false);
             // Set New Component ID
-            newComponent->setComponentID(generateID(newComponent->mName));
+            newDataSourceComponent->setComponentID(generateID(newDataSourceComponent->mName));
 
             // Add Data Source Base Component
-            if (!mDataSources->addDataSource(newComponent)) {
+            if (!mDataSources->addDataSource(newDataSourceComponent)) {
                 // Set Dirty Flag
-                newComponent->setDirty(false);
+                newDataSourceComponent->setDirty(false);
                 // Delete New Component
-                delete newComponent;
+                delete newDataSourceComponent;
             }
         }
 
@@ -438,7 +438,7 @@ QString ProjectModel::generateID(const QString& aName)
 //==============================================================================
 // Init New Project
 //==============================================================================
-bool ProjectModel::initProject(const QString& aName, const QString& aDir)
+bool ProjectModel::initProject(const QString& aName, const QString& aDir, const int& aScreenWidth, const int& aScreenHeight)
 {
     // Check Name
     if (!aName.isEmpty() && !aDir.isEmpty()) {
@@ -448,6 +448,11 @@ bool ProjectModel::initProject(const QString& aName, const QString& aDir)
         setProjectName(aName);
         // Set Project Dir
         setProjectDir(aDir + "/" + aName);
+
+        // Set Screen Width
+        setScreenWidth(aScreenWidth);
+        // Set Screen Height
+        setScreenHeight(aScreenHeight);
 
         // Set Base Components Dir
         setBaseComponentsDir(projectDir() + "/" + DEFAULT_PROJECT_BASECOMPONENTS_DIR_NAME);
@@ -964,7 +969,7 @@ void ProjectModel::setProjectDir(const QString& aDir)
 //==============================================================================
 int ProjectModel::screenWidth()
 {
-    return mProperties[JSON_KEY_PROJECT_SCREEN_WIDTH].toInt();
+    return mProperties.value(JSON_KEY_PROJECT_SCREEN_WIDTH).toString().toInt();
 }
 
 //==============================================================================
@@ -975,11 +980,15 @@ void ProjectModel::setScreenWidth(const int& aWidth)
     // Check Screen Width
     if (aWidth != screenWidth()) {
         // Set Screen Width
-        mProperties[JSON_KEY_PROJECT_SCREEN_WIDTH] = aWidth;
+        mProperties[JSON_KEY_PROJECT_SCREEN_WIDTH] = QString("%1").arg(aWidth);
         // Emit Screen Width Changed Signal
         emit screenWidthChanged(screenWidth());
         // Set Dirty Properties
         setDirty(true);
+
+        // Update Main View Width
+
+        // ...
     }
 }
 
@@ -988,7 +997,7 @@ void ProjectModel::setScreenWidth(const int& aWidth)
 //==============================================================================
 int ProjectModel::screenHeight()
 {
-    return mProperties[JSON_KEY_PROJECT_SCREEN_HEIGHT].toInt();
+    return mProperties.value(JSON_KEY_PROJECT_SCREEN_HEIGHT).toString().toInt();
 }
 
 //==============================================================================
@@ -999,11 +1008,15 @@ void ProjectModel::setScreenHeight(const int& aHeight)
     // Check Screen Height
     if (aHeight != screenHeight()) {
         // Set Screen Height
-        mProperties[JSON_KEY_PROJECT_SCREEN_HEIGHT] = aHeight;
+        mProperties[JSON_KEY_PROJECT_SCREEN_HEIGHT] = QString("%1").arg(aHeight);
         // Emit Screen Height changed Signal
         emit screenHeightChanged(screenHeight());
         // Set Dirty Properties
         setDirty(true);
+
+        // Update Main View Height
+
+        // ...
     }
 }
 

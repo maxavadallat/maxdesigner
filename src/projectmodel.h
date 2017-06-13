@@ -58,7 +58,7 @@ public:
     explicit ProjectModel(PropertiesController* aPropertiesController, QObject* aParent = NULL);
 
     // Init New Project
-    bool initProject(const QString& aName, const QString& aDir);
+    bool initProject(const QString& aName, const QString& aDir, const int& aScreenWidth, const int& aScreenHeight);
     // Load Project
     bool loadProject(const QString& aFileName);
     // Save Project

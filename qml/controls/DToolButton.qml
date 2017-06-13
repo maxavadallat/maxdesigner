@@ -1,8 +1,8 @@
 import QtQuick 2.0
 import QtGraphicalEffects 1.0
 
-import "../style"
-import "../system/DConstants.js" as CONSTS
+import "qrc:/qml/style"
+import "qrc:/qml/system/DConstants.js" as CONSTS
 
 DButtonBase {
     id: toolButtonRoot

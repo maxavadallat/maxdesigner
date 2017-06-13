@@ -1,12 +1,13 @@
 import QtQuick 2.0
+import QtGraphicalEffects 1.0
 
 //import enginecomponents 0.1
 
-import "../system/DConstants.js" as CONSTS
-import "../style"
-import "../system"
-import "../controls"
-import "../animations"
+import "qrc:/qml/system/DConstants.js" as CONSTS
+import "qrc:/qml/style"
+import "qrc:/qml/system"
+import "qrc:/qml/controls"
+import "qrc:/qml/animations"
 
 Item {
     id: assetBrowserRoot
@@ -172,35 +173,65 @@ Item {
                 anchors.bottomMargin: DStyle.defaultMargin
                 spacing: DStyle.defaultSpacing
 
-                DText {
-                    id: previewNameLabel
+                Item {
                     width: parent.width - DStyle.defaultMargin * 2
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.NoWrap
-                    elide: Text.ElideMiddle
-                    text: {
-                        // Check If Is Dir
-                        if (assetBrowserController.currentIsDir) {
-                            return "";
-                        }
+                    height: DStyle.fontSizeM
+                    visible: previewNameLabel.text !== ""
 
-                        return assetBrowserController.currentName;
+                    DText {
+                        id: previewNameLabel
+                        width: parent.width
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.NoWrap
+                        elide: Text.ElideMiddle
+                        text: {
+                            // Check If Is Dir
+                            if (assetBrowserController.currentIsDir) {
+                                return "";
+                            }
+
+                            return assetBrowserController.currentName;
+                        }
                     }
+
+//                    Glow {
+//                        anchors.fill: previewNameLabel
+//                        radius: 2
+//                        samples: DStyle.defaultGlowSamples
+//                        spread: 0.5
+//                        color: DStyle.colorFontDark
+//                        source: previewNameLabel
+//                    }
                 }
 
-                DText {
-                    id: previewSizeLabel
-                    anchors.horizontalCenter: parent.horizontalCenter
+                Item {
+                    width: parent.width - DStyle.defaultMargin * 2
+                    height: DStyle.fontSizeM
+                    visible: previewSizeLabel.text !== ""
 
-                    text: {
-                        // Check If Is Dir
-                        if (assetBrowserController.currentIsDir) {
-                            return "";
+                    DText {
+                        id: previewSizeLabel
+                        anchors.horizontalCenter: parent.horizontalCenter
+
+                        text: {
+                            // Check If Is Dir
+                            if (assetBrowserController.currentIsDir) {
+                                return "";
+                            }
+
+                            return previewImage.sourceSize.width + "x" + previewImage.sourceSize.height + " (" + assetBrowserController.currentSize + " KB)";
                         }
-
-                        return previewImage.sourceSize.width + "x" + previewImage.sourceSize.height + " (" + assetBrowserController.currentSize + " KB)";
                     }
+
+//                    Glow {
+//                        anchors.fill: previewSizeLabel
+//                        radius: 2
+//                        samples: DStyle.defaultGlowSamples
+//                        spread: 0.5
+//                        color: DStyle.colorFontDark
+//                        source: previewSizeLabel
+//                    }
                 }
             }
         }

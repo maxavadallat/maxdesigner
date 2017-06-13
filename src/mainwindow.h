@@ -107,6 +107,8 @@ signals:
     void dataSourcesModelChanged(DataSourcesModel* aDataSources);
     // Screen Shot Mode Changed Signal
     void screenshotModeChanged(const bool& aScreenShotMode);
+    // Asset Selected Signal
+    void assetSelected(const QString& aAssetPath);
 
 private:
     // Init

@@ -63,6 +63,8 @@ public: // from QAbstractListModel
     virtual QHash<int, QByteArray> roleNames() const;
 
 protected: // Data
+    friend class AssetBrowserWindow;
+
     // Item Field Roles
     enum EALMRoles {
         EALRName = Qt::UserRole + 1,

@@ -1,7 +1,7 @@
 import QtQuick 2.5
 
-import "../style"
-import "../system"
+import "qrc:/qml/style"
+import "qrc:/qml/system"
 
 MouseArea {
     id: resizeAreaRoot

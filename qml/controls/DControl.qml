@@ -1,7 +1,7 @@
 import QtQuick 2.0
 
-import "../style"
-import "../animations"
+import "qrc:/qml/style"
+import "qrc:/qml/animations"
 
 Item {
     opacity: enabled ? 1.0 : DStyle.disabledOpacity

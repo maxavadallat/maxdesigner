@@ -44,6 +44,11 @@ ComponentInfo* ComponentInfo::fromInfoFile(const QString& aFilePath, ProjectMode
 //==============================================================================
 ComponentInfo* ComponentInfo::clone()
 {
+    qDebug() << "#### ComponentInfo::clone - mName: " << mName;
+    // Load Children For Proto Type
+    loadChildren();
+    // Inc Ref Count
+    incRefCount();
     // Create Component Info
     ComponentInfo* newComponent = new ComponentInfo(mName, mType, mCategory, mProject, mBaseName, mBuiltIn, false);
     // Set Proto Type
@@ -88,6 +93,7 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mIsRoot(true)
     , mGroupped(false)
     , mChildrenLoaded(false)
+    , mAnimationsLoaded(false)
     , mRefCount(0)
     , mComponentHandler(NULL)
     , mBase(NULL)
@@ -154,10 +160,21 @@ void ComponentInfo::clearChildren()
 
         // Iterate Through Children
         while (mChildComponents.count() > 0) {
-            // Delete Last
-            delete mChildComponents.takeLast();
+            // Take Child Component
+            ComponentInfo* takenChild = mChildComponents.takeLast();
+            // Check If Proto
+            if (!takenChild->mIsProtoType && takenChild->mProtoType) {
+                // Dec Ref Count For ProtoType
+                takenChild->mProtoType->releaseRef();
+            }
+
+            // Delete Taken Child
+            delete takenChild;
         }
     }
+
+    // Reset Ref Count
+    mRefCount = 0;
 
     // Reset Children Loaded
     setChildrenLoaded(false);
@@ -330,13 +347,13 @@ bool ComponentInfo::save(const QString& aFilePath)
 //==============================================================================
 void ComponentInfo::loadChildren()
 {
+    // Get Children Array Count
+    int caCount = mChildren.count();
+
     // Check Children Loaded
     if (!mChildrenLoaded) {
         // Set Children Loaded
         setChildrenLoaded(true);
-
-        // Get Children Array Count
-        int caCount = mChildren.count();
 
         // Check To Create Children
         if (caCount > 0) {
@@ -378,6 +395,14 @@ void ComponentInfo::loadChildren()
 }
 
 //==============================================================================
+// Load Animations
+//==============================================================================
+void ComponentInfo::loadAnimations()
+{
+
+}
+
+//==============================================================================
 // Save Children Components To Children JSON Array
 //==============================================================================
 void ComponentInfo::saveChildren()
@@ -397,12 +422,15 @@ void ComponentInfo::saveChildren()
         return;
     }
 
-    qDebug() << "#### ComponentInfo::saveChildren";
+    // Check Child Components Count
+    if (cCount > 0) {
+        qDebug() << "#### ComponentInfo::saveChildren";
 
-    // Iterate Through Children Array
-    for (int i=0; i<cCount; i++) {
-        // Append Child
-        newChildArray << mChildComponents[i]->toJSONObject(true);
+        // Iterate Through Children Array
+        for (int i=0; i<cCount; i++) {
+            // Append Child
+            newChildArray << mChildComponents[i]->toJSONObject(true);
+        }
     }
 
     // Set Children JSON Array
@@ -3543,7 +3571,7 @@ void ComponentInfo::incRefCount()
     // Decrease Child Reference Count
     mRefCount++;
 
-    qDebug() << "ComponentInfo::incRefCount - mName: " << mName << " - mRefCount: " << mRefCount;
+    qDebug() << "#### ComponentInfo::incRefCount - mName: " << mName << " - mRefCount: " << mRefCount;
 }
 
 //==============================================================================
@@ -3554,7 +3582,7 @@ void ComponentInfo::releaseRef()
     // Decrease Child Reference Count
     mRefCount--;
 
-    qDebug() << "ComponentInfo::releaseChildRef - mName: " << mName << " - mRefCount: " << mRefCount;
+    qDebug() << "#### ComponentInfo::releaseRef - mName: " << mName << " - mRefCount: " << mRefCount;
 
     // Check Ref Count
     if (mRefCount == 0) {

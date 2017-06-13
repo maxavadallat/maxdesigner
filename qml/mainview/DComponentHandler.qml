@@ -2,11 +2,11 @@ import QtQuick 2.0
 
 import enginecomponents 0.1
 
-import "../system/DConstants.js" as CONSTS
-import "../style"
-import "../system"
-import "../controls"
-import "../animations"
+import "qrc:/qml/system/DConstants.js" as CONSTS
+import "qrc:/qml/style"
+import "qrc:/qml/system"
+import "qrc:/qml/controls"
+import "qrc:/qml/animations"
 
 DMouseArea {
     id: chRoot
@@ -1536,7 +1536,9 @@ DMouseArea {
     // Drop Area For Child Components
     DDropArea {
         id: dropArea
-        anchors.fill: parent
+        width: chRoot.componentInfo !== null && chRoot.componentInfo.isRoot ? parent.width : 0
+        height: chRoot.componentInfo !== null && chRoot.componentInfo.isRoot ? parent.height : 0
+        anchors.centerIn: parent
 
         onEntered: {
             // Set Drag Source
@@ -1594,11 +1596,17 @@ DMouseArea {
     // Component Label
     DText {
         id: componentLabel
-        anchors.centerIn: parent
+        anchors.fill: parent
+        anchors.leftMargin: DStyle.defaultMargin
+        anchors.rightMargin: DStyle.defaultMargin
         color: "white"
         visible: settingsController.componentNamesVisible && chRoot.updateComponentInfoEnabled
         opacity: CONSTS.componentNamesOpacity
-        font.pixelSize: 48 // TODO: Manage Size
+        font.pixelSize: DStyle.fontSizeXXXL
+        fontSizeMode: Text.HorizontalFit
+        horizontalAlignment: Text.AlignHCenter
+        clip: true
+        wrapMode: Text.NoWrap
         text: chRoot.componentInfo ? chRoot.componentInfo.componentName : ""
     }
 

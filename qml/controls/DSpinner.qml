@@ -1,6 +1,6 @@
 import QtQuick 2.7
 
-import "../style"
+import "qrc:/qml/style"
 
 DControl {
     id: spinnerRoot

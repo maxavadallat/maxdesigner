@@ -1,7 +1,7 @@
 import QtQuick 2.0
 
-import "../system/DConstants.js" as CONSTS
-import "../style"
+import "qrc:/qml/system/DConstants.js" as CONSTS
+import "qrc:/qml/style"
 
 DPaneBase {
     id: paneRoot
