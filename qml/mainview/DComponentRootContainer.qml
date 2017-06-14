@@ -126,7 +126,14 @@ DPaneBase {
     enablePosOverlay: false
     enableSizeOverlay: false
 
-    enableResize: true
+    enableResize: {
+        // Check Component Info
+        if (crcRoot.componentInfo !== null && crcRoot.componentInfo.componentCategory === "Animation") {
+            return false;
+        }
+
+        return true;
+    }
 
     showTitle: false
     showBackground: false
@@ -258,7 +265,9 @@ DPaneBase {
             crcRoot.rootComponentHandler.updateComponentInfoEnabled = (crcRoot.componentInfo !== null);
 
             // Check Component Info
-            if (crcRoot.componentInfo !== null && crcRoot.componentInfo.componentType !== "DataSource") {
+            if (crcRoot.componentInfo !== null &&
+                crcRoot.componentInfo.componentType !== "DataSource" &&
+                crcRoot.componentInfo.componentCategory !== "Animation") {
                 // Set Node Pane Loader Active
                 nodePaneLoader.active = true;
                 // Set Node Pane opacity

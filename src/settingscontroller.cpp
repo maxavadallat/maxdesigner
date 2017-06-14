@@ -358,6 +358,8 @@ void SettingsController::setShowDashboard(const bool& aShowDashboard)
         mShowDashboard = aShowDashboard;
         // Emit Show Dashboard Changed Signal
         emit showDashboardChanged(mShowDashboard);
+        // Set Dirty
+        setDirty(true);
     }
 }
 
@@ -380,6 +382,8 @@ void SettingsController::setClipComponentRoot(const bool& aClip)
         mClipComponentRoot = aClip;
         // Emit Clip Component Root Changed Signal
         emit clipComponentRootChanged(mClipComponentRoot);
+        // Set Dirty
+        setDirty(true);
     }
 }
 

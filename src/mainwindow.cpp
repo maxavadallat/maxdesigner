@@ -1250,21 +1250,25 @@ void MainWindow::createNewComponent(const QString& aName,
         // Init New Component
         ComponentInfo* newComponent = NULL;
 
+        // Init Component Width
+        int cWidth = aCategory == "Animation" ? DEFAULT_ANIMATION_WIDTH : aWidth;
+        int cHeight = aCategory == "Animation" ? DEFAULT_ANIMATION_HEIGHT : aHeight;
+
         // Check Type
         if (aType == COMPONENT_TYPE_BASECOMPONENT) {
 
             // Create New Base Component
-            newComponent = mProjectModel->createBaseComponent(aName, aBase, aCategory, aBuiltIn, aWidth, aHeight);
+            newComponent = mProjectModel->createBaseComponent(aName, aBase, aCategory, aBuiltIn, cWidth, cHeight);
 
         } else if (aType == COMPONENT_TYPE_COMPONENT) {
 
             // Create New Component
-            newComponent = mProjectModel->createComponent(aName, aBase, aCategory, aWidth, aHeight);
+            newComponent = mProjectModel->createComponent(aName, aBase, aCategory, cWidth, cHeight);
 
         } else if (aType == COMPONENT_TYPE_VIEW) {
 
             // Create New View
-            newComponent = mProjectModel->createView(aName, aBase, aWidth, aHeight);
+            newComponent = mProjectModel->createView(aName, aBase, cWidth, cHeight);
 
         } else if (aType == COMPONENT_TYPE_DATASOURCE) {
 
@@ -2293,11 +2297,6 @@ MainWindow::~MainWindow()
     // Clear QML Component Cache
     clearQMLComponentCache();
 
-    // Delete Main Quick Widget
-    delete ui->mainQuickWidget;
-    // Delete UI
-    delete ui;
-
     // Release Settings
     mSettings->release();
 
@@ -2392,6 +2391,11 @@ MainWindow::~MainWindow()
         delete mAssetBrowser;
         mAssetBrowser = NULL;
     }
+
+    // Delete Main Quick Widget
+    delete ui->mainQuickWidget;
+    // Delete UI
+    delete ui;
 
     // ...
 

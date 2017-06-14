@@ -33,5 +33,6 @@
         <file>assets/fonts/aero.ttf</file>
         <file>assets/fonts/neuropol.ttf</file>
         <file>assets/fonts/zekton.ttf</file>
+        <file>assets/icons/video-256.png</file>
     </qresource>
 </RCC>

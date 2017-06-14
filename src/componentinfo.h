@@ -483,7 +483,7 @@ signals:
     // Animation Added Signal
     void animationAdded(const int& aIndex);
     // Animation Moved Signal
-    void animamationMoved(ComponentInfo* aParentComponent, const int& aIndex, ComponentInfo* aTargetComponent, const int& aTargetIndex);
+    void animationMoved(ComponentInfo* aParentComponent, const int& aIndex, ComponentInfo* aTargetComponent, const int& aTargetIndex);
     // Animations Removed Signal
     void animationRemoved(const int& aIndex);
 

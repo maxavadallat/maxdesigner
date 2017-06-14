@@ -44,9 +44,24 @@ DMouseArea {
     property int maxHeight: 8192
 
     // Enable Size Overlay
-    property bool enableSizeOverlay: true
+    property bool enableSizeOverlay: {
+        // Check Category
+        if (componentInfo !== null && componentInfo.componentCategory === "Animation") {
+            return false;
+        }
+
+        return true;
+    }
+
     // Enable Pos Overlay
-    property bool enablePosOverlay: true
+    property bool enablePosOverlay: {
+        // Check Category
+        if (componentInfo !== null && componentInfo.componentCategory === "Animation") {
+            return false;
+        }
+
+        return true;
+    }
 
     // Border Visibility
     property bool borderVisible: settingsController.borderVisible
@@ -90,9 +105,25 @@ DMouseArea {
     // Enable Drag
     property bool enableDrag: true
     // Enable Pan By Keys
-    property bool enablePanByKeys: true
+    property bool enablePanByKeys: {
+        // Check Category
+        if (componentInfo !== null && componentInfo.componentCategory === "Animation") {
+            return false;
+        }
+
+        return true;
+    }
+
     // Enable Resizd
-    property bool enableResize: true
+    property bool enableResize: {
+        // Check Category
+        if (componentInfo !== null && componentInfo.componentCategory === "Animation") {
+            return false;
+        }
+
+        return true;
+    }
+
     // Set Focus On resize
     property bool setFocusOnResize: false
 
@@ -193,7 +224,7 @@ DMouseArea {
     property bool manualResize: false
 
     // Component Layout
-    property string componentLayout: ""//componentInfo.layoutBase()  // Column, Row, Flow
+    property string componentLayout: componentInfo !== null ? componentInfo.layoutBase() : "" // Column, Row, Flow
 
     // Child Handlers Count
     property int count: childHandlersContainer.children.length
@@ -238,10 +269,7 @@ DMouseArea {
         onComponentIDMapChanged: {
             // Check If Update Component Info Enabled
             if (chRoot.updateComponentInfoEnabled) {
-                console.log("#### DComponentHandler.componentInfoConnections.onComponentIDMapChanged");
-
-                // ...
-
+                console.log("DComponentHandler.componentInfoConnections.onComponentIDMapChanged");
                 // Emit Rebuild Content Signal
                 chRoot.rootContainer.rebuildContent();
             }
@@ -251,10 +279,7 @@ DMouseArea {
         onOwnPropertyAdded: {
             // Check If Update Component Info Enabled
             if (chRoot.updateComponentInfoEnabled) {
-                console.log("#### DComponentHandler.componentInfoConnections.onOwnPropertyAdded - aName: " + aName);
-
-                // ...
-
+                console.log("DComponentHandler.componentInfoConnections.onOwnPropertyAdded - aName: " + aName);
                 // Emit Rebuild Content Signal
                 chRoot.rootContainer.rebuildContent();
             }
@@ -264,10 +289,7 @@ DMouseArea {
         onOwnPropertyRemoved: {
             // Check If Update Component Info Enabled
             if (chRoot.updateComponentInfoEnabled) {
-                console.log("#### DComponentHandler.componentInfoConnections.onOwnPropertyRemoved - aName: " + aName);
-
-                // ...
-
+                console.log("DComponentHandler.componentInfoConnections.onOwnPropertyRemoved - aName: " + aName);
                 // Emit Rebuild Content Signal
                 chRoot.rootContainer.rebuildContent();
             }
@@ -306,8 +328,11 @@ DMouseArea {
             // Create Component Object
             var newComponentObject = createComponentObject(newChildInfo, newHandlerDummyParent, true);
 
-            // Add Compoennt Object
-            addComponentObject(aIndex, chRoot.componentObject, newComponentObject, newChildInfo.posX, newChildInfo.posY);
+            // Check Component Category
+            if (newChildInfo !== null && newChildInfo.componentCategory !== "Animation") {
+                // Add Compoennt Object
+                addComponentObject(aIndex, chRoot.componentObject, newComponentObject, newChildInfo.posX, newChildInfo.posY);
+            }
 
             // Create Component Handler
             var newComponentHandler = createComponentHandler(newComponentObject, newChildInfo, newHandlerDummyParent);
@@ -369,6 +394,24 @@ DMouseArea {
             // No Need, Taken Care By onChildAboutToBeRemoved
 
             // ...
+        }
+
+        // On Animation Added Slot
+        onAnimationAdded: {
+            console.log("DComponentHandler.componentInfoConnections.onAnimationAdded - aIndex: " + aIndex);
+
+        }
+
+        // On Animation Moved Slot
+        onAnimationMoved: {
+            console.log("DComponentHandler.componentInfoConnections.onAnimationMoved - aParentComponent: " +  aParentComponent.componentPath + " - aIndex: " + aIndex + " - aTargetComponent: " + aTargetComponent.componentPath + " - aTargetIndex: " + aTargetIndex);
+
+        }
+
+        // On Animation Removed
+        onAnimationRemoved: {
+            console.log("DComponentHandler.componentInfoConnections.onAnimationRemoved - aIndex: " + aIndex);
+
         }
 
         // On Child About To Be Removed Slot
@@ -1611,6 +1654,14 @@ DMouseArea {
         clip: true
         wrapMode: Text.NoWrap
         text: chRoot.componentInfo ? chRoot.componentInfo.componentName : ""
+    }
+
+    // Animation Image
+    DImage {
+        anchors.fill: parent
+        opacity: CONSTS.componentNamesOpacity
+        visible: chRoot.componentInfo !== null && chRoot.componentInfo.componentCategory === "Animation"
+        source: "qrc:/assets/icons/video-256.png"
     }
 
     // Position Indicator

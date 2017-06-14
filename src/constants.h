@@ -192,6 +192,10 @@
 #define DEFAULT_VIEW_WIDTH                                  640
 #define DEFAULT_VIEW_HEIGHT                                 480
 
+// Default Animation Size
+#define DEFAULT_ANIMATION_WIDTH                             168
+#define DEFAULT_ANIMATION_HEIGHT                            168
+
 // Initial Component JSON File Path
 #define DEFAULT_INITIAL_COMPONENTS_JSON_FILE                ":/assets/json/builtincomponents.json"
 

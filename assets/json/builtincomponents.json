@@ -18,8 +18,61 @@
             "componentName": "Animation",
             "componentType": "BaseComponent",
             "componentOwnProperties": {
-                "id": "string::::",
-                "objectName": "string::::"
+                "id": "string::::animationRoot",
+                "objectName": "string::::",
+                "alwaysRunToEnd": "bool::::false",
+                "loops": "int::::0",
+                "paused": "bool::::false",
+                "running": "bool::::false"
+            },
+            "componentProperties": {
+                "width": "168",
+                "height": "168"
+            }
+        },
+        {
+            "componentBase": "Animation",
+            "componentBuiltIn": true,
+            "componentCategory": "Animation",
+            "componentName": "PropertyAnimation",
+            "componentType": "BaseComponent",
+            "componentOwnProperties": {
+                "duration": "int::::0",
+                "easing.type": "enum:::Easing.Linear,Easing.InQuad,Easing.OutQuad,Easing.InBack,Easing.OutBack,Easing.InOutBack,Easing.OutBounce,Easing.OutElastic:Easing.Linear",
+                "from": "var::::0",
+                "properties": "string::::",
+                "property": "string::::",
+                "target": "QtObject::::null",
+                "to": "var::::0"
+            },
+            "componentProperties": {
+                "id": "propertyAnimationRoot",
+                "width": "168",
+                "height": "168"
+            }
+        },
+        {
+            "componentBase": "Animation",
+            "componentBuiltIn": true,
+            "componentCategory": "Animation",
+            "componentName": "SequentialAnimation",
+            "componentType": "BaseComponent",
+            "componentProperties": {
+                "id": "sequentialAnimationRoot",
+                "width": "168",
+                "height": "168"
+            }
+        },
+        {
+            "componentBase": "Animation",
+            "componentBuiltIn": true,
+            "componentCategory": "Animation",
+            "componentName": "ParallelAnimation",
+            "componentType": "BaseComponent",
+            "componentProperties": {
+                "id": "parallelAnimationRoot",
+                "width": "168",
+                "height": "168"
             }
         },
         {
