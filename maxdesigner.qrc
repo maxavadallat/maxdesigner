@@ -123,5 +123,9 @@
         <file>qml/main.qml</file>
         <file>qml/assetbrowser/DAssetItemDelegate.qml</file>
         <file>qml/controls/DPaneSeparator.qml</file>
+        <file>qml/mainview/DAnimationTree.qml</file>
+        <file>qml/mainview/DAnimationTreeNode.qml</file>
+        <file>qml/mainview/DAnimationTreeEmptyNode.qml</file>
+        <file>qml/mainview/DAnimationPane.qml</file>
     </qresource>
 </RCC>

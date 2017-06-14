@@ -2,7 +2,7 @@
 #include <QFileInfo>
 
 #include "designerfilesortproxy.h"
-#include "projectitemmodel.h"
+#include "projecttreemodel.h"
 
 //==============================================================================
 // Constructor

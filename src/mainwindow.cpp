@@ -34,7 +34,7 @@
 
 #include "minimizedcomponents.h"
 
-#include "projectitemmodel.h"
+#include "projecttreemodel.h"
 #include "openfilesmodel.h"
 #include "recentprojectsmodel.h"
 
@@ -50,6 +50,7 @@
 #include "componentstatesmodel.h"
 #include "componenttransitionsmodel.h"
 #include "componentfunctionsmodel.h"
+#include "componentsfilter.h"
 
 #include "settingskeys.h"
 #include "constants.h"
@@ -212,6 +213,9 @@ void MainWindow::init()
 
     // Register Own Properties Filter
     qmlRegisterType<ComponentOwnPropertiesFilter>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_OWN_COMPONENTS_FILTER);
+
+    // Register Components Filter
+    qmlRegisterType<ComponentsFilter>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_FILTER);
 
     // Register Component Imports Model
     qmlRegisterUncreatableType<ComponentImportsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_IMPORTS_MODEL, "");
@@ -1092,7 +1096,7 @@ void MainWindow::clearQMLComponentCache()
     // Check Engine
     if (engine) {
         // Clear Component Cache
-        engine->clearComponentCache();
+        //engine->clearComponentCache();
     }
 }
 
@@ -1424,6 +1428,9 @@ void MainWindow::updateComponent()
 //==============================================================================
 void MainWindow::closeProject()
 {
+    // Save
+    saveAllComponents();
+
     // Check Open Fies Model
     if (mOpenFiles) {
         // Close Current Project

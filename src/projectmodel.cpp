@@ -1,5 +1,6 @@
 #include <QJsonDocument>
 #include <QJsonArray>
+#include <QJsonValue>
 #include <QFileInfo>
 #include <QFile>
 #include <QTextStream>
@@ -484,6 +485,16 @@ bool ProjectModel::initProject(const QString& aName, const QString& aDir, const 
             return false;
         }
 
+        // Init Live Source Temp Dir Name
+        QString liveSourceTemp = QString("%1/%2").arg(DEFAULT_PROJECT_LIVE_TEMP_DIR_NAME).arg(DEFAULT_PROJECT_LIVE_SOURCE_DIR_NAME);
+
+        // Create Live Source Temp Dir
+        if (!pDir.exists(liveSourceTemp) && !pDir.mkpath(liveSourceTemp)) {
+            qWarning() << "ProjectModel::initProject - liveSourceTemp: " << liveSourceTemp << " - ERROR CREATING PATH!!";
+
+            return false;
+        }
+
         // Init Live Data Sources Dir
         QString liveDataSourcesDir = QString("%1/%2").arg(DEFAULT_PROJECT_LIVE_TEMP_DIR_NAME).arg(DEFAULT_PROJECT_DATASOURCES_DIR_NAME);
 
@@ -550,6 +561,23 @@ bool ProjectModel::loadProject(const QString& aFileName)
         emit dataSourcesDirChanged(dataSourcesDir());
         emit importPathsChanged(importPaths());
         emit pluginPathsChanged(pluginPaths());
+        emit screenWidthChanged(screenWidth());
+        emit screenHeightChanged(screenHeight());
+
+        // Init Project Dir
+        QString pDirPath(projectDir());
+        // Init Project Dir
+        QDir pDir(pDirPath);
+
+        // Init Live Source Temp Dir Name
+        QString liveSourceTemp = QString("%1/%2").arg(DEFAULT_PROJECT_LIVE_TEMP_DIR_NAME).arg(DEFAULT_PROJECT_LIVE_SOURCE_DIR_NAME);
+
+        // Create Live Source Temp Dir
+        if (!pDir.exists(liveSourceTemp) && !pDir.mkpath(liveSourceTemp)) {
+            qWarning() << "ProjectModel::initProject - liveSourceTemp: " << liveSourceTemp << " - ERROR CREATING PATH!!";
+
+            return false;
+        }
 
         // ...
 
@@ -653,6 +681,9 @@ void ProjectModel::closeProject(const bool& aSave)
         // Save Project
         saveProject();
     }
+
+    // Clear All Children
+    clearAllChildren(true);
 
     // Check Base Components Model
     if (mBaseComponents) {
@@ -969,7 +1000,12 @@ void ProjectModel::setProjectDir(const QString& aDir)
 //==============================================================================
 int ProjectModel::screenWidth()
 {
-    return mProperties.value(JSON_KEY_PROJECT_SCREEN_WIDTH).toString().toInt();
+    // Get JSON Value
+    QJsonValue jsw = mProperties.value(JSON_KEY_PROJECT_SCREEN_WIDTH);
+    // Get Screen Width
+    QString sw = QString("%1").arg(jsw.toDouble());
+
+    return sw.toInt();
 }
 
 //==============================================================================
@@ -997,7 +1033,12 @@ void ProjectModel::setScreenWidth(const int& aWidth)
 //==============================================================================
 int ProjectModel::screenHeight()
 {
-    return mProperties.value(JSON_KEY_PROJECT_SCREEN_HEIGHT).toString().toInt();
+    // Get JSON Value
+    QJsonValue jsh = mProperties.value(JSON_KEY_PROJECT_SCREEN_HEIGHT);
+    // Get Screen Height
+    QString sh = QString("%1").arg(jsh.toDouble());
+
+    return sh.toInt();
 }
 
 //==============================================================================
@@ -1749,6 +1790,15 @@ void ProjectModel::removeLiveTempFile(const QString& aFileName)
 void ProjectModel::clearLiveTemp()
 {
     qDebug() << "ProjectModel::clearLiveTemp";
+
+    // Init Live Source Temp Dir
+    QDir ltsDir(liveTempDir() + "/" + DEFAULT_PROJECT_LIVE_SOURCE_DIR_NAME);
+
+    // Check If Exists
+    if (ltsDir.exists()) {
+        // Remove All
+        ltsDir.removeRecursively();
+    }
 
     // Init Live Temp Dir
     QDir ltDir(liveTempDir());

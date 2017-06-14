@@ -2,7 +2,7 @@
 #include <QDir>
 #include <QDirIterator>
 
-#include "projectitemmodel.h"
+#include "projecttreemodel.h"
 #include "constants.h"
 
 //==============================================================================
@@ -45,6 +45,8 @@ void ProjectTreeModel::init()
 {
     // Set Root Path
     setRootPath(mCurrentPath);
+    // Set Filter
+    setFilter(QDir::AllEntries | QDir::NoDotAndDotDot);
 }
 
 //==============================================================================

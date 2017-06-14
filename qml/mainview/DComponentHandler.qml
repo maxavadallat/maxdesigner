@@ -69,7 +69,7 @@ DMouseArea {
         }
 
         // Check If Borders Visible
-        if (!chRoot.borderVisible || !chRoot.updateComponentInfoEnabled) {
+        if (!chRoot.borderVisible) {
             return "transparent";
         }
 
@@ -1038,10 +1038,13 @@ DMouseArea {
             // Get Component Info By ID
             var targetComponentInfo = chRoot.componentInfo.getChildObject(anchorTarget);
 
+            // Get Target Component
+            var targetComponentObject = targetComponentInfo !== null ? targetComponentInfo.componentHandler.componentObject : null;
+
             // TODO: Double Check!!
 
             // Get Anchor Target
-            anchorTarget = targetComponent !== null ? targetComponent.componentHandler.componentObject : undefined;
+            anchorTarget = targetComponentObject !== null ? targetComponent.componentHandler.componentObject : undefined;
         }
 
         // Check Anchor Target

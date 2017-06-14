@@ -69,7 +69,7 @@ public: // from QAbstractListModel
     // Get Role Names
     virtual QHash<int, QByteArray> roleNames() const;
 
-private: // Data
+protected: // Data
     // Item Field Roles
     enum EBCItemRoles {
         EBCRName = Qt::UserRole + 1,

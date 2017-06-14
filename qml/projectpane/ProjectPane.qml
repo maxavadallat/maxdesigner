@@ -148,7 +148,13 @@ DPane {
 
             Repeater {
                 id: baseComponentsRepeater
-                model: mainController.currentProject ? mainController.currentProject.baseComponentsModel : undefined
+
+                property ComponentsFilter componentsFilter: ComponentsFilter {
+                    filteredComponents: [] //["QtObject"]
+                    sourceModel: mainController.currentProject ? mainController.currentProject.baseComponentsModel : null
+                }
+
+                model: componentsFilter
 
                 delegate: DComponentItem {
                     id: baseComponentItemDelegateRoot

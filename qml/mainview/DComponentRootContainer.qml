@@ -199,7 +199,7 @@ DPaneBase {
         //console.log("DComponentRootContainer.onStateChanged - state: " + crcRoot.state);
 
         // Check State
-        if (crcRoot.state !== crcRoot.stateShown) {
+        if (crcRoot.state !== crcRoot.stateShown && crcRoot.state !== crcRoot.stateHidden) {
             // Reset Update Compoennt Info Enabled
             rootComponentHandler.disableComponentInfoUpdates();
         }

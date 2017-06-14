@@ -119,8 +119,10 @@ void AssetBrowserWindow::restoreUI()
 
     // Set Last Width & Height
 
-    //
+    // ...
 
+    // Set Always On top
+    setWindowFlags(Qt::WindowStaysOnTopHint);
 
 }
 

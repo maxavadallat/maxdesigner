@@ -57,34 +57,34 @@ Item {
         width: liveController.screenWidth
         height: liveController.screenHeight
         anchors.centerIn: parent
-        anchors.verticalCenterOffset: -22
+        anchors.verticalCenterOffset: 0
         color: "transparent"
         border.color: DStyle.colorBorderNoFocus
-    }
 
-    // Content Loader
-    DLoader {
-        id: contentLoader
-        anchors.centerIn: parent
-        anchors.verticalCenterOffset: screenBorderRect.anchors.verticalCenterOffset
-        anchors.horizontalCenterOffset: screenBorderRect.anchors.horizontalCenterOffset
+        // Content Loader
+        DLoader {
+            id: contentLoader
+            anchors.centerIn: parent
+//            anchors.verticalCenterOffset: screenBorderRect.anchors.verticalCenterOffset
+//            anchors.horizontalCenterOffset: screenBorderRect.anchors.horizontalCenterOffset
 
-        source: liveController.liveMain.length > 0 ? "file://" + liveController.liveMain : ""
+            source: liveController.liveMain.length > 0 ? "file://" + liveController.liveMain : ""
 
-        onStatusChanged: {
-            // Switch Status
-            switch (status) {
-                case Loader.Ready:
-                    console.log("liveMain.contentLoader.onStatusChanged - READY!");
-                break;
+            onStatusChanged: {
+                // Switch Status
+                switch (status) {
+                    case Loader.Ready:
+                        console.log("liveMain.contentLoader.onStatusChanged - READY!");
+                    break;
 
-                case Loader.Error:
-                    console.warn("liveMain.contentLoader.onStatusChanged - status: " + status + " - ERROR LOADING CONTENT!!");
-                break;
+                    case Loader.Error:
+                        console.warn("liveMain.contentLoader.onStatusChanged - status: " + status + " - ERROR LOADING CONTENT!!");
+                    break;
 
-                case Loader.Loading:
+                    case Loader.Loading:
 
-                break;
+                    break;
+                }
             }
         }
     }
@@ -100,6 +100,7 @@ Item {
     // Dashboard Image
     DImage {
         anchors.centerIn: parent
+        anchors.verticalCenterOffset: 22
         //source: "qrc:/assets/images/dashboard.png"
         source: "file://" + propertiesController.currentProject.dashboard
         visible: settingsController.showDashboard

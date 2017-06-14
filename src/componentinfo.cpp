@@ -147,6 +147,24 @@ void ComponentInfo::clear()
     clearIDMap();
     // Clear Children
     clearChildren();
+    // Clear Animations
+    clearAnimations();
+    // Clear Behaviors
+    clearBehaviors();
+}
+
+//==============================================================================
+// Clear ID Map
+//==============================================================================
+void ComponentInfo::clearIDMap()
+{
+    qDebug() << "ComponentInfo::clearIDMap";
+
+    // Clear ID Map
+    mIDMap.clear();
+
+    // Emit Component ID Map Changed
+    emit componentIDMapChanged();
 }
 
 //==============================================================================
@@ -156,7 +174,7 @@ void ComponentInfo::clearChildren()
 {
     // Check Child Component Count
     if (mChildComponents.count() > 0) {
-        qDebug() << "#### ComponentInfo::clearChildren";
+        qDebug() << "ComponentInfo::clearChildren";
 
         // Iterate Through Children
         while (mChildComponents.count() > 0) {
@@ -181,17 +199,49 @@ void ComponentInfo::clearChildren()
 }
 
 //==============================================================================
-// Clear ID Map
+// Clear Animations
 //==============================================================================
-void ComponentInfo::clearIDMap()
+void ComponentInfo::clearAnimations()
 {
-    qDebug() << "ComponentInfo::clearIDMap";
+    // Check Animation Components Count
+    if (mAnimationComponents.count() > 0) {
+        qDebug() << "#### ComponentInfo::clearAnimations";
 
-    // Clear ID Map
-    mIDMap.clear();
+        // Iterate Through Animation Components
+        while (mAnimationComponents.count() > 0) {
+            // Take Animation Component
+            ComponentInfo* takenAnimation = mAnimationComponents.takeLast();
 
-    // Emit Component ID Map Changed
-    emit componentIDMapChanged();
+            // Check If Proto
+            if (!takenAnimation->mIsProtoType && takenAnimation->mProtoType) {
+                // Dec Ref Count For ProtoType
+                takenAnimation->mProtoType->releaseRef();
+            }
+
+            // Delete Taken Animation
+            delete takenAnimation;
+        }
+    }
+}
+
+//==============================================================================
+// Clear Behaviors
+//==============================================================================
+void ComponentInfo::clearBehaviors()
+{
+    // Check Behavior Components Count
+    if (mBehaviorComponents.count() < 0) {
+        qDebug() << "#### ComponentInfo::clearBehaviors";
+
+        // Iterate Through Animation Components
+        while (mBehaviorComponents.count() > 0) {
+            // Take Behavior Component
+            ComponentInfo* takenBehavior = mBehaviorComponents.takeLast();
+
+            // Delete Taken Behavior
+            delete takenBehavior;
+        }
+    }
 }
 
 //==============================================================================
@@ -424,12 +474,16 @@ void ComponentInfo::saveChildren()
 
     // Check Child Components Count
     if (cCount > 0) {
-        qDebug() << "#### ComponentInfo::saveChildren";
+        qDebug() << "#### ComponentInfo::saveChildren - path: " << componentPath();
 
         // Iterate Through Children Array
         for (int i=0; i<cCount; i++) {
+            // Get Child Info
+            ComponentInfo* childInfo = mChildComponents[i];
+            // Save Children
+            childInfo->saveChildren();
             // Append Child
-            newChildArray << mChildComponents[i]->toJSONObject(true);
+            newChildArray << childInfo->toJSONObject(true);
         }
     }
 
@@ -974,6 +1028,14 @@ void ComponentInfo::setUseIPosX(const bool& aUseIPosX)
         emit useIPosXChanged(mImplicitPosX);
         // Set Dirty
         setDirty(true);
+
+        // Check Use Implicit Width
+        if (mImplicitPosX && mProperties.keys().indexOf(JSON_KEY_COMPONENT_PROPERTY_X) >= 0) {
+            // Remove Property
+            mProperties.remove(JSON_KEY_COMPONENT_PROPERTY_X);
+            // Emit Need Refresh
+            emit needRefresh();
+        }
     }
 }
 
@@ -998,6 +1060,14 @@ void ComponentInfo::setUseIPosY(const bool& aUseIPosY)
         emit useIPosYChanged(mImplicitPosY);
         // Set Dirty
         setDirty(true);
+
+        // Check Use Implicit Width
+        if (mImplicitPosY && mProperties.keys().indexOf(JSON_KEY_COMPONENT_PROPERTY_Y) >= 0) {
+            // Remove Property
+            mProperties.remove(JSON_KEY_COMPONENT_PROPERTY_Y);
+            // Emit Need Refresh
+            emit needRefresh();
+        }
     }
 }
 
@@ -1022,6 +1092,14 @@ void ComponentInfo::setUseIWidth(const bool& aUseIWidth)
         emit useIWidthChanged(mImplicitWidth);
         // Set Dirty
         setDirty(true);
+
+        // Check Use Implicit Width
+        if (mImplicitWidth && mProperties.keys().indexOf(JSON_KEY_COMPONENT_PROPERTY_WIDTH) >= 0) {
+            // Remove Property
+            mProperties.remove(JSON_KEY_COMPONENT_PROPERTY_WIDTH);
+            // Emit Need Refresh
+            emit needRefresh();
+        }
     }
 }
 
@@ -1044,8 +1122,17 @@ void ComponentInfo::setUseIHeight(const bool& aUseIHeight)
         mImplicitHeight = aUseIHeight;
         // Emit Use Implicit Height Changed Signal
         emit useIHeightChanged(mImplicitHeight);
+
         // Set Dirty
         setDirty(true);
+
+        // Check Use Implicit Height
+        if (mImplicitHeight && mProperties.keys().indexOf(JSON_KEY_COMPONENT_PROPERTY_HEIGHT) >= 0) {
+            // Clear Property Height
+            mProperties.remove(JSON_KEY_COMPONENT_PROPERTY_HEIGHT);
+            // Emit Need Refresh
+            emit needRefresh();
+        }
     }
 }
 
@@ -1320,6 +1407,14 @@ QStringList ComponentInfo::inheritedPropertyKeys()
 }
 
 //==============================================================================
+// Get Proto Type Keys
+//==============================================================================
+QStringList ComponentInfo::protoTypeKeys()
+{
+    return mProtoType ? mProtoType->componentOwnPropertyKeys() : QStringList();
+}
+
+//==============================================================================
 // Set Dirty State
 //==============================================================================
 void ComponentInfo::setDirty(const bool& aDirty)
@@ -1559,12 +1654,16 @@ QJsonObject ComponentInfo::toJSONObject(const bool& aChild)
         ciObject[JSON_KEY_COMPONENT_USE_IMPLICIT_HEIGHT] = QJsonValue(mImplicitHeight);
     }
 
-    // ...
-
     // Check Anchors
     if (!mAnchors.isEmpty()) {
         // Set Anchors
         ciObject[JSON_KEY_COMPONENT_ANCHORS] = mAnchors;
+    }
+
+    // Check Behaviors
+    if (!mBehaviors.isEmpty()) {
+        // Set Behaviors
+        ciObject[JSON_KEY_COMPONENT_BEHAVIORS] = mBehaviors;
     }
 
     // Check Own Properties
@@ -1615,13 +1714,16 @@ QJsonObject ComponentInfo::toJSONObject(const bool& aChild)
         ciObject[JSON_KEY_COMPONENT_TRANSITIONS] = mTransitions;
     }
 
-    // Save Children
-    saveChildren();
-
     // Check Child Array
     if (!mChildren.isEmpty()) {
         // Save Children
         ciObject[JSON_KEY_COMPONENT_CHILDREN] = mChildren;
+    }
+
+    // Check Animations Array
+    if (!mAnimations.isEmpty()) {
+        // Save Animations
+        ciObject[JSON_KEY_COMPONENT_ANIMATIONS] = mAnimations;
     }
 
     // ...
@@ -1724,6 +1826,8 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject, const bool aCreat
     mOwnProperties = aObject[JSON_KEY_COMPONENT_OWN_PROPERTIES].toObject();
     // Set Properties
     mProperties = aObject[JSON_KEY_COMPONENT_PROPERTIES].toObject();
+    // Set Behaviors
+    mBehaviors = aObject[JSON_KEY_COMPONENT_BEHAVIORS].toArray();
     // Set Signals
     mSignals = aObject[JSON_KEY_COMPONENT_SIGNALS].toArray();
     // Set Slots
@@ -1734,15 +1838,20 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject, const bool aCreat
     mStates = aObject[JSON_KEY_COMPONENT_STATES].toArray();
     // Transitions
     mTransitions = aObject[JSON_KEY_COMPONENT_TRANSITIONS].toArray();
-
     // Children
     mChildren = aObject[JSON_KEY_COMPONENT_CHILDREN].toArray();
+    // Animations
+    mAnimations = aObject[JSON_KEY_COMPONENT_ANIMATIONS].toArray();
 
     // Check If Load Children
     if (aCreateChildren) {
         // Load Children
         loadChildren();
     }
+
+    // Create Animations
+
+    // Create Behaviors
 
     // ...
 }
@@ -2072,7 +2181,7 @@ QString ComponentInfo::liveCodeFormatPosition(const QString& aIndent)
         // Get Pos X
         QString cpX = posX();
         // Check Pos X
-        if (!cpX.isEmpty() && cpX.toInt() != 0) {
+        if (!mImplicitPosX && !cpX.isEmpty() && cpX.toInt() != 0) {
             // Add Pos X
             liveCode += QString("%1x: %2\n").arg(aIndent).arg(cpX);
         }
@@ -2080,7 +2189,7 @@ QString ComponentInfo::liveCodeFormatPosition(const QString& aIndent)
         // Get Pos Y
         QString cpY = posY();
         // Check Pos Y
-        if (!cpY.isEmpty() && cpY.toInt() != 0) {
+        if (!mImplicitPosY && !cpY.isEmpty() && cpY.toInt() != 0) {
             // Add Pos Y
             liveCode += QString("%1y: %2\n").arg(aIndent).arg(cpY);
         }
@@ -2110,7 +2219,7 @@ QString ComponentInfo::liveCodeFormatSize(const QString& aIndent)
         // Get Width
         QString cWidth = width();
         // Check Width
-        if (!cWidth.isEmpty() && cWidth != "0") {
+        if (!mImplicitWidth && !cWidth.isEmpty() && cWidth != "0") {
             // Add Width
             liveCode += QString("%1width: %2\n").arg(aIndent).arg(cWidth);
         }
@@ -2118,7 +2227,7 @@ QString ComponentInfo::liveCodeFormatSize(const QString& aIndent)
         // Get Height
         QString cHeight = height();
         // Check Height
-        if (!cHeight.isEmpty() && cHeight != "0") {
+        if (!mImplicitHeight && !cHeight.isEmpty() && cHeight != "0") {
             // Add Height
             liveCode += QString("%1height: %2\n").arg(aIndent).arg(cHeight);
         }
@@ -2324,9 +2433,11 @@ QString ComponentInfo::liveCodeFormatOwnProperties(QStringList& aOPHooks,
     QString liveCode = "";
 
     // Get Own Properties Keys
-    QStringList opKeys = componentOwnPropertyKeys();
+    QStringList opKeys = mOwnProperties.keys();
+    //QStringList opKeys = componentOwnPropertyKeys();
     // Get Property Keys
     QStringList pKeys = inheritedPropertyKeys();
+
     // Get Own Properties Count
     int opCount = opKeys.count();
 
@@ -2454,6 +2565,11 @@ QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks,
 
     // Get All Inherited Properties Keys
     QStringList pKeys = inheritedPropertyKeys();
+    // Add Proto Type Keys
+    pKeys << protoTypeKeys();
+    // Remove Duplicates
+    pKeys.removeDuplicates();
+
     // Get Properties Count
     int pCount = pKeys.count();
 
@@ -2858,21 +2974,76 @@ QString ComponentInfo::liveCodeFormatFunctions(const QString& aIndent)
 //==============================================================================
 // Format Children
 //==============================================================================
-QString ComponentInfo::liveCodeFormatChildren(const bool& aGenerateChildren, const QString& aIndent, const bool& aComponentCode)
+QString ComponentInfo::liveCodeFormatChildren(const QString& aIndent, const bool& aComponentCode)
 {
     // Init Live Code
     QString liveCode = "";
 
+    // Get Number Of Children
+    int cCount = mChildComponents.count();
+
     // Check Children
-    if (aGenerateChildren && mChildComponents.count() > 0) {
+    if (cCount > 0) {
         // Add Comment
         liveCode += QString("\n%1// Children\n\n").arg(aIndent);
-        // Get Number Of Children
-        int cCount = mChildComponents.count();
         // Iterate Through Children
         for (int i=0; i<cCount; i++) {
             // Get Child Object
-            liveCode += mChildComponents[i]->generateLiveCode(false, aGenerateChildren, aIndent, aComponentCode);
+            liveCode += mChildComponents[i]->generateLiveCode(false, true, aIndent, aComponentCode);
+            // Add New Line
+            liveCode += "\n";
+        }
+    }
+
+    return liveCode;
+}
+
+//==============================================================================
+// Format Animations
+//==============================================================================
+QString ComponentInfo::liveCodeFormatAnimations(const QString& aIndent, const bool& aComponentCode)
+{
+    // Init Live Code
+    QString liveCode = "";
+
+    // Get Number Of Animations
+    int acCount = mAnimationComponents.count();
+
+    // Check Animations Count
+    if (acCount > 0) {
+        // Add Comment
+        liveCode += QString("\n%1// Animations\n\n").arg(aIndent);
+        // Iterate Through Children
+        for (int i=0; i<acCount; i++) {
+            // Get Child Object
+            liveCode += mAnimationComponents[i]->generateLiveCode(false, true, aIndent, aComponentCode);
+            // Add New Line
+            liveCode += "\n";
+        }
+    }
+
+    return liveCode;
+}
+
+//==============================================================================
+// Format Behaviors
+//==============================================================================
+QString ComponentInfo::liveCodeFormatBehaviors(const QString& aIndent, const bool& aComponentCode)
+{
+    // Init Live Code
+    QString liveCode = "";
+
+    // Get Number Of Behaviors
+    int bcCount = mBehaviorComponents.count();
+
+    // Check Animations Count
+    if (bcCount > 0) {
+        // Add Comment
+        liveCode += QString("\n%1// Behaviors\n\n").arg(aIndent);
+        // Iterate Through Children
+        for (int i=0; i<bcCount; i++) {
+            // Get Child Object
+            liveCode += mBehaviorComponents[i]->generateLiveCode(false, true, aIndent, aComponentCode);
             // Add New Line
             liveCode += "\n";
         }
@@ -3257,7 +3428,11 @@ QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGene
 
     // Add Children ============================================================
 
-    liveCode += liveCodeFormatChildren(aGenerateChildren, indent, aComponentCode);
+    // Check If Generate Children
+    if (aGenerateChildren) {
+        // Generate Children Live Code
+        liveCode += liveCodeFormatChildren(indent, aComponentCode);
+    }
 
     // Add States ==============================================================
 
@@ -3358,12 +3533,10 @@ QString ComponentInfo::generateComponentCode(const bool& aGenerateChildren)
 
     // Add Children ============================================================
 
-    // Generate Base Components For Children Base Classes
-    QString childrenCode = liveCodeFormatChildren(aGenerateChildren, indent, true);
-
     // Check Generate Children
     if (aGenerateChildren) {
-        componentCode += childrenCode;
+        // Format Children
+        componentCode += liveCodeFormatChildren(indent, true);
     }
 
     // Add States ==============================================================
@@ -3571,7 +3744,7 @@ void ComponentInfo::incRefCount()
     // Decrease Child Reference Count
     mRefCount++;
 
-    qDebug() << "#### ComponentInfo::incRefCount - mName: " << mName << " - mRefCount: " << mRefCount;
+    qDebug() << "ComponentInfo::incRefCount - mName: " << mName << " - mRefCount: " << mRefCount;
 }
 
 //==============================================================================
@@ -3582,12 +3755,16 @@ void ComponentInfo::releaseRef()
     // Decrease Child Reference Count
     mRefCount--;
 
-    qDebug() << "#### ComponentInfo::releaseRef - mName: " << mName << " - mRefCount: " << mRefCount;
+    qDebug() << "ComponentInfo::releaseRef - mName: " << mName << " - mRefCount: " << mRefCount;
 
     // Check Ref Count
-    if (mRefCount == 0) {
+    if (mRefCount <= 0) {
         // Clear Children
         clearChildren();
+        // Clear Animations
+        clearAnimations();
+        // Clear Behaviors
+        clearBehaviors();
     }
 }
 

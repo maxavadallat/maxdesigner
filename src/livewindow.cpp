@@ -103,11 +103,14 @@ void LiveWindow::restoreUI()
     // Init Meu Bar Height
     int menuBarHeight = 22;
 
-    // Set Geometry
-    setGeometry((mMainWindow->width() - screenWidth()) / 2 + mMainWindow->x(),
-                (mMainWindow->height() - screenHeight() + menuBarHeight) / 2 + menuBarHeight / 2 + mMainWindow->y(),
-                screenWidth(),
-                screenHeight() + menuBarHeight);
+//    // Set Geometry
+//    setGeometry((mMainWindow->width() - screenWidth()) / 2 + mMainWindow->x(),
+//                (mMainWindow->height() - screenHeight() + menuBarHeight) / 2 + menuBarHeight / 2 + mMainWindow->y(),
+//                screenWidth(),
+//                screenHeight() + menuBarHeight);
+
+    // Set Always On top
+    setWindowFlags(Qt::WindowStaysOnTopHint);
 
     // ...
 }
@@ -147,7 +150,10 @@ void LiveWindow::setLiveMain(const QString& aLiveMain)
 //==============================================================================
 int LiveWindow::screenWidth()
 {
-    return mProjectModel ? mProjectModel->screenWidth() : 640;
+    // Get Screen Width
+    int sw = mProjectModel ? mProjectModel->screenWidth() : 640;
+
+    return sw;
 }
 
 //==============================================================================
@@ -155,7 +161,10 @@ int LiveWindow::screenWidth()
 //==============================================================================
 int LiveWindow::screenHeight()
 {
-    return mProjectModel ? mProjectModel->screenHeight() : 480;
+    // Get Screen Height
+    int sh = mProjectModel ? mProjectModel->screenHeight() : 480;
+
+    return sh;
 }
 
 //==============================================================================

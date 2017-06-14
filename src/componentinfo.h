@@ -329,6 +329,9 @@ public:
     // Get All Inherited Property Keys
     Q_INVOKABLE QStringList inheritedPropertyKeys();
 
+    // Get Proto Type Keys
+    Q_INVOKABLE QStringList protoTypeKeys();
+
     // Get Component Hierarchy
     Q_INVOKABLE QStringList hierarchy();
 
@@ -358,6 +361,8 @@ public:
 
     // Get Children Loaded
     bool childrenLoaded();
+    // Animations Loaded
+    bool animationsLoaded();
 
     // Load Children
     Q_INVOKABLE void loadChildren();
@@ -366,6 +371,8 @@ public:
 
     // Get Child Count
     int childCount();
+    // Animations Count
+    int animsCount();
     // Child Depth
     int depth();
 
@@ -453,9 +460,13 @@ signals:
 
     // Children Loaded Changed Signal
     void childrenLoadedChanged(const bool& aChildrenLoaded);
+    // Animations Loaded Changed
+    void animationsLoadedChanged(const bool& aAnimsLoaded);
 
     // Child Count Changed Signal
     void childCountChanged(const int& aCount);
+    // Animations Count Changed
+    void animsCountChanged(const int& aCount);
     // Child Depth Changed Signal
     void depthChanged(const int& aDepth);
 
@@ -468,6 +479,13 @@ signals:
     void childMoved(ComponentInfo* aParentComponent, const int& aIndex, ComponentInfo* aTargetComponent, const int& aTargetIndex);
     // Child Removed Signal
     void childRemoved(const int& aIndex);
+
+    // Animation Added Signal
+    void animationAdded(const int& aIndex);
+    // Animation Moved Signal
+    void animamationMoved(ComponentInfo* aParentComponent, const int& aIndex, ComponentInfo* aTargetComponent, const int& aTargetIndex);
+    // Animations Removed Signal
+    void animationRemoved(const int& aIndex);
 
     // Source Path Changed Signal
     void sourcePathChanged(const QString& aPath);
@@ -646,12 +664,14 @@ protected:
     void init();
     // Clear
     void clear();
+    // Clear ID Map
+    void clearIDMap();
     // Clear Children
     void clearChildren();
     // Clear Animations
     void clearAnimations();
-    // Clear ID Map
-    void clearIDMap();
+    // Clear Behaviors
+    void clearBehaviors();
 
     // Init Info Path
     bool initInfoPath();
@@ -770,7 +790,11 @@ protected:
     // Format Functions
     QString liveCodeFormatFunctions(const QString& aIndent = "");
     // Format Children
-    QString liveCodeFormatChildren(const bool& aGenerateChildren = false, const QString& aIndent = "", const bool& aComponentCode = false);
+    QString liveCodeFormatChildren(const QString& aIndent = "", const bool& aComponentCode = false);
+    // Format Animations
+    QString liveCodeFormatAnimations(const QString& aIndent = "", const bool& aComponentCode = false);
+    // Format Behaviors
+    QString liveCodeFormatBehaviors(const QString& aIndent = "", const bool& aComponentCode = false);
     // Format States
     QString liveCodeFormatState(const int& aIndex, const QString& aIndent = "");
     // Format States
@@ -880,7 +904,9 @@ protected: // Data
     // Children
     QList<ComponentInfo*>   mChildComponents;
     // Animations
-    QList<ComponentInfo*>   mAnimations;
+    QList<ComponentInfo*>   mAnimationComponents;
+    // Behaviors
+    QList<ComponentInfo*>   mBehaviorComponents;
 
     // Component Id Map
     QMap<QString, QObject*> mIDMap;
@@ -893,6 +919,8 @@ protected: // Data
     QJsonObject             mOwnProperties;
     // Properties
     QJsonObject             mProperties;
+    // Behaviors
+    QJsonArray              mBehaviors;
     // Signals
     QJsonArray              mSignals;
     // Slots
@@ -901,6 +929,8 @@ protected: // Data
     QJsonArray              mFunctions;
     // Children
     QJsonArray              mChildren;
+    // Animations
+    QJsonArray              mAnimations;
     // States
     QJsonArray              mStates;
     // Transitions

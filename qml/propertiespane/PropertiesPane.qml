@@ -98,7 +98,7 @@ DPane {
 
     property int namesColumnWidth: propertiesPaneRoot.width * CONSTS.defaultNamesColumnWidth
 
-    title: "Properties" + (propertiesController.focusedComponent ? (" - " + propertiesController.focusedComponent.componentName) : "")
+    title: "Properties"
 
     creationWidth: settingsController ? settingsController.propertiesPaneWidth : 300
     creationHeight: settingsController ? settingsController.propertiesPaneHeight : 600
@@ -210,6 +210,29 @@ DPane {
         }
     }
 
+    DText {
+        id: componentPathLabel
+        parent: propertiesPaneRoot
+        anchors.left: parent.left
+        anchors.leftMargin: titleLabel.width + DStyle.defaultMargin
+        anchors.right: parent.right
+        anchors.rightMargin: DStyle.defaultMargin
+        anchors.top: parent.top
+        anchors.topMargin: DStyle.defaultMargin
+        font.bold: true
+        wrapMode: Text.NoWrap
+        elide: Text.ElideMiddle
+
+        text: {
+            // Check Focused Compoennt
+            if (propertiesController.focusedComponent !== null) {
+                return " - " + propertiesController.focusedComponent.componentPath
+            }
+
+            return "";
+        }
+    }
+
     // ID Row
     Row {
         id: idRow
@@ -233,8 +256,31 @@ DPane {
             text: propertiesController.focusedComponent ? propertiesController.focusedComponent.componentID : ""
 
             onAccepted: {
+                // Get Component Info By ID
+                var ciTemp = propertiesController.focusedComponent.getChildObject(newText);
+
+                // Check Compo
+                if (ciTemp !== null) {
+                    // Check Against The Focused Component
+                    if (ciTemp === propertiesController.focusedComponent) {
+                        // It's The Same Component, Just Ignore
+                        return;
+                    }
+
+                    // ID Is Already In Use
+                    // Set Invalid Value
+                    idEditor.invalidValue = true;
+
+                    return;
+                }
+
                 // Request New Component ID
                 propertiesController.requestCID(newText);
+            }
+
+            onTextEdited: {
+                // Reset Invalid Value
+                idEditor.invalidValue = false;
             }
         }
     }

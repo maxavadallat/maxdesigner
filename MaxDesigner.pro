@@ -25,7 +25,6 @@ SOURCES             += src/settingscontroller.cpp \
                     src/projectmodel.cpp \
                     src/componentinfo.cpp \
                     src/recentprojectsmodel.cpp \
-                    src/projectitemmodel.cpp \
                     src/componentsmodel.cpp \
                     src/viewsmodel.cpp \
                     src/designerfilesortproxy.cpp \
@@ -42,7 +41,9 @@ SOURCES             += src/settingscontroller.cpp \
                     src/componentimportsmodel.cpp \
                     src/datasourcesmodel.cpp \
                     src/assetlistmodel.cpp \
-                    src/assetstreemodel.cpp
+                    src/assetstreemodel.cpp \
+                    src/componentsfilter.cpp \
+                    src/projecttreemodel.cpp
 
 # Views/Dialog Sources
 SOURCES             += src/mainwindow.cpp \
@@ -79,7 +80,6 @@ HEADERS             += src/settingscontroller.h \
                     src/projectmodel.h \
                     src/componentinfo.h \
                     src/recentprojectsmodel.h \
-                    src/projectitemmodel.h \
                     src/componentsmodel.h \
                     src/viewsmodel.h \
                     src/minimizedcomponents.h \
@@ -96,7 +96,9 @@ HEADERS             += src/settingscontroller.h \
                     src/componentimportsmodel.h \
                     src/datasourcesmodel.h \
                     src/assetlistmodel.h \
-                    src/assetstreemodel.h
+                    src/assetstreemodel.h \
+                    src/componentsfilter.h \
+                    src/projecttreemodel.h
 
 # View/Dialog Headers
 HEADERS             += src/mainwindow.h \

@@ -71,7 +71,8 @@
 
 // Own Properties Filter Proxy
 #define DEFAULT_MAIN_QML_COMPONENTS_OWN_COMPONENTS_FILTER   "ComponentOwnPropertiesFilter"
-
+// Components Filter Proxy
+#define DEFAULT_MAIN_QML_COMPONENTS_FILTER                  "ComponentsFilter"
 
 // Main Controller Name
 #define DEFAULT_MAIN_CONTROLLER_NAME                        "mainController"
@@ -151,6 +152,7 @@
 
 #define DEFAULT_PROJECT_ASSETS_DIR_NAME                     "assets"
 #define DEFAULT_PROJECT_LIVE_TEMP_DIR_NAME                  "livetemp"
+#define DEFAULT_PROJECT_LIVE_SOURCE_DIR_NAME                "livesource"
 
 // JSON Keys for Project Info
 #define JSON_KEY_PROJECT_NAME                               "projectName"
@@ -218,8 +220,10 @@
 #define JSON_KEY_COMPONENT_BASE                             "componentBase"
 #define JSON_KEY_COMPONENT_OWN_PROPERTIES                   "componentOwnProperties"
 #define JSON_KEY_COMPONENT_PROPERTIES                       "componentProperties"
+#define JSON_KEY_COMPONENT_BEHAVIORS                        "componentBehaviors"
 #define JSON_KEY_COMPONENT_PARENT                           "componentParent"
 #define JSON_KEY_COMPONENT_CHILDREN                         "componentChildren"
+#define JSON_KEY_COMPONENT_ANIMATIONS                       "componentAnimations"
 #define JSON_KEY_COMPONENT_ANCHORS                          "componentAnchors"
 #define JSON_KEY_COMPONENT_SIGNALS                          "componentSignals"
 #define JSON_KEY_COMPONENT_SLOTS                            "componentSlots"
