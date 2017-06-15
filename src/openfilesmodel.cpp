@@ -362,6 +362,10 @@ void OpenFilesModel::openComponent(ComponentInfo* aComponent)
     if (aComponent) {
         // Load Children
         aComponent->loadChildren();
+        // Laod Animations
+        aComponent->loadAnimations();
+        // Load Behaviors
+        aComponent->loadBehaviors();
         // Get Opened File Index
         cIndex = openFile(aComponent->infoPath(), true);
         // Open File

@@ -181,6 +181,7 @@
 #define COMPONENT_CATEGORY_CONTAINER                        "Container"
 #define COMPONENT_CATEGORY_DELEGATE                         "Delegate"
 #define COMPONENT_CATEGORY_ANIMATION                        "Animation"
+#define COMPONENT_CATEGORY_BEHAVIOR                         "Behavior"
 #define COMPONENT_CATEGORY_IMAGE                            "Image"
 #define COMPONENT_CATEGORY_VIEW                             "View"
 

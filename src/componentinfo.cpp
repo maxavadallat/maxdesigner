@@ -47,6 +47,10 @@ ComponentInfo* ComponentInfo::clone()
     qDebug() << "#### ComponentInfo::clone - mName: " << mName;
     // Load Children For Proto Type
     loadChildren();
+    // Load Animations
+    loadAnimations();
+    // Load Behaviors
+    loadBehaviors();
     // Inc Ref Count
     incRefCount();
     // Create Component Info
@@ -94,6 +98,7 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mGroupped(false)
     , mChildrenLoaded(false)
     , mAnimationsLoaded(false)
+    , mBehaviorsLoaded(false)
     , mRefCount(0)
     , mComponentHandler(NULL)
     , mBase(NULL)
@@ -158,13 +163,14 @@ void ComponentInfo::clear()
 //==============================================================================
 void ComponentInfo::clearIDMap()
 {
-    qDebug() << "ComponentInfo::clearIDMap";
-
-    // Clear ID Map
-    mIDMap.clear();
-
-    // Emit Component ID Map Changed
-    emit componentIDMapChanged();
+    // Check ID Map Count
+    if (mIDMap.count() > 0) {
+        qDebug() << "ComponentInfo::clearIDMap";
+        // Clear ID Map
+        mIDMap.clear();
+        // Emit Component ID Map Changed
+        emit componentIDMapChanged();
+    }
 }
 
 //==============================================================================
@@ -174,7 +180,7 @@ void ComponentInfo::clearChildren()
 {
     // Check Child Component Count
     if (mChildComponents.count() > 0) {
-        qDebug() << "ComponentInfo::clearChildren";
+        qDebug() << "ComponentInfo::clearChildren - mName: " << mName;
 
         // Iterate Through Children
         while (mChildComponents.count() > 0) {
@@ -205,7 +211,7 @@ void ComponentInfo::clearAnimations()
 {
     // Check Animation Components Count
     if (mAnimationComponents.count() > 0) {
-        qDebug() << "#### ComponentInfo::clearAnimations";
+        qDebug() << "ComponentInfo::clearAnimations - mName: " << mName;
 
         // Iterate Through Animation Components
         while (mAnimationComponents.count() > 0) {
@@ -231,7 +237,7 @@ void ComponentInfo::clearBehaviors()
 {
     // Check Behavior Components Count
     if (mBehaviorComponents.count() < 0) {
-        qDebug() << "#### ComponentInfo::clearBehaviors";
+        qDebug() << "ComponentInfo::clearBehaviors - mName: " << mName;
 
         // Iterate Through Animation Components
         while (mBehaviorComponents.count() > 0) {
@@ -332,20 +338,26 @@ bool ComponentInfo::load(const QString& aFilePath, const bool aCreateChildren)
 //==============================================================================
 bool ComponentInfo::save(const QString& aFilePath)
 {
-    // Check If Prototype
-    if (!mIsProtoType) {
-        // Saving Only Prototypes...
-        return false;
-    }
-
     // Check File Path
     if (aFilePath.isEmpty() && !mDirty) {
         // No Need to Save
         return false;
     }
 
+    qDebug() << "ComponentInfo::save - path: " << componentPath();
+
     // Save Children
     saveChildren();
+    // Save Animations
+    saveAnimations();
+    // Save Behaviors
+    saveBehaviors();
+
+    // Check If Prototype
+    if (!mIsProtoType) {
+        // Saving Only Prototypes...
+        return false;
+    }
 
     // Init File Info
     QFileInfo fileInfo(aFilePath.isEmpty() ? mInfoPath : aFilePath);
@@ -363,7 +375,7 @@ bool ComponentInfo::save(const QString& aFilePath)
     // Init Component Info File
     QFile ciFile(fileInfo.absoluteFilePath());
 
-    qDebug() << "ComponentInfo::save - fileName: " << ciFile.fileName();
+    qDebug() << "ComponentInfo::save - mName: " << mName << " -> fileName: " << ciFile.fileName();
 
     // Open File
     if (ciFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -424,7 +436,7 @@ void ComponentInfo::loadChildren()
 
                 // Check Child Component
                 if (componentProtoType) {
-                    //qDebug() << "ComponentInfo::fromJSONObject - componentProtoType: " << componentProtoType->mName;
+                    //qDebug() << "ComponentInfo::loadChildren - componentProtoType: " << componentProtoType->mName;
                     // Clone Component
                     ComponentInfo* childComponent = componentProtoType->clone();
                     // Set Parent FIRST!!! Needed for the Recursive call of fromJSONObject
@@ -437,7 +449,7 @@ void ComponentInfo::loadChildren()
                     addChild(childComponent, true);
 
                 } else {
-                    qWarning() << "ComponentInfo::fromJSONObject - ccName: " << ccName << " - NO COMPONENT!!";
+                    qWarning() << "ComponentInfo::loadChildren - ccName: " << ccName << " - NO COMPONENT!!";
                 }
             }
         }
@@ -448,6 +460,58 @@ void ComponentInfo::loadChildren()
 // Load Animations
 //==============================================================================
 void ComponentInfo::loadAnimations()
+{
+    // Get Animations Array Count
+    int aaCount = mAnimations.count();
+
+    // Check Animations Loaded
+    if (!mAnimationsLoaded) {
+        // Set Animations Loaded
+        setAnimationsLoaded(true);
+
+        // Check To Create Animations
+        if (aaCount > 0) {
+            qDebug() << "#### ComponentInfo::loadAnimations";
+
+            // Iterate Through Animations Array
+            for (int i=0; i<aaCount; i++) {
+                // Get Array Item
+                QJsonObject animObject = mAnimations[i].toObject();
+
+                // Get Anim Component Name
+                QString acName = animObject[JSON_KEY_COMPONENT_NAME].toString();
+                // Get Anim Component Type
+                QString acType = animObject[JSON_KEY_COMPONENT_TYPE].toString();
+
+                // Get Anim Compoennt ProtoType
+                ComponentInfo* componentProtoType = mProject ? mProject->getComponentByName(acName, acType, true) : NULL;
+
+                // Check Anim Component
+                if (componentProtoType) {
+                    //qDebug() << "ComponentInfo::loadAnimations - componentProtoType: " << componentProtoType->mName;
+                    // Clone Component
+                    ComponentInfo* animComponent = componentProtoType->clone();
+                    // Set Parent FIRST!!! Needed for the Recursive call of fromJSONObject
+                    animComponent->mParent = this;
+                    // Emit Depth Changed Signal
+                    emit animComponent->depthChanged(animComponent->depth());
+                    // Set Up/Update Anim Component from JSON Object
+                    animComponent->fromJSONObject(animObject, true);
+                    // Add Anim
+                    addChild(animComponent, true);
+
+                } else {
+                    qWarning() << "ComponentInfo::fromJSONObject - acName: " << acName << " - NO COMPONENT!!";
+                }
+            }
+        }
+    }
+}
+
+//==============================================================================
+// Load BEhaviors
+//==============================================================================
+void ComponentInfo::loadBehaviors()
 {
 
 }
@@ -465,7 +529,7 @@ void ComponentInfo::saveChildren()
 
     // Check Children JSON Array Count
     if (mChildren.count() > 0 && !mChildrenLoaded && cCount > 0) {
-        qWarning() << "#### ComponentInfo::saveChildren - CHILD COMPOENNTS WERE NOT LOADED!!!";
+        qWarning() << "ComponentInfo::saveChildren - CHILD COMPONENTS WERE NOT LOADED!!!";
 
         // NEVER SHOULD GET HERE!!!
 
@@ -474,7 +538,7 @@ void ComponentInfo::saveChildren()
 
     // Check Child Components Count
     if (cCount > 0) {
-        qDebug() << "#### ComponentInfo::saveChildren - path: " << componentPath();
+        qDebug() << "ComponentInfo::saveChildren - path: " << componentPath();
 
         // Iterate Through Children Array
         for (int i=0; i<cCount; i++) {
@@ -482,6 +546,10 @@ void ComponentInfo::saveChildren()
             ComponentInfo* childInfo = mChildComponents[i];
             // Save Children
             childInfo->saveChildren();
+            // Save Animations
+            childInfo->saveAnimations();
+            // Save Behaviors
+            childInfo->saveBehaviors();
             // Append Child
             newChildArray << childInfo->toJSONObject(true);
         }
@@ -489,6 +557,86 @@ void ComponentInfo::saveChildren()
 
     // Set Children JSON Array
     mChildren = newChildArray;
+}
+
+//==============================================================================
+// Save Animations
+//==============================================================================
+void ComponentInfo::saveAnimations()
+{
+    // Init New JSON Array
+    QJsonArray newAnimsArray;
+
+    // Get Anim Components Count
+    int cCount = mAnimationComponents.count();
+
+    // Check Anims JSON Array Count
+    if (mAnimations.count() > 0 && !mAnimationsLoaded && cCount > 0) {
+        qWarning() << "ComponentInfo::saveAnimations - ANIMATION COMPONENTS WERE NOT LOADED!!!";
+
+        // NEVER SHOULD GET HERE!!!
+
+        return;
+    }
+
+    // Check Child Components Count
+    if (cCount > 0) {
+        qDebug() << "ComponentInfo::saveAnimations - path: " << componentPath() << " - cCount: " << cCount;
+
+        // Iterate Through Children Array
+        for (int i=0; i<cCount; i++) {
+            // Get Child Info
+            ComponentInfo* childInfo = mAnimationComponents[i];
+            // Save Animations
+            childInfo->saveAnimations();
+            // Get JSON Object
+            QJsonObject newObject = childInfo->toJSONObject(true);
+            // Append Child
+            newAnimsArray << newObject;
+        }
+    }
+
+    // Set Children JSON Array
+    mAnimations = newAnimsArray;
+}
+
+//==============================================================================
+// Save Behaviors
+//==============================================================================
+void ComponentInfo::saveBehaviors()
+{
+    // Init New JSON Array
+    QJsonArray newBehaviorsArray;
+
+    // Get Behavior Components Count
+    int cCount = mBehaviorComponents.count();
+
+    // Check Behaviors JSON Array Count
+    if (mBehaviors.count() > 0 && !mBehaviorsLoaded && cCount > 0) {
+        qWarning() << "ComponentInfo::saveBehaviors - BEHAVIOR COMPONENTS WERE NOT LOADED!!!";
+
+        // NEVER SHOULD GET HERE!!!
+
+        return;
+    }
+
+    // Check Child Components Count
+    if (cCount > 0) {
+        qDebug() << "ComponentInfo::saveBehaviors - path: " << componentPath();
+
+        // Iterate Through Children Array
+        for (int i=0; i<cCount; i++) {
+            // Get Child Info
+            ComponentInfo* childInfo = mBehaviorComponents[i];
+            // Save Animations
+            childInfo->saveAnimations();
+            // Append Child
+            newBehaviorsArray << childInfo->toJSONObject(true);
+        }
+    }
+
+    // Set Children JSON Array
+    mBehaviors = newBehaviorsArray;
 }
 
 //==============================================================================
@@ -502,6 +650,34 @@ void ComponentInfo::setChildrenLoaded(const bool& aChildrenLoaded)
         mChildrenLoaded = aChildrenLoaded;
         // Emit Children Loaded Changed Signal
         emit childrenLoadedChanged(mChildrenLoaded);
+    }
+}
+
+//==============================================================================
+// Set Animations Loaded
+//==============================================================================
+void ComponentInfo::setAnimationsLoaded(const bool& aAnimationsLoaded)
+{
+    // Check Animations Loaded
+    if (mAnimationsLoaded != aAnimationsLoaded) {
+        // Set Animations Loaded
+        mAnimationsLoaded = aAnimationsLoaded;
+        // Emit Animations Loaded Changed Signal
+        emit animationsLoadedChanged(mAnimationsLoaded);
+    }
+}
+
+//==============================================================================
+// Set Behaviors Loaded
+//==============================================================================
+void ComponentInfo::setBehaviorsLoaded(const bool& aBehaviorsLoaded)
+{
+    // Check Beaviors Loaded
+    if (mBehaviorsLoaded != aBehaviorsLoaded) {
+        // Set Behaviors Loaded
+        mBehaviorsLoaded = aBehaviorsLoaded;
+        // Emit Behaviors Loaded Changed Signal
+        emit behaviorsLoadedChanged(mBehaviorsLoaded);
     }
 }
 
@@ -1716,14 +1892,20 @@ QJsonObject ComponentInfo::toJSONObject(const bool& aChild)
 
     // Check Child Array
     if (!mChildren.isEmpty()) {
-        // Save Children
+        // Set Children
         ciObject[JSON_KEY_COMPONENT_CHILDREN] = mChildren;
     }
 
     // Check Animations Array
     if (!mAnimations.isEmpty()) {
-        // Save Animations
+        // Set Animations
         ciObject[JSON_KEY_COMPONENT_ANIMATIONS] = mAnimations;
+    }
+
+    // Check Behaviors Array
+    if (!mBehaviors.isEmpty()) {
+        // Set Behaviors
+        ciObject[JSON_KEY_COMPONENT_BEHAVIORS] = mBehaviors;
     }
 
     // ...
@@ -1946,7 +2128,6 @@ void ComponentInfo::setChildObjectID(QObject* aObject, const QString& aID)
     if (!cidKey.isEmpty()) {
         // Remove Key
         rootInfo->mIDMap.remove(cidKey);
-
         // Emit Component ID Map Changed Signal
         emit componentIDMapChanged();
     }
@@ -1959,12 +2140,10 @@ void ComponentInfo::setChildObjectID(QObject* aObject, const QString& aID)
 
     // Check If ID Is Already Registered
     if (rootInfo->mIDMap.keys().indexOf(aID) < 0) {
-
         //qDebug() << "ComponentInfo::setChildObjectID - aObject: " << aObject << " - aID: " << aID;
 
         // Add Object ID
         rootInfo->mIDMap[aID] = aObject;
-
         // Emit Component ID Map Changed Signal
         emit componentIDMapChanged();
 
@@ -1988,6 +2167,7 @@ void ComponentInfo::clearObjectID(const QString& aID)
         qDebug() << "ComponentInfo::clearObjectID - aID: " << aID;
         // Remove Object ID
         rootInfo->mIDMap.remove(aID);
+
     } else {
         qWarning() << "ComponentInfo::clearObjectID - aID: " << aID << " - IS NOT REGISTERED!!";
     }
@@ -4235,6 +4415,22 @@ int ComponentInfo::childCount()
 }
 
 //==============================================================================
+// Animations Count
+//==============================================================================
+int ComponentInfo::animsCount()
+{
+    return mAnimationComponents.count();
+}
+
+//==============================================================================
+// Behaviors Count
+//==============================================================================
+int ComponentInfo::behaviorsCount()
+{
+    return mBehaviorComponents.count();
+}
+
+//==============================================================================
 // Child Depth
 //==============================================================================
 int ComponentInfo::depth()
@@ -4302,6 +4498,19 @@ ComponentInfo* ComponentInfo::childInfo(const QString& aMap)
 }
 
 //==============================================================================
+// Get Anim Info
+//==============================================================================
+ComponentInfo* ComponentInfo::animInfo(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < mAnimationComponents.count()) {
+        return mAnimationComponents[aIndex];
+    }
+
+    return NULL;
+}
+
+//==============================================================================
 // Add Child
 //==============================================================================
 void ComponentInfo::addChild(ComponentInfo* aChild, const bool& aLoadChildren)
@@ -4315,19 +4524,48 @@ void ComponentInfo::addChild(ComponentInfo* aChild, const bool& aLoadChildren)
         aChild->mDirty = false;
         // Set Parent
         aChild->mParent = this;
-        // Append Child
-        mChildComponents << aChild;
+
+        // Check Child Component Category
+        if (aChild->mCategory == "Animation") {
+            // Append Anim
+            mAnimationComponents << aChild;
+
+        } else if (aChild->mCategory == "Behavior") {
+            // Append Behavior
+            mBehaviorComponents << aChild;
+
+        } else {
+            // Append Child
+            mChildComponents << aChild;
+        }
+
         // Add ID To ID Map
         setChildObjectID(aChild, aChild->componentID());
+
         // Check If Loading Children
         if (!aLoadChildren) {
             // Set Dirty
             setDirty(true);
         }
-        // Emit Child Added
-        emit childAdded(mChildComponents.count() - 1);
-        // Emit Child Count Changed Signal
-        emit childCountChanged(mChildComponents.count());
+
+        // Check Child Component Category
+        if (aChild->mCategory == "Animation") {
+            // Emit Animation Added Signal
+            emit animationAdded(mAnimationComponents.count() - 1);
+            // Emit Anims Count Changed Signal
+            emit animsCountChanged(mAnimationComponents.count());
+
+        } else if (aChild->mCategory == "Behavior") {
+            // Emit Behavior Added Signal
+            emit behaviorAdded(mBehaviorComponents.count() - 1);
+            // Emit Behaviors Count Changed Signal
+            emit behaviorsCountChanged(mBehaviorComponents.count());
+        } else {
+            // Emit Child Added
+            emit childAdded(mChildComponents.count() - 1);
+            // Emit Child Count Changed Signal
+            emit childCountChanged(mChildComponents.count());
+        }
     }
 }
 
@@ -4346,18 +4584,55 @@ void ComponentInfo::insertChild(const int& aIndex, ComponentInfo* aChild, const 
         aChild->mDirty = false;
         // Add ID To ID Map
         setChildObjectID(aChild, aChild->componentID());
-        // Insert Child
-        mChildComponents.insert(aIndex, aChild);
+
+        // Check Child Component Category
+        if (aChild->mCategory == "Animation") {
+            // Append Anim
+            mAnimationComponents.insert(aIndex, aChild);
+
+        } else if (aChild->mCategory == "Behavior") {
+            // Append Behavior
+            mBehaviorComponents.insert(aIndex, aChild);
+
+        } else {
+            // Insert Child
+            mChildComponents.insert(aIndex, aChild);
+        }
+
         // Set Dirty
         setDirty(true);
+
         // Check If Move
         if (!aMove) {
             qDebug() << "ComponentInfo::insertChild - path: " <<  componentPath() << " <- " << aChild->mName << " - aIndex: " << aIndex;
-            // Emit Child Added
-            emit childAdded(aIndex);
+            // Check Child Component Category
+            if (aChild->mCategory == "Animation") {
+                // Emit Animation Added Signal
+                emit animationAdded(aIndex);
+
+            } else if (aChild->mCategory == "Behavior") {
+                // Emit Behavior Added Signal
+                emit behaviorAdded(aIndex);
+
+            } else {
+                // Emit Child Added
+                emit childAdded(aIndex);
+            }
         }
-        // Emit Child Cound Changed Signal
-        emit childCountChanged(mChildComponents.count());
+
+        // Check Child Component Category
+        if (aChild->mCategory == "Animation") {
+            // Emit Anims Count Changed Signal
+            emit animsCountChanged(mAnimationComponents.count());
+
+        } else if (aChild->mCategory == "Behavior") {
+            // Emit Behaviors Count Changed Signal
+            emit behaviorsCountChanged(mBehaviorComponents.count());
+
+        } else {
+            // Emit Child Cound Changed Signal
+            emit childCountChanged(mChildComponents.count());
+        }
     }
 }
 
@@ -4368,14 +4643,55 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
 {
     // Check Child
     if (aChild) {
-        // Get Child Index
-        int cIndex = mChildComponents.indexOf(aChild);
+        // Get Category
+        QString cCategory = aChild->mCategory;
+        // Init Child Index
+        int cIndex = -1;
+        // Init Component Count
+        int cCount = 0;
+        // Check Child Component Category
+        if (cCategory == "Animation") {
+            // Get Animation Index
+            cIndex = mAnimationComponents.indexOf(aChild);
+            // Get Components Count
+            cCount = mAnimationComponents.count();
+        } else if (cCategory == "Behavior") {
+            // Get Behavior Index
+            cIndex = mBehaviorComponents.indexOf(aChild);
+            // Get Behaviors Count
+            cCount = mBehaviorComponents.count();
+        } else {
+            // Get Child Index
+            cIndex = mChildComponents.indexOf(aChild);
+            // Get Childlen Count
+            cCount = mChildComponents.count();
+        }
+
         // Check Child Index
-        if (cIndex >= 0 && cIndex < mChildComponents.count()) {
-            // Get Child Component Info
-            ComponentInfo* childComponent = mChildComponents[cIndex];
-            // Emit Child About To Be Removed
-            emit childComponent->childAboutToBeRemoved(childComponent);
+        if (cIndex >= 0 && cIndex < cCount) {
+            // Init Child Component Info
+            ComponentInfo* childComponent = NULL;
+
+            // Check Child Component Category
+            if (cCategory == "Animation") {
+                // Get Child Animation
+                childComponent = mAnimationComponents[cIndex];
+                // Emit Anim About To Be Removed
+                emit animationAboutToBeRemoved(childComponent);
+
+            } else if (cCategory == "Behavior") {
+                // Get Child Behavior
+                childComponent = mBehaviorComponents[cIndex];
+                // Emit Behavior About To Be Removed
+                emit behaviorAboutToBeRemoved(childComponent);
+
+            } else {
+                // Get Child Component
+                childComponent = mChildComponents[cIndex];;
+                // Emit Child About To Be Removed
+                emit childComponent->childAboutToBeRemoved(childComponent);
+            }
+
 
             qDebug() << "ComponentInfo::removeChild - path: " << componentPath() << " - mName: " << childComponent->mName;
 
@@ -4384,20 +4700,52 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
 
             // Check Delete
             if (aDelete) {
-                // Delete Child
-                delete mChildComponents.takeAt(cIndex);
+                // Check Child Component Category
+                if (cCategory == "Animation") {
+                    // Delete Anim
+                    delete mAnimationComponents.takeAt(cIndex);
+                } else if (cCategory == "Behavior") {
+                    // Delete Behavior
+                    delete mBehaviorComponents.takeAt(cIndex);
+                } else {
+                    // Delete Child
+                    delete mChildComponents.takeAt(cIndex);
+                }
             } else {
-                // Remove Child
-                mChildComponents.removeAt(cIndex);
+                // Check Child Component Category
+                if (cCategory == "Animation") {
+                    // Remove Animation
+                    mAnimationComponents.removeAt(cIndex);
+                } else if (cCategory == "Behavior") {
+                    // Remove Behavior
+                    mBehaviorComponents.removeAt(cIndex);
+                } else {
+                    // Remove Child
+                    mChildComponents.removeAt(cIndex);
+                }
             }
 
             // Set Dirty
             setDirty(true);
 
-            // Emit Child Removed Signal
-            emit childRemoved(cIndex);
-            // Emit Child Count Changed Signal
-            emit childCountChanged(mChildComponents.count());
+            // Check Child Component Category
+            if (cCategory == "Animation") {
+                // Emit Animation Removed Signal
+                emit animationRemoved(cIndex);
+                // Emit Anims Count Changed Signal
+                emit animsCountChanged(mAnimationComponents.count());
+
+            } else if (cCategory == "Behavior") {
+                // Emit Behavior Removed Signal
+                emit behaviorRemoved(cIndex);
+                // Emit Behaviors Count Changed Signal
+                emit behaviorsCountChanged(mBehaviorComponents.count());
+            } else {
+                // Emit Child Removed Signal
+                emit childRemoved(cIndex);
+                // Emit Child Count Changed Signal
+                emit childCountChanged(mChildComponents.count());
+            }
 
         } else {
             qWarning() << "ComponentInfo::removeChild - aChild: " << aChild << " - CHILD COMPONENT NOT FOUND!";
@@ -4448,12 +4796,12 @@ void ComponentInfo::moveChild(ComponentInfo* aChildInfo, const int& aIndex, Comp
 
         qDebug() << "ComponentInfo::moveChild - mName: " << takenChild->mName << " -> " << aTargetChildInfo->componentPath() << " - aTargetIndex: " << aTargetIndex;
 
+        // Reset Anchors
+        takenChild->resetAnchors();
+
         // Reset Pos
         takenChild->setPosX(QString("4"));
         takenChild->setPosY(QString("4"));
-
-        // Reset Anchors
-        resetAnchors();
 
         // Insert Child
         aTargetChildInfo->insertChild(aTargetIndex, takenChild, true);

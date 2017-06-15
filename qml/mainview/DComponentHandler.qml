@@ -308,6 +308,7 @@ DMouseArea {
             }
         }
 
+        // On Component State Changed Slot
         onComponentStateChanged: {
             // Check Component Object
             if (chRoot.componentObject !== null && chRoot.updateComponentInfoEnabled) {
@@ -1637,6 +1638,62 @@ DMouseArea {
         clip: settingsController.clipComponentRoot && chRoot.componentInfo !== null && chRoot.componentInfo.isRoot
 
         // ...
+    }
+
+    // Animations Manager Buton
+    DMouseArea {
+        id: animsManagetButton
+
+        width: 64
+        height: 64
+
+        anchors.right: parent.right
+        anchors.rightMargin: DStyle.defaultMargin
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: DStyle.defaultMargin
+
+        scale: pressed ? DStyle.pressedScale : 1.0
+
+        opacity: {
+            // Check If Show Animation Manager Enabled
+            if (!chRoot.rootContainer.showAnimManager) {
+                return 0.0;
+            }
+
+            // Check Component Info
+            if (chRoot.componentInfo === null) {
+                return 0.0;
+            }
+
+            // Check Animations Count
+            if (chRoot.componentInfo.animsCount === 0) {
+                return 0.0;
+            }
+
+            // Check Focused Child
+            if (chRoot.rootContainer.focusedChild !== chRoot.componentInfo) {
+                return 0.0;
+            }
+
+            return 1.0;
+        }
+
+        onClicked: {
+            // Check If Anim Manager Pane Visible
+            if (chRoot.rootContainer.animManagerPaneVisible) {
+                // Hide Anim Manager Pane
+                chRoot.rootContainer.hideAnimManagerPane();
+            } else {
+                // Show Anim Manager Pane
+                chRoot.rootContainer.showAnimManagerPane();
+            }
+        }
+
+        DImage {
+            anchors.centerIn: parent
+            opacity: DStyle.disabledOpacity
+            source: "qrc:/assets/icons/component.animation.png"
+        }
     }
 
     // Component Label

@@ -21,6 +21,40 @@ DPaneBase {
     // Component Category
     property string componentCategory: componentInfo ? componentInfo.componentCategory : ""
 
+    // Component Handler Factory
+    property Component componentHandlerFactory: Component {
+        DComponentHandler {
+            width: CONSTS.componentItemWidth
+            height: CONSTS.componentItemHeight
+            rootContainer: crcRoot
+        }
+    }
+
+    // Wait For Nodes To Close
+    property bool waitForNodesToClose: false
+
+    // Component Content Created
+    property bool componentContentCreated: false
+
+    // Current Hover Handler
+    property QtObject hoverHandler: null
+    // Hover Pos X
+    property int hoverPosX: 0
+    // Hover Pos Y
+    property int hoverPosY: 0
+    // Drag Source
+    property ComponentInfo dragSource: null
+    // Drag Key
+    property string dragKey: ""
+
+    // Root Component Handler
+    property alias rootComponentHandler: rootComponentHandler
+
+    // Show Animations Manager
+    property bool showAnimManager: false
+    // Animations Manager Visible
+    property bool animManagerPaneVisible: animPaneLoader.item !== null && animPaneLoader.item.state === animPaneLoader.item.stateShown
+
     // Open Files Model Connection
     property Connections openFilesModelConnection: Connections {
         target: openFilesModel
@@ -90,34 +124,25 @@ DPaneBase {
         }
     }
 
-    // Component Handler Factory
-    property Component componentHandlerFactory: Component {
-        DComponentHandler {
-            width: CONSTS.componentItemWidth
-            height: CONSTS.componentItemHeight
-            rootContainer: crcRoot
+    // Focused Child
+    property ComponentInfo focusedChild: null
+
+    // Properties Controller Connection
+    property Connections propertiesControllerConnections: Connections {
+        target: propertiesController
+
+        onFocusedComponentChanged: {
+            // Check Focused Component
+            if (propertiesController.focusedComponent !== null) {
+                // Check Category
+                if (propertiesController.focusedComponent.componentCategory !== "Animation" &&
+                    propertiesController.focusedComponent.componentCategory !== "Behavior") {
+                    // Set Focused Child
+                    crcRoot.focusedChild = propertiesController.focusedComponent;
+                }
+            }
         }
     }
-
-    // Wait For Nodes To Close
-    property bool waitForNodesToClose: false
-
-    // Component Content Created
-    property bool componentContentCreated: false
-
-    // Current Hover Handler
-    property QtObject hoverHandler: null
-    // Hover Pos X
-    property int hoverPosX: 0
-    // Hover Pos Y
-    property int hoverPosY: 0
-    // Drag Source
-    property ComponentInfo dragSource: null
-    // Drag Key
-    property string dragKey: ""
-
-    // Root Component Handler
-    property alias rootComponentHandler: rootComponentHandler
 
     title: "Component" + (crcRoot.componentInfo !== null ? (" - " + crcRoot.componentInfo.componentName) : "")
 
@@ -217,6 +242,9 @@ DPaneBase {
 
         // Check State
         if (newState === crcRoot.stateHidden) {
+            // Reset Root Container Border Color
+            crcRoot.borderColor = DStyle.colorBorderNoFocus;
+            // Set Border
             // Check Node Pane Loader Item
             if (nodePaneLoader.item) {
                 // Close Node Pane
@@ -224,6 +252,9 @@ DPaneBase {
             }
 
         } else if (newState === crcRoot.stateCreate) {
+            // Hide Anim Manager
+            crcRoot.showAnimManager = false;
+
             // Check Destroy
             if (destroyOnResetFinished) {
                 // Remove Handlers
@@ -241,8 +272,16 @@ DPaneBase {
                 nodePaneLoader.item.hideNodes();
             }
 
+            // Check Anim Pane Loaded
+            if (animPaneLoader.item) {
+                // Close
+                animPaneLoader.item.hideNodes();
+            }
+
             // Set Node Pane Loader Opacity
             nodePaneLoader.opacity = 0.0;
+            // Set ANim Pane Loader Opacity
+            animPaneLoader.opacity = 0.0;
         }
     }
 
@@ -253,11 +292,12 @@ DPaneBase {
         if (newState === crcRoot.stateShown) {
             // Set Root Container Border Color
             crcRoot.borderColor = "transparent";
+            // Set Root Component Handler Visibility
+            rootComponentHandler.visible = true;
             // Create Component Content
             crcRoot.createComponentQMLContent();
             // Create Handlers
             crcRoot.createComponentHandlers(rootComponentHandler);
-
             // Set Focus
             crcRoot.focus = true;
 
@@ -265,14 +305,23 @@ DPaneBase {
             crcRoot.rootComponentHandler.updateComponentInfoEnabled = (crcRoot.componentInfo !== null);
 
             // Check Component Info
-            if (crcRoot.componentInfo !== null &&
-                crcRoot.componentInfo.componentType !== "DataSource" &&
-                crcRoot.componentInfo.componentCategory !== "Animation") {
-                // Set Node Pane Loader Active
-                nodePaneLoader.active = true;
-                // Set Node Pane opacity
-                nodePaneLoader.opacity = 1.0;
+            if (crcRoot.componentInfo !== null) {
+                // Check Type
+                if (crcRoot.componentInfo.componentType !== "DataSource" && crcRoot.componentInfo.componentCategory !== "Animation") {
+                    // Set Node Pane Loader Active
+                    nodePaneLoader.active = true;
+                    // Set Node Pane opacity
+                    nodePaneLoader.opacity = 1.0;
+
+                    // Set Anim Pane Loaded Active
+                    animPaneLoader.active = true;
+                    // Set Anim Pane Loader Opacity
+                    animPaneLoader.opacity = 1.0;
+                }
             }
+
+            // Show Anim Manager
+            crcRoot.showAnimManager = true;
 
         } else {
 //            // Reset Update Component Info Enabled
@@ -527,6 +576,24 @@ DPaneBase {
 
     }
 
+    // Show Anim Manager Pane
+    function showAnimManagerPane() {
+        // Check Anim Pane Loader Item
+        if (animPaneLoader.item) {
+            // Show Pane/Nodes
+            animPaneLoader.item.showNodes();
+        }
+    }
+
+    // Hide Anim Manager Pane
+    function hideAnimManagerPane() {
+        // Check Anim Pane Loader Item
+        if (animPaneLoader.item) {
+            // Hide Pane/Nodes
+            animPaneLoader.item.hideNodes();
+        }
+    }
+
     // Zoom Area
     DMouseArea {
         id: wheelArea
@@ -575,6 +642,7 @@ DPaneBase {
         enablePanByKeys: false
         borderMargins: -1
         borderVisible: true
+        visible: false
     }
 
     // No Content Placeholder
@@ -621,6 +689,48 @@ DPaneBase {
 
                 case Loader.Error:
                     console.warn("DComponentRootContainer.nodePaneLoader.onStatusChanged - status: " + status + " - ERROR LOADING NODE PANE!");
+                break;
+            }
+        }
+    }
+
+    // Anim Pane/Manager Loader
+    DLoader {
+        id: animPaneLoader
+
+        parent: crcRoot
+
+        anchors.left: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+
+        opacity: 0.0
+        Behavior on opacity { DFadeAnimation { } }
+        visible: opacity > 0.0
+
+        sourceComponent: DAnimationPane {
+            componentInfo: propertiesController.focusedComponent
+
+            onTransitionFinished: {
+                // Check If Waiting For Nodes To Close
+                if (crcRoot.waitForNodesToClose) {
+                    // Reset Waiting For Nodes To Close
+                    crcRoot.waitForNodesToClose = false;
+                    // Dismiss Pane
+                    crcRoot.dismissPane(false);
+                }
+            }
+        }
+
+        onStatusChanged: {
+            // Switch Status
+            switch (status) {
+                case Loader.Ready:
+                    // Set Component Root Container Child Pane
+                    //crcRoot.childPane = nodePaneLoader.item;
+                break;
+
+                case Loader.Error:
+                    console.warn("DComponentRootContainer.animPaneLoader.onStatusChanged - status: " + status + " - ERROR LOADING NODE PANE!");
                 break;
             }
         }

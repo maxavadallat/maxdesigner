@@ -17,20 +17,15 @@ DContainer {
     anchors.leftMargin: paneLeftMargin
     anchors.verticalCenter: parent.verticalCenter
 
+    // Pane Left Margin
     property int paneLeftMargin: 0
-
+    // Component Info
     property ComponentInfo componentInfo: null
-
-    property string title: componentInfo !== null ? componentInfo.componentName : "NULL"
-
-    property int initialX: 0
-    property int initialY: parent ? parent.height * 0.5 : 0
+    // Title
+    property string title: componentInfo !== null ? (componentInfo.componentName + " - Animations") : "NULL"
 
     property int initialWidth: 0
     property int initialHeight: 0
-
-    property int creationX: initialX - creationWidth - DStyle.defaultMargin
-    property int creationY: initialY - creationHeight * 0.5
 
     property int creationWidth: 320
     property int creationHeight: 400
@@ -116,7 +111,7 @@ DContainer {
         width: CONSTS.defaultPaneHideButtonWidth
         height: CONSTS.defaultPaneHideButtonHeight
 
-        anchors.right: parent.left
+        anchors.left: parent.right
         anchors.verticalCenter: parent.verticalCenter
 
         hidden: true

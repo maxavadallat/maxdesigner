@@ -64,6 +64,10 @@ class ComponentInfo : public QObject
     Q_PROPERTY(bool childrenLoaded READ childrenLoaded NOTIFY childrenLoadedChanged)
     // Child Count
     Q_PROPERTY(int childCount READ childCount NOTIFY childCountChanged)
+    // Animation Count
+    Q_PROPERTY(int animsCount READ animsCount NOTIFY animsCountChanged)
+    // Behaviors Count
+    Q_PROPERTY(int behaviorsCount READ behaviorsCount NOTIFY behaviorsCountChanged)
     // Child Depth
     Q_PROPERTY(int depth READ depth NOTIFY depthChanged)
 
@@ -363,16 +367,22 @@ public:
     bool childrenLoaded();
     // Animations Loaded
     bool animationsLoaded();
+    // Behaviors Loaded
+    bool behaviorsLoaded();
 
     // Load Children
     Q_INVOKABLE void loadChildren();
     // Load Animations
     Q_INVOKABLE void loadAnimations();
+    // Load BEhaviors
+    Q_INVOKABLE void loadBehaviors();
 
     // Get Child Count
     int childCount();
     // Animations Count
     int animsCount();
+    // Behaviors Count
+    int behaviorsCount();
     // Child Depth
     int depth();
 
@@ -380,6 +390,8 @@ public:
     Q_INVOKABLE ComponentInfo* childInfo(const int& aIndex);
     // Get Child Info By Child Index Map
     Q_INVOKABLE ComponentInfo* childInfo(const QString& aMap);
+    // Get Anim Info
+    Q_INVOKABLE ComponentInfo* animInfo(const int& aIndex);
 
     // Add Child
     Q_INVOKABLE void addChild(ComponentInfo* aChild, const bool& aLoadChildren = false);
@@ -462,16 +474,25 @@ signals:
     void childrenLoadedChanged(const bool& aChildrenLoaded);
     // Animations Loaded Changed
     void animationsLoadedChanged(const bool& aAnimsLoaded);
+    // Behaviorss Loaded Changed
+    void behaviorsLoadedChanged(const bool& aAnimsLoaded);
 
     // Child Count Changed Signal
     void childCountChanged(const int& aCount);
     // Animations Count Changed
     void animsCountChanged(const int& aCount);
+    // Behaviors Count Changed
+    void behaviorsCountChanged(const int& aCount);
+
     // Child Depth Changed Signal
     void depthChanged(const int& aDepth);
 
     // Child About To Be Removed Signal
     void childAboutToBeRemoved(ComponentInfo* aChild);
+    // Animation Is About To Be Removed
+    void animationAboutToBeRemoved(ComponentInfo* aChild);
+    // Behavior
+    void behaviorAboutToBeRemoved(ComponentInfo* aChild);
 
     // Child Added Signal
     void childAdded(const int& aIndex);
@@ -486,6 +507,13 @@ signals:
     void animationMoved(ComponentInfo* aParentComponent, const int& aIndex, ComponentInfo* aTargetComponent, const int& aTargetIndex);
     // Animations Removed Signal
     void animationRemoved(const int& aIndex);
+
+    // Behavior Added Signal
+    void behaviorAdded(const int& aIndex);
+    // Behavior Moved Signal
+    void behaviorMoved(ComponentInfo* aParentComponent, const int& aIndex, ComponentInfo* aTargetComponent, const int& aTargetIndex);
+    // Behaviors Removed Signal
+    void behaviorRemoved(const int& aIndex);
 
     // Source Path Changed Signal
     void sourcePathChanged(const QString& aPath);
@@ -685,11 +713,15 @@ protected:
     void saveChildren();
     // Save Animations
     void saveAnimations();
+    // Save Behaviors
+    void saveBehaviors();
 
     // Set Children Loaded
     void setChildrenLoaded(const bool& aChildrenLoaded);
     // Set Animations Loaded
     void setAnimationsLoaded(const bool& aAnimationsLoaded);
+    // Set Behaviors Loaded
+    void setBehaviorsLoaded(const bool& aBehaviorsLoaded);
 
     // Save Live data Source
     bool saveLiveDataSource();
@@ -887,6 +919,8 @@ protected: // Data
     bool                    mChildrenLoaded;
     // Animations Loaded
     bool                    mAnimationsLoaded;
+    // Behaviors Loaded
+    bool                    mBehaviorsLoaded;
 
     // Reference Count For Children
     int                     mRefCount;
