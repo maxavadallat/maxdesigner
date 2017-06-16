@@ -508,6 +508,13 @@ DPaneBase {
         }
 
         Item {
+            width: propertyFieldsColumn.width
+            height: typeOption.currentIndex === 8 ? DStyle.defaultMargin * 0.5 : 0
+            Behavior on height { DAnimation { } }
+            visible: height > 0
+        }
+
+        Item {
             id: enumValuesContainer
             width: propertyFieldsColumn.width
             height: typeOption.currentIndex === 8 ? enumValuesFlow.height : 0
@@ -519,6 +526,7 @@ DPaneBase {
                 id: enumValuesFlow
                 width: nameEditor.width
                 anchors.right: parent.right
+                anchors.rightMargin: DStyle.defaultMargin
                 spacing: DStyle.defaultSpacing
 
                 Repeater {
@@ -528,6 +536,7 @@ DPaneBase {
 
                     delegate: DTag {
                         tagTitle: propertyEditorRoot.enumValues[index]
+                        maxWidth: enumValuesFlow.width - DStyle.defaultMargin * 2
                         onRemoveClicked: {
                             //console.log("enumValuesRepeater.delegate.onRemoveClicked - index: " + index);
                             // Remove Enum Value
@@ -536,6 +545,13 @@ DPaneBase {
                     }
                 }
             }
+        }
+
+        Item {
+            width: propertyFieldsColumn.width
+            height: typeOption.currentIndex === 8 && enumValuesRepeater.count > 0 ? DStyle.defaultMargin * 0.5 : 0
+            Behavior on height { DAnimation { } }
+            visible: height > 0
         }
 
         DButton {

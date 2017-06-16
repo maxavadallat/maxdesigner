@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.7
 
 import "qrc:/qml/system/DConstants.js" as CONSTS
 import "qrc:/qml/style"
@@ -6,10 +6,12 @@ import "qrc:/qml/style"
 DRectangle {
     id: tagRoot
 
-    width: tagLabel.width + deleteButton.width + DStyle.defaultMargin * 3
+    width: tagLabel.width + deleteButton.width + DStyle.defaultMargin
     height: CONSTS.defaultButtonHeight
 
     property string tagTitle: "Tag"
+
+    property int maxWidth: 1024
 
     radius: DStyle.defaultRadius * 2
 
@@ -31,11 +33,24 @@ DRectangle {
         }
     }
 
+    TextMetrics {
+        id: tagLabelMetrics
+        font: tagLabel.font
+        text: tagRoot.tagTitle
+    }
+
     DText {
         id: tagLabel
+
+        width: Math.min(tagLabelMetrics.boundingRect.width + 4, tagRoot.maxWidth - deleteButton.width + DStyle.defaultMargin)
+
         anchors.left: parent.left
         anchors.leftMargin: DStyle.defaultMargin
         anchors.verticalCenter: parent.verticalCenter
+
+        wrapMode: Text.NoWrap
+        elide: Text.ElideMiddle
+
         text: tagRoot.tagTitle
     }
 

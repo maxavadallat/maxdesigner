@@ -916,7 +916,7 @@ DMouseArea {
     // Update Component Pos X
     function updateComponentPosX(posX) {
         // Check Upadte Component Info Enabled
-        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null) {
+        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null && !chRoot.componentInfo.useIPosX) {
             // Check If Root
             if (!chRoot.componentInfo.isRoot) {
                 // Check Pos X
@@ -934,7 +934,7 @@ DMouseArea {
     // Update Component Pos Y
     function updateComponentPosY(posY) {
         // Check Upadte Component Info Enabled
-        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null) {
+        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null && !chRoot.componentInfo.useIPosY) {
             // Check If Root
             if (!chRoot.componentInfo.isRoot) {
                 // Check Pos X
@@ -952,7 +952,7 @@ DMouseArea {
     // Update Component Width
     function updateComponentWidth(width) {
         // Check Upadte Component Info Enabled
-        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null) {
+        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null && !chRoot.componentInfo.useIWidth) {
             // Check Width
             if (chRoot.componentInfo.width !== width) {
 
@@ -967,7 +967,7 @@ DMouseArea {
     // Update Component Height
     function updateComponentHeight(height) {
         // Check Upadte Component Info Enabled
-        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null) {
+        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null && !chRoot.componentInfo.useIHeight) {
             // Check Height
             if (chRoot.componentInfo.height !== height) {
 
@@ -1140,15 +1140,24 @@ DMouseArea {
             return null;
         }
 
-        // Set Drop Pos X
+        // Set Hover Pos X
         chRoot.rootContainer.hoverPosX = posX;
-        // Set Drop Pos Y
+        // Set Hover Pos Y
         chRoot.rootContainer.hoverPosY = posY;
 
         //console.log("DComponentHandler.getHoveringHandler - parentHandler: " + parentHandler.componentInfo.componentName + " - pos: " + posX + ":" + posY);
 
         // Init Handler Child Found
         var hChildFound = parentHandler.childHandlersContainer.childAt(posX, posY);
+
+        // Check If Child Found
+        if (hChildFound !== null) {
+            // Set Hover Pos X
+            chRoot.rootContainer.hoverPosX = posX - hChildFound.x;
+            // Set Hover Pos Y
+            chRoot.rootContainer.hoverPosY = posY - hChildFound.y;
+        }
+
         // Init Parent Handler Next Child Found
         var hNextChildFound = null;
 
@@ -1157,7 +1166,8 @@ DMouseArea {
         // Check For Children
         if (hChildFound && hChildFound.count > 0) {
             // Test For Child Hit
-            hNextChildFound = getHoveringHandler(posX - hChildFound.x, posY - hChildFound.y, hChildFound);
+            hNextChildFound = getHoveringHandler(chRoot.rootContainer.hoverPosX, chRoot.rootContainer.hoverPosY, hChildFound);
+            //hNextChildFound = getHoveringHandler(posX - hChildFound.x, posY - hChildFound.y, hChildFound);
         }
 
         return hNextChildFound !== null ? hNextChildFound : hChildFound;
@@ -1205,10 +1215,12 @@ DMouseArea {
             // Clone New Object
             var newComponent = drop.source.clone();
 
+            console.log("DComponentHandler.makeDrop - pos[" + chRoot.rootContainer.hoverPosX + ":" + chRoot.rootContainer.hoverPosY + "]");
+
             // Set Pos X
-            newComponent.setPosX(rootContainer.hoverPosX - CONSTS.componentItemWidth * 0.5);
+            newComponent.setPosX(chRoot.rootContainer.hoverPosX - CONSTS.componentItemWidth * 0.5);
             // Set Pos Y
-            newComponent.setPosY(rootContainer.hoverPosY - CONSTS.componentItemHeight * 0.5);
+            newComponent.setPosY(chRoot.rootContainer.hoverPosY - CONSTS.componentItemHeight * 0.5);
 
             // TODO: Update Set Pos According New Component Size
 

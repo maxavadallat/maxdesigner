@@ -39,7 +39,7 @@ DRectangle {
 
     onComponentInfoChanged: {
         // Check Focused Component
-        if (toolBarRoot.componentInfo !== null && !toolBarRoot.componentInfo.isRoot) {
+        if (toolBarRoot.componentInfo !== null && !toolBarRoot.componentInfo.isRoot && toolBarRoot.componentInfo.componentCategory !== "Animation") {
             // Restore Toolbar
             restoreToolbar();
         } else {

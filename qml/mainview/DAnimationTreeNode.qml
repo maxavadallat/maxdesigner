@@ -818,6 +818,12 @@ Item {
                 onActionButtonClicked: {
                     // Check Component Info
                     if (nodeRoot.componentInfo !== null) {
+                        // Check If Focused Component
+                        if (propertiesController.focusedComponent === nodeRoot.componentInfo) {
+                            // set Focused Component To Parent
+                            propertiesController.focusedComponent = nodeRoot.componentInfo.componentParent;
+                        }
+
                         // Remove From Parent
                         nodeRoot.componentInfo.removeFromParent();
                     }

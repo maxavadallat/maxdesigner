@@ -95,7 +95,7 @@ DSection {
                                 return "fx:"
                             }
 
-                            return "x:";
+                            return "x:"; // •
                         }
                     }
 
@@ -135,7 +135,7 @@ DSection {
                         width: sizeAndPosSectionRoot.labelWidth
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignRight
-                        text: "•x:"
+                        text: "x:"
                     }
 
                     DText {
@@ -181,7 +181,7 @@ DSection {
                         width: sizeAndPosSectionRoot.labelWidth
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignRight
-                        text: "•y:"
+                        text: "y:"
                     }
 
                     DSpinner {
@@ -219,7 +219,7 @@ DSection {
                         width: sizeAndPosSectionRoot.labelWidth
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignRight
-                        text: "•y:"
+                        text: "y:"
                     }
 
                     DText {
@@ -274,7 +274,7 @@ DSection {
                         width: sizeAndPosSectionRoot.labelWidth
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignRight
-                        text: "•w:"
+                        text: "w:"
                     }
 
                     DSpinner {
@@ -313,7 +313,7 @@ DSection {
                         width: sizeAndPosSectionRoot.labelWidth
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignRight
-                        text: "•w:"
+                        text: "w:"
                     }
 
                     DText {
@@ -359,7 +359,7 @@ DSection {
                         width: sizeAndPosSectionRoot.labelWidth
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignRight
-                        text: "•h:"
+                        text: "h:"
                     }
 
                     DSpinner {
@@ -404,7 +404,7 @@ DSection {
                         width: sizeAndPosSectionRoot.labelWidth
                         anchors.verticalCenter: parent.verticalCenter
                         horizontalAlignment: Text.AlignRight
-                        text: "•h:"
+                        text: "h:"
                     }
 
                     DText {

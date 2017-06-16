@@ -42,6 +42,7 @@ DPaneBase {
     property int hoverPosX: 0
     // Hover Pos Y
     property int hoverPosY: 0
+
     // Drag Source
     property ComponentInfo dragSource: null
     // Drag Key
@@ -406,6 +407,11 @@ DPaneBase {
         // ...
     }
 
+    onFocusedChildChanged: {
+        // Hide Animation Manager Pane
+        hideAnimManagerPane();
+    }
+
     // Hide/Show/Pane Button Function
     function paneButtonFunction() {
         // Check State
@@ -592,6 +598,9 @@ DPaneBase {
             // Hide Pane/Nodes
             animPaneLoader.item.hideNodes();
         }
+
+        // Set Focused Component
+        propertiesController.focusedComponent = crcRoot.focusedChild;
     }
 
     // Zoom Area
@@ -708,7 +717,7 @@ DPaneBase {
         visible: opacity > 0.0
 
         sourceComponent: DAnimationPane {
-            componentInfo: propertiesController.focusedComponent
+            componentInfo: crcRoot.focusedChild
 
             onTransitionFinished: {
                 // Check If Waiting For Nodes To Close

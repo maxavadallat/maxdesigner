@@ -2024,16 +2024,18 @@ void ComponentInfo::fromJSONObject(const QJsonObject& aObject, const bool aCreat
     mChildren = aObject[JSON_KEY_COMPONENT_CHILDREN].toArray();
     // Animations
     mAnimations = aObject[JSON_KEY_COMPONENT_ANIMATIONS].toArray();
+    // Behaviors
+    mBehaviors = aObject[JSON_KEY_COMPONENT_BEHAVIORS].toArray();
 
     // Check If Load Children
     if (aCreateChildren) {
         // Load Children
         loadChildren();
+        // Load Animations
+        loadAnimations();
+        // Load Behaviors
+        loadBehaviors();
     }
-
-    // Create Animations
-
-    // Create Behaviors
 
     // ...
 }

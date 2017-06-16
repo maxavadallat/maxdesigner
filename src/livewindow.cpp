@@ -68,6 +68,15 @@ void LiveWindow::init()
 
         // Set Imports Path
 
+        // Get Engine
+        QQmlEngine* engine = ctx ? ctx->engine() : NULL;
+
+        // Check Engine
+        if (engine) {
+            // Add Import Path
+            engine->addImportPath(mProjectModel->liveTempDir());
+        }
+
         // ...
 
         // Set Plugins Path

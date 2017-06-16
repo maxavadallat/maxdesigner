@@ -58,6 +58,17 @@ Item {
         object.creationWidth = width > 0 ? width : CONSTS.defaultNonVisualComponentWidth;
         object.creationHeight = height > 0 ? height : CONSTS.defaultNonVisualComponentHeight;
 
+        // Random Offset For Components/Files Open Position
+        var randomXOffset = Math.random() * 300 - 150;
+        var randomYOffset = Math.random() * 200 - 100;
+
+        // Update Initial Pos Y
+        object.initialY += randomYOffset;
+
+        // Update Creation Pos
+        object.creationX += randomXOffset;
+        object.creationY += randomYOffset;
+
         // Show
         object.show();
     }
