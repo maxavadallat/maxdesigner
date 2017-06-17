@@ -1101,6 +1101,10 @@ QString ComponentInfo::posX()
 //==============================================================================
 void ComponentInfo::setPosX(const QString& aPosX)
 {
+    // Check Category
+    if (mCategory == "Animation" || mCategory == "Behavior") {
+        return;
+    }
     // Set Component Property
     setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_X, aPosX);
     // Emit Pos X Changed Signal
@@ -1120,6 +1124,10 @@ QString ComponentInfo::posY()
 //==============================================================================
 void ComponentInfo::setPosY(const QString& aPosY)
 {
+    // Check Category
+    if (mCategory == "Animation" || mCategory == "Behavior") {
+        return;
+    }
     // Set Component Property
     setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Y, aPosY);
     // Emit Pos Y Changed Signal
@@ -1139,6 +1147,10 @@ QString ComponentInfo::posZ()
 //==============================================================================
 void ComponentInfo::setPosZ(const QString& aPosZ)
 {
+    // Check Category
+    if (mCategory == "Animation" || mCategory == "Behavior") {
+        return;
+    }
     // Set Component Property
     setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_Z, aPosZ);
     // Emit Pos Z Changed Signal
@@ -1158,6 +1170,10 @@ QString ComponentInfo::width()
 //==============================================================================
 void ComponentInfo::setWidth(const QString& aWidth)
 {
+    // Check Category
+    if (mCategory == "Animation" || mCategory == "Behavior") {
+        return;
+    }
     // Set Property - Width
     setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
     // Emit Width Changed Signal
@@ -1177,6 +1193,10 @@ QString ComponentInfo::height()
 //==============================================================================
 void ComponentInfo::setHeight(const QString& aHeight)
 {
+    // Check Category
+    if (mCategory == "Animation" || mCategory == "Behavior") {
+        return;
+    }
     // Set Property - Height
     setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
     // Emit Height Changed Signal
@@ -2632,6 +2652,9 @@ QString ComponentInfo::liveCodeFormatOwnProperties(QStringList& aOPHooks,
         for (int i=0; i<opCount; i++) {
             // Get Property Name
             QString pName = opKeys[i];
+
+            //qDebug() << "ComponentInfo::liveCodeFormatOwnProperties - mName: " << mName << " - pName: " << pName;
+
             // Check Filtered Properties
             if (aFPKeys.indexOf(pName) == -1) {
                 // Get Type And Value
@@ -2663,9 +2686,9 @@ QString ComponentInfo::liveCodeFormatOwnProperties(QStringList& aOPHooks,
                 // Check Inherited Property Keys
                 if (pKeys.indexOf(pName) == -1) {
                     // Check If Built In Component
-                    if (mBuiltIn) {
+                    if (mBuiltIn && mIsProtoType) {
                         // Check If Read Only
-                        if (!readOnly) {
+                        if (!readOnly && !pValue.isEmpty()) {
                             // Append Live Code
                             liveCode += QString("%1%3: %4\n").arg(aIndent).arg(pName).arg(pValue);
                         }
@@ -2785,8 +2808,11 @@ QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks,
                         pValue = QString("\"%1\"").arg(pValue);
                     }
 
-                    // Append Live Code
-                    liveCode += QString("%1%2: %3\n").arg(aIndent).arg(pKeys[k]).arg(pValue);
+                    // Check Value
+                    if (!pValue.isEmpty()) {
+                        // Append Live Code
+                        liveCode += QString("%1%2: %3\n").arg(aIndent).arg(pKeys[k]).arg(pValue);
+                    }
                 }
 
                 // Check Property Key
@@ -3574,7 +3600,7 @@ QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGene
     QStringList fpKeys = mProject->filteredProperties();
 
     // Check If Component Code
-    if (!aComponentCode) {
+    if (!aComponentCode && mCategory != "Animation" && mCategory != "Behavior") {
         // Add Global Child Index Map
         liveCode += QString("\n%1%2property string %3: \"%4\"\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(DEFAULT_COMPONENT_CHILD_MAP).arg(getGlobalChildIndexMap());
     }
@@ -3614,6 +3640,10 @@ QString ComponentInfo::generateLiveCode(const bool& aLiveRoot, const bool& aGene
     if (aGenerateChildren) {
         // Generate Children Live Code
         liveCode += liveCodeFormatChildren(indent, aComponentCode);
+        // Generate Animations
+        liveCode += liveCodeFormatAnimations(indent, aComponentCode);
+        // Generate Behaviors
+        liveCode += liveCodeFormatBehaviors(indent, aComponentCode);
     }
 
     // Add States ==============================================================
@@ -3719,6 +3749,10 @@ QString ComponentInfo::generateComponentCode(const bool& aGenerateChildren)
     if (aGenerateChildren) {
         // Format Children
         componentCode += liveCodeFormatChildren(indent, true);
+        // Generate Animations
+        componentCode += liveCodeFormatAnimations(indent, true);
+        // Generate Behaviors
+        componentCode += liveCodeFormatBehaviors(indent, true);
     }
 
     // Add States ==============================================================
@@ -4409,6 +4443,22 @@ bool ComponentInfo::childrenLoaded()
 }
 
 //==============================================================================
+// Animations Loaded
+//==============================================================================
+bool ComponentInfo::animationsLoaded()
+{
+    return mAnimationsLoaded;
+}
+
+//==============================================================================
+// Behaviors Loaded
+//==============================================================================
+bool ComponentInfo::behaviorsLoaded()
+{
+    return mBehaviorsLoaded;
+}
+
+//==============================================================================
 // Get Child Count
 //==============================================================================
 int ComponentInfo::childCount()
@@ -4771,16 +4821,19 @@ void ComponentInfo::moveChild(const int& aIndex, const int& aTargetIndex)
     // Init New Target Index
     //int newTargetIndex = qBound(0, aTargetIndex, mChildren.count() - 1);
 
-    qDebug() << "ComponentInfo::moveChild - aIndex: " << aIndex << " -> " << newTargetIndex;
+    // Check Index
+    if (aIndex >= 0 && aIndex < mChildComponents.count()) {
+        qDebug() << "ComponentInfo::moveChild - aIndex: " << aIndex << " -> " << newTargetIndex;
 
-    // Move Child
-    mChildComponents.move(aIndex, newTargetIndex);
+        // Move Child
+        mChildComponents.move(aIndex, newTargetIndex);
 
-    // Emit Child Moved Signal
-    emit childMoved(this, aIndex, this, newTargetIndex);
+        // Emit Child Moved Signal
+        emit childMoved(this, aIndex, this, newTargetIndex);
 
-    // Set Dirty
-    setDirty(true);
+        // Set Dirty
+        setDirty(true);
+    }
 }
 
 //==============================================================================
@@ -4810,6 +4863,61 @@ void ComponentInfo::moveChild(ComponentInfo* aChildInfo, const int& aIndex, Comp
 
         // Emit Child Moved Signal
         emit childMoved(this, aIndex, aTargetChildInfo, aTargetIndex);
+    }
+}
+
+//==============================================================================
+// Move Animation
+//==============================================================================
+void ComponentInfo::moveAnimation(const int& aIndex, const int& aTargetIndex)
+{
+    // Check Indexes
+    if (aIndex == aTargetIndex) {
+        return;
+    }
+
+    // Init New target Index
+    int newTargetIndex = aIndex < aTargetIndex ? aTargetIndex - 1 : aTargetIndex;
+
+    // Init New Target Index
+    //int newTargetIndex = qBound(0, aTargetIndex, mChildren.count() - 1);
+
+    // Check Index
+    if (aIndex >= 0 && aIndex < mAnimationComponents.count()) {
+        qDebug() << "ComponentInfo::moveAnimation - aIndex: " << aIndex << " -> " << newTargetIndex;
+
+        // Move Child
+        mAnimationComponents.move(aIndex, newTargetIndex);
+
+        // Emit Animation Moved Signal
+        emit animationMoved(this, aIndex, this, newTargetIndex);
+
+        // Set Dirty
+        setDirty(true);
+    }
+
+}
+
+//==============================================================================
+// Move Animation
+//==============================================================================
+void ComponentInfo::moveAnimation(ComponentInfo* aChildInfo, const int& aIndex, ComponentInfo* aTargetChildInfo, const int& aTargetIndex)
+{
+    // Check Component Info & Target Info
+    if (aChildInfo == aTargetChildInfo) {
+        // Move Animation
+        aChildInfo->moveAnimation(aIndex, aTargetIndex);
+    } else {
+        // Take Animation
+        ComponentInfo* takenAnimation = aChildInfo->takeAnimation(aIndex, true);
+
+        qDebug() << "ComponentInfo::moveAnimation - mName: " << takenAnimation->mName << " -> " << aTargetChildInfo->componentPath() << " - aTargetIndex: " << aTargetIndex;
+
+        // Insert Child
+        aTargetChildInfo->insertChild(aTargetIndex, takenAnimation, true);
+
+        // Emit Animation Moved Signal
+        emit animationMoved(this, aIndex, aTargetChildInfo, aTargetIndex);
     }
 }
 
@@ -4851,6 +4959,43 @@ ComponentInfo* ComponentInfo::takeChild(const int& aIndex, const bool& aMove)
 }
 
 //==============================================================================
+// Take Animation
+//==============================================================================
+ComponentInfo* ComponentInfo::takeAnimation(const int& aIndex, const bool& aMove)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < mAnimationComponents.count()) {
+        // Take Animation
+        ComponentInfo* takenAnimation = mAnimationComponents.takeAt(aIndex);
+        // Check Taken Child
+        if (takenAnimation) {
+            // Check If Move
+            if (!aMove) {
+                qDebug() << "ComponentInfo::takeAnimation - path: " << componentPath() << " - aIndex: " << aIndex;
+                // Emit Child About To Be Removed
+                emit takenAnimation->childAboutToBeRemoved(takenAnimation);
+            }
+
+            // Remove Child Object From ID Map
+            setChildObjectID(takenAnimation, "");
+            // Set Dirty
+            setDirty(true);
+            // Check If Moved
+            if (!aMove) {
+                // Emmit Animation Removed Signal
+                emit animationRemoved(aIndex);
+            }
+            // Emit Anim Cound Changed Signal
+            emit animsCountChanged(mAnimationComponents.count());
+
+            return takenAnimation;
+        }
+    }
+
+    return NULL;
+}
+
+//==============================================================================
 // Take Child Info
 //==============================================================================
 int ComponentInfo::takeChild(ComponentInfo* aChildInfo)
@@ -4876,6 +5021,39 @@ int ComponentInfo::takeChild(ComponentInfo* aChildInfo)
         emit childRemoved(cIndex);
         // Emit Child Cound Changed Signal
         emit childCountChanged(mChildComponents.count());
+
+        return cIndex;
+    }
+
+    return -1;
+}
+
+//==============================================================================
+// Take Animation Component
+//==============================================================================
+int ComponentInfo::takeAnimation(ComponentInfo* aChildInfo)
+{
+    // Get Child Index
+    int cIndex = mAnimationComponents.indexOf(aChildInfo);
+    // Find Index
+    if (cIndex >= 0) {
+        qDebug() << "ComponentInfo::takeAnimation - path: " << componentPath() << " - mName: " << aChildInfo->mName;
+
+        // Take Animation
+        ComponentInfo* takenAnimation = mAnimationComponents.takeAt(cIndex);
+
+        // Remove Child Object From ID Map
+        setChildObjectID(takenAnimation, "");
+        // Emit Child About To Be Removed
+        emit takenAnimation->childAboutToBeRemoved(takenAnimation);
+
+        // Set Dirty
+        setDirty(true);
+
+        // Emmit Animation Removed Signal
+        emit animationRemoved(cIndex);
+        // Emit Animations Cound Changed Signal
+        emit animsCountChanged(mAnimationComponents.count());
 
         return cIndex;
     }

@@ -101,6 +101,9 @@
     <addaction name="actionShowTracers"/>
     <addaction name="actionSlowMotion"/>
     <addaction name="separator"/>
+    <addaction name="actionToggleProjectPane"/>
+    <addaction name="actionTogglePropertiesPane"/>
+    <addaction name="separator"/>
     <addaction name="actionShowAssetBrowser"/>
     <addaction name="separator"/>
     <addaction name="actionGoLive"/>
@@ -554,6 +557,28 @@
    </property>
    <property name="shortcut">
     <string>F8</string>
+   </property>
+  </action>
+  <action name="actionToggleProjectPane">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Toggle Project Pane</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Left</string>
+   </property>
+  </action>
+  <action name="actionTogglePropertiesPane">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Toggle Properties Pane</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Right</string>
    </property>
   </action>
  </widget>

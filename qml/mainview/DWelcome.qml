@@ -83,6 +83,12 @@ Column {
         visible: rpListView.count > 0
     }
 
+    Item {
+        width: 256
+        height: 8
+        visible: rpListView.count > 0
+    }
+
     // Recent Project List
     ListView {
         id: rpListView

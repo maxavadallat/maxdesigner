@@ -342,7 +342,7 @@ void OpenFilesModel::selectFile(const QString& aFilePath)
 void OpenFilesModel::openComponent(ComponentInfo* aComponent)
 {
     // Check Project Model
-    if (mProject) {
+    if (!mProject) {
         // ...
     }
 
@@ -360,12 +360,12 @@ void OpenFilesModel::openComponent(ComponentInfo* aComponent)
 
     // Check Component
     if (aComponent) {
-        // Load Children
-        aComponent->loadChildren();
-        // Laod Animations
-        aComponent->loadAnimations();
-        // Load Behaviors
-        aComponent->loadBehaviors();
+//        // Load Children
+//        aComponent->loadChildren();
+//        // Laod Animations
+//        aComponent->loadAnimations();
+//        // Load Behaviors
+//        aComponent->loadBehaviors();
         // Get Opened File Index
         cIndex = openFile(aComponent->infoPath(), true);
         // Open File

@@ -14,7 +14,8 @@ SOURCES             += src/main.cpp \
                     src/qmlprojectparser.cpp \
                     src/designereventfilter.cpp \
                     src/designerimageprovider.cpp \
-                    src/utils.cpp
+                    src/utils.cpp \
+                    src/designertextdocument.cpp
 
 # Model Sources
 SOURCES             += src/settingscontroller.cpp \
@@ -71,7 +72,9 @@ HEADERS             += src/designerapplication.h \
                     src/designerimageprovider.h \
                     src/designerfilesortproxy.h \
                     src/uiengineinterface.h \
-                    src/utils.h
+                    src/utils.h \
+                    src/designertextdocument.h \
+                    src/idesignertargetplugininterface.h
 
 # Model Headers
 HEADERS             += src/settingscontroller.h \

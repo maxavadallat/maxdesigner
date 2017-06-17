@@ -61,6 +61,12 @@ void ComponentSlotsModel::setDirty(const bool& aDirty)
     if (mDirty != aDirty) {
         // Set Dirty
         mDirty = aDirty;
+
+        // Check Component
+        if (mComponent && mDirty) {
+            // Set Dirty
+            mComponent->setDirty(true);
+        }
     }
 }
 

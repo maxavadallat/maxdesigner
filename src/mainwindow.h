@@ -109,6 +109,10 @@ signals:
     void screenshotModeChanged(const bool& aScreenShotMode);
     // Asset Selected Signal
     void assetSelected(const QString& aAssetPath);
+    // Toggle Project Pane Shown
+    void toggleProjectPaneShown();
+    // Toggle Properties Pane Show
+    void togglePropertiesPaneShown();
 
 private:
     // Init
@@ -298,10 +302,14 @@ private slots:
     void on_actionSlowMotion_triggered();
     // On Show Asset Browser Action Triggered Slot
     void on_actionShowAssetBrowser_triggered();
-    // Action Quit Triggered Slot
-    void on_actionQuit_triggered();
     // On Generate Sources Action triggered Slot
     void on_actionGenerateSources_triggered();
+    // On Toggle Project Pane Action Triggered SLot
+    void on_actionToggleProjectPane_triggered();
+    // On Toggle Properties Pane Action Triggered SLot
+    void on_actionTogglePropertiesPane_triggered();
+    // Action Quit Triggered Slot
+    void on_actionQuit_triggered();
 
 protected: // from QMainWindow
     // Key Release Event

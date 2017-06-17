@@ -91,15 +91,15 @@ Item {
                 // Remove Node
                 removeNode(aIndex);
                 // Check Hovering Node Parent
-                if (nodeTree.hoverindNodeParent) {
+                if (nodeTree.hoveringNodeParent) {
                     // Insert Node
-                    nodeTree.hoverindNodeParent.insertNode(aTargetIndex);
+                    nodeTree.hoveringNodeParent.insertNode(aTargetIndex);
                     // Set Current Node For Animating Height
-                    nodeTree.currentNode = nodeTree.hoverindNodeParent;
+                    nodeTree.currentNode = nodeTree.hoveringNodeParent;
                     // Expand
-                    nodeTree.hoverindNodeParent.expand();
+                    nodeTree.hoveringNodeParent.expand();
                     // Reset Hovering Parent Node
-                    nodeTree.hoverindNodeParent = null;
+                    nodeTree.hoveringNodeParent = null;
                 } else {
                     console.log("DNodeTreeNode.componentInfoConnections.onChildMoved - NULL HOVERING PARENT NODE!!");
                 }
@@ -541,7 +541,7 @@ Item {
                 }
 
                 // Set Hovering Parent Node
-                nodeTree.hoverindNodeParent = nodeRoot;
+                nodeTree.hoveringNodeParent = nodeRoot;
 
                 // Emit Remove Empty Node Signal
                 nodeTree.removeEmptyNode();
@@ -609,7 +609,7 @@ Item {
                 }
 
 //                // Reset Hovering Parent Node
-//                nodeTree.hoverindNodeParent = null;
+//                nodeTree.hoveringNodeParent = null;
             }
 
             onExited: {

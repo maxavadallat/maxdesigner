@@ -615,12 +615,15 @@ QVariant ComponentOwnPropertiesModel::data(const QModelIndex& index, int role) c
 
         // Get Inherited Property Key Index
         int ipkIndex = mComponent->mProperties.keys().indexOf(opKey);
+        // Get Own Property Key Index
+        int opkIndex = mComponent->mOwnProperties.keys().indexOf(opKey);
 
         // Init Component Is a Prototype
         bool opProtoType = mComponent->mIsProtoType;
 
         // Init Using Prototype Property Value
-        bool opUseProto = mComponent->mIsProtoType ? false : (ipkIndex == -1);
+        bool opUseProto = mComponent->mIsProtoType ? false : (opkIndex == -1);
+        //bool opUseProto = mComponent->mIsProtoType ? false : (ipkIndex == -1);
 
         // Init Property Value
         QString opValue = "";

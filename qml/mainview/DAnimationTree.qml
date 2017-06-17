@@ -26,7 +26,7 @@ Item {
 
     property DAnimationTreeNode currentNode: null
 
-    property DAnimationTreeNode hoverindNodeParent: null
+    property DAnimationTreeNode hoveringNodeParent: null
 
     property alias nodeGrabbedState: grabbedNode.dragActive
     property alias grabbedIndex: grabbedNode.childIndex

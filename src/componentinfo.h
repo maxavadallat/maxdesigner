@@ -62,6 +62,10 @@ class ComponentInfo : public QObject
     Q_PROPERTY(bool builtIn READ builtIn NOTIFY builtInChanged)
     // Children Loaded
     Q_PROPERTY(bool childrenLoaded READ childrenLoaded NOTIFY childrenLoadedChanged)
+    // Animations Loaded
+    Q_PROPERTY(bool animationsLoaded READ animationsLoaded NOTIFY animationsLoadedChanged)
+    // Behaviors Loaded
+    Q_PROPERTY(bool behaviorsLoaded READ behaviorsLoaded NOTIFY behaviorsLoadedChanged)
     // Child Count
     Q_PROPERTY(int childCount READ childCount NOTIFY childCountChanged)
     // Animation Count
@@ -397,16 +401,25 @@ public:
     Q_INVOKABLE void addChild(ComponentInfo* aChild, const bool& aLoadChildren = false);
     // Insert Child
     Q_INVOKABLE void insertChild(const int& aIndex, ComponentInfo* aChild, const bool& aMove);
-    // Take Child Info
+    // Take Child Component
     Q_INVOKABLE ComponentInfo* takeChild(const int& aIndex, const bool& aMove);
-    // Take Child Info
+    // Take Animation
+    Q_INVOKABLE ComponentInfo* takeAnimation(const int& aIndex, const bool& aMove);
+    // Take Child Component
     Q_INVOKABLE int takeChild(ComponentInfo* aChildInfo);
+    // Take Animation Component
+    Q_INVOKABLE int takeAnimation(ComponentInfo* aChildInfo);
     // Remove Child
     Q_INVOKABLE void removeChild(ComponentInfo* aChild, const bool& aDelete = true);
     // Move Child
     Q_INVOKABLE void moveChild(const int& aIndex, const int& aTargetIndex);
     // Move Child
     Q_INVOKABLE void moveChild(ComponentInfo* aChildInfo, const int& aIndex, ComponentInfo* aTargetChildInfo, const int& aTargetIndex);
+
+    // Move Animation
+    Q_INVOKABLE void moveAnimation(const int& aIndex, const int& aTargetIndex);
+    // Move Animation
+    Q_INVOKABLE void moveAnimation(ComponentInfo* aChildInfo, const int& aIndex, ComponentInfo* aTargetChildInfo, const int& aTargetIndex);
 
     // Remove/Delete From Parent
     Q_INVOKABLE void removeFromParent();

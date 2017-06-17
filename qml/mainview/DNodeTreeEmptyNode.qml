@@ -20,6 +20,9 @@ Item {
     // Parent Node
     property QtObject parentNode: null
 
+    // Drop OK
+    property bool dropOK: false
+
     smooth: true
 
     signal emptyNodeShown()
@@ -81,15 +84,27 @@ Item {
         anchors.fill: parent
 
         onEntered: {
+            // Check Height
+            if (emptyNodeRoot.height === 0) {
+                return;
+            }
+
+            // Reset Drop OK
+            emptyNodeRoot.dropOK = false;
+
             // Check Drop Keys
-            if (drag.keys[0] === CONSTS.newComponentDragKey || drag.keys[0] === CONSTS.childComponentDragKey) {
+            if ((drag.keys[0] === CONSTS.newComponentDragKey || drag.keys[0] === CONSTS.childComponentDragKey) && drag.source !== null) {
                 //console.log("DNodeTreeEmptyNode.emptyNodeDropArea.onEntered - ACCEPT!");
+
+                // Set Drop OK
+                emptyNodeRoot.dropOK = true;
+
                 // Accept Drag
                 drag.accept();
             }
 
             // Set Hovering Node Parent
-            nodeTree.hoverindNodeParent = parentNode;
+            nodeTree.hoveringNodeParent = parentNode;
         }
 
         onDropped: {
@@ -133,7 +148,7 @@ Item {
             }
 
 //            // Reset Hovering Parent Node
-//            nodeTree.hoverindNodeParent = null;
+//            nodeTree.hoveringNodeParent = null;
         }
 
         onExited: {

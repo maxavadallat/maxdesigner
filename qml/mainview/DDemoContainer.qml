@@ -50,11 +50,19 @@ DContainer {
     }
 
     Component.onCompleted: {
+        // Check If Visible
+        if (!visible) {
+            return;
+        }
+
 //        // Open Project
 //        mainController.openProject("/Users/max/Dev/Temp/myproject/myproject.json");
 
 //        // Select Component
 //        var focusedComponent = propertiesController.selectComponent("TestView");
+
+//        // Open Component
+//        mainController.openComponent(focusedComponent);
 
 //        // Set Component
 //        demoComponentRootContainer.componentInfo = focusedComponent;
@@ -70,7 +78,90 @@ DContainer {
 
 //        // Show Demo Container
 //        demoComponentRootContainer.show();
+
+//        // Get New Anim
+//        var newAnim = mainController.currentProject.getComponentByName("PropertyAnimation");
+
+//        // Add New Anim
+//        focusedComponent.addChild(newAnim.clone());
+
+//        console.log("ccount: " + demoRectangle.children.length);
+
+//        demoContainer.x = (demoContainerRoot.width - demoContainer.width) / 2
+//        demoContainer.y = (demoContainerRoot.height - demoContainer.height) / 2
     }
+
+//    DComponentRootContainer {
+//        id: demoComponentRootContainer
+
+//        parentWidth: demoContainerRoot.width
+//        parentHeight: demoContainerRoot.height
+//    }
+
+//    DButton {
+//        width: 140
+//        anchors.right: parent.right
+//        anchors.rightMargin: 32
+//        anchors.verticalCenter: parent.verticalCenter
+//        text: "Rebuild Content"
+//        onClicked: {
+//            demoComponentRootContainer.rebuildContent();
+//        }
+//    }
+
+//    DContainer {
+//        id: demoContainer
+//        width: 300
+//        height: 300
+
+//        clipContent: false
+
+//        DMouseArea {
+//            width: 64
+//            height: 64
+//            anchors.right: parent.right
+//            anchors.rightMargin: DStyle.defaultMargin
+//            anchors.bottom: parent.bottom
+//            anchors.bottomMargin: DStyle.defaultMargin
+
+//            scale: pressed ? DStyle.pressedScale : 1.0
+
+//            DRectangle {
+//                anchors.fill: parent
+
+//                DImage {
+//                    anchors.centerIn: parent
+//                    source: "qrc:/assets/icons/component.animation.png"
+//                    opacity: 0.5
+//                }
+//            }
+
+//            onClicked: {
+//                if (demoAnimsPane.state === demoAnimsPane.stateCreate) {
+//                    demoAnimsPane.showNodes();
+//                } else {
+//                    demoAnimsPane.hideNodes();
+//                }
+//            }
+//        }
+
+//        DAnimationPane {
+//            id: demoAnimsPane
+//            componentInfo: propertiesController.focusedComponent
+//        }
+//    }
+
+
+//    DRectangle {
+//        id: demoRectangle
+//        width: 300
+//        height: 400
+//        anchors.centerIn: parent
+
+//        PropertyAnimation {
+//            target: demoRectangle
+//        }
+//    }
 
 //    DPaneSeparator {
 //        id: paneSeparatorVertical
@@ -155,24 +246,6 @@ DContainer {
 //            }
 //        }
 
-//    }
-
-//    DComponentRootContainer {
-//        id: demoComponentRootContainer
-
-//        parentWidth: demoContainerRoot.width
-//        parentHeight: demoContainerRoot.height
-//    }
-
-//    DButton {
-//        width: 140
-//        anchors.right: parent.right
-//        anchors.rightMargin: 32
-//        anchors.verticalCenter: parent.verticalCenter
-//        text: "Rebuild Content"
-//        onClicked: {
-//            demoComponentRootContainer.rebuildContent();
-//        }
 //    }
 
 //    DStateSelector {

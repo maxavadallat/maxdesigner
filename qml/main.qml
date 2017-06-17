@@ -46,9 +46,24 @@ Item {
         //console.log("launchComponentRoot - componentName: " + componentInfo.componentName + " - width: " + width + " - height: " + height);
 
         // Check If Children Loaded
-        if (componentInfo !== null && !componentInfo.childrenLoaded) {
-            // Load Children
-            componentInfo.loadChildren();
+        if (componentInfo !== null) {
+            // Check If Children Loaded
+            if (!componentInfo.childrenLoaded) {
+                // Load Children
+                componentInfo.loadChildren();
+            }
+
+            // Check If Animations Loaded
+            if (!componentInfo.animationsLoaded) {
+                // Laod Animations
+                componentInfo.loadAnimations();
+            }
+
+            // Chekc If behaviors Loaded
+            if (!componentInfo.behaviorsLoaded) {
+                // Load Behaviors
+                componentInfo.loadBehaviors();
+            }
         }
 
         // Set Component Info
@@ -205,6 +220,34 @@ Item {
                 welcomScreen.show();
             }
         }
+
+        onToggleProjectPaneShown: {
+            // Check Current Project
+            if (mainController.currentProject !== null) {
+                // Check Project Pane State
+                if (projectPane.state === projectPane.stateShown) {
+                    // Hide Project Pane
+                    projectPane.hide();
+                } else {
+                    // Show Project Pane
+                    projectPane.show();
+                }
+            }
+        }
+
+        onTogglePropertiesPaneShown: {
+            // Check Current Project
+            if (mainController.currentProject !== null) {
+                // Check Properties Pane State
+                if (propertiesPane.state === propertiesPane.stateShown) {
+                    // Hide Project Pane
+                    propertiesPane.hide();
+                } else {
+                    // Show Project Pane
+                    propertiesPane.show();
+                }
+            }
+        }
     }
 
     // Properties Controller Connections
@@ -280,6 +323,7 @@ Item {
                 var component = mainController.currentProject.getComponentByPath(aFilePath);
                 // Check Component
                 if (component !== null) {
+
                     // Open Component
                     createNewComponentRoot(component, component.width, component.height);
 

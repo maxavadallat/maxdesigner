@@ -785,10 +785,28 @@ ComponentInfo* PropertiesController::selectComponent(const QString& aName, const
 
     // Get Component
     ComponentInfo* componentInfo = mProject->getComponentByName(aName);
+
     // Check Component Info
     if (componentInfo) {
+        // Load Children
+        componentInfo->loadChildren();
+        // Load Animations
+        componentInfo->loadAnimations();
+        // Load Behaviors
+        componentInfo->loadBehaviors();
+
         // Set Focused Component
         setFocusedComponent(aChildIndex >= 0 ? componentInfo->childInfo(aChildIndex) : componentInfo);
+    }
+
+    // Check Focused Component
+    if (mFocusedComponent) {
+        // Load Children
+        mFocusedComponent->loadChildren();
+        // Load Animations
+        mFocusedComponent->loadAnimations();
+        // Load Behaviors
+        mFocusedComponent->loadBehaviors();
     }
 
     return mFocusedComponent;

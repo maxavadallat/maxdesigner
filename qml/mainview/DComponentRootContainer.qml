@@ -191,6 +191,14 @@ DPaneBase {
                 // Toggle Nodes
                 toggleNodePane();
             break;
+
+            case Qt.Key_A:
+                // Check Focused Child
+                if (crcRoot.focusedChild !== null && crcRoot.focusedChild.animsCount > 0) {
+                    // Toggle Animations
+                    toggleAnimationsPane();
+                }
+            break;
         }
     }
 
@@ -445,6 +453,21 @@ DPaneBase {
             } else {
                 // Show Nodes
                 nodePaneLoader.item.showNodes();
+            }
+        }
+    }
+
+    // Toggle Animations Pane
+    function toggleAnimationsPane() {
+        // Check Animation Pane Loader
+        if (animPaneLoader.item) {
+            // Check State
+            if (animPaneLoader.item.state === animPaneLoader.item.stateShown) {
+                // Hide Animations
+                animPaneLoader.item.hideNodes();
+            } else {
+                // Show Animations
+                animPaneLoader.item.showNodes();
             }
         }
     }

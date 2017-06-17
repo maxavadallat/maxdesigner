@@ -552,6 +552,10 @@ void MainWindow::openProject(const QString& aFilePath)
         ui->actionGoLive->setEnabled(true);
         // Set Show Asset Browser Action Enabled
         ui->actionShowAssetBrowser->setEnabled(true);
+        // Set Toggle Project Pane Shown Enabled
+        ui->actionToggleProjectPane->setEnabled(true);
+        // Set Toggle Properties Pane Shown Enabled
+        ui->actionTogglePropertiesPane->setEnabled(true);
 
         // Add Impor Path To Main Quick Widget
         ui->mainQuickWidget->engine()->addImportPath(mProjectModel->liveTempDir());
@@ -1208,6 +1212,10 @@ void MainWindow::createNewProject()
         ui->actionGoLive->setEnabled(true);
         // Set Show Asset Browser Action Enabled
         ui->actionShowAssetBrowser->setEnabled(true);
+        // Set Toggle Project Pane Shown Enabled
+        ui->actionToggleProjectPane->setEnabled(true);
+        // Set Toggle Properties Pane Shown Enabled
+        ui->actionTogglePropertiesPane->setEnabled(true);
 
         // Check Project Tree Model
         if (mProjectTreeModel) {
@@ -1515,6 +1523,8 @@ void MainWindow::closeProject()
     ui->actionRenameView->setEnabled(false);
     ui->actionGoLive->setEnabled(false);
     ui->actionShowAssetBrowser->setEnabled(false);
+    ui->actionToggleProjectPane->setEnabled(false);
+    ui->actionTogglePropertiesPane->setEnabled(false);
 
     // ...
 }
@@ -2218,6 +2228,24 @@ void MainWindow::on_actionGenerateSources_triggered()
 {
     // Launch Generate Sources
     launchGenerateSources();
+}
+
+//==============================================================================
+// On Toggle Project Pane Action Triggered SLot
+//==============================================================================
+void MainWindow::on_actionToggleProjectPane_triggered()
+{
+    // Emit Toggle Project Pane Shown Signal
+    emit toggleProjectPaneShown();
+}
+
+//==============================================================================
+// On Toggle Properties Pane Action Triggered SLot
+//==============================================================================
+void MainWindow::on_actionTogglePropertiesPane_triggered()
+{
+    // Emit Toggle Properties Pane Shown Signal
+    emit togglePropertiesPaneShown();
 }
 
 //==============================================================================

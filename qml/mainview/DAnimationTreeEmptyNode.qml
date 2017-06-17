@@ -84,26 +84,40 @@ Item {
         anchors.fill: parent
 
         onEntered: {
+            // Check Height
+            if (emptyNodeRoot.height === 0) {
+                return;
+            }
+
             // Reset Drop OK
             emptyNodeRoot.dropOK = false;
 
             // Check Drop Keys
-            if (drag.keys[0] === CONSTS.newComponentDragKey || drag.keys[0] === CONSTS.childComponentDragKey) {
+            if ((drag.keys[0] === CONSTS.newComponentDragKey || drag.keys[0] === CONSTS.childComponentDragKey) && drag.source !== null) {
 
                 // Check Source & Source Parent Component
-                if (drag.source !== null && drag.source.componentParent !== parentNode.componentInfo && drag.source.componentCategory === "Animation") {
+                if (/*drag.source.componentParent !== parentNode.componentInfo &&*/ drag.source.componentCategory === "Animation") {
                     //console.log("DAnimationTreeEmptyNode.emptyNodeDropArea.onEntered - ACCEPT!");
+
+                    // Set Drop OK
+                    emptyNodeRoot.dropOK = true;
+
                     // Accept Drag
                     drag.accept();
                 }
             }
 
             // Set Hovering Node Parent
-            nodeTree.hoverindNodeParent = parentNode;
+            nodeTree.hoveringNodeParent = parentNode;
         }
 
         onDropped: {
             //console.log("DAnimationTreeEmptyNode.emptyNodeDropArea.onDropped");
+
+            // Check Drop OK
+            if (!emptyNodeRoot.dropOK) {
+                return;
+            }
 
             // Get Dragged Component Info
             var draggedComponentInfo = drop.source;
@@ -131,9 +145,9 @@ Item {
 
                     // TODO: Add More Checking
 
-                    // Move Child
-                    draggedComponentInfo.componentParent.moveChild(draggedComponentInfo.componentParent, nodeTree.grabbedIndex,
-                                                                   emptyNodeRoot.parentNode.componentInfo, emptyNodeRoot.childIndex);
+                    // Move Animation
+                    draggedComponentInfo.componentParent.moveAnimation(draggedComponentInfo.componentParent, nodeTree.grabbedIndex,
+                                                                       emptyNodeRoot.parentNode.componentInfo, emptyNodeRoot.childIndex);
 
                     // ...
 
@@ -146,7 +160,7 @@ Item {
             emptyNodeRoot.dropOK = false;
 
 //            // Reset Hovering Parent Node
-//            nodeTree.hoverindNodeParent = null;
+//            nodeTree.hoveringNodeParent = null;
         }
 
         onExited: {

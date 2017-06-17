@@ -823,6 +823,14 @@ DMouseArea {
                 }
             break;
 
+            case Qt.Key_A:
+                // Check Root Component Container
+                if (chRoot.rootContainer !== null && animsManagetButton.visible) {
+                    // Toggle Animations
+                    chRoot.rootContainer.toggleAnimationsPane();
+                }
+            break;
+
             case Qt.Key_N:
                 // Check Root Component Container
                 if (chRoot.rootContainer !== null) {

@@ -91,15 +91,15 @@ Item {
                 // Remove Node
                 removeNode(aIndex);
                 // Check Hovering Node Parent
-                if (nodeTree.hoverindNodeParent) {
+                if (nodeTree.hoveringNodeParent) {
                     // Insert Node
-                    nodeTree.hoverindNodeParent.insertNode(aTargetIndex);
+                    nodeTree.hoveringNodeParent.insertNode(aTargetIndex);
                     // Set Current Node For Animating Height
-                    nodeTree.currentNode = nodeTree.hoverindNodeParent;
+                    nodeTree.currentNode = nodeTree.hoveringNodeParent;
                     // Expand
-                    nodeTree.hoverindNodeParent.expand();
+                    nodeTree.hoveringNodeParent.expand();
                     // Reset Hovering Parent Node
-                    nodeTree.hoverindNodeParent = null;
+                    nodeTree.hoveringNodeParent = null;
                 } else {
                     console.log("DAnimationTreeNode.componentInfoConnections.onChildMoved - NULL HOVERING PARENT NODE!!");
                 }
@@ -471,7 +471,7 @@ Item {
 //    }
 
     // Empty Node
-    DNodeTreeEmptyNode {
+    DAnimationTreeEmptyNode {
         id: emptyNode
         width: nodeRoot.width * CONSTS.defaultNodeScaleRatio - CONSTS.defaultNodeTreeItemHeight * 0.5
         anchors.right: parent ? parent.right : undefined
@@ -502,6 +502,8 @@ Item {
                 //console.log("DAnimationTreeNode.topDropArea.onEntered");
                 // Check Enable Drop Area Visibility
                 if (nodeRoot.enableDropAreasVisibility) {
+                    // Emit Remove Empty Node Signal to Hide Other Empty Nodes
+                    nodeRoot.nodeTree.removeEmptyNode();
                     // Restart Hover Time
                     hoverTimer.restart();
                 }
@@ -532,10 +534,10 @@ Item {
                     nodeRoot.dropOK = false;
 
                     // Check Keys - New Component
-                    if (drag.keys[0] === CONSTS.newComponentDragKey || drag.keys[0] === CONSTS.childComponentDragKey) {
+                    if ((drag.keys[0] === CONSTS.newComponentDragKey || drag.keys[0] === CONSTS.childComponentDragKey) && drag.source !== null) {
 
                         // Check Source & Source Parent Component
-                        if (drag.source !== null && drag.source.componentParent !== nodeRoot.componentInfo && drag.source.componentCategory === "Animation") {
+                        if (/*drag.source.componentParent !== nodeRoot.componentInfo &&*/ drag.source.componentCategory === "Animation") {
                             //console.log("DAnimationTreeNode.centerDropArea.onEntered - ACCEPT!");
 
                             // Set Drop OK
@@ -549,7 +551,7 @@ Item {
                 }
 
                 // Set Hovering Parent Node
-                nodeTree.hoverindNodeParent = nodeRoot;
+                nodeTree.hoveringNodeParent = nodeRoot;
 
                 // Emit Remove Empty Node Signal
                 nodeTree.removeEmptyNode();
@@ -606,8 +608,8 @@ Item {
                         // TODO: Add More Checking
 
                         // Move Child
-                        draggedComponentInfo.componentParent.moveChild(draggedComponentInfo.componentParent, nodeTree.grabbedIndex,
-                                                                       nodeRoot.componentInfo, nodeRoot.componentInfo.childCount);
+                        draggedComponentInfo.componentParent.moveAnimation(draggedComponentInfo.componentParent, nodeTree.grabbedIndex,
+                                                                           nodeRoot.componentInfo, nodeRoot.componentInfo.animsCount);
 
                         // ...
 
@@ -620,7 +622,7 @@ Item {
                 nodeRoot.dropOK = false;
 
 //                // Reset Hovering Parent Node
-//                nodeTree.hoverindNodeParent = null;
+//                nodeTree.hoveringNodeParent = null;
             }
 
             onExited: {
@@ -641,6 +643,8 @@ Item {
                 //console.log("DAnimationTreeNode.bottomDropArea.onEntered");
                 // Check Enable Drop Area Visibility
                 if (nodeRoot.enableDropAreasVisibility) {
+                    // Emit Remove Empty Node Signal to Hide Other Empty Nodes
+                    nodeRoot.nodeTree.removeEmptyNode();
                     // Restart Hover Time
                     hoverTimer.restart();
                 }
@@ -670,7 +674,7 @@ Item {
             width: height * 0.5
             height: CONSTS.defaultNodeTreeItemHeight
             anchors.verticalCenter: parent.verticalCenter
-            visible: nodeRoot.componentInfo && nodeRoot.componentInfo.childCount > 0
+            visible: nodeRoot.componentInfo && nodeRoot.componentInfo.animsCount > 0
 
             onPressed: {
                 // Set Current Node For Animating Height
