@@ -34,6 +34,12 @@ public:
     // Destructor
     ~ComponentsModel();
 
+signals:
+    // Component Added
+    void componentAdded(ComponentInfo* aComponent);
+    // Component About To Be Removed
+    void componentAboutToBeRemoved(ComponentInfo* aComponent);
+
 protected:
     friend class ProjectModel;
 

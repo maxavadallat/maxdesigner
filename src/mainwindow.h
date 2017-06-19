@@ -32,6 +32,7 @@ class CreateDataSourceDialog;
 class LiveWindow;
 class MinimizedComponents;
 class AssetBrowserWindow;
+class AnimationComponentsModel;
 
 //==============================================================================
 // Main Window Class
@@ -46,6 +47,7 @@ class MainWindow : public QMainWindow
     Q_PROPERTY(ComponentsModel* componentsModel READ componentsModel NOTIFY componentsModelChanged)
     Q_PROPERTY(ViewsModel* viewsModel READ viewsModel NOTIFY viewsModelChanged)
     Q_PROPERTY(DataSourcesModel* dataSourcesModel READ dataSourcesModel NOTIFY dataSourcesModelChanged)
+    Q_PROPERTY(AnimationComponentsModel* animationsModel READ animationsModel NOTIFY animationsModelChanged)
 
     Q_PROPERTY(bool screenshotMode READ screenshotMode NOTIFY screenshotModeChanged)
 
@@ -67,6 +69,8 @@ public:
     ViewsModel* viewsModel();
     // Get Data Sources Model
     DataSourcesModel* dataSourcesModel();
+    // Animation components Model
+    AnimationComponentsModel* animationsModel();
 
     // Get Screen Shot Mode
     bool screenshotMode();
@@ -105,6 +109,8 @@ signals:
     void viewsModelChanged(ViewsModel* aViews);
     // Data Sources Model Changed Signal
     void dataSourcesModelChanged(DataSourcesModel* aDataSources);
+    // Animation Components Model Changed Signal
+    void animationsModelChanged(AnimationComponentsModel* aAnimationsModel);
     // Screen Shot Mode Changed Signal
     void screenshotModeChanged(const bool& aScreenShotMode);
     // Asset Selected Signal
@@ -372,6 +378,9 @@ private:
 
     // Components Categories Model
     ComponentCategoryModel*     mCategories;
+
+    // Animation Components Model
+    AnimationComponentsModel*   mAnimationComponents;
 
     // Current Component
     ComponentInfo*              mCurrentComponent;

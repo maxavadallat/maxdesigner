@@ -269,6 +269,11 @@ signals:
     // Data Source Created
     void dataSourceCreated(ComponentInfo* aComponent);
 
+    // Component Added
+    void componentAdded(ComponentInfo* aComponent);
+    // Component Removed
+    void componentAboutToBeRemoved(ComponentInfo* aComponent);
+
     // Busy State Changed Signal
     void busyChanged(const bool& aBusy);
 

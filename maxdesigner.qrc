@@ -127,5 +127,7 @@
         <file>qml/mainview/DAnimationTreeNode.qml</file>
         <file>qml/mainview/DAnimationTreeEmptyNode.qml</file>
         <file>qml/mainview/DAnimationPane.qml</file>
+        <file>qml/live/DDataSourceControl.qml</file>
+        <file>qml/live/DStoryBoard.qml</file>
     </qresource>
 </RCC>

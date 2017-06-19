@@ -89,6 +89,7 @@ MainWindow::MainWindow(QWidget* aParent)
     , mComponents(NULL)
     , mViews(NULL)
     , mCategories(NULL)
+    , mAnimationComponents(NULL)
 
     , mCurrentComponent(NULL)
     , mScreenShotMode(false)
@@ -151,6 +152,15 @@ void MainWindow::init()
         mCategories = new ComponentCategoryModel();
     }
 
+    // Check Animation Components Model
+    if (!mAnimationComponents) {
+        // Create Animation Components Model
+        mAnimationComponents = new AnimationComponentsModel(NULL);
+
+        // Emit Animation Components Model Changed Signal
+        emit animationsModelChanged(mAnimationComponents);
+    }
+
     // Set Context Properties
     QQmlContext* ctx = ui->mainQuickWidget->rootContext();
 
@@ -194,66 +204,69 @@ void MainWindow::init()
 
     // ...
 
-    // Register Base Components Model
+    // Register Component - Base Components Model
     qmlRegisterUncreatableType<BaseComponentsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_BASECOMPONENTS_MODEL, "");
-    // Register Components Model
+    // Register Component - Components Model
     qmlRegisterUncreatableType<ComponentsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_COMPONENTS_MODEL, "");
-    // Register Views Model
+    // Register Component - Views Model
     qmlRegisterUncreatableType<ViewsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_VIEWS_MODEL, "");
-    // Register Data Sources Model
+    // Register Component - Data Sources Model
     qmlRegisterUncreatableType<DataSourcesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_DATASOURCES_MODEL, "");
 
-    // Register Project Model
+    // Register Component - Project Model
     qmlRegisterUncreatableType<ProjectModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_PROJECT_MODEL, "");
-    // Register Component Info
+    // Register Component - Component Info
     qmlRegisterUncreatableType<ComponentInfo>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_COMPONENT_INFO, "");
 
-    // Register File Sort Filter Proxy
+    // Register Type - File Sort Filter Proxy
     qmlRegisterType<DesignerFileSortProxy>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_FILE_SORT_FILTER);
 
-    // Register Own Properties Filter
+    // Register Type - Own Properties Filter
     qmlRegisterType<ComponentOwnPropertiesFilter>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_OWN_COMPONENTS_FILTER);
 
-    // Register Components Filter
+    // Register Components - Filter
     qmlRegisterType<ComponentsFilter>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_FILTER);
 
-    // Register Component Imports Model
+    // Register Component - Imports Model
     qmlRegisterUncreatableType<ComponentImportsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_IMPORTS_MODEL, "");
 
-    // Register Component Own Properties Model
+    // Register Component - Own Properties Model
     qmlRegisterUncreatableType<ComponentOwnPropertiesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_OWN_PROPERTIES_MODEL, "");
-    // Register Component Properties Model
+    // Register Component - Properties Model
     qmlRegisterUncreatableType<ComponentPropertiesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_PROPERTIES_MODEL, "");
 
-    // Register Component Anchors Model
+    // Register Component - Anchors Model
     qmlRegisterUncreatableType<ComponentAnchorsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_ANCHORS_MODEL, "");
 
-    // Register Component Signals Model
+    // Register Component - Signals Model
     qmlRegisterUncreatableType<ComponentSignalsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_SIGNALS_MODEL, "");
-    // Register Component Signal
+    // Register Component - Signal
     qmlRegisterUncreatableType<ComponentSignal>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENT_SIGNAL, "");
 
-    // Register Component Slots Model
+    // Register Component - Slots Model
     qmlRegisterUncreatableType<ComponentSlotsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_SLOTS_MODEL, "");
-    // Register Component Slot
+    // Register Component - Slot
     qmlRegisterUncreatableType<ComponentSlot>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENT_SLOT, "");
 
-    // Register Component Functions Model
+    // Register Component - Functions Model
     qmlRegisterUncreatableType<ComponentFunctionsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_FUNCTIONS_MODEL, "");
-    // Register Component Function
+    // Register Component - Function
     qmlRegisterUncreatableType<ComponentFunction>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENT_FUNCTION, "");
 
-    // Register Component States Model
+    // Register Component - States Model
     qmlRegisterUncreatableType<ComponentStatesModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_STATES_MODEL, "");
-    // Register Component State
+    // Register Component - State
     qmlRegisterUncreatableType<ComponentState>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENT_STATE, "");
-    // Register Component Property Change
+    // Register Component - Property Change
     qmlRegisterUncreatableType<ComponentPropertyChange>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENT_PROPERTY_CHANGE, "");
 
-    // Register Component Transitions Model
+    // Register Component - Transitions Model
     qmlRegisterUncreatableType<ComponentTransitionsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENTS_TRANSITIONS_MODEL, "");
-    // Register Component Transition
+    // Register Component - Transition
     qmlRegisterUncreatableType<ComponentTransition>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_COMPONENT_TRANSITION, "");
+
+    // Register Component - Animation Components Model
+    qmlRegisterUncreatableType<AnimationComponentsModel>(DEFAULT_MAIN_QML_IMPORT_URI_ENGINE_COMPONENTS, 0, 1, DEFAULT_MAIN_QML_ANIMATION_COMPONENTS_MODEL, "");
 
 
     // Get Engine
@@ -488,6 +501,14 @@ DataSourcesModel* MainWindow::dataSourcesModel()
 }
 
 //==============================================================================
+// Animation components Model
+//==============================================================================
+AnimationComponentsModel* MainWindow::animationsModel()
+{
+    return mAnimationComponents;
+}
+
+//==============================================================================
 // Get Screen Shot Mode
 //==============================================================================
 bool MainWindow::screenshotMode()
@@ -578,6 +599,12 @@ void MainWindow::openProject(const QString& aFilePath)
         if (mOpenFiles) {
             // Set Project Model
             mOpenFiles->setProjectModel(mProjectModel);
+        }
+
+        // Check Animation Components Model
+        if (mAnimationComponents) {
+            // Set Current Project
+            mAnimationComponents->setCurrentProject(mProjectModel);
         }
 
         // Set Properties Controller
@@ -1229,6 +1256,12 @@ void MainWindow::createNewProject()
             mOpenFiles->setProjectModel(mProjectModel);
         }
 
+        // Check Animation Components Model
+        if (mAnimationComponents) {
+            // Set Current Project
+            mAnimationComponents->setCurrentProject(mProjectModel);
+        }
+
         // Emit Current Project chnged Signal
         emit currentProjectChanged(mProjectModel);
     }
@@ -1447,6 +1480,12 @@ void MainWindow::closeProject()
     if (mOpenFiles) {
         // Close Current Project
         mOpenFiles->closeProject();
+    }
+
+    // Check Animation Components Model
+    if (mAnimationComponents) {
+        // Set Current Project
+        mAnimationComponents->setCurrentProject(NULL);
     }
 
     // Check Live Window
@@ -2361,6 +2400,11 @@ MainWindow::~MainWindow()
     if (mCategories) {
         delete mCategories;
         mCategories = NULL;
+    }
+
+    if (mAnimationComponents) {
+        delete mAnimationComponents;
+        mAnimationComponents = NULL;
     }
 
     // ...

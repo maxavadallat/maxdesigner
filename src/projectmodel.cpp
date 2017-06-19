@@ -1000,12 +1000,7 @@ void ProjectModel::setProjectDir(const QString& aDir)
 //==============================================================================
 int ProjectModel::screenWidth()
 {
-    // Get JSON Value
-    QJsonValue jsw = mProperties.value(JSON_KEY_PROJECT_SCREEN_WIDTH);
-    // Get Screen Width
-    QString sw = QString("%1").arg(jsw.toDouble());
-
-    return sw.toInt();
+    return mProperties[JSON_KEY_PROJECT_SCREEN_WIDTH].toInt();
 }
 
 //==============================================================================
@@ -1016,7 +1011,7 @@ void ProjectModel::setScreenWidth(const int& aWidth)
     // Check Screen Width
     if (aWidth != screenWidth()) {
         // Set Screen Width
-        mProperties[JSON_KEY_PROJECT_SCREEN_WIDTH] = QString("%1").arg(aWidth);
+        mProperties[JSON_KEY_PROJECT_SCREEN_WIDTH] = aWidth;
         // Emit Screen Width Changed Signal
         emit screenWidthChanged(screenWidth());
         // Set Dirty Properties
@@ -1034,11 +1029,7 @@ void ProjectModel::setScreenWidth(const int& aWidth)
 int ProjectModel::screenHeight()
 {
     // Get JSON Value
-    QJsonValue jsh = mProperties.value(JSON_KEY_PROJECT_SCREEN_HEIGHT);
-    // Get Screen Height
-    QString sh = QString("%1").arg(jsh.toDouble());
-
-    return sh.toInt();
+    return mProperties[JSON_KEY_PROJECT_SCREEN_HEIGHT].toInt();
 }
 
 //==============================================================================
@@ -1049,7 +1040,7 @@ void ProjectModel::setScreenHeight(const int& aHeight)
     // Check Screen Height
     if (aHeight != screenHeight()) {
         // Set Screen Height
-        mProperties[JSON_KEY_PROJECT_SCREEN_HEIGHT] = QString("%1").arg(aHeight);
+        mProperties[JSON_KEY_PROJECT_SCREEN_HEIGHT] = aHeight;
         // Emit Screen Height changed Signal
         emit screenHeightChanged(screenHeight());
         // Set Dirty Properties

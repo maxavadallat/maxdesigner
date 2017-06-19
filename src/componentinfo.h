@@ -161,8 +161,10 @@ public:
     // Create Component From Component Info File
     static ComponentInfo* fromInfoFile(const QString& aFilePath, ProjectModel* aProject, const bool aCreateChildren = true);
 
-    // Clone Component Info
+    // Clone Prototype Component Info
     Q_INVOKABLE ComponentInfo* clone();
+    // Duplicate Component Info
+    Q_INVOKABLE ComponentInfo* duplicate(const bool& aBefore = false);
 
     // Get Prototype
     bool protoType();
@@ -690,6 +692,7 @@ protected:
     friend class MainWindow;
     friend class LiveWindow;
     friend class PropertiesController;
+    friend class ComponentTransition;
 
     // Constructor
     explicit ComponentInfo(const QString& aName,
@@ -878,6 +881,7 @@ protected: // Data
     friend class ComponentStatesModel;
     friend class ComponentTransitionsModel;
     friend class ComponentFunctionsModel;
+    friend class AnimationComponentsModel;
 
     // Project Model
     ProjectModel*           mProject;

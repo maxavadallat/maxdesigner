@@ -67,6 +67,8 @@
 #define DEFAULT_MAIN_QML_COMPONENTS_TRANSITIONS_MODEL       "ComponentTransitionsModel"
 // Component Transition
 #define DEFAULT_MAIN_QML_COMPONENT_TRANSITION               "ComponentTransition"
+// Animation Components Model
+#define DEFAULT_MAIN_QML_ANIMATION_COMPONENTS_MODEL         "AnimationComponentsModel"
 
 
 // Own Properties Filter Proxy

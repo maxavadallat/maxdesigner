@@ -233,6 +233,9 @@ bool ComponentsModel::addComponent(ComponentInfo* aComponent)
         // End Insert Rows
         endInsertRows();
 
+        // Emit Component Added Signal
+        emit componentAdded(aComponent);
+
         return true;
     }
 
@@ -250,26 +253,31 @@ bool ComponentsModel::removeComponent(const int& aIndex)
     if (aIndex >= 0 && aIndex < bcCount) {
         // Get Component
         ComponentInfo* component = getComponentByIndex(aIndex);
-        // Get Info File
-        QFile ciFile(component->mInfoPath);
-        // Get Key
-        QString bcKey = mComponents.keys()[aIndex];
-        // Begin Remove Rows
-        beginRemoveRows(QModelIndex(), aIndex, aIndex);
-        // Remove Key
-        mComponents.remove(bcKey);
-        // Disonnect Dirty Changed Signal
-        connect(component, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
-        // Delete Component
-        delete component;
-        // Delete Component Info File
-        if (!ciFile.remove()) {
-            qWarning() << "ComponentsModel::removeBaseComponent - ERROR REMOVING FILE!";
-        }
-        // End Remove Rows
-        endRemoveRows();
+        // Check Component
+        if (component) {
+            // Emit Compoennt About To Be Removed Signal
+            emit componentAboutToBeRemoved(component);
+            // Get Info File
+            QFile ciFile(component->mInfoPath);
+            // Get Key
+            QString bcKey = mComponents.keys()[aIndex];
+            // Begin Remove Rows
+            beginRemoveRows(QModelIndex(), aIndex, aIndex);
+            // Remove Key
+            mComponents.remove(bcKey);
+            // Disonnect Dirty Changed Signal
+            disconnect(component, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
+            // Delete Component
+            delete component;
+            // Delete Component Info File
+            if (!ciFile.remove()) {
+                qWarning() << "ComponentsModel::removeBaseComponent - ERROR REMOVING FILE!";
+            }
+            // End Remove Rows
+            endRemoveRows();
 
-        return true;
+            return true;
+        }
     }
 
     return false;

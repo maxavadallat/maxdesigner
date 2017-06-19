@@ -87,9 +87,73 @@ DContainer {
 
 //        console.log("ccount: " + demoRectangle.children.length);
 
-//        demoContainer.x = (demoContainerRoot.width - demoContainer.width) / 2
-//        demoContainer.y = (demoContainerRoot.height - demoContainer.height) / 2
+//        demoContainer.x = (demoContainerRoot.width - demoContainer.width) / 2;
+//        demoContainer.y = (demoContainerRoot.height - demoContainer.height) / 2;
+
+//        demoRectangle.x = (demoContainerRoot.width - demoRectangle.width) / 2;
+//        demoRectangle.y = (demoContainerRoot.height - demoRectangle.height) / 2;
+
     }
+
+
+//    DRectangle {
+//        id: demoRectangle
+
+//        width: 200
+//        height: 200
+
+//        property int pressPosX: 0
+//        property int pressPosY: 0
+
+//        MouseArea {
+//            anchors.fill: parent
+
+//            onPressed: {
+//                parent.pressPosX = parent.x;
+//                parent.pressPosY = parent.y;
+
+//                drag.target = parent;
+//            }
+
+//            onReleased: {
+//                drag.target = undefined;
+
+//                rectAnim.start();
+//            }
+//        }
+
+//        ParallelAnimation {
+//            id: rectAnim
+
+//            PropertyAnimation {
+//                id: xAnim
+//                target: demoRectangle
+//                duration: 500
+//                property: "x"
+//                properties: ""
+//                to: demoRectangle.pressPosX
+//                easing.type: Easing.OutElastic
+//                //alwaysRunToEnd: false
+//                loops: 1
+//                //paused: false
+//                //running: false
+//            }
+
+//            PropertyAnimation {
+//                id: yAnim
+//                target: demoRectangle
+//                duration: 500
+//                property: "y"
+//                properties: ""
+//                to: demoRectangle.pressPosY
+//                easing.type: Easing.OutElastic
+//                //alwaysRunToEnd: false
+//                loops: 1
+//                //paused: false
+//                //running: false
+//            }
+//        }
+//    }
 
 //    DComponentRootContainer {
 //        id: demoComponentRootContainer

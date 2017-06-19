@@ -8,24 +8,11 @@
 
 class ComponentInfo;
 class ComponentTransition;
-class ComponentPropertyAction;
-class ComponentPropertyAnimation;
-class ComponentTransitionNode;
-
 class PropertiesController;
-
-//==============================================================================
-// Component Transitions Node Type
-//==============================================================================
-enum ETransitionType {
-    ETTUnknown                  = 0,
-    ETTParallelAnimation,
-    ETTSequentialAnimation,
-    ETTPauseAnimation,
-    ETTPropertyAction,
-    ETTScripAction,
-    ETTPropertyAnimation
-};
+class ProjectModel;
+class BaseComponentsModel;
+class ComponentsModel;
+class MainWindow;
 
 //==============================================================================
 // Component Transitions Model
@@ -36,7 +23,7 @@ class ComponentTransitionsModel : public QAbstractListModel
 
     Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent WRITE setCurrentComponent NOTIFY currentComponentChanged)
     Q_PROPERTY(ComponentTransition* currentTransition READ currentTransition WRITE setCurrentTransition NOTIFY currentTransitionChanged)
-    Q_PROPERTY(ComponentTransitionNode* currentTransitionNode READ currentTransitionNode WRITE setCurrentTransitionNode NOTIFY currentTransitionNodeChanged)
+//    Q_PROPERTY(int transitionsCount READ transitionsCount WRITE setTransitionsCount NOTIFY transitionsCountChanged)
 
 public:
     // Get Current Component
@@ -49,66 +36,29 @@ public:
     // Set Current Transition
     void setCurrentTransition(ComponentTransition* aTransition);
 
-    // Get Current Node
-    ComponentTransitionNode* currentTransitionNode();
-    // Set Current Node
-    void setCurrentTransitionNode(ComponentTransitionNode* aNode);
+//    // Get TRansitions Count
+//    int transitionsCount();
 
-    // Add Transition
-    void addTransition(const QString& aFrom, const QString& aTo);
-    // Set Transition
-    void setTransition(const int& aIndex, const QString& aFrom, const QString& aTo);
-    // Remove Transition
-    void removeTransition(const int& aIndex);
-    // Remvoe Transitions
-    void removeTransition(ComponentTransition* aTransition);
+    // Select Transition
+    Q_INVOKABLE void selectTransition(const int& aIndex);
 
-    // Add Parallel Animation Node
-    void addParallelAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode = NULL);
-    // Add Sequential Animation Node
-    void addSequentialAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode = NULL);
-    // Add Pause Animation Node
-    void addPauseAnimation(const QString& aDuration, ComponentTransition* aTransition, ComponentTransitionNode* aParentNode = NULL);
-    // Add Property Animation Node
-    void addPropertyAnimation(const QString& aTarget,
-                              const QString& aProperty,
-                              const QString& aFrom,
-                              const QString& aTo,
-                              const QString& aDuration,
-                              const QString& aEasing,
-                              ComponentTransition* aTransition,
-                              ComponentTransitionNode* aParentNode = NULL);
-    // Add Property Action Node
-    void addPropertyAction(const QString& aTarget,
-                           const QString& aProperty,
-                           const QString& aValue,
-                           ComponentTransition* aTransition,
-                           ComponentTransitionNode* aParentNode = NULL);
-    // Add Script Action Node
-    void addScriptAction(const QString& aScript,
-                         ComponentTransition* aTransition,
-                         ComponentTransitionNode* aParentNode= NULL);
+    // Create New Transition
+    Q_INVOKABLE ComponentTransition* createNewTransition();
+    // Discard New Transition
+    Q_INVOKABLE void discardNewTransition();
 
-    // Remove Transition Node
-    void removeTransitionNode(ComponentTransition* aTransition,
-                              const int& aIndex,
-                              ComponentTransitionNode* aParentNode = NULL);
-
-    // Remove Transition Node
-    void removeTransitionNode(ComponentTransition* aTransition,
-                              ComponentTransitionNode* aNode,
-                              ComponentTransitionNode* aParentNode = NULL);
-    // Move Transition Node
-    void moveTransitionNode(ComponentTransition* aTransition,
-                            ComponentTransitionNode* aNode,
-                            ComponentTransitionNode* aTargetNode,
-                            const int& aTargetIndex);
-
-    // To JSON Array
-    QJsonArray toJSONArray();
+    // Append Transition
+    Q_INVOKABLE void appendTransition(ComponentTransition* aTransition);
 
     // Get Transition
     Q_INVOKABLE ComponentTransition* getTransition(const int& aIndex);
+    // Move Transition
+    Q_INVOKABLE void moveTransition(const int& aIndex, const int& aTarget);
+    // Remove Transition
+    Q_INVOKABLE void removeTransition(const int& aIndex);
+
+    // Add Transition
+    void addTransition(const QString& aFrom, const QString& aTo);
 
     // Destructor
     ~ComponentTransitionsModel();
@@ -118,8 +68,8 @@ signals:
     void currentComponentChanged(ComponentInfo* aComponent);
     // Current Transition Changed
     void currentTransitionChanged(ComponentTransition* aTransition);
-    // Current Transition Node Changed
-    void currentTransitionNodeChanged(ComponentTransitionNode* aNode);
+//    // Transitions Count Changed Signal
+//    void transitionsCountChanged(const int& aCount);
 
 protected:
     friend class ComponentInfo;
@@ -133,10 +83,16 @@ protected:
     // Clear
     void clear();
 
+    // To JSON Array
+    QJsonArray toJSONArray();
+
     // Load Component Transitions
     void loadComponentTransitions();
     // Save Component Transitions
     void saveComponentTransitions();
+
+    // Set Dirty State
+    void setDirty(const bool& aDirty);
 
 public: // from QAbstractListModel
     // Row Count
@@ -150,7 +106,8 @@ public:
     // Transitions Model Roles
     enum TMRoles {
         ETMRFromState   =   Qt::UserRole + 1,
-        ETMRToState
+        ETMRToState,
+        ETMRNodesCount
     };
 
 protected: // Data
@@ -160,12 +117,12 @@ protected: // Data
     ComponentInfo*                  mComponent;
     // Transitions List
     QList<ComponentTransition*>     mTransitions;
+    // New Transition
+    ComponentTransition*            mNewTransition;
     // Current Transition
     ComponentTransition*            mCurrentTransition;
-    // Current Transition Node
-    ComponentTransitionNode*        mCurrentTransitionNode;
-    // Transition Node Type Map
-    QMap<QString, ETransitionType>  mNodeTypeMap;
+    // Dirty State
+    bool                            mDirty;
 };
 
 
@@ -187,8 +144,8 @@ class ComponentTransition : public QObject
     Q_PROPERTY(QString fromState READ fromState WRITE setFromState NOTIFY fromStateChanged)
     // To State
     Q_PROPERTY(QString toState READ toState WRITE setToState NOTIFY toStateChanged)
-    // Current Node
-    Q_PROPERTY(ComponentTransitionNode* currentNode READ currentNode WRITE setCurrentNode NOTIFY currentNodeChanged)
+    // Nodes Count
+    Q_PROPERTY(int nodesCount READ nodesCount NOTIFY nodeCountChanged)
 
 public:
     // From JSON Object
@@ -204,15 +161,26 @@ public:
     // Set To State
     void setToState(const QString& aToState);
 
-    // Get Current Node
-    ComponentTransitionNode* currentNode();
-    // Set Current Node
-    void setCurrentNode(ComponentTransitionNode* aNode);
-
     // Get Node Count
-    Q_INVOKABLE int nodeCount();
+    Q_INVOKABLE int nodesCount();
+
+    // Create New Node
+    Q_INVOKABLE ComponentInfo* createNewNode(const QString& aComponentName);
+    // Discard New Node
+    Q_INVOKABLE void discardNewNode();
     // Get Node By Index
-    Q_INVOKABLE ComponentTransitionNode* nodeByIndex(const int& aIndex);
+    Q_INVOKABLE ComponentInfo* getNode(const int& aIndex);
+
+    // Append Node
+    Q_INVOKABLE void appendNode(ComponentInfo* aNode, ComponentInfo* aParentNode = NULL);
+    // Insert Node
+    Q_INVOKABLE void insertNode(const int& aIndex, ComponentInfo* aNode, ComponentInfo* aParentNode = NULL);
+    // Move Node
+    Q_INVOKABLE void moveNode(const int& aIndex, const int& aTargetIndex);
+    // Move Node
+    Q_INVOKABLE void moveNode(ComponentInfo* aParentNode, const int& aIndex, ComponentInfo* aTargetNode, const int& aTargetIndex);
+    // Remove Node
+    Q_INVOKABLE void removeNode(const int& aIndex);
 
     // Destructor
     ~ComponentTransition();
@@ -226,13 +194,6 @@ protected:
     // Clear
     void clear();
 
-    // Append Node
-    void appendNode(ComponentTransitionNode* aNode, ComponentTransitionNode* aParentNode = NULL);
-    // Insert Node
-    void insertNode(const int& aIndex, ComponentTransitionNode* aNode, ComponentTransitionNode* aParentNode = NULL);
-    // Remove Node
-    void removeNode(const int& aIndex, ComponentTransitionNode* aParentNode = NULL);
-
     // To JSON Object
     QJsonObject toJSONObject();
 
@@ -244,22 +205,22 @@ signals:
     void fromStateChanged(const QString& aFromState);
     // To State Changed Signal
     void toStateChanged(const QString& aToState);
-    // Current Node changed Signal
-    void currentNodeChanged(ComponentTransitionNode* aNode);
+    // Node Count Changed Signal
+    void nodeCountChanged(const int& aCount);
 
 protected: // Data
     friend class ComponentTransitionsModel;
 
     // Transitions Model
     ComponentTransitionsModel*      mModel;
-    // Transition Nodes
-    QList<ComponentTransitionNode*> mNodes;
-    // Current Node
-    ComponentTransitionNode*        mCurrentNode;
     // From State
     QString                         mFromState;
     // To State
     QString                         mToState;
+    // Transition Nodes
+    QList<ComponentInfo*>           mNodes;
+    // New Transition Node
+    ComponentInfo*                  mNewNode;
 };
 
 
@@ -268,368 +229,91 @@ protected: // Data
 
 
 
+
+
+
+
+
 //==============================================================================
-// Component Transitin Item Node Base
+// Animation Components List Model
 //==============================================================================
-class ComponentTransitionNode  : public QObject
+class AnimationComponentsModel : public QAbstractListModel
 {
     Q_OBJECT
 
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    Q_PROPERTY(ProjectModel* currentProject READ currentProject WRITE setCurrentProject NOTIFY currentProjectChanged)
 
 public:
-    // From JSON Object
-    static ComponentTransitionNode* fromJSONObject(ComponentTransitionsModel* aModel, const QJsonObject& aObject);
 
-    // Get Count
-    int count();
+    // Get Current Project
+    ProjectModel* currentProject();
+    // Set Current Project
+    void setCurrentProject(ProjectModel* aProjectModel);
 
-    // Get Child
-    ComponentTransitionNode* child(const int& aIndex);
-
-    // Append Child
-    void appendChild(ComponentTransitionNode* aChild);
-    // Insert Child
-    void insertChild(const int& aIndex, ComponentTransitionNode* aChild);
-    // Remove Child
-    void removeChild(const int& aIndex);
-
-    // Clear
-    virtual void clear();
-    // To JSON Object
-    virtual QJsonObject toJSONObject();
+    // get Animation Component Name By Index
+    Q_INVOKABLE QString getNameByIndex(const int& aIndex);
 
     // Destructor
-    ~ComponentTransitionNode();
+    ~AnimationComponentsModel();
 
 signals:
-    // Count Changed Signal
-    void countChanged(const int& aCount);
+    // Project Model Changed Signal
+    void currentProjectChanged(ProjectModel* aProjectModel);
+    // Item Added
+    void itemAdded(const int& aIndex);
+    // Item Removed
+    void itemRemoved(const int& aIndex);
 
 protected:
+    friend class MainWindow;
     // Constructor
-    explicit ComponentTransitionNode(const ETransitionType& aType, QObject* aParent = NULL);
+    explicit AnimationComponentsModel(ProjectModel* aProject, QObject* aParent = NULL);
+    // Init
+    void init();
+    // Clear
+    void clear();
 
-protected: // Data
-    friend class ComponentTransition;
-    friend class ComponentTransitionsModel;
+    // Connect Model Signals
+    void connectModelSignals();
+    // Disconnect Model Signals
+    void disconnectModelSignals();
 
-    // Transitions Model
-//    ComponentTransitionsModel*          mModel;
-    // Transition Type
-    ETransitionType                     mType;
-    // Parent Node
-    ComponentTransitionNode*            mParent;
-    // Children
-    QList<ComponentTransitionNode*>     mChildren;
-};
+    // Collect Animation Components
+    void collectAnimationComponents();
 
+protected slots:
+    // Component Created Slot
+    void componentCreated(ComponentInfo* aComponent, const int& aWidth, const int& aHeight);
+    // Component Added Slot
+    void componentAdded(ComponentInfo* aComponent);
+    // Component About To Be Removed Slot
+    void componentAboutToBeRemoved(ComponentInfo* aComponent);
 
-
-
-
-
-
-
-//==============================================================================
-// Component Parallel Animation
-//==============================================================================
-class ComponentParallelAnimation : public ComponentTransitionNode
-{
-    Q_OBJECT
+public: // from QAbstractListModel
+    // Row Count
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+    // Data
+    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+    // Get Role Names
+    virtual QHash<int, QByteArray> roleNames() const;
 
 public:
-    // From JSON Object
-    static ComponentParallelAnimation* fromJSONObject(const QJsonObject& aObject);
-    // Constructor
-    explicit ComponentParallelAnimation(QObject* aParent = NULL);
-    // To JSON Object
-    virtual QJsonObject toJSONObject();
-    // Destructor
-    ~ComponentParallelAnimation();
+    // Transitions Model Roles
+    enum ACMRoles {
+        EACMRComponentName   =   Qt::UserRole + 1,
+    };
+
+protected:
+    // Project Model
+    ProjectModel*           mProject;
+    // Base Components Model
+    BaseComponentsModel*    mBaseComponents;
+    // Components Model
+    ComponentsModel*        mComponents;
+    // Animation Components List
+    QList<ComponentInfo*>   mAnimationComponents;
 };
 
 
-
-
-
-
-
-//==============================================================================
-// Component Sequential Animation
-//==============================================================================
-class ComponentSequentialAnimation : public ComponentTransitionNode
-{
-    Q_OBJECT
-
-public:
-    // From JSON Object
-    static ComponentSequentialAnimation* fromJSONObject(const QJsonObject& aObject);
-    // Constructor
-    explicit ComponentSequentialAnimation(QObject* aParent = NULL);
-    // To JSON Object
-    virtual QJsonObject toJSONObject();
-    // Destructor
-    ~ComponentSequentialAnimation();
-};
-
-
-
-
-
-
-
-//==============================================================================
-// Component Pause Animation
-//==============================================================================
-class ComponentPauseAnimation : public ComponentTransitionNode
-{
-    Q_OBJECT
-
-    // Duration
-    Q_PROPERTY(QString duration READ duration WRITE setDuration NOTIFY durationChanged)
-
-public:
-    // From JSON Object
-    static ComponentPauseAnimation* fromJSONObject(const QJsonObject& aObject);
-    // Constructor
-    explicit ComponentPauseAnimation(QObject* aParent = NULL);
-
-    // Get Duration
-    QString duration();
-    // Set Duration
-    void setDuration(const QString& aDuration);
-
-    // To JSON Object
-    virtual QJsonObject toJSONObject();
-
-    // Destructor
-    ~ComponentPauseAnimation();
-
-signals:
-    // Duration Changed Signal
-    void durationChanged(const QString& aDuration);
-
-protected: // Data
-    // Duration
-    QString     mDuration;
-};
-
-
-
-
-
-
-
-//==============================================================================
-// Component Property Action
-//==============================================================================
-class ComponentPropertyAction : public ComponentTransitionNode
-{
-    Q_OBJECT
-
-    // Target
-    Q_PROPERTY(QString propertyActionTarget READ propertyActionTarget WRITE setPropertyActionTarget NOTIFY propertyActionTargetChanged)
-    // Property
-    Q_PROPERTY(QString propertyActionProperty READ propertyActionProperty WRITE setPropertyActionProperty NOTIFY propertyActionPropertyChanged)
-    // Value
-    Q_PROPERTY(QString propertyActionValue READ propertyActionValue WRITE setPropertyActionValue NOTIFY propertyActionValueChanged)
-
-public:
-    // From JSON Object
-    static ComponentPropertyAction* fromJSONObject(const QJsonObject& aObject);
-    // Constructor
-    explicit ComponentPropertyAction(QObject* aParent = NULL);
-
-    // Get Target
-    QString propertyActionTarget();
-    // Set Target
-    void setPropertyActionTarget(const QString& aTarget);
-
-    // Get Property
-    QString propertyActionProperty();
-    // Set Property
-    void setPropertyActionProperty(const QString& aProperty);
-
-    // Get Value
-    QString propertyActionValue();
-    // Set Value
-    void setPropertyActionValue(const QString& aValue);
-
-    // To JSON Object
-    virtual QJsonObject toJSONObject();
-
-    // Destructor
-    ~ComponentPropertyAction();
-
-signals:
-    // Property Action Target changed Signal
-    void propertyActionTargetChanged(const QString& aTarget);
-    // Property Action Property Changed Signal
-    void propertyActionPropertyChanged(const QString& aProperty);
-    // Property Action Value Changed Signal
-    void propertyActionValueChanged(const QString& aValue);
-
-protected: // Data
-    // Target
-    QString     mTarget;
-    // Property
-    QString     mProperty;
-    // Value
-    QString     mValue;
-};
-
-
-
-
-
-
-
-
-//==============================================================================
-// Component Script Action
-//==============================================================================
-class ComponentScriptAction : public ComponentTransitionNode
-{
-    Q_OBJECT
-
-    // Script
-    Q_PROPERTY(QString script READ script WRITE setScript NOTIFY scriptChanged)
-
-public:
-    // From JSON Object
-    static ComponentScriptAction* fromJSONObject(const QJsonObject& aObject);
-    // Constructor
-    explicit ComponentScriptAction(QObject* aParent = NULL);
-
-    // Get Script
-    QString script();
-    // Set Script
-    void setScript(const QString& aScript);
-
-    // To JSON Object
-    virtual QJsonObject toJSONObject();
-
-    // Destructor
-    ~ComponentScriptAction();
-
-signals:
-    // Script Action Script Changed Signal
-    void scriptChanged(const QString& aScript);
-
-protected: // Data
-    // Script
-    QString     mScript;
-};
-
-
-
-
-
-
-//==============================================================================
-// Component Property Animation
-//==============================================================================
-class ComponentPropertyAnimation : public ComponentTransitionNode
-{
-    Q_OBJECT
-
-    // Base Type
-    Q_PROPERTY(QString base READ base WRITE setBase NOTIFY baseChanged)
-    // Target
-    Q_PROPERTY(QString propertyAnimationTarget READ propertyAnimationTarget WRITE setPropertyAnimationTarget NOTIFY propertyAnimationTargetChanged)
-    // Property
-    Q_PROPERTY(QString propertyAnimationProperty READ propertyAnimationProperty WRITE setPropertyAnimationProperty NOTIFY propertyAnimationPropertyChanged)
-    // From
-    Q_PROPERTY(QString valueFrom READ valueFrom WRITE setValueFrom NOTIFY valueFromChanged)
-    // To
-    Q_PROPERTY(QString valueTo READ valueTo WRITE setValueTo NOTIFY valueToChanged)
-    // Duration
-    Q_PROPERTY(QString duration READ duration WRITE setDuration NOTIFY durationChanged)
-    // Easing Type
-    Q_PROPERTY(QString easingType READ easingType WRITE setEasingType NOTIFY easingTypeChanged)
-
-    // Curve
-    // Amplitude
-
-public:
-    // From JSON Object
-    static ComponentPropertyAnimation* fromJSONObject(const QJsonObject& aObject);
-    // Constructor
-    explicit ComponentPropertyAnimation(QObject* aParent = NULL);
-
-    // Get Base
-    QString base();
-    // Set Base
-    void setBase(const QString& aBase);
-
-    // Get Target
-    QString propertyAnimationTarget();
-    // Set Target
-    void setPropertyAnimationTarget(const QString& aTarget);
-
-    // Get Property
-    QString propertyAnimationProperty();
-    // Set Property
-    void setPropertyAnimationProperty(const QString& aProperty);
-
-    // Get Value From
-    QString valueFrom();
-    // Set Value From
-    void setValueFrom(const QString& aValueFrom);
-
-    // Get Value To
-    QString valueTo();
-    // Set Value To
-    void setValueTo(const QString& aValueTo);
-
-    // Get Duration
-    QString duration();
-    // Set Duration
-    void setDuration(const QString& aDuration);
-
-    // Get Easing Type
-    QString easingType();
-    // Set Easing Type
-    void setEasingType(const QString& aEasingType);
-
-    // To JSON Object
-    virtual QJsonObject toJSONObject();
-
-    // Destructor
-    ~ComponentPropertyAnimation();
-
-signals:
-    // Base Type Changed Signal
-    void baseChanged(const QString& aBase);
-    // Target Changed Signal
-    void propertyAnimationTargetChanged(const QString& aTarget);
-    // Property Changed Signal
-    void propertyAnimationPropertyChanged(const QString& aProperty);
-    // Value From Changed Signal
-    void valueFromChanged(const QString& aValueFrom);
-    // Value To Changed Signal
-    void valueToChanged(const QString& aValueTo);
-    // Duration Changed Signal
-    void durationChanged(const QString& aDuration);
-    // Easing Type Changed Signal
-    void easingTypeChanged(const QString& aEasingType);
-
-protected: // Data
-    // Base
-    QString         mBase;
-    // Target
-    QString         mTarget;
-    // Property
-    QString         mProperty;
-    // Value From
-    QString         mValueFrom;
-    // Value To
-    QString         mValueTo;
-    // Duration
-    QString         mDuration;
-    // Easing Type
-    QString         mEasingType;
-};
 
 #endif // COMPONENTTRANSITIONSMODEL_H

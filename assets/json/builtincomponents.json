@@ -21,11 +21,60 @@
                 "id": "string::::animationRoot",
                 "objectName": "string::::",
                 "alwaysRunToEnd": "bool::::false",
-                "loops": "int::::0",
+                "loops": "int::::1",
                 "paused": "bool::::false",
                 "running": "bool::::false"
             },
             "componentProperties": {
+                "width": "168",
+                "height": "168"
+            }
+        },
+        {
+            "componentBase": "Animation",
+            "componentBuiltIn": true,
+            "componentCategory": "Animation",
+            "componentName": "PauseAnimation",
+            "componentType": "BaseComponent",
+            "componentOwnProperties": {
+                "duration": "int::::200"
+            },
+            "componentProperties": {
+                "id": "pauseAnimationRoot",
+                "width": "168",
+                "height": "168"
+            }
+        },
+        {
+            "componentBase": "Animation",
+            "componentBuiltIn": true,
+            "componentCategory": "Animation",
+            "componentName": "PropertyAction",
+            "componentType": "BaseComponent",
+            "componentOwnProperties": {
+                "property": "string::::",
+                "properties": "string::::",
+                "target": "QtObject::::",
+                "value": "var::::"
+            },
+            "componentProperties": {
+                "id": "propertyActionRoot",
+                "width": "168",
+                "height": "168"
+            }
+        },
+        {
+            "componentBase": "Animation",
+            "componentBuiltIn": true,
+            "componentCategory": "Animation",
+            "componentName": "ScriptAction",
+            "componentType": "BaseComponent",
+            "componentOwnProperties": {
+                "script": "string::::",
+                "scriptName": "string::::"
+            },
+            "componentProperties": {
+                "id": "scriptActionRoot",
                 "width": "168",
                 "height": "168"
             }
@@ -39,11 +88,11 @@
             "componentOwnProperties": {
                 "duration": "int::::0",
                 "easing.type": "enum:::Easing.Linear,Easing.InQuad,Easing.OutQuad,Easing.InBack,Easing.OutBack,Easing.InOutBack,Easing.OutBounce,Easing.OutElastic:Easing.Linear",
-                "from": "var::::0",
+                "from": "var::::",
                 "properties": "string::::",
                 "property": "string::::",
-                "target": "QtObject::::null",
-                "to": "var::::0"
+                "target": "QtObject::::",
+                "to": "var::::"
             },
             "componentProperties": {
                 "id": "propertyAnimationRoot",
@@ -105,7 +154,7 @@
             "componentType": "BaseComponent",
             "componentOwnProperties": {
                 "border.color": "string::::transparent",
-                "border.width": "int::::1",
+                "border.width": "int::::0",
                 "color": "string::::black",
                 "radius": "int::::0"
             }
@@ -119,8 +168,15 @@
             "componentOwnProperties": {
                 "containsMouse": "readonly bool::::false",
                 "containsPress": "readonly bool::::false",
-                "pressed": "readonly bool::::false",
+                "drag.active": "readonly bool::::false",
+                "drag.axis": "enum:::Drag.XAxis,Drag.YAxis,Drag.XAndYAxis,Drag.None:Drag.XAndYAxis",
+                "drag.filterChildren": "bool::::false",
+                "drag.target": "QtObject::::",
+                "drag.threshold": "int::::0",
                 "hoverEnabled": "bool::::false",
+                "mouseX": "readonly int::::0",
+                "mouseY": "readonly int::::0",
+                "pressed": "readonly bool::::false",
                 "preventStealing": "bool::::false"
             }
         },

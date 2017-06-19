@@ -6,22 +6,56 @@ import "qrc:/qml/system/DConstants.js" as CONSTS
 import "qrc:/qml/style"
 import "qrc:/qml/system"
 import "qrc:/qml/controls"
+import "qrc:/qml/animations"
 
 DSection {
     id: transitionsSectionRoot
     width: 300
+
+    property ComponentTransitionsModel transitionsModel: propertiesController.transitionsModel
+
     title: "Transitions"
     minHeight: transitionsContainer.height + addTransitionButton.height
 
     state: stateClosed
 
-    // Transitions
+    signal newTransitionSignal()
+    signal editTransitionSignal(var index)
+
+    // Transitions Container
     Item {
         id: transitionsContainer
         width: transitionsSectionRoot.width
-        height: 0
+        height: CONSTS.defaultPaneItemHeight * Math.min(CONSTS.defaultStatesMax, transitionsListView.count);
+        Behavior on height { DAnimation { } }
 
-        // ...
+        // Transitions List View
+        DListView {
+            id: transitionsListView
+            anchors.fill: parent
+
+            model: transitionsSectionRoot.transitionsModel
+
+            delegate: DTransitionItemDelegate {
+                width: transitionsListView.width
+
+                itemIndex: index
+
+                stateFrom: model.tmFrom
+                stateTo: model.tmTo
+                nodesCount: model.tmNodesCount
+
+                onItemActionClicked: {
+                    // Remove Transition
+                    transitionsSectionRoot.transitionsModel.removeTransition(index);
+                }
+
+                onItemDoubleClicked: {
+                    // Emit Edit Transition Launch Signal
+                    propertiesPaneRoot.editTransitionLaunch(index);
+                }
+            }
+        }
     }
 
     Item {

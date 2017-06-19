@@ -40,7 +40,7 @@ ComponentInfo* ComponentInfo::fromInfoFile(const QString& aFilePath, ProjectMode
 }
 
 //==============================================================================
-// Clone Component Info
+// Clone Prototype Component Info
 //==============================================================================
 ComponentInfo* ComponentInfo::clone()
 {
@@ -59,6 +59,55 @@ ComponentInfo* ComponentInfo::clone()
     newComponent->setProtoType(this);
     // Set Is Root
     newComponent->mIsRoot = false;
+
+    return newComponent;
+}
+
+//==============================================================================
+// Duplicate Component Info
+//==============================================================================
+ComponentInfo* ComponentInfo::duplicate(const bool& aBefore)
+{
+    // Check If Root
+    if (mIsRoot) {
+        return NULL;
+    }
+
+    qDebug() << "#### ComponentInfo::duplicate - mName: " << mName << " - aBefore: " << aBefore;
+
+    // Create Component Info
+    ComponentInfo* newComponent = new ComponentInfo(mName, mType, mCategory, mProject, mBaseName, mBuiltIn, false);
+
+
+    // Copy Imports
+
+    // Copy Own Properties
+
+    // Copy Properties
+
+    // Copy Signals
+
+    // Copy Slots
+
+    // Copy Functions
+
+    // Copy Behaviors
+
+    // Copy Children
+
+    // Copy Animations
+
+    // Copy States
+
+    // Copy Transitions
+
+
+    // Check If Insert Before
+    if (aBefore) {
+
+    } else {
+
+    }
 
     return newComponent;
 }
@@ -2785,25 +2834,30 @@ QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks,
 
         // Iterate Through Property Keys
         for (int k=0; k<pCount; k++) {
+            // Get Property Name
+            QString pName = pKeys[k];
+
+            //qDebug() << "ComponentInfo::liveCodeFormatInheritedProperties - mName: " << mName << " - pName: " << pName;
+
             // Get Type
-            QString pType = propertyType(pKeys[k]);
+            QString pType = propertyType(pName);
             // Init ReadOnly
             bool readOnly = pType.indexOf(JSON_VALUE_PROPERTY_TYPE_PREFIX_READONLY) >= 0;
             // Get Value
-            QString pValue = componentProperty(pKeys[k]).toString();
+            QString pValue = componentProperty(pName).toString();
             // Init Value Is Binding/Formula
             bool pIsBinding = (pValue[0] == QChar(16));
 
             // Check readOnly
             if (!readOnly) {
                 // Check Key
-                if (aFPKeys.indexOf(pKeys[k]) == -1) {
+                if (aFPKeys.indexOf(pName) == -1 /*&& mProperties.keys().indexOf(pName) != -1*/) {
                     // Check If Binding
                     if (pIsBinding) {
                         // Remove Char 16
                         pValue = pValue.mid(1);
                     // Check For String Type
-                    } else if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING) {
+                    } else if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_STRING /*&& !pValue.isEmpty()*/) {
                         // Set Value
                         pValue = QString("\"%1\"").arg(pValue);
                     }
@@ -2811,36 +2865,36 @@ QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks,
                     // Check Value
                     if (!pValue.isEmpty()) {
                         // Append Live Code
-                        liveCode += QString("%1%2: %3\n").arg(aIndent).arg(pKeys[k]).arg(pValue);
+                        liveCode += QString("%1%2: %3\n").arg(aIndent).arg(pName).arg(pValue);
                     }
                 }
 
                 // Check Property Key
-                if (pKeys[k] != JSON_KEY_COMPONENT_PROPERTY_ID && !aComponentCode) {
+                if (pName != JSON_KEY_COMPONENT_PROPERTY_ID && !aComponentCode) {
 
                     // Check Property Type
                     if (pType == JSON_VALUE_PROPERTY_TYPE_PREFIX_ENUM) {
 
                         // Add Enum Values To Enum Hooks
-                        aEnumHooks << liveCodeGenerateEnumValueCases(propertyEnums(pKeys[k]), aIndent);
+                        aEnumHooks << liveCodeGenerateEnumValueCases(propertyEnums(pName), aIndent);
 
                         // Check ID
                         if (aID.isEmpty()) {
                             // Add Value Setting Hook
-                            aPHooks << QString("%1%2%2case \"%3\": %3 = __string2enum(value); break;\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(pKeys[k]);
+                            aPHooks << QString("%1%2%2case \"%3\": %3 = __string2enum(value); break;\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(pName);
                         } else {
                             // Add Value Setting Hook
-                            aPHooks << QString("%1%2%2case \"%3\": %4.%3 = __string2enum(value); break;\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(pKeys[k]).arg(aID);
+                            aPHooks << QString("%1%2%2case \"%3\": %4.%3 = __string2enum(value); break;\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(pName).arg(aID);
                         }
 
                     } else {
                         // Check ID
                         if (aID.isEmpty()) {
                             // Add Value Setting Hook
-                            aPHooks << QString("%1%2%2case \"%3\": %3 = value; break;\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(pKeys[k]);
+                            aPHooks << QString("%1%2%2case \"%3\": %3 = value; break;\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(pName);
                         } else {
                             // Add Value Setting Hook
-                            aPHooks << QString("%1%2%2case \"%3\": %4.%3 = value; break;\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(pKeys[k]).arg(aID);
+                            aPHooks << QString("%1%2%2case \"%3\": %4.%3 = value; break;\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(pName).arg(aID);
                         }
                     }
                 }
@@ -2849,9 +2903,9 @@ QString ComponentInfo::liveCodeFormatInheritedProperties(QStringList& aPHooks,
             // TODO: Handle Property Changes -> PropertyChanged Slot
 
             // Check Proprty Name
-            if (!aComponentCode && aFPKeys.indexOf(pKeys[k]) == -1 && pKeys[k].indexOf(".") == -1) {
+            if (!aComponentCode && aFPKeys.indexOf(pName) == -1 && pName.indexOf(".") == -1) {
                 // Init Property Change Slot Name
-                QString pcSlotName = QString("on%1Changed").arg(pKeys[k]);
+                QString pcSlotName = QString("on%1Changed").arg(pName);
                 // UpperCase 3rd Char
                 pcSlotName[2] = pcSlotName[2].toUpper();
                 // Add To Property Change Hook List

@@ -1,9 +1,13 @@
 #include <QDebug>
 #include <QJsonObject>
+#include <QQmlEngine>
 
 #include "componenttransitionsmodel.h"
 #include "componentinfo.h"
 #include "constants.h"
+#include "projectmodel.h"
+#include "basecomponentsmodel.h"
+#include "componentsmodel.h"
 
 //==============================================================================
 // Constructor
@@ -11,8 +15,10 @@
 ComponentTransitionsModel::ComponentTransitionsModel(ComponentInfo* aComponent, QObject* aParent)
     : QAbstractListModel(aParent)
     , mComponent(aComponent)
+    , mNewTransition(NULL)
+    , mCurrentTransition(NULL)
 {
-    //qDebug() << "ComponentTransitionsModel created.";
+    qDebug() << "ComponentTransitionsModel created.";
 
     // Init
     init();
@@ -23,17 +29,10 @@ ComponentTransitionsModel::ComponentTransitionsModel(ComponentInfo* aComponent, 
 //==============================================================================
 void ComponentTransitionsModel::init()
 {
-    // Set Up Transition Node Type Map
-    mNodeTypeMap[""]                                        = ETTUnknown;
-    mNodeTypeMap[JSON_VALUE_TRANSITION_NODE_TYPE_PARALLEL]  = ETTParallelAnimation;
-    mNodeTypeMap[JSON_VALUE_TRANSITION_NODE_TYPE_SQUENTIAL] = ETTSequentialAnimation;
-    mNodeTypeMap[JSON_VALUE_TRANSITION_NODE_TYPE_PAUSE]     = ETTPauseAnimation;
-    mNodeTypeMap[JSON_VALUE_TRANSITION_NODE_TYPE_ACTION]    = ETTPropertyAction;
-    mNodeTypeMap[JSON_VALUE_TRANSITION_NODE_TYPE_SCRIPT]    = ETTScripAction;
-    mNodeTypeMap[JSON_VALUE_TRANSITION_NODE_TYPE_ANIMATION] = ETTPropertyAnimation;
-
     // Load Component Transitions
     loadComponentTransitions();
+
+    // ...
 }
 
 //==============================================================================
@@ -41,308 +40,25 @@ void ComponentTransitionsModel::init()
 //==============================================================================
 void ComponentTransitionsModel::clear()
 {
-    // Begin Reset model
-    beginResetModel();
+    // Check Count
+    if (rowCount() > 0) {
+        qDebug() << "ComponentTransitionsModel::clear";
 
-    // Iterate Through Transitions
-    while (mTransitions.count() > 0) {
-        // Delete Last
-        delete mTransitions.takeLast();
-    }
+        // Begin Reset model
+        beginResetModel();
 
-    // End Reset Model
-    endResetModel();
-}
-
-//==============================================================================
-// Load Component Transitions
-//==============================================================================
-void ComponentTransitionsModel::loadComponentTransitions()
-{
-    // Check Component
-    if (!mComponent) {
-        return;
-    }
-}
-
-//==============================================================================
-// Save Component Transitions
-//==============================================================================
-void ComponentTransitionsModel::saveComponentTransitions()
-{
-    // Check Component
-    if (mComponent) {
-        // Set Transiions
-        mComponent->mTransitions = toJSONArray();
-    }
-}
-
-//==============================================================================
-// Add Transition
-//==============================================================================
-void ComponentTransitionsModel::addTransition(const QString& aFrom, const QString& aTo)
-{
-    // Create New Transition
-    ComponentTransition* newTransition = new ComponentTransition(aFrom, aTo, this);
-    // Begin Insert Rows
-    beginInsertRows(QModelIndex(), rowCount(), rowCount());
-    // Append Transition
-    mTransitions << newTransition;
-    // End Insert Rows
-    endInsertRows();
-}
-
-//==============================================================================
-// Set Transition
-//==============================================================================
-void ComponentTransitionsModel::setTransition(const int& aIndex, const QString& aFrom, const QString& aTo)
-{
-    // Check Index
-    if (aIndex >= 0 && aIndex < rowCount()) {
-        // Set Transition
-        mTransitions[aIndex]->setFromState(aFrom);
-        mTransitions[aIndex]->setToState(aTo);
-    }
-}
-
-//==============================================================================
-// Remove Transition
-//==============================================================================
-void ComponentTransitionsModel::removeTransition(const int& aIndex)
-{
-    // Check Index
-    if (aIndex >= 0 && aIndex < rowCount()) {
-        // Begin Remove Rows
-        beginRemoveRows(QModelIndex(), aIndex, aIndex);
-        // Delete Transition
-        delete mTransitions.takeAt(aIndex);
-        // End Remove Rows
-        endRemoveRows();
-    }
-}
-
-//==============================================================================
-// Remvoe Transitions
-//==============================================================================
-void ComponentTransitionsModel::removeTransition(ComponentTransition* aTransition)
-{
-    // Check Transition
-    if (!aTransition) {
-        return;
-    }
-
-    // Iterate Through Transitions
-    for (int i=0; mTransitions.count(); i++) {
-        // Check Transitions
-        if (mTransitions[i] == aTransition) {
-            // Begin Remove Rows
-            beginRemoveRows(QModelIndex(), i, i);
-            // Delete Transition
-            delete mTransitions.takeAt(i);
-            // End Remove Rows
-            endRemoveRows();
+        // Iterate Through Transitions
+        while (mTransitions.count() > 0) {
+            // Delete Last
+            delete mTransitions.takeLast();
         }
+
+        // End Reset Model
+        endResetModel();
+
+//        // Emit Transitions Count Changed Signal
+//        emit transitionsCountChanged(mTransitions.count());
     }
-}
-
-//==============================================================================
-// Add Parallel Animation Node
-//==============================================================================
-void ComponentTransitionsModel::addParallelAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode)
-{
-    // Check Transition
-    if (!aTransition) {
-        return;
-    }
-
-    // Create New Parallel Animation
-    ComponentParallelAnimation* newParallelAnimation = new ComponentParallelAnimation();
-    // Append Node
-    aTransition->appendNode(newParallelAnimation, aParentNode);
-}
-
-//==============================================================================
-// Add Sequential Animation Node
-//==============================================================================
-void ComponentTransitionsModel::addSequentialAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode)
-{
-    // Check Transition
-    if (!aTransition) {
-        return;
-    }
-
-    // Create New Sequential Animation
-    ComponentSequentialAnimation* newSequentialAnimation = new ComponentSequentialAnimation();
-    // Append Node
-    aTransition->appendNode(newSequentialAnimation, aParentNode);
-}
-
-//==============================================================================
-// Add Pause Animation Node
-//==============================================================================
-void ComponentTransitionsModel::addPauseAnimation(const QString& aDuration, ComponentTransition* aTransition, ComponentTransitionNode* aParentNode)
-{
-    // Check Transition
-    if (!aTransition) {
-        return;
-    }
-
-    // Create New Pause Animation
-    ComponentPauseAnimation* newPauseAnimation = new ComponentPauseAnimation();
-    // Set Duration
-    newPauseAnimation->setDuration(aDuration);
-    // Append Node
-    aTransition->appendNode(newPauseAnimation, aParentNode);
-}
-
-//==============================================================================
-// Add Property Animation Node
-//==============================================================================
-void ComponentTransitionsModel::addPropertyAnimation(const QString& aTarget,
-                                                     const QString& aProperty,
-                                                     const QString& aFrom,
-                                                     const QString& aTo,
-                                                     const QString& aDuration,
-                                                     const QString& aEasing,
-                                                     ComponentTransition* aTransition,
-                                                     ComponentTransitionNode* aParentNode)
-{
-    // Check Transition
-    if (!aTransition) {
-        return;
-    }
-
-    // Create New Property Animation
-    ComponentPropertyAnimation* newPropertyAnimation = new ComponentPropertyAnimation();
-    // Set Up Property animation
-    newPropertyAnimation->setPropertyAnimationTarget(aTarget);
-    newPropertyAnimation->setPropertyAnimationProperty(aProperty);
-    newPropertyAnimation->setValueFrom(aFrom);
-    newPropertyAnimation->setValueTo(aTo);
-    newPropertyAnimation->setDuration(aDuration);
-    newPropertyAnimation->setEasingType(aEasing);
-
-    // Append Node
-    aTransition->appendNode(newPropertyAnimation, aParentNode);
-}
-
-//==============================================================================
-// Add Property Action Node
-//==============================================================================
-void ComponentTransitionsModel::addPropertyAction(const QString& aTarget,
-                                                  const QString& aProperty,
-                                                  const QString& aValue,
-                                                  ComponentTransition* aTransition,
-                                                  ComponentTransitionNode* aParentNode)
-{
-    // Check Transition
-    if (!aTransition) {
-        return;
-    }
-
-    // Create New Property Action
-    ComponentPropertyAction* newPropertyAction = new ComponentPropertyAction();
-    // Set Up Property Action
-    newPropertyAction->setPropertyActionTarget(aTarget);
-    newPropertyAction->setPropertyActionProperty(aProperty);
-    newPropertyAction->setPropertyActionValue(aValue);
-
-    // Append Node
-    aTransition->appendNode(newPropertyAction, aParentNode);
-}
-
-//==============================================================================
-// Add Script Action Node
-//==============================================================================
-void ComponentTransitionsModel::addScriptAction(const QString& aScript,
-                                                ComponentTransition* aTransition,
-                                                ComponentTransitionNode* aParentNode)
-{
-    // Check Transition
-    if (!aTransition) {
-        return;
-    }
-
-    // Create New Script Action
-    ComponentScriptAction* newScriptAction = new ComponentScriptAction();
-    // Set Up New Script Action
-    newScriptAction->setScript(aScript);
-    // Append Node
-    aTransition->appendNode(newScriptAction, aParentNode);
-}
-
-// Remove Transition Node
-void ComponentTransitionsModel::removeTransitionNode(ComponentTransition* aTransition,
-                                                     const int& aIndex,
-                                                     ComponentTransitionNode* aParentNode)
-{
-    // Check Transition
-    if (!aTransition) {
-        return;
-    }
-
-    // Remove Node
-    aTransition->removeNode(aIndex, aParentNode);
-}
-
-//==============================================================================
-// Remove Transition Node
-//==============================================================================
-void ComponentTransitionsModel::removeTransitionNode(ComponentTransition* aTransition,
-                                                     ComponentTransitionNode* aNode,
-                                                     ComponentTransitionNode* aParentNode)
-{
-    // Check Transition
-    if (!aTransition) {
-        return;
-    }
-
-    // Check Parent Node
-    if (aParentNode) {
-        // Get Nodes Count
-        int nCount = aParentNode->mChildren.count();
-        // Iterate Through Nodes
-        for (int i=0; i<nCount; i++) {
-            // Check Child Node
-            if (aParentNode->mChildren[i] == aNode) {
-                // Delete Node
-                delete aParentNode->mChildren.takeAt(i);
-                return;
-            }
-        }
-    } else {
-        // Get Nodes Count
-        int nCount = aTransition->mNodes.count();
-        // Iterate Through Nodes
-        for (int i=0; i<nCount; i++) {
-            // Check Child Node
-            if (aTransition->mNodes[i] == aNode) {
-                // Delete Node
-                delete aTransition->mNodes.takeAt(i);
-                return;
-            }
-        }
-    }
-}
-
-//==============================================================================
-// Move Transition Node
-//==============================================================================
-void ComponentTransitionsModel::moveTransitionNode(ComponentTransition* aTransition,
-                                                   ComponentTransitionNode* aNode,
-                                                   ComponentTransitionNode* aTargetNode,
-                                                   const int& aTargetIndex)
-{
-    Q_UNUSED(aTargetNode);
-    Q_UNUSED(aTargetIndex);
-
-    // Check Transition
-    if (!aTransition || !aNode) {
-        return;
-    }
-
-    // ...
-
 }
 
 //==============================================================================
@@ -361,12 +77,19 @@ void ComponentTransitionsModel::setCurrentComponent(ComponentInfo* aComponent)
     // Check Current Component
     if (mComponent != aComponent) {
         //qDebug() << "ComponentTransitionsModel::setCurrentComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
+
+        // Save Component Transtions For Previous Component
+        saveComponentTransitions();
         // Clear
         clear();
+        // Discard New Transition
+        discardNewTransition();
+
         // Set Current Component
         mComponent = aComponent;
         // Emit Current Compoennt Changed Signal
         emit currentComponentChanged(mComponent);
+
         // Load Component Transitions
         loadComponentTransitions();
     }
@@ -395,24 +118,185 @@ void ComponentTransitionsModel::setCurrentTransition(ComponentTransition* aTrans
 }
 
 //==============================================================================
-// Get Current Node
+// Select Transition
 //==============================================================================
-ComponentTransitionNode* ComponentTransitionsModel::currentTransitionNode()
+void ComponentTransitionsModel::selectTransition(const int& aIndex)
 {
-    return mCurrentTransitionNode;
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        // Get Transition
+        ComponentTransition* transition = mTransitions[aIndex];
+        // Set Current Transition
+        setCurrentTransition(transition);
+    }
 }
 
 //==============================================================================
-// Set Current Node
+// Create New Transition
 //==============================================================================
-void ComponentTransitionsModel::setCurrentTransitionNode(ComponentTransitionNode* aNode)
+ComponentTransition* ComponentTransitionsModel::createNewTransition()
 {
-    // Check Current Transition Node
-    if (mCurrentTransitionNode != aNode) {
-        // Set Current Transition Node
-        mCurrentTransitionNode = aNode;
-        // Emit Current Transition Node Changed Signal
-        emit currentTransitionNodeChanged(mCurrentTransitionNode);
+    // Check New Transition
+    if (!mNewTransition) {
+        qDebug() << "ComponentTransitionsModel::createNewTransition";
+
+        // Create New Transition
+        mNewTransition = new ComponentTransition("", "", this);
+
+        // Set Current Transition
+        setCurrentTransition(mNewTransition);
+
+    } else {
+        qWarning() << "ComponentTransitionsModel::createNewTransition - NEW TRANSITION ALREADY CREATED!!";
+    }
+
+    return mNewTransition;
+}
+
+//==============================================================================
+// Discard New Transition
+//==============================================================================
+void ComponentTransitionsModel::discardNewTransition()
+{
+    // Check New Transition
+    if (mNewTransition) {
+        qDebug() << "ComponentTransitionsModel::discardNewTransition";
+
+        // Check Current Transition
+        if (mCurrentTransition != NULL && mCurrentTransition == mNewTransition) {
+            // Reset Current Transition
+            setCurrentTransition(NULL);
+        }
+
+        // Delete New Transition
+        delete mNewTransition;
+        mNewTransition = NULL;
+    }
+}
+
+//==============================================================================
+// Append Transition
+//==============================================================================
+void ComponentTransitionsModel::appendTransition(ComponentTransition* aTransition)
+{
+    // Check Transition
+    if (aTransition) {
+        qDebug() << "ComponentTransitionsModel::appendTransition - from: " << aTransition->fromState() << " - to: " << aTransition->toState();
+
+        // Begin Insert Rows
+        beginInsertRows(QModelIndex(), rowCount(), rowCount());
+
+        mTransitions << aTransition;
+        // End Insert Rows
+        endInsertRows();
+
+        // Check Transition
+        if (mNewTransition == aTransition) {
+            // Reset New Transition
+            mNewTransition = NULL;
+        }
+    }
+}
+
+//==============================================================================
+// Load Component Transitions
+//==============================================================================
+void ComponentTransitionsModel::loadComponentTransitions()
+{
+    // Check Component
+    if (!mComponent) {
+        return;
+    }
+
+    // Get Transitions Count
+    int tCount = mComponent->mTransitions.count();
+
+    // Check Count
+    if (tCount > 0) {
+        qDebug() << "ComponentTransitionsModel::loadComponentTransitions";
+
+        // Begin Reset model
+        beginResetModel();
+
+        // Iterate Through Transtions
+        for (int i=0; i<tCount; i++) {
+            // Append Transition
+            mTransitions << ComponentTransition::fromJSONObject(this, mComponent->mTransitions[i].toObject());
+        }
+
+        // End Reset Model
+        endResetModel();
+    }
+}
+
+//==============================================================================
+// Save Component Transitions
+//==============================================================================
+void ComponentTransitionsModel::saveComponentTransitions()
+{
+    // Check Component
+    if (mComponent && mDirty) {
+        qDebug() << "ComponentTransitionsModel::saveComponentTransitions";
+
+        // Set Transiions
+        mComponent->mTransitions = toJSONArray();
+
+        // Reset Dirty State
+        setDirty(false);
+    }
+}
+
+//==============================================================================
+// Set Dirty State
+//==============================================================================
+void ComponentTransitionsModel::setDirty(const bool& aDirty)
+{
+    // Check Dirty State
+    if (mDirty != aDirty) {
+        // Set Dirty State
+        mDirty = aDirty;
+
+        // Check Current Component
+        if (mComponent && mDirty) {
+            // Set Dirty
+            mComponent->setDirty(true);
+        }
+    }
+}
+
+//==============================================================================
+// Add Transition
+//==============================================================================
+void ComponentTransitionsModel::addTransition(const QString& aFrom, const QString& aTo)
+{
+    // Create New Transition
+    ComponentTransition* newTransition = new ComponentTransition(aFrom, aTo, this);
+
+    qDebug() << "ComponentTransitionsModel::addTransition - aFrom: " << aFrom << " - aTo: " << aTo;
+
+    // Begin Insert Rows
+    beginInsertRows(QModelIndex(), rowCount(), rowCount());
+    // Append Transition
+    mTransitions << newTransition;
+    // End Insert Rows
+    endInsertRows();
+}
+
+//==============================================================================
+// Remove Transition
+//==============================================================================
+void ComponentTransitionsModel::removeTransition(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        qDebug() << "ComponentTransitionsModel::removeTransition - aIndex: " << aIndex;
+
+        // Begin Remove Rows
+        beginRemoveRows(QModelIndex(), aIndex, aIndex);
+        // Delete Transition
+        delete mTransitions.takeAt(aIndex);
+        // End Remove Rows
+        endRemoveRows();
     }
 }
 
@@ -426,6 +310,8 @@ QJsonArray ComponentTransitionsModel::toJSONArray()
 
     // Get Count
     int tmCount = mTransitions.count();
+
+    qDebug() << "ComponentTransitionsModel::toJSONArray - tmCount: " << tmCount;
 
     // Iterate Through Transitions
     for (int i=0; i<tmCount; i++) {
@@ -450,6 +336,20 @@ ComponentTransition* ComponentTransitionsModel::getTransition(const int& aIndex)
 }
 
 //==============================================================================
+// Move Transition
+//==============================================================================
+void ComponentTransitionsModel::moveTransition(const int& aIndex, const int& aTarget)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        qDebug() << "ComponentTransitionsModel::moveTransition - aIndex: " << aIndex << " - aTarget: " << aTarget;
+
+        // Move Transition
+        mTransitions.move(aIndex, aTarget);
+    }
+}
+
+//==============================================================================
 // Row Count
 //==============================================================================
 int ComponentTransitionsModel::rowCount(const QModelIndex& ) const
@@ -466,9 +366,15 @@ QVariant ComponentTransitionsModel::data(const QModelIndex& index, int role) con
     int tmRow = index.row();
     // Check Row
     if (tmRow >= 0 && tmRow < rowCount()) {
+        // Get Transition
+        ComponentTransition* transition = mTransitions[tmRow];
         // Switch Role
         switch (role) {
+            case ETMRFromState:     return transition->fromState();
+            case ETMRToState:       return transition->toState();
+            case ETMRNodesCount:    return transition->nodesCount();
 
+            // ...
         }
     }
 
@@ -480,7 +386,13 @@ QVariant ComponentTransitionsModel::data(const QModelIndex& index, int role) con
 //==============================================================================
 QHash<int, QByteArray> ComponentTransitionsModel::roleNames() const
 {
+    // Init Role Names
     QHash<int, QByteArray> rNames;
+
+    // Set Up Role Names
+    rNames[ETMRFromState]   = "tmFrom";
+    rNames[ETMRToState]     = "tmTo";
+    rNames[ETMRNodesCount]  = "tmNodesCount";
 
     // ...
 
@@ -495,9 +407,12 @@ ComponentTransitionsModel::~ComponentTransitionsModel()
     // Clear
     clear();
 
+    // Discard New Transition
+    discardNewTransition();
+
     // ...
 
-    //qDebug() << "ComponentTransitionsModel deleted.";
+    qDebug() << "ComponentTransitionsModel deleted.";
 }
 
 
@@ -531,10 +446,15 @@ ComponentTransition* ComponentTransition::fromJSONObject(ComponentTransitionsMod
 ComponentTransition::ComponentTransition(const QString& aFromState, const QString& aToState, ComponentTransitionsModel* aModel, QObject* aParent)
     : QObject(aParent)
     , mModel(aModel)
-    , mCurrentNode(NULL)
     , mFromState(aFromState)
     , mToState(aToState)
+    , mNewNode(NULL)
 {
+    qDebug() << "ComponentTransition created.";
+
+    // Set Ownership
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
     // ...
 }
 
@@ -583,31 +503,9 @@ void ComponentTransition::setToState(const QString& aToState)
 }
 
 //==============================================================================
-// Get Current Node
-//==============================================================================
-ComponentTransitionNode* ComponentTransition::currentNode()
-{
-    return mCurrentNode;
-}
-
-//==============================================================================
-// Set Current Node
-//==============================================================================
-void ComponentTransition::setCurrentNode(ComponentTransitionNode* aNode)
-{
-    // Check Current Node
-    if (mCurrentNode != aNode) {
-        // Set Current Node
-        mCurrentNode = aNode;
-        // Emit Current Node Changed Signal
-        emit currentNodeChanged(mCurrentNode);
-    }
-}
-
-//==============================================================================
 // Get Node Count
 //==============================================================================
-int ComponentTransition::nodeCount()
+int ComponentTransition::nodesCount()
 {
     return mNodes.count();
 }
@@ -615,7 +513,7 @@ int ComponentTransition::nodeCount()
 //==============================================================================
 // Get Node By Index
 //==============================================================================
-ComponentTransitionNode* ComponentTransition::nodeByIndex(const int& aIndex)
+ComponentInfo* ComponentTransition::getNode(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < mNodes.count()) {
@@ -623,6 +521,37 @@ ComponentTransitionNode* ComponentTransition::nodeByIndex(const int& aIndex)
     }
 
     return NULL;
+}
+
+//==============================================================================
+// Create New Node
+//==============================================================================
+ComponentInfo* ComponentTransition::createNewNode(const QString& aComponentName)
+{
+    // Check New Node
+    if (!mNewNode) {
+        qDebug() << "ComponentTransition::createNewNode - aComponentName: " << aComponentName;
+
+        // ...
+
+    } else {
+        qWarning() << "ComponentTransition::createNewNode - ALREADY HAVE A NEW NODE!!";
+    }
+
+    return mNewNode;
+}
+
+//==============================================================================
+// Discard New Node
+//==============================================================================
+void ComponentTransition::discardNewNode()
+{
+    // Check New Node
+    if (mNewNode) {
+        // Delete New Node
+        delete mNewNode;
+        mNewNode = NULL;
+    }
 }
 
 //==============================================================================
@@ -694,7 +623,7 @@ void ComponentTransition::readNodes(const QJsonArray& aNodes)
 //==============================================================================
 // Append Node
 //==============================================================================
-void ComponentTransition::appendNode(ComponentTransitionNode* aNode, ComponentTransitionNode* aParentNode)
+void ComponentTransition::appendNode(ComponentInfo* aNode, ComponentInfo* aParentNode)
 {
     // Check Node
     if (!aNode) {
@@ -704,17 +633,20 @@ void ComponentTransition::appendNode(ComponentTransitionNode* aNode, ComponentTr
     // Check Parent Node
     if (aParentNode) {
         // Append Node
-        aParentNode->appendChild(aNode);
+        aParentNode->addChild(aNode);
     } else {
         // Append Node
         mNodes << aNode;
+
+        // Emit Nodes Count Changed Signal
+        emit nodeCountChanged(mNodes.count());
     }
 }
 
 //==============================================================================
 // Insert Node
 //==============================================================================
-void ComponentTransition::insertNode(const int& aIndex, ComponentTransitionNode* aNode, ComponentTransitionNode* aParentNode)
+void ComponentTransition::insertNode(const int& aIndex, ComponentInfo* aNode, ComponentInfo* aParentNode)
 {
     // Check Node
     if (!aNode) {
@@ -724,7 +656,7 @@ void ComponentTransition::insertNode(const int& aIndex, ComponentTransitionNode*
     // Check Parent Node
     if (aParentNode) {
         // Insert Node
-        aParentNode->insertChild(aIndex, aNode);
+        aParentNode->insertChild(aIndex, aNode, false);
     } else {
         // Check Index
         if (aIndex >= 0 && aIndex < mNodes.count()) {
@@ -734,26 +666,46 @@ void ComponentTransition::insertNode(const int& aIndex, ComponentTransitionNode*
             // Append Node
             mNodes << aNode;
         }
+
+        // Emit Nodes Count Changed Signal
+        emit nodeCountChanged(mNodes.count());
     }
+}
+
+//==============================================================================
+// Move Node
+//==============================================================================
+void ComponentTransition::moveNode(const int& aIndex, const int& aTargetIndex)
+{
+    qDebug() << "ComponentTransition::moveNode - aIndex: " << aIndex << " - aTargetIndex: " << aTargetIndex;
+
+    // Check Index
+
+    // ...
+}
+
+//==============================================================================
+// Move Node
+//==============================================================================
+void ComponentTransition::moveNode(ComponentInfo* aParentNode, const int& aIndex, ComponentInfo* aTargetNode, const int& aTargetIndex)
+{
+    qDebug() << "ComponentTransition::moveNode - aParentNode: " << aParentNode << " - aIndex: " << aIndex << " - aTargetNode: " << aTargetNode << " - aTargetIndex: " << aTargetIndex;
+
+    // ...
 }
 
 //==============================================================================
 // Remove Node
 //==============================================================================
-void ComponentTransition::removeNode(const int& aIndex, ComponentTransitionNode* aParentNode)
+void ComponentTransition::removeNode(const int& aIndex)
 {
-    // Check Parent Node
-    if (aParentNode) {
+    // Check Index
+    if (aIndex >= 0 && aIndex < mNodes.count()) {
         // Remove Node
-        aParentNode->removeChild(aIndex);
-    } else {
-        // Check Index
-        if (aIndex >= 0 && aIndex < mNodes.count()) {
-            // Remove Node
-            delete mNodes.takeAt(aIndex);
-        } else {
-            qWarning() << "ComponentTransition::removeNode - aIndex: " << aIndex << " - INVALID INDEX!";
-        }
+        delete mNodes.takeAt(aIndex);
+
+        // Emit Nodes Count Changed Signal
+        emit nodeCountChanged(mNodes.count());
     }
 }
 
@@ -762,14 +714,14 @@ void ComponentTransition::removeNode(const int& aIndex, ComponentTransitionNode*
 //==============================================================================
 void ComponentTransition::clear()
 {
-    // Set Current Node
-    setCurrentNode(NULL);
-
     // Iterate Through Nodes
     while (mNodes.count() > 0) {
         // Delete Last
         delete mNodes.takeLast();
     }
+
+    // Emit Nodes Count Changed Signal
+    emit nodeCountChanged(mNodes.count());
 }
 
 //==============================================================================
@@ -777,10 +729,15 @@ void ComponentTransition::clear()
 //==============================================================================
 ComponentTransition::~ComponentTransition()
 {
+    // Discard New Node
+    discardNewNode();
+
     // Clear
     clear();
 
     // ...
+
+    qDebug() << "ComponentTransition deleted.";
 }
 
 
@@ -788,762 +745,337 @@ ComponentTransition::~ComponentTransition()
 
 
 
-//==============================================================================
-// From JSON Object
-//==============================================================================
-ComponentTransitionNode* ComponentTransitionNode::fromJSONObject(ComponentTransitionsModel* aModel, const QJsonObject& aObject)
-{
-    // Check Model
-    if (!aModel) {
-        return NULL;
-    }
 
-    // Get Transitin Node Type
-    ETransitionType tnType = aModel->mNodeTypeMap[aObject[JSON_KEY_COMPONENT_TRANSITION_NODE_TYPE].toString()];
-    // Check Transition Node Type
-    if (tnType == ETTUnknown) {
-        return NULL;
-    }
 
-    // Init New Transition Node
-    ComponentTransitionNode* newTransitionNode = NULL;
 
-    // Switch Type
-    switch (tnType) {
-        case ETTParallelAnimation:      newTransitionNode = ComponentParallelAnimation::fromJSONObject(aObject); break;
-        case ETTSequentialAnimation:    newTransitionNode = ComponentSequentialAnimation::fromJSONObject(aObject); break;
-        case ETTPauseAnimation:         newTransitionNode = ComponentPauseAnimation::fromJSONObject(aObject); break;
-        case ETTPropertyAction:         newTransitionNode = ComponentPropertyAction::fromJSONObject(aObject); break;
-        case ETTScripAction:            newTransitionNode = ComponentScriptAction::fromJSONObject(aObject); break;
-        case ETTPropertyAnimation:      newTransitionNode = ComponentPropertyAnimation::fromJSONObject(aObject); break;
-        default: return newTransitionNode;
-    }
 
-    // Get Children Array
-    QJsonArray childrenArray = aObject[JSON_KEY_COMPONENT_TRANSITION_NODE_CHILDREN].toArray();
 
-    // Get Array Count
-    int caCount = childrenArray.count();
 
-    // Iterate Through Children Array
-    for (int i=0; i<caCount; i++) {
-        // Create New Child
-        ComponentTransitionNode* newChild = ComponentTransitionNode::fromJSONObject(aModel, childrenArray[i].toObject());
-        // Append Child
-        newTransitionNode->appendChild(newChild);
-    }
 
-    return newTransitionNode;
-}
+
+
+
 
 //==============================================================================
 // Constructor
 //==============================================================================
-ComponentTransitionNode::ComponentTransitionNode(const ETransitionType& aType, QObject* aParent)
-    : QObject(aParent)
-//    , mModel(NULL)
-    , mType(aType)
-    , mParent(NULL)
+AnimationComponentsModel::AnimationComponentsModel(ProjectModel* aProject, QObject* aParent)
+    : QAbstractListModel(aParent)
+    , mProject(aProject)
+    , mBaseComponents(mProject ? mProject->baseComponentsModel() : NULL)
+    , mComponents(mProject ? mProject->componentsModel() : NULL)
 {
+    qDebug() << "AnimationComponentsModel created.";
+
+    // Init
+    init();
+
     // ...
 }
 
 //==============================================================================
-// Get Count
+// Init
 //==============================================================================
-int ComponentTransitionNode::count()
+void AnimationComponentsModel::init()
 {
-    return mChildren.count();
-}
+    // Collect Animation Components
+    collectAnimationComponents();
 
-//==============================================================================
-// Get Child
-//==============================================================================
-ComponentTransitionNode* ComponentTransitionNode::child(const int& aIndex)
-{
-    // Check Index
-    if (aIndex >= 0 && aIndex < mChildren.count()) {
-        return mChildren[aIndex];
-    }
+    // Connect Project Signals
+    connectModelSignals();
 
-    return NULL;
-}
-
-//==============================================================================
-// Append Child
-//==============================================================================
-void ComponentTransitionNode::appendChild(ComponentTransitionNode* aChild)
-{
-    // Check Child Node
-    if (mChildren.indexOf(aChild) >= 0) {
-        return;
-    }
-
-    // Append Child
-    mChildren << aChild;
-}
-
-//==============================================================================
-// Insert Child
-//==============================================================================
-void ComponentTransitionNode::insertChild(const int& aIndex, ComponentTransitionNode* aChild)
-{
-    // Check Child Node
-    if (mChildren.indexOf(aChild) >= 0) {
-        return;
-    }
-
-    // Check Index
-    if (aIndex >= 0 && aIndex < mChildren.count()) {
-        // Insert Child
-        mChildren.insert(aIndex, aChild);
-    } else {
-        // Append Child
-        mChildren << aChild;
-    }
-}
-
-//==============================================================================
-// Remove Child
-//==============================================================================
-void ComponentTransitionNode::removeChild(const int& aIndex)
-{
-    // Check Index
-    if (aIndex >= 0 && aIndex < mChildren.count()) {
-        // Delete Child
-        delete mChildren.takeAt(aIndex);
-    }
+    // ...
 }
 
 //==============================================================================
 // Clear
 //==============================================================================
-void ComponentTransitionNode::clear()
+void AnimationComponentsModel::clear()
 {
-    // Iterate Thru Children
-    while (mChildren.count() > 0) {
-        // Delete Last
-        delete mChildren.takeLast();
+    // Begin Reset Model
+    beginResetModel();
+    // Clear Anim Components
+    mAnimationComponents.clear();
+    // End Reset Model
+    endResetModel();
+}
+
+//==============================================================================
+// Connect Model Signals
+//==============================================================================
+void AnimationComponentsModel::connectModelSignals()
+{
+    // Check Project Model
+    if (!mProject) {
+        //qWarning() << "AnimationComponentsModel::connectModelSignals - NO PROJECT MODEL IS SET!!";
+        return;
+    }
+
+    qDebug() << "AnimationComponentsModel::connectModelSignals";
+
+    // Check Base Compoennts
+    if (mBaseComponents) {
+        // Connect Signals
+        connect(mBaseComponents, SIGNAL(baseComponentAdded(ComponentInfo*)), this, SLOT(componentAdded(ComponentInfo*)));
+        connect(mBaseComponents, SIGNAL(baseComponentAboutToBeRemoved(ComponentInfo*)), this, SLOT(componentAboutToBeRemoved(ComponentInfo*)));
+    }
+
+    // Check Components
+    if (mComponents) {
+        // Connect Signals
+        connect(mComponents, SIGNAL(componentAdded(ComponentInfo*)), this, SLOT(componentAdded(ComponentInfo*)));
+        connect(mComponents, SIGNAL(componentAboutToBeRemoved(ComponentInfo*)), this, SLOT(componentAboutToBeRemoved(ComponentInfo*)));
+    }
+
+    // ...
+}
+
+//==============================================================================
+// Disconnect Model Signals
+//==============================================================================
+void AnimationComponentsModel::disconnectModelSignals()
+{
+    // Check Project Model
+    if (!mProject) {
+        return;
+    }
+
+    qDebug() << "AnimationComponentsModel::disconnectModelSignals";
+
+    // Check Base Compoennts
+    if (mBaseComponents) {
+        // Disconnect Signals
+        disconnect(mBaseComponents, SIGNAL(baseComponentAdded(ComponentInfo*)), this, SLOT(componentAdded(ComponentInfo*)));
+        disconnect(mBaseComponents, SIGNAL(baseComponentAboutToBeRemoved(ComponentInfo*)), this, SLOT(componentAboutToBeRemoved(ComponentInfo*)));
+    }
+
+    // Check Components
+    if (mComponents) {
+        // Disconnect Signals
+        disconnect(mComponents, SIGNAL(componentAdded(ComponentInfo*)), this, SLOT(componentAdded(ComponentInfo*)));
+        disconnect(mComponents, SIGNAL(componentAboutToBeRemoved(ComponentInfo*)), this, SLOT(componentAboutToBeRemoved(ComponentInfo*)));
+    }
+
+    // ...
+}
+
+//==============================================================================
+// Collect Animation Components
+//==============================================================================
+void AnimationComponentsModel::collectAnimationComponents()
+{
+    // Check Project Model
+    if (!mProject) {
+        //qWarning() << "AnimationComponentsModel::collectAnimationComponents - NO PROJECT MODEL IS SET!!";
+        return;
+    }
+
+    qDebug() << "AnimationComponentsModel::collectAnimationComponents";
+
+    // Check Base Components Model
+    if (mBaseComponents) {
+        // Get Row Count
+        int bcCount = mBaseComponents->rowCount();
+        // Iterate Through Base Compoennts
+        for (int i=0; i<bcCount; i++) {
+            // Append Compoennt
+            componentAdded(mBaseComponents->getComponentByIndex(i));
+        }
+
+    } else {
+        qWarning() << "AnimationComponentsModel::collectAnimationComponents - NO BASE COMPONENTS MODEL!!";
+    }
+
+    // Check Components Model
+    if (mComponents) {
+
+        // Get Row Count
+        int cCount = mComponents->rowCount();
+        // Iterate Through Base Compoennts
+        for (int i=0; i<cCount; i++) {
+            // Append Compoennt
+            componentAdded(mComponents->getComponentByIndex(i));
+        }
+
+    } else {
+        qWarning() << "AnimationComponentsModel::collectAnimationComponents - NO COMPONENTS MODEL!!";
+    }
+
+    // ...
+}
+
+//==============================================================================
+// Get Current Project
+//==============================================================================
+ProjectModel* AnimationComponentsModel::currentProject()
+{
+    return mProject;
+}
+
+//==============================================================================
+// Set Current Project
+//==============================================================================
+void AnimationComponentsModel::setCurrentProject(ProjectModel* aProjectModel)
+{
+    // Check Current Project
+    if (mProject != aProjectModel) {
+        // Disconnect Modl Signals
+        disconnectModelSignals();
+        // Clear
+        clear();
+        // Set Current Project
+        mProject = aProjectModel;
+
+        // Set Base Components
+        mBaseComponents = mProject ? mProject->baseComponentsModel() : NULL;
+        // Set Components Model
+        mComponents = mProject ? mProject->componentsModel() : NULL;
+
+        // Emit Current Project changed Signal
+        emit currentProjectChanged(mProject);
+        // Collect Animation Components
+        collectAnimationComponents();
+        // Connect Model Signals
+        connectModelSignals();
     }
 }
 
 //==============================================================================
-// To JSON Object
+// Get Animation Component Name By Index
 //==============================================================================
-QJsonObject ComponentTransitionNode::toJSONObject()
+QString AnimationComponentsModel::getNameByIndex(const int& aIndex)
 {
-    // Init New JSON Object
-    QJsonObject newObject;
+    // Check Index
+    if (aIndex >= 0 && aIndex < rowCount()) {
+        return mAnimationComponents[aIndex]->mName;
+    }
+
+    return "";
+}
+
+//==============================================================================
+// Component Created Slot
+//==============================================================================
+void AnimationComponentsModel::componentCreated(ComponentInfo* aComponent, const int& , const int& )
+{
+    // Check Component
+    if (aComponent && aComponent->mCategory == "Animation") {
+        qDebug() << "AnimationComponentsModel::componentCreated - mName: " << aComponent->mName;
+
+        // Begin Insert Rows
+        beginInsertRows(QModelIndex(), rowCount(), rowCount());
+        // Append To Animation Components
+        mAnimationComponents << aComponent;
+        // End Insert Rows
+        endInsertRows();
+
+        // Amit Item Added Signal
+        emit itemAdded(rowCount() - 1);
+    }
+}
+
+//==============================================================================
+// Component Added Slot
+//==============================================================================
+void AnimationComponentsModel::componentAdded(ComponentInfo* aComponent)
+{
+    // Check Component - Filter Animations
+    if (aComponent && aComponent->mCategory == "Animation" && aComponent->mName != "Animation") {
+        qDebug() << "AnimationComponentsModel::componentAdded - mName: " << aComponent->mName;
+
+        // Begin Insert Rows
+        beginInsertRows(QModelIndex(), rowCount(), rowCount());
+        // Append To Animation Components
+        mAnimationComponents << aComponent;
+        // End Insert Rows
+        endInsertRows();
+
+        // Amit Item Added Signal
+        emit itemAdded(rowCount() - 1);
+    }
+}
+
+//==============================================================================
+// Component About To Be Removed Slot
+//==============================================================================
+void AnimationComponentsModel::componentAboutToBeRemoved(ComponentInfo* aComponent)
+{
+    // Check Component - Filter Animations
+    if (aComponent && aComponent->mCategory == "Animation") {
+        qDebug() << "AnimationComponentsModel::componentCreated - mName: " << aComponent->mName;
+
+        // Get Index
+        int acIndex = mAnimationComponents.indexOf(aComponent);
+
+        // Check Index
+        if (acIndex >= 0 && acIndex < rowCount()) {
+            // Begin Remove Rows
+            beginRemoveRows(QModelIndex(), acIndex, acIndex);
+            // Remove From Animation Components
+            mAnimationComponents.removeAt(acIndex);
+            // End Remove Rows
+            endRemoveRows();
+
+            // Emit Item Removed Signal
+            emit itemRemoved(acIndex);
+
+        } else {
+            qWarning() << "AnimationComponentsModel::componentAboutToBeRemoved - Animations WAS NOT ADDED!!!";
+        }
+    }
+}
+
+//==============================================================================
+// Row Count
+//==============================================================================
+int AnimationComponentsModel::rowCount(const QModelIndex& ) const
+{
+    return mAnimationComponents.count();
+}
+
+//==============================================================================
+// Data
+//==============================================================================
+QVariant AnimationComponentsModel::data(const QModelIndex& index, int role) const
+{
+    // Get Row Index
+    int acmRow = index.row();
+    // Check Row Index
+    if (acmRow >= 0 && acmRow < rowCount()) {
+        // Switch Role
+        switch (role) {
+            case EACMRComponentName: return mAnimationComponents[acmRow]->mName;
+        }
+    }
+
+    return QVariant();
+}
+
+//==============================================================================
+// Get Role Names
+//==============================================================================
+QHash<int, QByteArray> AnimationComponentsModel::roleNames() const
+{
+    // Init Role Names
+    QHash<int, QByteArray> rNames;
+
+    // Set Up Role Names
+    rNames[EACMRComponentName]   = "acmName";
 
     // ...
 
-    return newObject;
+    return rNames;
 }
 
 //==============================================================================
 // Destructor
 //==============================================================================
-ComponentTransitionNode::~ComponentTransitionNode()
+AnimationComponentsModel::~AnimationComponentsModel()
 {
     // Clear
     clear();
 
     // ...
+
+    qDebug() << "AnimationComponentsModel deleted.";
 }
-
-
-
-
-
-
-
-
-
-//==============================================================================
-// From JSON Object
-//==============================================================================
-ComponentParallelAnimation* ComponentParallelAnimation::fromJSONObject(const QJsonObject& aObject)
-{
-    Q_UNUSED(aObject);
-
-    // Create New Component Parallel Animations
-    ComponentParallelAnimation* newParallelAnimation = new ComponentParallelAnimation();
-
-    // ...
-
-    return newParallelAnimation;
-}
-
-//==============================================================================
-// Constructor
-//==============================================================================
-ComponentParallelAnimation::ComponentParallelAnimation(QObject* aParent)
-    : ComponentTransitionNode(ETTParallelAnimation, aParent)
-{
-
-}
-
-//==============================================================================
-// To JSON Object
-//==============================================================================
-QJsonObject ComponentParallelAnimation::toJSONObject()
-{
-    // Init New JSON Object
-    QJsonObject newJSONObject;
-
-    // ...
-
-    return newJSONObject;
-}
-
-//==============================================================================
-// Destructor
-//==============================================================================
-ComponentParallelAnimation::~ComponentParallelAnimation()
-{
-
-}
-
-
-
-
-
-
-
-
-
-
-//==============================================================================
-// From JSON Object
-//==============================================================================
-ComponentSequentialAnimation* ComponentSequentialAnimation::fromJSONObject(const QJsonObject& aObject)
-{
-    Q_UNUSED(aObject);
-
-    // Init New Sequential Animation
-    ComponentSequentialAnimation* newSequentialAnimation = new ComponentSequentialAnimation();
-
-    // ...
-
-    return newSequentialAnimation;
-}
-
-//==============================================================================
-// Constructor
-//==============================================================================
-ComponentSequentialAnimation::ComponentSequentialAnimation(QObject* aParent)
-    : ComponentTransitionNode(ETTSequentialAnimation, aParent)
-{
-
-}
-
-//==============================================================================
-// To JSON Object
-//==============================================================================
-QJsonObject ComponentSequentialAnimation::toJSONObject()
-{
-    // Init New JSON Object
-    QJsonObject newJSONObject;
-
-    // ...
-
-    return newJSONObject;
-}
-
-//==============================================================================
-// Destructor
-//==============================================================================
-ComponentSequentialAnimation::~ComponentSequentialAnimation()
-{
-
-}
-
-
-
-
-
-
-
-//==============================================================================
-// From JSON Object
-//==============================================================================
-ComponentPauseAnimation* ComponentPauseAnimation::fromJSONObject(const QJsonObject& aObject)
-{
-    // Create New Pause Animation
-    ComponentPauseAnimation* newPauseAnimation = new ComponentPauseAnimation();
-
-    // Set Duration
-    newPauseAnimation->setDuration(aObject[JSON_KEY_COMPONENT_TRANSITION_PAUSE_DURATION].toString());
-
-    return newPauseAnimation;
-}
-
-//==============================================================================
-// Constructor
-//==============================================================================
-ComponentPauseAnimation::ComponentPauseAnimation(QObject* aParent)
-    : ComponentTransitionNode(ETTPauseAnimation, aParent)
-    , mDuration("0")
-{
-    // ...
-}
-
-//==============================================================================
-// Get Duration
-//==============================================================================
-QString ComponentPauseAnimation::duration()
-{
-    return mDuration;
-}
-
-//==============================================================================
-// Set Duration
-//==============================================================================
-void ComponentPauseAnimation::setDuration(const QString& aDuration)
-{
-    // Check Duration
-    if (mDuration != aDuration) {
-        // Set Duration
-        mDuration = aDuration;
-        // Emit Duration Changed
-        emit durationChanged(mDuration);
-    }
-}
-
-//==============================================================================
-// To JSON Object
-//==============================================================================
-QJsonObject ComponentPauseAnimation::toJSONObject()
-{
-    // Init New JSON Object
-    QJsonObject newJSONObject;
-
-    // ...
-
-    return newJSONObject;
-}
-
-//==============================================================================
-// Destructor
-//==============================================================================
-ComponentPauseAnimation::~ComponentPauseAnimation()
-{
-    // ...
-}
-
-
-
-
-
-
-
-
-
-//==============================================================================
-// From JSON Object
-//==============================================================================
-ComponentPropertyAction* ComponentPropertyAction::fromJSONObject(const QJsonObject& aObject)
-{
-    // Create New Property Action
-    ComponentPropertyAction* newPropertyAction = new ComponentPropertyAction();
-
-    // Set Target
-    newPropertyAction->setPropertyActionTarget(aObject[JSON_KEY_COMPONENT_TRANSITION_PACTION_TARGET].toString());
-    // Set Property
-    newPropertyAction->setPropertyActionProperty(aObject[JSON_KEY_COMPONENT_TRANSITION_PACTION_PROPERTY].toString());
-    // Set Value
-    newPropertyAction->setPropertyActionValue(aObject[JSON_KEY_COMPONENT_TRANSITION_PACTION_VALUE].toString());
-
-    return newPropertyAction;
-}
-
-//==============================================================================
-// Constructor
-//==============================================================================
-ComponentPropertyAction::ComponentPropertyAction(QObject* aParent)
-    : ComponentTransitionNode(ETTPropertyAction, aParent)
-    , mTarget("")
-    , mProperty("")
-    , mValue("")
-{
-    // ...
-}
-
-//==============================================================================
-// Get Target
-//==============================================================================
-QString ComponentPropertyAction::propertyActionTarget()
-{
-    return mTarget;
-}
-
-//==============================================================================
-// Set Target
-//==============================================================================
-void ComponentPropertyAction::setPropertyActionTarget(const QString& aTarget)
-{
-    // Check Target
-    if (mTarget != aTarget) {
-        // Set Target
-        mTarget = aTarget;
-        // Emit Target Changed
-        emit propertyActionTargetChanged(mTarget);
-    }
-}
-
-//==============================================================================
-// Get Property
-//==============================================================================
-QString ComponentPropertyAction::propertyActionProperty()
-{
-    return mProperty;
-}
-
-//==============================================================================
-// Set Property
-//==============================================================================
-void ComponentPropertyAction::setPropertyActionProperty(const QString& aProperty)
-{
-    // Check Property
-    if (mProperty != aProperty) {
-        // Set Property
-        mProperty = aProperty;
-        // Emit Property Changed Signal
-        emit propertyActionPropertyChanged(mProperty);
-    }
-}
-
-//==============================================================================
-// Get Value
-//==============================================================================
-QString ComponentPropertyAction::propertyActionValue()
-{
-    return mValue;
-}
-
-//==============================================================================
-// Set Value
-//==============================================================================
-void ComponentPropertyAction::setPropertyActionValue(const QString& aValue)
-{
-    // Check Value
-    if (mValue != aValue) {
-        // Set Value
-        mValue = aValue;
-        // Emit Value Changed Signal
-        emit propertyActionValueChanged(mValue);
-    }
-}
-
-//==============================================================================
-// To JSON Object
-//==============================================================================
-QJsonObject ComponentPropertyAction::toJSONObject()
-{
-    // Init New JSON Object
-    QJsonObject newJSONObject;
-
-    // ...
-
-    return newJSONObject;
-}
-
-//==============================================================================
-// Destructor
-//==============================================================================
-ComponentPropertyAction::~ComponentPropertyAction()
-{
-    // ...
-}
-
-
-
-
-
-
-
-//==============================================================================
-// From JSON Object
-//==============================================================================
-ComponentScriptAction* ComponentScriptAction::fromJSONObject(const QJsonObject& aObject)
-{
-    // Create New Script Action
-    ComponentScriptAction* newScriptAction = new ComponentScriptAction();
-
-    // Set Script
-    newScriptAction->setScript(aObject[JSON_KEY_COMPONENT_TRANSITION_SACTION_SCRIPT].toString());
-
-    return newScriptAction;
-}
-
-//==============================================================================
-// Constructor
-//==============================================================================
-ComponentScriptAction::ComponentScriptAction(QObject* aParent)
-    : ComponentTransitionNode(ETTScripAction, aParent)
-    , mScript("")
-{
-    // ...
-}
-
-//==============================================================================
-// Get Script
-//==============================================================================
-QString ComponentScriptAction::script()
-{
-    return mScript;
-}
-
-//==============================================================================
-// Set Script
-//==============================================================================
-void ComponentScriptAction::setScript(const QString& aScript)
-{
-    // Check Script
-    if (mScript != aScript) {
-        // Set Script
-        mScript = aScript;
-        // Emit Script Changed Signal
-        emit scriptChanged(mScript);
-    }
-}
-
-//==============================================================================
-// To JSON Object
-//==============================================================================
-QJsonObject ComponentScriptAction::toJSONObject()
-{
-    // Init New JSON Object
-    QJsonObject newJSONObject;
-
-    // ...
-
-    return newJSONObject;
-}
-
-//==============================================================================
-// Destructor
-//==============================================================================
-ComponentScriptAction::~ComponentScriptAction()
-{
-    // ...
-}
-
-
-
-
-
-
-//==============================================================================
-// From JSON Object
-//==============================================================================
-ComponentPropertyAnimation* ComponentPropertyAnimation::fromJSONObject(const QJsonObject& aObject)
-{
-    // Init New Property Animation
-    ComponentPropertyAnimation* newPropertyAnimation = new ComponentPropertyAnimation();
-
-    // Set Target
-    newPropertyAnimation->setPropertyAnimationTarget(aObject[JSON_KEY_COMPONENT_TRANSITION_PANIMATION_TARGET].toString());
-    // Set Property
-    newPropertyAnimation->setPropertyAnimationProperty(aObject[JSON_KEY_COMPONENT_TRANSITION_PANIMATION_PROPERTY].toString());
-    // Set Value From
-    newPropertyAnimation->setValueFrom(aObject[JSON_KEY_COMPONENT_TRANSITION_PANIMATION_VALUEFROM].toString());
-    // Set Value To
-    newPropertyAnimation->setValueTo(aObject[JSON_KEY_COMPONENT_TRANSITION_PANIMATION_VALUETO].toString());
-    // Set Duration
-    newPropertyAnimation->setDuration(aObject[JSON_KEY_COMPONENT_TRANSITION_PANIMATION_DURATION].toString());
-    // Set Easing Type
-    newPropertyAnimation->setEasingType(aObject[JSON_KEY_COMPONENT_TRANSITION_PANIMATION_ETYPE].toString());
-
-    return newPropertyAnimation;
-}
-
-//==============================================================================
-// Constructor
-//==============================================================================
-ComponentPropertyAnimation::ComponentPropertyAnimation(QObject* aParent)
-    : ComponentTransitionNode(ETTPropertyAnimation, aParent)
-    , mTarget("")
-    , mProperty("")
-    , mValueFrom("")
-    , mValueTo("")
-    , mDuration("")
-    , mEasingType("")
-{
-    // ...
-}
-
-//==============================================================================
-// Get Base
-//==============================================================================
-QString ComponentPropertyAnimation::base()
-{
-    return mBase;
-}
-
-//==============================================================================
-// Set Base
-//==============================================================================
-void ComponentPropertyAnimation::setBase(const QString& aBase)
-{
-    // Check Base
-    if (mBase != aBase) {
-        // Set Base
-        mBase = aBase;
-        // Emit Property Animation Base Changed Signal
-        emit baseChanged(mBase);
-    }
-}
-
-//==============================================================================
-// Get Target
-//==============================================================================
-QString ComponentPropertyAnimation::propertyAnimationTarget()
-{
-    return mTarget;
-}
-
-//==============================================================================
-// Set Target
-//==============================================================================
-void ComponentPropertyAnimation::setPropertyAnimationTarget(const QString& aTarget)
-{
-    // Check Target
-    if (mTarget != aTarget) {
-        // Set Target
-        mTarget = aTarget;
-        // Emit Target Changed Signal
-        emit propertyAnimationTargetChanged(mTarget);
-    }
-}
-
-//==============================================================================
-// Get Property
-//==============================================================================
-QString ComponentPropertyAnimation::propertyAnimationProperty()
-{
-    return mProperty;
-}
-
-//==============================================================================
-// Set Property
-//==============================================================================
-void ComponentPropertyAnimation::setPropertyAnimationProperty(const QString& aProperty)
-{
-    // Check Property
-    if (mProperty != aProperty) {
-        // Set Property
-        mProperty = aProperty;
-        // Emit Property Changed Signal
-        emit propertyAnimationPropertyChanged(mProperty);
-    }
-}
-
-//==============================================================================
-// Get Value From
-//==============================================================================
-QString ComponentPropertyAnimation::valueFrom()
-{
-    return mValueFrom;
-}
-
-//==============================================================================
-// Set Value From
-//==============================================================================
-void ComponentPropertyAnimation::setValueFrom(const QString& aValueFrom)
-{
-    // Check Value From
-    if (mValueFrom != aValueFrom) {
-        // Set Value From
-        mValueFrom = aValueFrom;
-        // Emit Value From Changed Signal
-        emit valueFromChanged(mValueFrom);
-    }
-}
-
-//==============================================================================
-// Get Value To
-//==============================================================================
-QString ComponentPropertyAnimation::valueTo()
-{
-    return mValueTo;
-}
-
-//==============================================================================
-// Set Value To
-//==============================================================================
-void ComponentPropertyAnimation::setValueTo(const QString& aValueTo)
-{
-    // Check Value To
-    if (mValueTo != aValueTo) {
-        // Set Value To
-        mValueTo = aValueTo;
-        // Emit Value To Changed Signal
-        emit valueToChanged(mValueTo);
-    }
-}
-
-//==============================================================================
-// Get Duration
-//==============================================================================
-QString ComponentPropertyAnimation::duration()
-{
-    return mDuration;
-}
-
-//==============================================================================
-// Set Duration
-//==============================================================================
-void ComponentPropertyAnimation::setDuration(const QString& aDuration)
-{
-    // Check Duration
-    if (mDuration != aDuration) {
-        // Set Duration
-        mDuration = aDuration;
-        // Emit Duration Change Signal
-        emit durationChanged(mDuration);
-    }
-}
-
-//==============================================================================
-// Get Easing Type
-//==============================================================================
-QString ComponentPropertyAnimation::easingType()
-{
-    return mEasingType;
-}
-
-//==============================================================================
-// Set Easing Type
-//==============================================================================
-void ComponentPropertyAnimation::setEasingType(const QString& aEasingType)
-{
-    // Check Easing Type
-    if (mEasingType != aEasingType) {
-        // Set Easing Type
-        mEasingType = aEasingType;
-        // Emit Easing Type Changed Signal
-        emit easingTypeChanged(mEasingType);
-    }
-}
-
-//==============================================================================
-// To JSON Object
-//==============================================================================
-QJsonObject ComponentPropertyAnimation::toJSONObject()
-{
-    QJsonObject newObject;
-
-    // ...
-
-    return newObject;
-}
-
-//==============================================================================
-// Destructor
-//==============================================================================
-ComponentPropertyAnimation::~ComponentPropertyAnimation()
-{
-    // ...
-}
-

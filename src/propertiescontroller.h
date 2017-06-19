@@ -195,43 +195,6 @@ public:
     Q_INVOKABLE void addTransition(const QString& aFrom, const QString& aTo);
     // Remove Transition
     Q_INVOKABLE void removeTransition(const int& aIndex);
-    // Remove Transition
-    Q_INVOKABLE void removeTransition(ComponentTransition* aTransition);
-
-    // Add Parallel Animation Node
-    Q_INVOKABLE void addParallelAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode = NULL);
-    // Add Sequential Animation Node
-    Q_INVOKABLE void addSequentialAnimation(ComponentTransition* aTransition, ComponentTransitionNode* aParentNode = NULL);
-    // Add Pause Animation Node
-    Q_INVOKABLE void addPauseAnimation(const QString& aDuration, ComponentTransition* aTransition, ComponentTransitionNode* aParentNode = NULL);
-    // Add Property Animation Node
-    Q_INVOKABLE void addPropertyAnimation(const QString& aTarget,
-                                          const QString& aProperty,
-                                          const QString& aFrom,
-                                          const QString& aTo,
-                                          const QString& aDuration,
-                                          const QString& aEasing,
-                                          ComponentTransition* aTransition,
-                                          ComponentTransitionNode* aParentNode = NULL);
-    // Add Property Action Node
-    Q_INVOKABLE void addPropertyAction(const QString& aTarget,
-                                       const QString& aProperty,
-                                       const QString& aValue,
-                                       ComponentTransition* aTransition,
-                                       ComponentTransitionNode* aParentNode = NULL);
-    // Add Script Action Node
-    Q_INVOKABLE void addScriptAction(const QString& aScript,
-                                     ComponentTransition* aTransition,
-                                     ComponentTransitionNode* aParentNode= NULL);
-    // Remove Transition Node
-    Q_INVOKABLE void removeTransitionNode(ComponentTransition* aTransition,
-                                          ComponentTransitionNode* aNode,
-                                          ComponentTransitionNode* aParentNode = NULL);
-    // Move Transition Node
-    Q_INVOKABLE void moveTransitionNode(ComponentTransition* aTransition,
-                                        ComponentTransitionNode* aNode,
-                                        ComponentTransitionNode* aTargetNode,
-                                        const int& aTargetIndex);
 
     // ...
 

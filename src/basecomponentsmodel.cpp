@@ -241,6 +241,9 @@ bool BaseComponentsModel::addBaseComponent(ComponentInfo* aComponent)
         // End Insert Rows
         endInsertRows();
 
+        // Emit Base Component Added Signal
+        emit baseComponentAdded(aComponent);
+
         return true;
     }
 
@@ -258,26 +261,31 @@ bool BaseComponentsModel::removeBaseComponent(const int& aIndex)
     if (aIndex >= 0 && aIndex < bcCount) {
         // Get Component
         ComponentInfo* component = getComponentByIndex(aIndex);
-        // Get Info File
-        QFile ciFile(component->mInfoPath);
-        // Get Key
-        QString bcKey = mBaseComponents.keys()[aIndex];
-        // Begin Remove Rows
-        beginRemoveRows(QModelIndex(), aIndex, aIndex);
-        // Remove Key
-        mBaseComponents.remove(bcKey);
-        // Disconnect Dirty Changed Signal
-        connect(component, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
-        // Delete Component
-        delete component;
-        // Delete Component Info File
-        if (!ciFile.remove()) {
-            qWarning() << "BaseComponentsModel::removeBaseComponent - ERROR REMOVING FILE!";
-        }
-        // End Remove Rows
-        endRemoveRows();
+        // Check Component
+        if (component) {
+            // Emit Base Component Is About to Be Removed Signal
+            emit baseComponentAboutToBeRemoved(component);
+            // Get Info File
+            QFile ciFile(component->mInfoPath);
+            // Get Key
+            QString bcKey = mBaseComponents.keys()[aIndex];
+            // Begin Remove Rows
+            beginRemoveRows(QModelIndex(), aIndex, aIndex);
+            // Remove Key
+            mBaseComponents.remove(bcKey);
+            // Disconnect Dirty Changed Signal
+            disconnect(component, SIGNAL(dirtyChanged(bool)), this, SLOT(componentDirtyChanged(bool)));
+            // Delete Component
+            delete component;
+            // Delete Component Info File
+            if (!ciFile.remove()) {
+                qWarning() << "BaseComponentsModel::removeBaseComponent - ERROR REMOVING FILE!";
+            }
+            // End Remove Rows
+            endRemoveRows();
 
-        return true;
+            return true;
+        }
     }
 
     return false;

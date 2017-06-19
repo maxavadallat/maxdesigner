@@ -12,24 +12,7 @@ DPane {
     width: 360
     height: 600
 
-    title: "Project" + (mainController.currentProject ? (" - " + mainController.currentProject.projectName) : "")
-
-    creationWidth: settingsController ? settingsController.projectPaneWidth : 360
-    creationHeight: settingsController ? settingsController.projectPaneHeight : 600
-
-    minWidth: 300
-    minHeight: parent ? parent.height * 0.6 : 600
-
-    enablePaneContent: true
-
-    setFocusOnResize: false
-
-    //topMouseAreaVisible: true
-
-    hideToSide: hideToLeft
-
-    borderColor: DStyle.colorBorder
-
+    // Current Project Connections
     property Connections currentProjectConnection: Connections {
         target: mainController.currentProject
 
@@ -55,6 +38,7 @@ DPane {
         }
     }
 
+    // Open Files Model Connection
     property Connections openFilesModelConnection: Connections {
         target: openFilesModel
 
@@ -117,6 +101,25 @@ DPane {
             }
         }
     }
+
+    title: "Project" + (mainController.currentProject ? (" - " + mainController.currentProject.projectName) : "")
+
+    creationWidth: settingsController ? settingsController.projectPaneWidth : 360
+    creationHeight: settingsController ? settingsController.projectPaneHeight : 600
+
+    minWidth: 360
+    minHeight: parent ? parent.height * 0.6 : 600
+
+    maxWidth: parent ? parent.width * 0.5 : 2000
+    maxHeight: parent ? parent.height / DStyle.defaultMargin * 2 : 2000
+
+    enablePaneContent: true
+
+    setFocusOnResize: false
+
+    hideToSide: hideToLeft
+
+    borderColor: DStyle.colorBorder
 
     onWidthChanged: {
         // Check State

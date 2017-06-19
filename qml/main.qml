@@ -609,6 +609,7 @@ Item {
                     transitionEditor.newTransition = true;
 
                     // Set Component Transition
+                    transitionEditor.componentTransition = propertiesController.transitionsModel.createNewTransition();
 
                     // Show Transition Editor
                     transitionEditor.show();
@@ -622,6 +623,7 @@ Item {
                     transitionEditor.newTransition = false;
 
                     // Set Component Transition
+                    transitionEditor.componentTransition = propertiesController.transitionsModel.selectTransition(index);
 
                     // Show Transition Editor
                     transitionEditor.show();
