@@ -19,12 +19,13 @@ Item {
     property bool enableSwipe: true
 
     signal itemActionClicked(var index)
+    signal itemClicked(var index)
     signal itemDoubleClicked(var index)
 
     // ...
 
     Row {
-        id: stateItemRow
+        id: transitionItemRow
         height: parent.height
         anchors.left: parent.left
         anchors.leftMargin: DStyle.defaultMargin
@@ -78,6 +79,12 @@ Item {
 
     DMouseArea {
         anchors.fill: parent
+
+        onClicked: {
+            // Emit Item Clicked Signal
+            transitionItemRoot.itemClicked(transitionItemRoot.itemIndex);
+        }
+
         onDoubleClicked: {
             // Emit Item Double Clicked Signal
             transitionItemRoot.itemDoubleClicked(transitionItemRoot.itemIndex);
@@ -88,7 +95,7 @@ Item {
     DSwipeGesture {
         id: swipeGesture
         anchors.fill: parent
-        enableSwipe: stateItemRoot.enableSwipe
+        enableSwipe: transitionItemRoot.enableSwipe
         onActionButtonClicked: {
             //console.log("DPropertyItem.swipeGesture.onActionButtonClicked");
             // Emit Item Action Clicked Signal

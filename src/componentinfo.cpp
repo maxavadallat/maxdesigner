@@ -15,6 +15,7 @@
 #include "projectmodel.h"
 #include "constants.h"
 #include "utils.h"
+#include "componenttransitionsmodel.h"
 
 //==============================================================================
 // Create Component From Component Info File
@@ -152,6 +153,7 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mComponentHandler(NULL)
     , mBase(NULL)
     , mParent(NULL)
+    , mTransitionParent(NULL)
     , mProtoType(NULL)
 {
     //qDebug() << "ComponentInfo " <<  mName << " created.";
@@ -2138,10 +2140,18 @@ void ComponentInfo::removeFromParent()
 {
     // Check Parent
     if (mParent) {
-        qDebug() << "ComponentInfo::removeFromParent";
+        qDebug() << "ComponentInfo::removeFromParent - child";
         // Remove Child
         mParent->removeChild(this);
     }
+
+    // Check Transition Parent
+    if (mTransitionParent) {
+        qDebug() << "ComponentInfo::removeFromParent - transition node";
+        // Remove Node
+        mTransitionParent->removeNode(this);
+    }
+
 }
 
 //==============================================================================
@@ -3421,7 +3431,7 @@ QString ComponentInfo::liveCodeFormatTransition(const int& aIndex, const QString
     // Check From State
     if (!fromState.isEmpty()) {
         // Add From State
-        liveCode += QString("%1%2%2from: %3\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(fromState);
+        liveCode += QString("%1%2%2from: \"%3\"\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(fromState);
     }
 
     // Get To State
@@ -3430,7 +3440,7 @@ QString ComponentInfo::liveCodeFormatTransition(const int& aIndex, const QString
     // Check To State
     if (!toState.isEmpty()) {
         // Add To State
-        liveCode += QString("%1%2%2to: %3\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(toState);
+        liveCode += QString("%1%2%2to: \"%3\"\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(toState);
     }
 
     // Add Nodes
@@ -3441,7 +3451,7 @@ QString ComponentInfo::liveCodeFormatTransition(const int& aIndex, const QString
     // ...
 
     // Add Closing Bracket To Live Code
-    liveCode += QString("%1%2}").arg(aIndent).arg(DEFAULT_SOURCE_INDENT);
+    liveCode += QString("%1%2}\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT);
 
     return liveCode;
 }
@@ -3463,7 +3473,7 @@ QString ComponentInfo::liveCodeFormatTransitions(const QString& aIndent)
         liveCode += QString("%1// Transitions\n").arg(aIndent);
 
         // Add To Live Code
-        liveCode += QString("%1transitions: [").arg(aIndent);
+        liveCode += QString("%1transitions: [\n").arg(aIndent);
 
         // Get Transitions Count
         int tCount = mTransitions.count();
@@ -4004,6 +4014,24 @@ QString ComponentInfo::layoutBase()
 
     // Init Layout Base Name
     return mBase ? mBase->layoutBase() : "";
+}
+
+//==============================================================================
+// Get Animation Base
+//==============================================================================
+QString ComponentInfo::animBase()
+{
+    // Check Category
+    if (mCategory != COMPONENT_CATEGORY_ANIMATION) {
+        return "";
+    }
+
+    // Check If Built In
+    if (mBuiltIn) {
+        return mName;
+    }
+
+    return mBase ? mBase->animBase() : "";
 }
 
 //==============================================================================
@@ -4856,6 +4884,28 @@ void ComponentInfo::removeChild(ComponentInfo* aChild, const bool& aDelete)
         } else {
             qWarning() << "ComponentInfo::removeChild - aChild: " << aChild << " - CHILD COMPONENT NOT FOUND!";
         }
+    }
+}
+
+//==============================================================================
+// Remove Animation By Index
+//==============================================================================
+void ComponentInfo::removeAnimation(const int& aIndex)
+{
+    // Get Animations Count
+    int acCount = mAnimationComponents.count();
+    // Check Index
+    if (aIndex > 0 && aIndex < acCount) {
+        // Delete Animation
+        delete mAnimationComponents.takeAt(aIndex);
+
+        // Set Dirty
+        setDirty(true);
+
+        // Emit Animation Removed Signal
+        emit animationRemoved(aIndex);
+        // Emit Anims Count Changed Signal
+        emit animsCountChanged(mAnimationComponents.count());
     }
 }
 

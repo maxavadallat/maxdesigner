@@ -31,6 +31,8 @@ DControl {
 
     property bool invalidValue: false
 
+    property bool showSelector: true
+
     state: stateClosed
 
     signal itemSelected(var itemIndex)
@@ -137,6 +139,12 @@ DControl {
         if (optionRoot.optionInitCompleted && optionRoot.currentIndex === -1 && optionRoot.count > 0) {
             // Set Current Index
             optionRoot.currentIndex = 0;
+        } else if (optionRoot.currentIndex !== -1 && optionRoot.count > 0) {
+            // Check Current Index
+            if (optionRoot.currentIndex === optionRoot.count - 1) {
+                // Set Item Checked
+                setItemChecked(optionRoot.currentIndex);
+            }
         }
     }
 
@@ -165,6 +173,8 @@ DControl {
 
     // Item Clicked
     function itemClicked(itemIndex) {
+        //console.log("DOption.itemClicked - itemIndex: " + itemIndex);
+
         // Check State
         if (optionRoot.state === optionRoot.stateClosed) {
             // Set State
@@ -325,6 +335,8 @@ DControl {
                         //console.log("DOption.delegateRoot.text: " + optionRoot.model[index].text);
                         return optionRoot.model[index].text;
                     }
+
+                    showSelector: optionRoot.showSelector
 
                     checked: {
                         //console.log("DOption.delegateRoot.checked: " + optionRoot.model[index].checked);

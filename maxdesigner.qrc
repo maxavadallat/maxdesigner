@@ -84,7 +84,6 @@
         <file>qml/mainview/DTransitionEditor.qml</file>
         <file>qml/mainview/DTransitionItemDelegateNode.qml</file>
         <file>qml/mainview/DTransitionNodeEditor.qml</file>
-        <file>qml/mainview/DTransitionTree.qml</file>
         <file>qml/mainview/DTransitionTreeEmptyNode.qml</file>
         <file>qml/mainview/DTransitionTreeNode.qml</file>
         <file>qml/mainview/DWelcome.qml</file>

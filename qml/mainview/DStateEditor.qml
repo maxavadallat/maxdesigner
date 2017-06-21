@@ -342,10 +342,9 @@ DPaneBase {
         Item {
             id: propertyChangesContainer
             width: parent.width
-            height: propertyChangesList.count * CONSTS.defaultPaneItemHeight //propertyChangesList.contentHeight
+            height: propertyChangesList.count * CONSTS.defaultPaneItemHeight
             Behavior on height { DAnimation { } }
             visible: height > 0
-            //clip: true
 
             DListView {
                 id: propertyChangesList

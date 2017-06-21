@@ -90,13 +90,8 @@ void ComponentStatesModel::loadComponentStates()
 //==============================================================================
 void ComponentStatesModel::saveComponentStates()
 {
-    // Check Component
-    if (!mComponent) {
-        return;
-    }
-
     // Check Dirty State
-    if (mDirty) {
+    if (mComponent && mDirty) {
         qDebug() <<  "ComponentStatesModel::saveComponentStates";
 
         // Set Component States
@@ -220,7 +215,6 @@ void ComponentStatesModel::appendState(ComponentState* aState)
 
         // Set Dirty State
         setDirty(true);
-
     }
 }
 

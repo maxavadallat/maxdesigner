@@ -20,6 +20,8 @@ DMouseArea {
 
     property bool checked: false
 
+    property bool showSelector: true
+
     hoverEnabled: true
 
     acceptedButtons: { Qt.LeftButton }
@@ -85,7 +87,7 @@ DMouseArea {
         anchors.verticalCenterOffset: -2
         text: "•"
         font.pixelSize: DStyle.fontSizeXL
-        visible: popupItemRoot.checked
+        visible: popupItemRoot.checked && popupItemRoot.showSelector
     }
 
     Rectangle {

@@ -31,6 +31,7 @@ PropertiesController::PropertiesController(ProjectModel* aProjectModel, QObject*
     , mComponentFunctions(NULL)
     , mComponentStates(NULL)
     , mComponentTransitions(NULL)
+    , mAnimationComponents(NULL)
 {
     qDebug() << "PropertiesController created.";
     // Init
@@ -43,6 +44,12 @@ PropertiesController::PropertiesController(ProjectModel* aProjectModel, QObject*
 void PropertiesController::init()
 {
     //qDebug() << "PropertiesController::init";
+
+    // Check Animation Components Model
+    if (!mAnimationComponents) {
+        // Create Animation Components Model
+        mAnimationComponents = new AnimationComponentsModel(mProject);
+    }
 
     // Check Project Model
     if (mProject) {
@@ -149,6 +156,12 @@ void PropertiesController::clear()
         mComponentFunctions = NULL;
         // Set Component Functions Model
         setFunctionsModel(NULL);
+    }
+
+    // Check Animation Components
+    if (mAnimationComponents) {
+        delete mAnimationComponents;
+        mAnimationComponents = NULL;
     }
 
     // Clear Filtered Properties
@@ -312,6 +325,20 @@ void PropertiesController::setFunctionsModel(ComponentFunctionsModel* aFunctions
 }
 
 //==============================================================================
+// Set Animation Components Model
+//==============================================================================
+void PropertiesController::setAnimComponentsModel(AnimationComponentsModel* aAnimComponentsModel)
+{
+    // Check Animation Components Model
+    if (mAnimationComponents != aAnimComponentsModel) {
+        // Set Animation Components Model
+        mAnimationComponents = aAnimComponentsModel;
+        // Emit Animation Components Model Changed Signal
+        emit animComponentsModelChanged(mAnimationComponents);
+    }
+}
+
+//==============================================================================
 // Child About To Be Removed Slot
 //==============================================================================
 void PropertiesController::childAboutToBeRemoved(ComponentInfo* aChild)
@@ -348,6 +375,17 @@ void PropertiesController::setCurrentProject(ProjectModel* aProjectModel)
         // Set Current Project Model
         mProject = aProjectModel;
 
+
+        // Check Imports Model
+        if (mComponentImports) {
+
+        }
+
+        // Check Anchors Model
+        if (mComponentAnchors) {
+
+        }
+
         // Check Properties Model
         if (mComponentProperties) {
             // Set Project Model
@@ -358,6 +396,38 @@ void PropertiesController::setCurrentProject(ProjectModel* aProjectModel)
         if (mComponentOwnProperties) {
             // Set Project Model
             mComponentOwnProperties->mProject = aProjectModel;
+        }
+
+        // Check Signals Model
+        if (mComponentSignals) {
+
+        }
+
+        // Slots
+        if (mComponentSlots) {
+
+        }
+
+        // Functions
+        if (mComponentFunctions) {
+
+        }
+
+        // States
+        if (mComponentStates) {
+
+        }
+
+        // Transitions
+        if (mComponentTransitions) {
+            // Set Project Model
+            mComponentTransitions->mProject = aProjectModel;
+        }
+
+        // Check Animatin Components Model
+        if (mAnimationComponents) {
+            // Set Project
+            mAnimationComponents->setCurrentProject(mProject);
         }
 
         // ...
@@ -488,7 +558,7 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
             mComponentTransitions->setCurrentComponent(aComponent);
         } else {
             // Create New Component Trnsitions Model
-            ComponentTransitionsModel* newComponentTransitionsModel = new ComponentTransitionsModel(mFocusedComponent);
+            ComponentTransitionsModel* newComponentTransitionsModel = new ComponentTransitionsModel(mFocusedComponent, mAnimationComponents);
             // Set Component Transitions Model
             setTransitionsModel(newComponentTransitionsModel);
         }
@@ -754,6 +824,14 @@ ComponentPropertiesModel* PropertiesController::propertiesModel()
 ComponentFunctionsModel* PropertiesController::functionsModel()
 {
     return mComponentFunctions;
+}
+
+//==============================================================================
+// Get Animation Components Model
+//==============================================================================
+AnimationComponentsModel* PropertiesController::animComponentsModel()
+{
+    return mAnimationComponents;
 }
 
 //==============================================================================
@@ -1097,7 +1175,6 @@ void PropertiesController::removeTransition(const int& aIndex)
         mComponentTransitions->removeTransition(aIndex);
     }
 }
-
 
 //==============================================================================
 // Destructor

@@ -9,128 +9,162 @@ import "qrc:/qml/animations"
 DPaneBase {
     id: transitionNodeEditorRoot
 
-    property int nodeType: 0
+    // Component Info
+    property ComponentInfo componentInfo: propertiesController.focusedComponent
+    // Transitions Model
+    property ComponentTransitionsModel transitionsModel: propertiesController.transitionsModel
+    // Component Transition
+    property ComponentTransition componentTransition: null
+    // Transition Node - Animation Component
+    property ComponentInfo transitionNode: null
+    // Node Name
+    property string nodeName: transitionNode !== null ? transitionNode.animBase() : "NULL"
+    // New Transition Node
+    property bool newTransitionNode: false
 
-    //property ComponentInfo componentInfo: null
-
-    title: {
-        // Init Type Text
-        var typeText = "";
-
-        switch (transitionNodeEditorRoot.nodeType) {
-            default:
-            case 1:
-            case 2: break;
-            case 3: typeText = "Property Animation"; break;
-            case 4: typeText = "Property Action"; break;
-            case 5: typeText = "Script Action"; break;
-            case 6: typeText = "Pause Animation"; break;
-        }
-
-        return "Transition Node - " + typeText;
-    }
+    title: "Transition Node - " + nodeName
 
     hideToSide: hideToTop
 
-/*
-    DPopupItemObject { text: "Add New Node" },
-    DPopupItemObject { text: "Add Sequential Animation" },
-    DPopupItemObject { text: "Add Parallel Animation" },
-    DPopupItemObject { text: "Add Property Animation" },
-    DPopupItemObject { text: "Add Property Action" },
-    DPopupItemObject { text: "Add Script Action" },
-    DPopupItemObject { text: "Add Pause Animation" }
-*/
-
     creationWidth: {
-        // Switch Node Type
-        switch (transitionNodeEditorRoot.nodeType) {
-            case 4: return 300;
-            case 5: return 532;
-            case 6: return 354;
-            default:
+        // Switch Node Name
+        switch (transitionNodeEditorRoot.nodeName) {
+//            case "PropertyAnimation":   return 282;
+            case "PropertyAction":      return 360;
+            case "PauseAnimation":      return 360;
+//            case "ScriptAction":        return 282;
         }
 
-        return 556;
+        return 500;
     }
 
-
     creationHeight: {
-        // Switch Node Type
-        switch (transitionNodeEditorRoot.nodeType) {
-            case 6: return 108;
-            default:
+        // Switch Node Name
+        switch (transitionNodeEditorRoot.nodeName) {
+            case "PropertyAnimation":   return 292;
+            case "PropertyAction":      return 176;
+            case "PauseAnimation":      return 118;
+            case "ScriptAction":        return 282;
         }
 
-        return 152;
+        return 260;
     }
 
     minWidth: creationWidth
     minHeight: creationHeight
 
-    enableResize: false
+    enableResize: true
     enableHideButton: false
+
+    resizeTopEnabled: false
+    resizeBottomEnabled: nodeName === "ScriptAction"
 
     state: stateCreate
 
-//    onAccepted: {
-//        // Reset
-//        transitionNodeEditorRoot.reset(false);
-//    }
-
-//    onRejected: {
-//        // Reset
-//        transitionNodeEditorRoot.reset(false);
-//    }
-
     onTransitionStarted: {
+        // Check New State
         if (newState === stateCreate) {
+            // Set Fields Flow Opacity
             fieldsFlow.opacity = 0.0;
+
+            // Reset Editor's Focus
+            targetEditor.setEditorFocus(false, false);
+            propertyEditor.setEditorFocus(false, false);
+            valueEditor.setEditorFocus(false, false);
+            fromValueEditor.setEditorFocus(false, false);
+            toValueEditor.setEditorFocus(false, false);
+            curveValueEditor.setEditorFocus(false, false);
+            scriptEditor.setEditorFocus(false, false);
+            durationValueEditor.setEditorFocus(false, false);
+
+        } else if (newState === stateShown) {
+            // Reset Transition Node Editor
+            resetTransitionNodeEditor();
         }
     }
 
     onTransitionFinished: {
+        // Check New State
         if (newState === stateShown) {
-            // Switch Node Type
-            switch (transitionNodeEditorRoot.nodeType) {
-                case 3:
-                case 4: targetEditor.setEditorFocus(true, true); break;
-                case 5: scriptEditor.setEditorFocus(true, false); break;
-                case 6: durationValueEditor.setEditorFocus(true, true); break;
-            }
-
+            // Set Fields Flow Opacity
             fieldsFlow.opacity = 1.0;
+
+            // Switch Node Name
+            switch (transitionNodeEditorRoot.nodeName) {
+                case "PropertyAnimation":
+                case "PropertyAction":
+                    // Set Editor Focus
+                    targetEditor.setEditorFocus(true, false);
+                break;
+
+                case "ScriptAction":
+                    scriptEditor.setEditorFocus(true, false);
+                break;
+
+                case "PauseAnimation":
+                    durationValueEditor.setEditorFocus(true, false);
+                break;
+            }
         }
     }
 
-    DDisc {
-        anchors.right: parent.right
-        anchors.rightMargin: DStyle.defaultMargin * 2
-        anchors.verticalCenter: parent.verticalCenter
-
-        onClicked: {
-            // Emit Accepted Signal
-            transitionNodeEditorRoot.accepted();
+    onTransitionNodeChanged: {
+        // Check Transition Node
+        if (transitionNodeEditorRoot.transitionNode !== null) {
+            console.log("#### DTransitionNodeEditor.onTransitionNodeChanged - name: " + transitionNodeEditorRoot.transitionNode.componentName);
 
             // ...
         }
     }
 
-    Rectangle {
-        anchors.fill: fieldsFlow
-        color: "transparent"
-        border.color: "purple"
+    // Reset Transition Node Editor
+    function resetTransitionNodeEditor() {
+
     }
 
+    // Update Transition Node
+    function updateTransitionNode() {
+
+    }
+
+    // Validate Transition Node
+    function validateTransitionNode() {
+
+
+
+        return true;
+    }
+
+    // Accept Transition Node
+    function acceptTransitionNode() {
+        // Check If TransitionNode Valid
+        if (validateTransitionNode()) {
+            // Update TransitionNode
+            updateTransitionNode();
+            // Emit Accepted Signal
+            transitionNodeEditorRoot.accepted();
+        }
+    }
+
+    DDisc {
+        id: discButton
+        anchors.right: parent.right
+        anchors.rightMargin: DStyle.defaultMargin * 2
+        anchors.verticalCenter: parent.verticalCenter
+
+        onClicked: acceptTransitionNode();
+    }
+
+    // Transition Fileds Flow
     Flow {
         id: fieldsFlow
 
         anchors.left: parent.left
         anchors.leftMargin: DStyle.defaultMargin
         anchors.top: parent.top
-        anchors.topMargin: titleLabel.height + DStyle.defaultMargin * 2
-        anchors.right: parent.right
-        anchors.rightMargin: 88
+        anchors.topMargin: titleLabel.height + DStyle.defaultMargin * 3
+        anchors.right: discButton.left
+        anchors.rightMargin: DStyle.defaultMargin * 3
 
         spacing: DStyle.defaultSpacing
 
@@ -138,19 +172,22 @@ DPaneBase {
         Behavior on opacity { DFadeAnimation { } }
         visible: opacity > 0.0
 
+        // Target Label
         DText {
             id: targetLabel
             width: propertyLabel.width
             height: targetEditor.height
             horizontalAlignment: Text.AlignRight
             text: "target:"
-            visible: transitionNodeEditorRoot.nodeType === 3 || transitionNodeEditorRoot.nodeType === 4
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAction" || transitionNodeEditorRoot.nodeName === "PropertyAnimation"
         }
 
+        // Target Editor
         DTextInput {
             id: targetEditor
-            width: 120
-            visible: transitionNodeEditorRoot.nodeType === 3 || transitionNodeEditorRoot.nodeType === 4
+            width: fieldsFlow.width - targetLabel.width - DStyle.defaultSpacing
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAction" || transitionNodeEditorRoot.nodeName === "PropertyAnimation"
+
             onKeyEvent: {
                 switch (event.key) {
                     case Qt.Key_Escape:
@@ -165,19 +202,22 @@ DPaneBase {
             }
         }
 
+        // Property Label
         DText {
             id: propertyLabel
-            width: 76
+            //width: 76
             height: propertyEditor.height
             horizontalAlignment: Text.AlignRight
             text: "property:"
-            visible: transitionNodeEditorRoot.nodeType === 3 || transitionNodeEditorRoot.nodeType === 4
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAction" || transitionNodeEditorRoot.nodeName === "PropertyAnimation"
         }
 
+        // Property Name Editor
         DTextInput {
             id: propertyEditor
-            width: 120
-            visible: transitionNodeEditorRoot.nodeType === 3 || transitionNodeEditorRoot.nodeType === 4
+            width: fieldsFlow.width - propertyLabel.width - DStyle.defaultSpacing
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAction" || transitionNodeEditorRoot.nodeName === "PropertyAnimation"
+
             onKeyEvent: {
                 switch (event.key) {
                     case Qt.Key_Escape:
@@ -186,9 +226,12 @@ DPaneBase {
                     break;
 
                     case Qt.Key_Tab:
+                        // Check If Value Editor Visible
                         if (valueEditor.visible) {
+                            // Set Editor Focus
                             valueEditor.setEditorFocus(true, true);
                         } else {
+                            // Set Editor Focus
                             fromValueEditor.setEditorFocus(true, true);
                         }
                     break;
@@ -196,19 +239,22 @@ DPaneBase {
             }
         }
 
+        // Value Label
         DText {
             id: valueLabel
             width: propertyLabel.width
             height: valueEditor.height
             horizontalAlignment: Text.AlignRight
             text: "value:"
-            visible: transitionNodeEditorRoot.nodeType === 4
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAction"
         }
 
+        // Value Editor
         DTextInput {
             id: valueEditor
-            width: 120
-            visible: transitionNodeEditorRoot.nodeType === 4
+            width: fieldsFlow.width - valueLabel.width - DStyle.defaultSpacing
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAction"
+
             onKeyEvent: {
                 switch (event.key) {
                     case Qt.Key_Escape:
@@ -223,39 +269,21 @@ DPaneBase {
             }
         }
 
-        DText {
-            id: scriptLabel
-            height: scriptEditor.height
-            horizontalAlignment: Text.AlignRight
-            text: "script:"
-            visible: transitionNodeEditorRoot.nodeType === 5
-        }
-
-        DSourceCodeEditor {
-            id: scriptEditor
-            width: transitionNodeEditorRoot.width - 146
-            height: transitionNodeEditorRoot.height - 40 - DStyle.defaultMargin
-            visible: transitionNodeEditorRoot.nodeType === 5
-
-            onEscapeClicked: {
-                // Dismiss Pane
-                transitionNodeEditorRoot.dismissPane(true);
-            }
-        }
-
+        // From Label
         DText {
             id: fromValueLabel
             width: propertyLabel.width
             height: fromValueEditor.height
             horizontalAlignment: Text.AlignRight
             text: "from:"
-            visible: transitionNodeEditorRoot.nodeType === 3
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAnimation"
         }
 
+        // From Value Editor
         DTextInput {
             id: fromValueEditor
-            width: 120
-            visible: transitionNodeEditorRoot.nodeType === 3
+            width: (fieldsFlow.width - fromValueLabel.width - toValueLabel.width - DStyle.defaultSpacing * 3) / 2
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAnimation"
             onKeyEvent: {
                 switch (event.key) {
                     case Qt.Key_Escape:
@@ -270,19 +298,22 @@ DPaneBase {
             }
         }
 
+        // To Value Label
         DText {
             id: toValueLabel
-            width: propertyLabel.width
+            width: fromValueLabel.width
             height: toValueEditor.height
             horizontalAlignment: Text.AlignRight
             text: "to:"
-            visible: transitionNodeEditorRoot.nodeType === 3
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAnimation"
         }
 
+        // To Value Editor
         DTextInput {
             id: toValueEditor
-            width: 120
-            visible: transitionNodeEditorRoot.nodeType === 3
+            width: (fieldsFlow.width - fromValueLabel.width - toValueLabel.width - DStyle.defaultSpacing * 3) / 2
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAnimation"
+
             onKeyEvent: {
                 switch (event.key) {
                     case Qt.Key_Escape:
@@ -299,24 +330,26 @@ DPaneBase {
 
         // Spacer
         Item {
-            width: durationValueLabel.width + durationValueEditor.width
-            height: 8
-            visible: transitionNodeEditorRoot.nodeType === 6
+            width: fieldsFlow.width
+            height: 4
+            visible: transitionNodeEditorRoot.nodeName === "PauseAnimation"
         }
 
+        // Duration Label
         DText {
             id: durationValueLabel
             width: propertyLabel.width
             height: durationValueEditor.height
             horizontalAlignment: Text.AlignRight
             text: "duration:"
-            visible: transitionNodeEditorRoot.nodeType === 3 || transitionNodeEditorRoot.nodeType === 6
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAnimation" || transitionNodeEditorRoot.nodeName === "PauseAnimation"
         }
 
         DTextInput {
             id: durationValueEditor
-            width: 120
-            visible: transitionNodeEditorRoot.nodeType === 3 || transitionNodeEditorRoot.nodeType === 6
+            width: fieldsFlow.width - durationValueLabel.width - DStyle.defaultSpacing
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAnimation" || transitionNodeEditorRoot.nodeName === "PauseAnimation"
+
             onKeyEvent: {
                 switch (event.key) {
                     case Qt.Key_Escape:
@@ -325,7 +358,9 @@ DPaneBase {
                     break;
 
                     case Qt.Key_Tab:
-                        if (transitionNodeEditorRoot.nodeType === 2) {
+                        // Check Visibility
+                        if (easingValueOption.visible) {
+                            // Set Option Focus
                             easingValueOption.setOptionFocus(true);
                         }
                     break;
@@ -340,28 +375,23 @@ DPaneBase {
 //            visible: transitionNodeEditorRoot.nodeType === 5
 //        }
 
+        // Easing Label
         DText {
             id: easingValueLabel
             width: propertyLabel.width
             height: easingValueOption.height
             horizontalAlignment: Text.AlignRight
             text: "easing:"
-            visible: transitionNodeEditorRoot.nodeType === 3
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAnimation"
         }
 
+        // Easing Option
         DOption {
             id: easingValueOption
+            width: fieldsFlow.width - easingValueLabel.width - DStyle.defaultSpacing
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAnimation"
 
-            visible: transitionNodeEditorRoot.nodeType === 3
-
-            model: [
-                { text: "Easing.Linear" },
-                { text: "Easing.InQuad" },
-                { text: "Easing.OutQuad" },
-                { text: "Easing.InOutQuad" },
-                { text: "Easing.OutInQuad" },
-                { text: "more" }
-            ]
+            model: []
 
             onKeyEvent: {
                 switch (event.key) {
@@ -371,10 +401,72 @@ DPaneBase {
                     break;
 
                     case Qt.Key_Tab:
+                        // Set Editor Focus
+                        curveValueEditor.setEditorFocus(true, true);
+                    break;
+                }
+            }
+        }
+
+        // Easing Label
+        DText {
+            id: curveValueLabel
+            width: propertyLabel.width
+            height: curveValueEditor.height
+            horizontalAlignment: Text.AlignRight
+            text: "curve:"
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAnimation"
+        }
+
+        DTextInput {
+            id: curveValueEditor
+            width: fieldsFlow.width - curveValueLabel.width - DStyle.defaultSpacing
+            visible: transitionNodeEditorRoot.nodeName === "PropertyAnimation"
+
+            onKeyEvent: {
+                switch (event.key) {
+                    case Qt.Key_Escape:
+                        // Dismiss Pane
+                        transitionNodeEditorRoot.dismissPane(true);
+                    break;
+
+                    case Qt.Key_Tab:
+                        // Set Editor Focus
                         targetEditor.setEditorFocus(true, true);
                     break;
                 }
             }
+        }
+    }
+
+//    // Script Label
+//    DText {
+//        id: scriptLabel
+//        height: scriptEditor.height
+//        horizontalAlignment: Text.AlignRight
+//        text: "script:"
+//        visible: transitionNodeEditorRoot.nodeName === "ScriptAction"
+//    }
+
+    // Script Editor
+    DSourceCodeEditor {
+        id: scriptEditor
+
+        anchors.left: parent.left
+        anchors.leftMargin: DStyle.defaultMargin
+        anchors.right: discButton.left
+        anchors.rightMargin: DStyle.defaultMargin * 3
+        anchors.top:  transitionNodeEditorRoot.titleLabel.bottom
+        anchors.topMargin: DStyle.defaultMargin
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: DStyle.defaultMargin
+
+        //height: transitionNodeEditorRoot.height - scriptLabel.height - transitionNodeEditorRoot.titleHeight - DStyle.defaultMargin - DStyle.defaultSpacing * 2
+        visible: transitionNodeEditorRoot.nodeName === "ScriptAction"
+
+        onEscapeClicked: {
+            // Dismiss Pane
+            transitionNodeEditorRoot.dismissPane(true);
         }
     }
 }

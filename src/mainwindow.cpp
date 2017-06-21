@@ -89,7 +89,6 @@ MainWindow::MainWindow(QWidget* aParent)
     , mComponents(NULL)
     , mViews(NULL)
     , mCategories(NULL)
-    , mAnimationComponents(NULL)
 
     , mCurrentComponent(NULL)
     , mScreenShotMode(false)
@@ -150,15 +149,6 @@ void MainWindow::init()
     if (!mCategories) {
         // Create Component Categories Model
         mCategories = new ComponentCategoryModel();
-    }
-
-    // Check Animation Components Model
-    if (!mAnimationComponents) {
-        // Create Animation Components Model
-        mAnimationComponents = new AnimationComponentsModel(NULL);
-
-        // Emit Animation Components Model Changed Signal
-        emit animationsModelChanged(mAnimationComponents);
     }
 
     // Set Context Properties
@@ -501,14 +491,6 @@ DataSourcesModel* MainWindow::dataSourcesModel()
 }
 
 //==============================================================================
-// Animation components Model
-//==============================================================================
-AnimationComponentsModel* MainWindow::animationsModel()
-{
-    return mAnimationComponents;
-}
-
-//==============================================================================
 // Get Screen Shot Mode
 //==============================================================================
 bool MainWindow::screenshotMode()
@@ -532,7 +514,7 @@ void MainWindow::openProject(const QString& aFilePath)
     // Check Project Model
     if (!mProjectModel) {
         // Create Project Model
-        mProjectModel = new ProjectModel(mPropertiesController);
+        mProjectModel = new ProjectModel(NULL);
 
         // Connect Signal
         connect(mProjectModel, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)), this, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)));
@@ -599,12 +581,6 @@ void MainWindow::openProject(const QString& aFilePath)
         if (mOpenFiles) {
             // Set Project Model
             mOpenFiles->setProjectModel(mProjectModel);
-        }
-
-        // Check Animation Components Model
-        if (mAnimationComponents) {
-            // Set Current Project
-            mAnimationComponents->setCurrentProject(mProjectModel);
         }
 
         // Set Properties Controller
@@ -1187,7 +1163,7 @@ void MainWindow::createNewProject()
     // Check Project Model
     if (!mProjectModel) {
         // Create Project Model
-        mProjectModel = new ProjectModel(mPropertiesController);
+        mProjectModel = new ProjectModel(NULL);
         // Connect Signal
         connect(mProjectModel, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)), this, SIGNAL(baseComponentsModelChanged(BaseComponentsModel*)));
         connect(mProjectModel, SIGNAL(componentsModelChanged(ComponentsModel*)), this, SIGNAL(componentsModelChanged(ComponentsModel*)));
@@ -1256,10 +1232,10 @@ void MainWindow::createNewProject()
             mOpenFiles->setProjectModel(mProjectModel);
         }
 
-        // Check Animation Components Model
-        if (mAnimationComponents) {
+        // Check Properties Controller
+        if (mPropertiesController) {
             // Set Current Project
-            mAnimationComponents->setCurrentProject(mProjectModel);
+            mPropertiesController->setCurrentProject(mProjectModel);
         }
 
         // Emit Current Project chnged Signal
@@ -1480,12 +1456,6 @@ void MainWindow::closeProject()
     if (mOpenFiles) {
         // Close Current Project
         mOpenFiles->closeProject();
-    }
-
-    // Check Animation Components Model
-    if (mAnimationComponents) {
-        // Set Current Project
-        mAnimationComponents->setCurrentProject(NULL);
     }
 
     // Check Live Window
@@ -2400,11 +2370,6 @@ MainWindow::~MainWindow()
     if (mCategories) {
         delete mCategories;
         mCategories = NULL;
-    }
-
-    if (mAnimationComponents) {
-        delete mAnimationComponents;
-        mAnimationComponents = NULL;
     }
 
     // ...

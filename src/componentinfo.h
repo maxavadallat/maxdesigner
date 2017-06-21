@@ -26,6 +26,7 @@ class ComponentSlotsModel;
 class ComponentStatesModel;
 class ComponentTransitionsModel;
 class ComponentFunctionsModel;
+class ComponentTransition;
 
 //==============================================================================
 // Component Info Class
@@ -413,6 +414,8 @@ public:
     Q_INVOKABLE int takeAnimation(ComponentInfo* aChildInfo);
     // Remove Child
     Q_INVOKABLE void removeChild(ComponentInfo* aChild, const bool& aDelete = true);
+    // Remove Animation By Index
+    Q_INVOKABLE void removeAnimation(const int& aIndex);
     // Move Child
     Q_INVOKABLE void moveChild(const int& aIndex, const int& aTargetIndex);
     // Move Child
@@ -445,6 +448,8 @@ public:
 
     // Get Layout Base
     Q_INVOKABLE QString layoutBase();
+    // Get Animation Base
+    Q_INVOKABLE QString animBase();
 
     // Get Global Child Index Map
     Q_INVOKABLE QString getGlobalChildIndexMap();
@@ -949,6 +954,8 @@ protected: // Data
     ComponentInfo*          mBase;
     // Parent Component Info
     ComponentInfo*          mParent;
+    // Transition Parent
+    ComponentTransition*    mTransitionParent;
     // Prototype Component
     ComponentInfo*          mProtoType;
 

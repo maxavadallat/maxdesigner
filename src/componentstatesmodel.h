@@ -93,7 +93,7 @@ protected:
     QJsonArray toJSONArray();
 
 protected slots:
-    // Component State Dirty Changed
+    // Component State Dirty State Changed
     void componentStateDirtyChanged(const bool& aDirty);
 
 public: // from QAbstractListModel

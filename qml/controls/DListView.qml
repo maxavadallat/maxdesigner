@@ -20,6 +20,7 @@ DControl {
     property alias moveTransition: listView.move
     property alias removeTransition: listView.remove
     property alias removeDisplacedTransition: listView.removeDisplaced
+    property alias highlight: listView.highlight
 
     clip: true
 

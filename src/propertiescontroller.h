@@ -18,7 +18,7 @@ class ComponentTransitionsModel;
 class ComponentTransition;
 class ComponentTransitionNode;
 class ComponentFunctionsModel;
-
+class AnimationComponentsModel;
 
 //==============================================================================
 // Properties Controller Class
@@ -53,6 +53,7 @@ class PropertiesController : public QObject
     Q_PROPERTY(ComponentTransitionsModel* transitionsModel READ transitionsModel NOTIFY transitionsModelChanged)
     Q_PROPERTY(ComponentPropertiesModel* propertiesModel READ propertiesModel NOTIFY propertiesModelChanged)
     Q_PROPERTY(ComponentFunctionsModel* functionsModel READ functionsModel WRITE setFunctionsModel NOTIFY functionsModelChanged)
+    Q_PROPERTY(AnimationComponentsModel* animComponentsModel READ animComponentsModel NOTIFY animComponentsModelChanged)
 
     // ...
 
@@ -133,6 +134,8 @@ public:
     ComponentPropertiesModel* propertiesModel();
     // Get Functions Model
     ComponentFunctionsModel* functionsModel();
+    // Get Animation Components Model
+    AnimationComponentsModel* animComponentsModel();
 
     // Set Component Tag
     Q_INVOKABLE void setComponentTag(const QString& aTag);
@@ -164,8 +167,6 @@ public:
     // Remove Own Property
     Q_INVOKABLE void removeComponentProperty(const QString& aName);
 
-    // Anchors
-
     // ...
 
     // Add Signal
@@ -189,7 +190,6 @@ public:
     Q_INVOKABLE void removeState(const int& aIndex);
     // Add Property Change
     Q_INVOKABLE void addPropertyChange(const QString& aStateName, const QString& aTarget, const QString& aProperty, const QString& aValue);
-
 
     // Add Transition
     Q_INVOKABLE void addTransition(const QString& aFrom, const QString& aTo);
@@ -246,6 +246,8 @@ signals:
     void transitionsModelChanged(ComponentTransitionsModel* aTransitionsModel);
     // Functions Model Changed Signal
     void functionsModelChanged(ComponentFunctionsModel* aFunctionsModel);
+    // Animation Components Model Changed Signal
+    void animComponentsModelChanged(AnimationComponentsModel* aAnimComponentsModel);
 
     // Component Updated Signal
     void componentUpdated();
@@ -281,6 +283,8 @@ private:
     void setTransitionsModel(ComponentTransitionsModel* aTransitionsModel);
     // Set Functions Model
     void setFunctionsModel(ComponentFunctionsModel* aFunctionsModel);
+    // Set Animation Components Model
+    void setAnimComponentsModel(AnimationComponentsModel* aAnimComponentsModel);
 
 private slots:
     // Child About To Be Removed Slot
@@ -288,6 +292,8 @@ private slots:
 
 protected: // Data
     friend class ProjectModel;
+    friend class MainWindow;
+
     // Project Model
     ProjectModel*                   mProject;
 
@@ -319,6 +325,8 @@ protected: // Data
     ComponentStatesModel*           mComponentStates;
     // Transitions
     ComponentTransitionsModel*      mComponentTransitions;
+    // Animation Components Model
+    AnimationComponentsModel*       mAnimationComponents;
 };
 
 #endif // PROPERTIESCONTROLLER_H

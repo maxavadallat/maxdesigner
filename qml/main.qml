@@ -937,11 +937,6 @@ Item {
             childPane: transitionNodeEditor
 
             // ...
-
-            onNewTransitionNode: {
-                // Show Transition Node Editor
-                transitionNodeEditor.show();
-            }
         }
 
         // Transition Node Editor

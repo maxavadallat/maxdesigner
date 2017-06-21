@@ -50,11 +50,21 @@ DSection {
                     transitionsSectionRoot.transitionsModel.removeTransition(index);
                 }
 
+                onItemClicked: {
+                    transitionsListView.currentIndex = index;
+                }
+
                 onItemDoubleClicked: {
                     // Emit Edit Transition Launch Signal
                     propertiesPaneRoot.editTransitionLaunch(index);
                 }
             }
+
+//            highlight: Rectangle {
+//                width: transitionsListView.width
+//                height: CONSTS.defaultPaneItemHeight
+//                color: DStyle.colorSelectedHighLight
+//            }
         }
     }
 

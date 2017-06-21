@@ -607,7 +607,7 @@ Item {
 
                         // TODO: Add More Checking
 
-                        // Move Child
+                        // Move Animation
                         draggedComponentInfo.componentParent.moveAnimation(draggedComponentInfo.componentParent, nodeTree.grabbedIndex,
                                                                            nodeRoot.componentInfo, nodeRoot.componentInfo.animsCount);
 
