@@ -55,6 +55,9 @@ public:
     // Remove Transition
     Q_INVOKABLE void removeTransition(const int& aIndex);
 
+    // Update Selected Transition
+    Q_INVOKABLE void updateSelectedTransition();
+
     // Add Transition
     void addTransition(const QString& aFrom, const QString& aTo);
 
@@ -74,7 +77,7 @@ protected:
     friend class PropertiesController;
 
     // Constructor
-    explicit ComponentTransitionsModel(ComponentInfo* aComponent, AnimationComponentsModel* aAnimComponents, QObject* aParent = NULL);
+    explicit ComponentTransitionsModel(ComponentInfo* aComponent, ProjectModel* aProjectModel, AnimationComponentsModel* aAnimComponents, QObject* aParent = NULL);
 
     // Init
     void init();
@@ -127,6 +130,8 @@ protected: // Data
     ComponentTransition*            mNewTransition;
     // Current Transition
     ComponentTransition*            mCurrentTransition;
+    // Selected Transition Index
+    int                             mSelectedIndex;
     // Dirty State
     bool                            mDirty;
 };

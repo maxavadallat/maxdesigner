@@ -12,13 +12,15 @@
 //==============================================================================
 // Constructor
 //==============================================================================
-ComponentTransitionsModel::ComponentTransitionsModel(ComponentInfo* aComponent, AnimationComponentsModel* aAnimComponents, QObject* aParent)
+ComponentTransitionsModel::ComponentTransitionsModel(ComponentInfo* aComponent, ProjectModel* aProjectModel, AnimationComponentsModel* aAnimComponents, QObject* aParent)
     : QAbstractListModel(aParent)
-    , mProject(NULL)
+    , mProject(aProjectModel)
     , mAnimComponents(aAnimComponents)
     , mComponent(aComponent)
     , mNewTransition(NULL)
     , mCurrentTransition(NULL)
+    , mSelectedIndex(-1)
+    , mDirty(false)
 {
     qDebug() << "ComponentTransitionsModel created.";
 
@@ -126,6 +128,8 @@ ComponentTransition* ComponentTransitionsModel::selectTransition(const int& aInd
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
+        // Set Selected Index
+        mSelectedIndex = aIndex;
         // Get Transition
         ComponentTransition* transition = mTransitions[aIndex];
         // Set Current Transition
@@ -142,13 +146,15 @@ ComponentTransition* ComponentTransitionsModel::selectTransition(const int& aInd
 //==============================================================================
 ComponentTransition* ComponentTransitionsModel::createNewTransition()
 {
+    // Reset Selected Index
+    mSelectedIndex = -1;
+
     // Check New Transition
     if (!mNewTransition) {
         qDebug() << "ComponentTransitionsModel::createNewTransition";
 
         // Create New Transition
         mNewTransition = new ComponentTransition("", "", this);
-
         // Set Current Transition
         setCurrentTransition(mNewTransition);
 
@@ -189,9 +195,12 @@ void ComponentTransitionsModel::appendTransition(ComponentTransition* aTransitio
     if (aTransition) {
         qDebug() << "ComponentTransitionsModel::appendTransition - from: " << aTransition->fromState() << " - to: " << aTransition->toState();
 
+        // Connect Dirty Changed Signal
+        connect(aTransition, SIGNAL(dirtyChanged(bool)), this, SLOT(componentTransitionDirtyChanged(bool)));
+
         // Begin Insert Rows
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
-
+        // Append Transition
         mTransitions << aTransition;
         // End Insert Rows
         endInsertRows();
@@ -229,8 +238,12 @@ void ComponentTransitionsModel::loadComponentTransitions()
 
         // Iterate Through Transtions
         for (int i=0; i<tCount; i++) {
+            // Creste New Transition
+            ComponentTransition* newtransition = ComponentTransition::fromJSONObject(this, mComponent->mTransitions[i].toObject());
+            // Connect Dirty Changed Signal
+            connect(newtransition, SIGNAL(dirtyChanged(bool)), this, SLOT(componentTransitionDirtyChanged(bool)));
             // Append Transition
-            mTransitions << ComponentTransition::fromJSONObject(this, mComponent->mTransitions[i].toObject());
+            mTransitions << newtransition;
         }
 
         // End Reset Model
@@ -287,15 +300,7 @@ void ComponentTransitionsModel::addTransition(const QString& aFrom, const QStrin
 
     qDebug() << "ComponentTransitionsModel::addTransition - aFrom: " << aFrom << " - aTo: " << aTo;
 
-    // Begin Insert Rows
-    beginInsertRows(QModelIndex(), rowCount(), rowCount());
-    // Append Transition
-    mTransitions << newTransition;
-    // End Insert Rows
-    endInsertRows();
-
-    // Set Dirty State
-    setDirty(true);
+    appendTransition(newTransition);
 }
 
 //==============================================================================
@@ -309,10 +314,39 @@ void ComponentTransitionsModel::removeTransition(const int& aIndex)
 
         // Begin Remove Rows
         beginRemoveRows(QModelIndex(), aIndex, aIndex);
+        // Take Transition
+        ComponentTransition* takenTransition = mTransitions.takeAt(aIndex);
         // Delete Transition
-        delete mTransitions.takeAt(aIndex);
+        delete takenTransition;
         // End Remove Rows
         endRemoveRows();
+    }
+}
+
+//==============================================================================
+// Update Selected Transition
+//==============================================================================
+void ComponentTransitionsModel::updateSelectedTransition()
+{
+    // Check Selected Index
+    if (mSelectedIndex >= 0 && mSelectedIndex < rowCount()) {
+
+        // Get Selected State
+        ComponentTransition* componentTransition = mTransitions[mSelectedIndex];
+
+        // Check Selected State
+        if (componentTransition && componentTransition->mDirty) {
+            // Emit Data Changed Signal
+            emit dataChanged(index(mSelectedIndex), index(mSelectedIndex));
+
+            // Reset Dirty State
+            componentTransition->setDirty(false);
+
+            // Set Dirty State -> Save Component States
+            setDirty(true);
+
+            // ...
+        }
     }
 }
 
@@ -345,6 +379,9 @@ ComponentTransition* ComponentTransitionsModel::getTransition(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
+        // Set Selected Transition Index
+        mSelectedIndex = aIndex;
+
         return mTransitions[aIndex];
     }
 
@@ -378,13 +415,18 @@ void ComponentTransitionsModel::componentTransitionDirtyChanged(const bool& aDir
         ComponentTransition* componentTransition = static_cast<ComponentTransition*>(sender());
         // Check Sender
         if (componentTransition) {
+
+            // Update Selected Transition
+            updateSelectedTransition();
+
             // Set Dirty
             setDirty(true);
+
 
             // ...
 
             // Reset Dirty
-            componentTransition->setDirty(false);
+            //componentTransition->setDirty(false);
         }
     }
 }
@@ -673,14 +715,43 @@ QJsonObject ComponentTransition::toJSONObject()
 void ComponentTransition::readNodes(const QJsonArray& aNodes)
 {
     // Check Nodes Array Count
-    if (!aNodes.isEmpty()) {
+    if (!aNodes.isEmpty() && mProject) {
         // Get Nodes Count
         int nCount = aNodes.count();
 
         qDebug() << "ComponentTransition::readNodes - nCount: " << nCount;
 
-        // ...
+        // Iterate Through Nodes Array
+        for (int i=0; i<nCount; i++) {
+            // Get Node Object
+            QJsonObject nodeObject = aNodes[i].toObject();
+            // Get Node Name
+            QString nodeName = nodeObject.value(JSON_KEY_COMPONENT_NAME).toString();
+            // Get Node Type
+            QString nodeType = nodeObject.value(JSON_KEY_COMPONENT_TYPE).toString();
 
+            qDebug() << "ComponentTransition::readNodes - nodeName: " << nodeName << " - nodeType: " << nodeType;
+
+            // Find Node Component
+            ComponentInfo* newNodeInfo = mProject->getComponentByName(nodeName, nodeType);
+            // Check Node Component
+            if (newNodeInfo) {
+                // Clone Component
+                newNodeInfo = newNodeInfo->clone();
+                // Set Transition Parent
+                newNodeInfo->mTransitionParent = this;
+                // Load From JSON
+                newNodeInfo->fromJSONObject(nodeObject, true);
+            }
+
+            // Append To Nodes
+            mNodes << newNodeInfo;
+
+            // Emit Nodes Count Changed
+            emit nodeCountChanged(mNodes.count());
+
+            // ...
+        }
     }
 }
 

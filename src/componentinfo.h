@@ -367,6 +367,9 @@ public:
     // Get Property Value
     Q_INVOKABLE QVariant propertyValue(const QString& aName, const bool& aRaw = false);
 
+    // Set Property Value
+    Q_INVOKABLE void setPropertyValue(const QString& aName, const QVariant& aValue);
+
     // Get Property Is Formula or Binding for Value
     Q_INVOKABLE bool propertyIsFormula(const QString& aName);
 
@@ -852,6 +855,8 @@ protected:
     QString liveCodeFormatState(const int& aIndex, const QString& aIndent = "");
     // Format States
     QString liveCodeFormatStates(const QString& aIndent = "");
+    // Format Transition Node
+    QString liveCodeFormatTransitionNode(const QJsonObject& aTransitionNode, const QString& aIndent = "");
     // Format Transition
     QString liveCodeFormatTransition(const int& aIndex, const QString& aIndent = "");
     // Format Transitions

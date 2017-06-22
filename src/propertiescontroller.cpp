@@ -558,7 +558,7 @@ void PropertiesController::setFocusedComponent(ComponentInfo* aComponent)
             mComponentTransitions->setCurrentComponent(aComponent);
         } else {
             // Create New Component Trnsitions Model
-            ComponentTransitionsModel* newComponentTransitionsModel = new ComponentTransitionsModel(mFocusedComponent, mAnimationComponents);
+            ComponentTransitionsModel* newComponentTransitionsModel = new ComponentTransitionsModel(mFocusedComponent, mProject, mAnimationComponents);
             // Set Component Transitions Model
             setTransitionsModel(newComponentTransitionsModel);
         }

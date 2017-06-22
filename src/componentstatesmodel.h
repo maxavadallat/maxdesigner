@@ -86,6 +86,9 @@ protected:
     // Save Component States
     void saveComponentStates();
 
+    // Reset States Dirty State
+    void resetStatesDirtyState();
+
     // Set Dirty State
     void setDirty(const bool& aDirty);
 

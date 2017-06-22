@@ -59,7 +59,7 @@ DContainer {
 //        mainController.openProject("/Users/max/Dev/Temp/myproject/myproject.json");
 
 //        // Select Component
-//        var focusedComponent = propertiesController.selectComponent("TestView");
+//        var focusedComponent = propertiesController.selectComponent("PropertyAnimation");
 
 //        // Open Component
 //        mainController.openComponent(focusedComponent);
@@ -93,8 +93,32 @@ DContainer {
 //        demoRectangle.x = (demoContainerRoot.width - demoRectangle.width) / 2;
 //        demoRectangle.y = (demoContainerRoot.height - demoRectangle.height) / 2;
 
+
+//        demoNodeEditor.x = (demoContainerRoot.width - demoNodeEditor.width) / 2;
+//        demoNodeEditor.y = (demoContainerRoot.height - demoNodeEditor.height) / 2;
+
+//        demoNodeEditor.transitionNode = focusedComponent;
+//        demoNodeEditor.show();
     }
 
+//    DTransitionNodeEditor {
+//        id: demoNodeEditor
+//    }
+
+//    DButton {
+//        width: 140
+//        anchors.right: parent.right
+//        anchors.rightMargin: 32
+//        anchors.verticalCenter: parent.verticalCenter
+//        text: "Toggle"
+//        onClicked: {
+//            if (demoNodeEditor.state === "shown") {
+//                demoNodeEditor.reset(false);
+//            } else {
+//                demoNodeEditor.show();
+//            }
+//        }
+//    }
 
 //    DRectangle {
 //        id: demoRectangle

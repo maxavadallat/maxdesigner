@@ -181,6 +181,8 @@ DPaneBase {
     signal nodeReleased()
     signal removeEmptyNode()
 
+    signal nodeFocusLost()
+
     // On Completed
     Component.onCompleted: {
         // Build Anims
@@ -251,25 +253,39 @@ DPaneBase {
 
             console.log("DTransitionEditor.onNewTransitionNode - animName: " + animName);
 
-            // Clone Animation Component
-            var newTransitionNodeComponent = transitionEditorRoot.componentTransition.createNewNode(animName);
+            // Get Current Node Component Info
+            var cnComponentInfo = transitionEditorRoot.currentNode ? transitionEditorRoot.currentNode.componentInfo : null;
 
-            // Check Anim Name
-            if (animName === "SequentialAnimation" || animName === "ParallelAnimation") {
-                // Add Animation Component
-                transitionEditorRoot.componentTransition.appendNode(newTransitionNodeComponent);
-                // Enable Add Transition Option
-                addTransitionOption.enabled = true;
+            // Get Current Node Component Info Animation Base
+            var cnAnimBase = cnComponentInfo !== null ? cnComponentInfo.animBase() : "";
+
+            console.log("DTransitionEditor.onNewTransitionNode - cnAnimBase: " + cnAnimBase);
+
+            // Check Current Node Animation Base
+            if (cnAnimBase === "ParallelAnimation" || cnAnimBase === "SequentialAnimation") {
+
+                // ...
 
             } else {
-                // Set New Transition Node
-                childPane.newTransitionNode = true;
-                // Set Component Transitions
-                childPane.componentTransition = transitionEditorRoot.componentTransition;
-                // Set Transition Node
-                childPane.transitionNode = newTransitionNodeComponent;
-                // Show Transition Node Editor
-                childPane.show();
+                // Clone Animation Component
+                var newTransitionNodeComponent = transitionEditorRoot.componentTransition.createNewNode(animName);
+                // Check Anim Name
+                if (animName === "SequentialAnimation" || animName === "ParallelAnimation") {
+                    // Add Animation Component
+                    transitionEditorRoot.componentTransition.appendNode(newTransitionNodeComponent);
+                    // Enable Add Transition Option
+                    addTransitionOption.enabled = true;
+
+                } else {
+                    // Set New Transition Node
+                    childPane.newTransitionNode = true;
+                    // Set Component Transitions
+                    childPane.componentTransition = transitionEditorRoot.componentTransition;
+                    // Set Transition Node
+                    childPane.transitionNode = newTransitionNodeComponent;
+                    // Show Transition Node Editor
+                    childPane.show();
+                }
             }
         }
     }
@@ -278,18 +294,21 @@ DPaneBase {
     onEditTransitionNode: {
         // Check Component Transition
         if (transitionEditorRoot.componentTransition !== null) {
-//            // Set New Transition Node
-//            childPane.newTransitionNode = false;
-//            // Set Transition Node
-//            //childPane.transitionNode = ;
-//            // Show Transition Node Editor
-//            childPane.show();
+            // Set New Transition Node
+            childPane.newTransitionNode = false;
+            // Set Transition Node
+            childPane.transitionNode = transitionEditorRoot.currentNode.componentInfo;
+            // Show Transition Node Editor
+            childPane.show();
         }
     }
 
     // On Accepted Slot
     onAccepted: {
         //console.log("DTransitionEditor.onAccepted");
+
+        // Update Component Transition
+        updateComponentTransition();
 
         // Check If New Transition
         if (transitionEditorRoot.newTransition) {
@@ -328,6 +347,11 @@ DPaneBase {
     onRemoveEmptyNode: {
         // Remove Empty Node
         removeEmptyNodeFromNodes();
+    }
+
+    onNodeFocusLost: {
+        // Set Focus To Add Transition Option
+        addTransitionOption.setOptionFocus(true);
     }
 
     // Build From States Option List
@@ -490,6 +514,14 @@ DPaneBase {
             transitionEditorRoot.componentTransition.fromState = fromOption.getItemText(fromOption.currentIndex);
             // Set To State
             transitionEditorRoot.componentTransition.toState = toOption.getItemText(toOption.currentIndex);
+
+            // ...
+
+            // Check Transitions Model
+            if (transitionEditorRoot.transitionsModel !== null) {
+                // Update Selected State
+                transitionEditorRoot.transitionsModel.updateSelectedTransition();
+            }
 
             // ...
         }
@@ -797,12 +829,6 @@ DPaneBase {
             opacity: height > 0 ? 1.0 : 0.0
             Behavior on opacity { DFadeAnimation { } }
             visible: opacity > 0.0
-
-            Rectangle {
-                anchors.fill: parent
-                color: "transparent"
-                border.color: "lime"
-            }
 
             // Child Nodes Object Model
             ObjectModel {

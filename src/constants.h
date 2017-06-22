@@ -263,24 +263,6 @@
 
 #define JSON_KEY_COMPONENT_TRANSITION_NODES                 "componentTransitionNodes"
 
-#define JSON_KEY_COMPONENT_TRANSITION_NODE_TYPE             "componentTransitionNodeType"
-#define JSON_KEY_COMPONENT_TRANSITION_NODE_CHILDREN         "componentTransitionNodeChildren"
-
-#define JSON_KEY_COMPONENT_TRANSITION_PAUSE_DURATION        "componentTransitionPauseDuration"
-
-#define JSON_KEY_COMPONENT_TRANSITION_PACTION_TARGET        "componentTransitionPActionTarget"
-#define JSON_KEY_COMPONENT_TRANSITION_PACTION_PROPERTY      "componentTransitionPActionProperty"
-#define JSON_KEY_COMPONENT_TRANSITION_PACTION_VALUE         "componentTransitionPActionValue"
-
-#define JSON_KEY_COMPONENT_TRANSITION_SACTION_SCRIPT        "componentTransitionSActionScript"
-
-#define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_TARGET     "componentTransitionPAnimationTarget"
-#define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_PROPERTY   "componentTransitionPAnimationProperty"
-#define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_VALUEFROM  "componentTransitionPAnimationValueFrom"
-#define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_VALUETO    "componentTransitionPAnimationValueTo"
-#define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_DURATION   "componentTransitionPAnimationDuration"
-#define JSON_KEY_COMPONENT_TRANSITION_PANIMATION_ETYPE      "componentTransitionPAnimationEType"
-
 // Read Only Property Type Prefix
 #define JSON_VALUE_PROPERTY_TYPE_PREFIX_READONLY            "readonly"
 // Default Alias Property Type Prefix
@@ -329,6 +311,18 @@
 
 #define JSON_KEY_COMPONENT_PROPERTY_ANCHORS_HCENTER_OFFS    "anchors.horizontalCenterOffset"
 #define JSON_KEY_COMPONENT_PROPERTY_ANCHORS_VCENTER_OFFS    "anchors.verticalCenterOffset"
+
+#define JSON_KEY_COMPONENT_PROPERTY_TRANSITION_TARGET       "target"
+#define JSON_KEY_COMPONENT_PROPERTY_TRANSITION_PROPERTY     "property"
+#define JSON_KEY_COMPONENT_PROPERTY_TRANSITION_PROPERTIES   "properties"
+#define JSON_KEY_COMPONENT_PROPERTY_TRANSITION_FROM         "from"
+#define JSON_KEY_COMPONENT_PROPERTY_TRANSITION_TO           "to"
+#define JSON_KEY_COMPONENT_PROPERTY_TRANSITION_VALUE        "value"
+#define JSON_KEY_COMPONENT_PROPERTY_TRANSITION_DURATION     "duration"
+#define JSON_KEY_COMPONENT_PROPERTY_TRANSITION_EASING_TYPE  "easing.type"
+#define JSON_KEY_COMPONENT_PROPERTY_TRANSITION_EASING_CURVE "easing.bezierCurve"
+#define JSON_KEY_COMPONENT_PROPERTY_TRANSITION_SCRIPT       "script"
+#define JSON_KEY_COMPONENT_PROPERTY_TRANSITION_SCRIPTNAME   "scriptName"
 
 // ...
 

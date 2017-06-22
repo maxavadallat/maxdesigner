@@ -79,28 +79,30 @@ ComponentInfo* ComponentInfo::duplicate(const bool& aBefore)
     // Create Component Info
     ComponentInfo* newComponent = new ComponentInfo(mName, mType, mCategory, mProject, mBaseName, mBuiltIn, false);
 
-
     // Copy Imports
-
+    newComponent->mImports = mImports;
     // Copy Own Properties
-
+    newComponent->mOwnProperties = mOwnProperties;
     // Copy Properties
-
+    newComponent->mProperties = mProperties;
     // Copy Signals
-
+    newComponent->mSignals = mSignals;
     // Copy Slots
-
+    newComponent->mSlots = mSlots;
     // Copy Functions
+    newComponent->mFunctions = mFunctions;
 
     // Copy Behaviors
-
+    newComponent->mBehaviors = mBehaviors;
     // Copy Children
-
+    newComponent->mChildren = mChildren;
     // Copy Animations
+    newComponent->mAnimations = mAnimations;
 
     // Copy States
-
+    newComponent->mStates = mStates;
     // Copy Transitions
+    newComponent->mTransitions = mTransitions;
 
 
     // Check If Insert Before
@@ -564,7 +566,7 @@ void ComponentInfo::loadAnimations()
 //==============================================================================
 void ComponentInfo::loadBehaviors()
 {
-
+    // ...
 }
 
 //==============================================================================
@@ -3412,6 +3414,188 @@ QString ComponentInfo::liveCodeFormatStates(const QString& aIndent)
 }
 
 //==============================================================================
+// Format Transition Node
+//==============================================================================
+QString ComponentInfo::liveCodeFormatTransitionNode(const QJsonObject& aTransitionNode, const QString& aIndent)
+{
+    // Check Transition Object
+    if (aTransitionNode.isEmpty()) {
+        return "";
+    }
+
+    // Init Live Code
+    QString liveCode = "";
+
+    // Get Transition Node Name
+    QString tnName = aTransitionNode.value(JSON_KEY_COMPONENT_NAME).toString();
+
+    // Check Name
+    if (tnName.isEmpty()) {
+        return "";
+    }
+
+    // Get Transition Node Type
+    QString tnType = aTransitionNode.value(JSON_KEY_COMPONENT_TYPE).toString();
+
+    // Get Proto Type
+    ComponentInfo* tnProto = mProject->getComponentByName(tnName, tnType);
+
+    // Check Proto Type
+    if (!tnProto) {
+        return "";
+    }
+
+
+    // Add Node Name
+    liveCode += QString("%1%2%3 {\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(tnName);
+
+    // Get Node Compoennt Info Properties
+    QJsonObject tnicProperties = aTransitionNode.value(JSON_KEY_COMPONENT_PROPERTIES).toObject();
+
+    // Add Target ==============================================================
+
+    // Get Target
+    QString tnTarget = tnicProperties.value(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_TARGET).toString();
+    // Check target
+    if (!tnTarget.isEmpty()) {
+        // Add To Live Code
+        liveCode += QString("%1%2%2%3: %4\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_TARGET).arg(tnTarget);
+    }
+
+    // Add Properties ==========================================================
+
+    // Get Properties
+    QString tnProperties  = tnicProperties.value(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_PROPERTIES).toString();
+    // Check Properties
+    if (tnProperties.isEmpty()) {
+        // Get Proto Properties
+        tnProperties = tnProto->propertyValue(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_PROPERTIES).toString();
+    }
+
+    // Check Properties
+    if (!tnProperties.isEmpty()) {
+        // Add To Live Code
+        liveCode += QString("%1%2%2%3: \"%4\"\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_PROPERTIES).arg(tnProperties);
+    }
+
+    // Add Property ============================================================
+
+    // Get Property
+    QString tnProperty  = tnicProperties.value(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_PROPERTY).toString();
+
+    // Check Property
+    if (tnProperty.isEmpty()) {
+        // Get Property From Proto
+        tnProperty = tnProto->propertyValue(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_PROPERTY).toString();
+    }
+
+    // Check Property
+    if (!tnProperty.isEmpty()) {
+        // Add To Live Code
+        liveCode += QString("%1%2%2%3: \"%4\"\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_PROPERTY).arg(tnProperty);
+    }
+
+    // Add Value ===============================================================
+
+    // Get Value
+    QString tnValue  = tnicProperties.value(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_VALUE).toString();
+    // Check Value
+    if (!tnValue.isEmpty()) {
+        // Add To Live Code
+        liveCode += QString("%1%2%2%3: %4\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_VALUE).arg(tnValue);
+    }
+
+    // Add From Value ==========================================================
+
+    // Get From Value
+    QString tnFromValue  = tnicProperties.value(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_FROM).toString();
+    // Check From Value
+    if (!tnFromValue.isEmpty()) {
+        // Add To Live Code
+        liveCode += QString("%1%2%2%3: %4\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_FROM).arg(tnFromValue);
+    }
+
+    // Add To Value ============================================================
+
+    // Get To Value
+    QString tnToValue  = tnicProperties.value(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_TO).toString();
+    // Check To Value
+    if (!tnToValue.isEmpty()) {
+        // Add To Live Code
+        liveCode += QString("%1%2%2%3: %4\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_TO).arg(tnToValue);
+    }
+
+    // Add Duration ============================================================
+
+    // Get Duration
+    QString tnDuration  = tnicProperties.value(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_DURATION).toString();
+
+    // Check Duration
+    if (tnDuration.isEmpty()) {
+        // Get Duration From Proto
+        tnDuration = tnProto->propertyValue(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_DURATION).toString();
+    }
+
+    // Check Duration
+    if (!tnDuration.isEmpty()) {
+        // Add To Live Code
+        liveCode += QString("%1%2%2%3: %4\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_DURATION).arg(tnDuration);
+    }
+
+    // Add Easing Type =========================================================
+
+    // Get Easing Type
+    QString tnEasingType = tnicProperties.value(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_EASING_TYPE).toString();
+    // Check Easing Type
+    if (!tnEasingType.isEmpty()) {
+        // Add To Live Code
+        liveCode += QString("%1%2%2%3: %4\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_EASING_TYPE).arg(tnEasingType);
+    }
+
+    // Add Easing Curve ========================================================
+
+    // Get Easing Curve
+    QString tnEasingCurve = tnicProperties.value(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_EASING_CURVE).toString();
+    // Check Easing Curve
+    if (!tnEasingCurve.isEmpty()) {
+        // Add To Live Code
+        liveCode += QString("%1%2%2%3: %4\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_EASING_CURVE).arg(tnEasingCurve);
+    }
+
+    // Add Script ==============================================================
+
+    // Get Script
+    QString tnScript = tnicProperties.value(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_SCRIPT).toString();
+    // Check Script
+    if (!tnScript.isEmpty()) {
+        // Add Script To Live Code
+        liveCode += QString("%1%2%2%3: %4\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_SCRIPT).arg(tnScript);
+    }
+
+    // Get Child Nodes
+    QJsonArray transitionNodes = aTransitionNode.value(JSON_KEY_COMPONENT_TRANSITION_NODES).toArray();
+
+    // Get Nodes Count
+    int tnCount = transitionNodes.count();
+    // Iterate Through Nodes
+    for (int i=0; i<tnCount; i++) {
+        // Format Node
+        liveCode += liveCodeFormatTransitionNode(transitionNodes[i].toObject(), aIndent + DEFAULT_SOURCE_INDENT);
+        // Check Count & Index
+        if (tnCount > 1 && i < (tnCount - 1)) {
+            // Append Comma And New Line
+            liveCode += QString(",\n\n");
+        } else {
+            liveCode += QString("\n");
+        }
+    }
+
+    liveCode += QString("%1%2}").arg(aIndent).arg(DEFAULT_SOURCE_INDENT);
+
+    return liveCode;
+}
+
+//==============================================================================
 // Format Transition
 //==============================================================================
 QString ComponentInfo::liveCodeFormatTransition(const int& aIndex, const QString& aIndent)
@@ -3446,12 +3630,28 @@ QString ComponentInfo::liveCodeFormatTransition(const int& aIndex, const QString
     // Add Nodes
 
     // Get Nodes
-    //QJsonArray transitionNodes = transitionObject.value(JSON_KEY_COMPONENT_TRANSITION_NODES).toArray();
+    QJsonArray transitionNodes = transitionObject.value(JSON_KEY_COMPONENT_TRANSITION_NODES).toArray();
+
+    // Get Nodes Count
+    int tnCount = transitionNodes.count();
+
+    // Iterate Through Nodex
+    for (int i=0; i<tnCount; i++) {
+        // Generate Live Code
+        liveCode += liveCodeFormatTransitionNode(transitionNodes[i].toObject(), aIndent + DEFAULT_SOURCE_INDENT);
+        // Check Count & Index
+        if (tnCount > 1 && i < (tnCount - 1)) {
+            // Append Comma And New Line
+            liveCode += QString(",\n\n");
+        } else {
+            liveCode += QString("\n");
+        }
+    }
 
     // ...
 
     // Add Closing Bracket To Live Code
-    liveCode += QString("%1%2}\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT);
+    liveCode += QString("%1%2}").arg(aIndent).arg(DEFAULT_SOURCE_INDENT);
 
     return liveCode;
 }
@@ -4498,6 +4698,20 @@ QVariant ComponentInfo::propertyValue(const QString& aName, const bool& aRaw)
     }
 
     return QVariant();
+}
+
+//==============================================================================
+// Set Property Value
+//==============================================================================
+void ComponentInfo::setPropertyValue(const QString& aName, const QVariant& aValue)
+{
+    // Check Name
+    if (aName.isEmpty()) {
+        return;
+    }
+
+    // Set Component Property
+    setComponentProperty(aName, aValue);
 }
 
 //==============================================================================

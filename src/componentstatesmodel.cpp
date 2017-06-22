@@ -96,11 +96,25 @@ void ComponentStatesModel::saveComponentStates()
 
         // Set Component States
         mComponent->mStates = toJSONArray();
+
+        // ...
+
         // Set Dirty State
         mComponent->setDirty(true);
+    }
+}
 
-        // Reset Dirty State
-        setDirty(false);
+//==============================================================================
+// Reset States Dirty State
+//==============================================================================
+void ComponentStatesModel::resetStatesDirtyState()
+{
+    // Get Number Of States
+    int sCount = rowCount();
+    // Iterate Through States
+    for (int i=0; i<sCount; i++) {
+        // Set Dirty State
+        mStates[i]->setDirty(false);
     }
 }
 
@@ -120,6 +134,8 @@ void ComponentStatesModel::setDirty(const bool& aDirty)
 
         // Save Component States // TODO: Double Check If This is OK
         saveComponentStates();
+
+        //
     }
 }
 
@@ -140,7 +156,6 @@ void ComponentStatesModel::setCurrentComponent(ComponentInfo* aComponent)
     if (mComponent != aComponent) {
         // Save Component States
         saveComponentStates();
-
         // Clear
         clear();
 
@@ -200,10 +215,8 @@ void ComponentStatesModel::appendState(ComponentState* aState)
 
         // Begin Insert rows
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
-
         // Append To States
         mStates << aState;
-
         // End Insert Rows
         endInsertRows();
 
@@ -228,18 +241,8 @@ void ComponentStatesModel::addState(const QString& aStateName, const QString& aW
         //qDebug() << "ComponentStatesModel::addState - aStateName: " << aStateName << " - aWhen: " << aWhen;
         // Create New State
         ComponentState* newState = new ComponentState(aStateName, aWhen, this);
-        // Connect Signals
-        connect(newState, SIGNAL(dirtyStateChanged(bool)), this, SLOT(componentStateDirtyChanged(bool)));
-
-        // Begin Insert rows
-        beginInsertRows(QModelIndex(), rowCount(), rowCount());
-        // Append To States
-        mStates << newState;
-        // End Insert Rows
-        endInsertRows();
-
-        // Set Dirty State
-        setDirty(true);
+        // Append State
+        appendState(newState);
     }
 }
 

@@ -279,6 +279,13 @@ DControl {
             // Switch Key
             switch (event.key) {
                 case Qt.Key_Escape:
+                    // Check State
+                    if (optionRoot.state === stateOpen) {
+                        // Set State
+                        optionRoot.state = optionRoot.stateClosed;
+
+                        return;
+                    }
                     // Reset Focus
                     optionPopup.focus = false;
                 break;

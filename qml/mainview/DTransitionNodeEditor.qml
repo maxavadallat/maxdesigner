@@ -108,31 +108,155 @@ DPaneBase {
         }
     }
 
-    onTransitionNodeChanged: {
-        // Check Transition Node
-        if (transitionNodeEditorRoot.transitionNode !== null) {
-            console.log("#### DTransitionNodeEditor.onTransitionNodeChanged - name: " + transitionNodeEditorRoot.transitionNode.componentName);
-
-            // ...
-        }
-    }
-
     // Reset Transition Node Editor
     function resetTransitionNodeEditor() {
+        // Reset Invalid Value Of Property Editor
+        propertyEditor.invalidValue = false;
 
+        // Check Transition Node
+        if (transitionNodeEditorRoot.transitionNode !== null) {
+            // Switch Node Name
+            switch (transitionNodeEditorRoot.nodeName) {
+                case "PropertyAnimation":
+                    // Set Target Editor Text
+                    targetEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("target");
+                    // Set Property Editor Text
+                    propertyEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("properties");
+                    // Set From Value Editor Text
+                    fromValueEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("from");
+                    // Set To Value Editor Text
+                    toValueEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("to");
+                    // Set Duration EDitor Text
+                    durationValueEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("duration");
+
+                    // Get Esing Type Enums
+                    var easingTypes = transitionNodeEditorRoot.transitionNode.propertyEnums("easing.type");
+                    // Clear Easing Value Option
+                    easingValueOption.clearItemModel();
+                    // Get Easing Types Count
+                    var etCount = easingTypes.length;
+                    // Iterate Through Easing Types
+                    for (var i=0; i<etCount; i++) {
+                        // Add Easing Type Values
+                        easingValueOption.appendItem(easingTypes[i]);
+                    }
+
+                    // Set Easing Type Option
+                    easingValueOption.setValue(transitionNodeEditorRoot.transitionNode.propertyValue("easing.type"));
+                    // Set Easing Curve Editor Text
+                    curveValueEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("easing.bezierCurve");
+                break;
+
+                case "PropertyAction":
+                    // Set Target Editor Text
+                    targetEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("target");
+                    // Set Property Editor Text
+                    propertyEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("property");
+                    // Set Value Editor Text
+                    valueEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("value");
+                break;
+
+                case "PauseAnimation":
+                    // Set Duration EDitor Text
+                    durationValueEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("duration");
+                break;
+
+                case "ScriptAction":
+                    // Sety Script Editor Text
+                    scriptEditor.setText(transitionNodeEditorRoot.transitionNode.propertyValue("script"));
+                break;
+            }
+        }
     }
 
     // Update Transition Node
     function updateTransitionNode() {
+        // Check Transition Node
+        if (transitionNodeEditorRoot.transitionNode !== null) {
+            // Switch Node Name
+            switch (transitionNodeEditorRoot.nodeName) {
+                case "PropertyAnimation":
+                    // Set Target
+                    transitionNodeEditorRoot.transitionNode.setPropertyValue("target", targetEditor.editedText);
+                    // Set Properties
+                    transitionNodeEditorRoot.transitionNode.setPropertyValue("properties", propertyEditor.editedText);
+                    // Set Value From
+                    transitionNodeEditorRoot.transitionNode.setPropertyValue("from", fromValueEditor.editedText);
+                    // Set Value To
+                    transitionNodeEditorRoot.transitionNode.setPropertyValue("to", toValueEditor.editedText);
+                    // Set Duration
+                    transitionNodeEditorRoot.transitionNode.setPropertyValue("duration", durationValueEditor.editedText);
+                    // Set Easing Type
+                    transitionNodeEditorRoot.transitionNode.setPropertyValue("easing.type", easingValueOption.getItemText(easingValueOption.currentIndex));
+                    // Set Easing Curve
+                    transitionNodeEditorRoot.transitionNode.setPropertyValue("easing.bezierCurve", curveValueEditor.editedText);
+                break;
 
+                case "PropertyAction":
+                    // Set Target
+                    transitionNodeEditorRoot.transitionNode.setPropertyValue("target", targetEditor.editedText);
+                    // Set Property
+                    transitionNodeEditorRoot.transitionNode.setPropertyValue("property", propertyEditor.editedText);
+                    // Set Value
+                    transitionNodeEditorRoot.transitionNode.setPropertyValue("value", valueEditor.editedText);
+                break;
+
+                case "PauseAnimation":
+                    // Set Duration
+                    transitionNodeEditorRoot.transitionNode.setPropertyValue("duration", durationValueEditor.editedText);
+                break;
+
+                case "ScriptAction":
+                    // Set Script
+                    transitionNodeEditorRoot.transitionNode.setPropertyValue("script", scriptEditor.getText());
+                break;
+            }
+        }
     }
 
     // Validate Transition Node
     function validateTransitionNode() {
+        // Check Transition Node
+        if (transitionNodeEditorRoot.transitionNode !== null) {
+            // Switch Node Name
+            switch (transitionNodeEditorRoot.nodeName) {
+                case "PropertyAnimation":
+                    // Check Property Editor Text
+                    if (propertyEditor.editedText === "") {
+                        // Set Invalid Value
+                        propertyEditor.invalidValue = true;
+                        // Set Focus
+                        propertyEditor.setEditorFocus(true, false)
 
+                        return false;
+                    }
+                break;
 
+                case "PropertyAction":
+                    // Check Property Editor Text
+                    if (propertyEditor.editedText === "") {
+                        // Set Invalid Value
+                        propertyEditor.invalidValue = true;
+                        // Set Focus
+                        propertyEditor.setEditorFocus(true, false)
 
-        return true;
+                        return false;
+                    }
+                break;
+
+                case "PauseAnimation":
+
+                break;
+
+                case "ScriptAction":
+
+                break;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     // Accept Transition Node
@@ -212,7 +336,7 @@ DPaneBase {
             visible: transitionNodeEditorRoot.nodeName === "PropertyAction" || transitionNodeEditorRoot.nodeName === "PropertyAnimation"
         }
 
-        // Property Name Editor
+        // Property/Properties Name Editor
         DTextInput {
             id: propertyEditor
             width: fieldsFlow.width - propertyLabel.width - DStyle.defaultSpacing

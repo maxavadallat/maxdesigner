@@ -233,6 +233,20 @@ Item {
         // ...
     }
 
+    Keys.onReleased: {
+        // Switch Event Key
+        switch (event.key) {
+            case Qt.Key_Escape:
+                // Reset Focus
+                nodeRoot.focus = false;
+                // Emit Node Focus Lost
+                transitionEditorRoot.nodeFocusLost();
+                // Reset Current Node
+                transitionEditorRoot.currentNode = null;
+            break;
+        }
+    }
+
     // Expand
     function expand() {
         // Check Children
@@ -785,6 +799,8 @@ Item {
                 onClicked: {
                     // Set Current Node For Animating Height
                     transitionEditorRoot.currentNode = nodeRoot;
+                    // Set Focus
+                    nodeRoot.focus = true;
                 }
 
                 onDoubleClicked: {
