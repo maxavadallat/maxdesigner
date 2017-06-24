@@ -21,11 +21,11 @@ Item {
                 duration: transitionEditorRoot !== null && transitionEditorRoot.currentNode === nodeRoot ? DStyle.animDuration : 0
             }
 
-            ScriptAction {
-                script: {
-                    transitionEditorRoot.currentNode = null;
-                }
-            }
+//            ScriptAction {
+//                script: {
+//                    transitionEditorRoot.currentNode = null;
+//                }
+//            }
         }
     }
 
@@ -37,6 +37,8 @@ Item {
     default property alias childrenContainerAlias: childrenColumn.children
     // Node's Component Info
     property ComponentInfo componentInfo: null
+    // Node Animation Base
+    property string nodeAnimBase: componentInfo !== null ? componentInfo.animBase() : ""
     // Node is Root
     property bool isRootNode: false
     // Node Title Text
@@ -157,15 +159,16 @@ Item {
         // ...
     }
 
+    // On Component Info Changed Slot
     onComponentInfoChanged: {
-        //console.log("DTransitionTreeNode.onComponentInfoChanged - componentName: " + (nodeRoot.componentInfo !== null ? nodeRoot.componentInfo.componentName  + " - childCount: " + nodeRoot.componentInfo.childCount : "NULL"));
-
+        //console.log("DTransitionTreeNode.onComponentInfoChanged - componentName: " + (nodeRoot.componentInfo !== null ? nodeRoot.componentInfo.componentName  + " - animsCount: " + nodeRoot.componentInfo.animsCount : "NULL"));
         // Clear
-        clear();
+        nodeRoot.clear();
         // Build Node tree
-        buildNodeTree();
+        nodeRoot.buildNodeTree();
     }
 
+    // On Expanded State Changd Slot
     onExpandedChanged: {
         //console.log("DTransitionTreeNode.onExpandedChanged - expanded: " + expanded + " - childIndex: " + childIndex);
         // Check If Expanded
@@ -267,19 +270,19 @@ Item {
     // Build Node Tree
     function buildNodeTree() {
         // Check Component Info
-        if (nodeRoot.componentInfo !== null && nodeRoot.transitionEditorRoot !== null) {
+        if (nodeRoot.componentInfo !== null) {
             // Set Title
             //nodeRoot.title = nodeRoot.componentInfo.componentPath;
 
             // Get Animations Count
             var cCount = nodeRoot.componentInfo.animsCount;
 
-            //console.log("DTransitionTreeNode.buildNodeTree  - componentInfo: " + nodeRoot.componentInfo.componentName + " - cCount: " + cCount);
+            console.log("DTransitionTreeNode.buildNodeTree  - componentInfo: " + nodeRoot.componentInfo.componentName + " - cCount: " + cCount);
 
             // Iterate Through Children
             for (var i=0; i<cCount; i++) {
                 // Append Node
-                appendNode(i);
+                appendNode();
             }
 
             // Check Child  Count
@@ -291,39 +294,38 @@ Item {
 
     // Append Node
     function appendNode() {
-        //console.log("DTransitionTreeNode.appendNode");
+        // Check Transjition Editor Root
+        if (nodeRoot.transitionEditorRoot !== null && nodeRoot.componentInfo !== null) {
+            // Get New Index
+            var newIndex = animNodesModel.count;
 
-        // Get New Index
-        var newIndex = animNodesModel.count;
+            console.log("DTransitionTreeNode.appendNode - newIndex: " + newIndex);
 
-        // Create New Node
-        var newNode = nodeRoot.transitionEditorRoot.createNode(nodeRoot.componentInfo.animInfo(newIndex), nodeRoot);
+            // Create New Node
+            var newNode = nodeRoot.transitionEditorRoot.createNode(nodeRoot.componentInfo.animInfo(newIndex), nodeRoot);
 
-        // Check New Node
-        if (newNode !== null) {
-            // Append To Children Node Model
-            animNodesModel.append(newNode);
-            // Set Width
-            newNode.width = Qt.binding(function() { return nodeRoot.width * CONSTS.defaultNodeScaleRatio; });
-            // Set Anchor
-            newNode.anchors.right = childrenColumn.right;
-            // Set Parent Node
-            newNode.parentNode = nodeRoot;
-            // Set Child Index
-            newNode.childIndex = newIndex;
-
-//            // Update Child Indexes
-//            updateChildIndexes(0);
-
+            // Check New Node
+            if (newNode !== null) {
+                // Append To Children Node Model
+                animNodesModel.append(newNode);
+                // Set Width
+                newNode.width = Qt.binding(function() { return nodeRoot.width * CONSTS.defaultNodeScaleRatio; });
+                // Set Anchor
+                newNode.anchors.right = childrenColumn.right;
+                // Set Parent Node
+                newNode.parentNode = nodeRoot;
+                // Set Child Index
+                newNode.childIndex = newIndex;
+            }
         }
     }
 
     // Insert Node
     function insertNode(newNodeIndex) {
-        //console.log("DTransitionTreeNode.insertNode - newNodeIndex: " + newNodeIndex);
-
         // Remove Empty Node
         removeEmptyNode();
+
+        console.log("DTransitionTreeNode.insertNode - newNodeIndex: " + newNodeIndex);
 
         // Create New Node
         var newNode = nodeRoot.transitionEditorRoot.createNode(nodeRoot.componentInfo.animInfo(newNodeIndex), nodeRoot);
@@ -354,7 +356,7 @@ Item {
         var nodeObject = animNodesModel.get(nodeIndex);
         // Check Node Object
         if (nodeObject !== null) {
-            //console.log("DTransitionTreeNode.removeNode - nodeIndex: " + nodeIndex);
+            console.log("DTransitionTreeNode.removeNode - nodeIndex: " + nodeIndex);
 
             // Remove Node Object
             animNodesModel.remove(nodeIndex);
@@ -403,10 +405,15 @@ Item {
 
     // Clear
     function clear() {
-        // Iterate Child Nodes Model
-        while (animNodesModel.count > 0) {
-            // Remove Last Node
-            removeNode(animNodesModel.count - 1);
+        // Check Model Count
+        if (animNodesModel.count > 0) {
+            console.log("DTransitionTreeNode.clear");
+
+            // Iterate Child Nodes Model
+            while (animNodesModel.count > 0) {
+                // Remove Last Node
+                removeNode(animNodesModel.count - 1);
+            }
         }
     }
 
@@ -418,7 +425,7 @@ Item {
 
     // Insert Empty Node
     function insertEmptyNode(newNodeIndex) {
-        //console.log("DTransitionTreeNode.insertEmptyNode - newNodeIndex: " + newNodeIndex + " - grabbedChildIndex: " + nodeRoot.grabbedChildIndex);
+        console.log("DTransitionTreeNode.insertEmptyNode - newNodeIndex: " + newNodeIndex + " - grabbedChildIndex: " + nodeRoot.grabbedChildIndex);
 
         // Init Target Index
         var targetIndex = newNodeIndex;
@@ -454,9 +461,9 @@ Item {
     function removeEmptyNode() {
         // Check Empty Node Index
         if (emptyNode.childIndex >= 0) {
-            //console.log("DTransitionTreeNode.removeEmptyNode - childIndex: " + emptyNode.childIndex);
+            console.log("DTransitionTreeNode.removeEmptyNode - childIndex: " + emptyNode.childIndex);
             // Set Current Node For Animating Height
-            transitionEditorRoot.currentNode = nodeRoot;
+            nodeRoot.transitionEditorRoot.currentNode = nodeRoot;
             // Remove Empty Node
             animNodesModel.remove(emptyNode.childIndex);
             // Hide Empty Node
@@ -485,12 +492,6 @@ Item {
             node.childIndex = i;
         }
     }
-
-//    Rectangle {
-//        anchors.fill: parent
-//        color: "transparent"
-//        border.color: "purple"
-//    }
 
     // Empty Node
     DTransitionTreeEmptyNode {
@@ -545,6 +546,9 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
 
             onEntered: {
+                // Emit Remove Empty Node Signal
+                nodeRoot.transitionEditorRoot.removeEmptyNode();
+
                 // Check Enable Drop Area Visibility
                 if (nodeRoot.enableDropAreasVisibility) {
                     //console.log("DTransitionTreeNode.centerDropArea.onEntered");
@@ -559,7 +563,7 @@ Item {
                     if ((drag.keys[0] === CONSTS.newComponentDragKey || drag.keys[0] === CONSTS.childComponentDragKey) && drag.source !== null) {
 
                         // Check Source & Source Parent Component
-                        if (/*drag.source.componentParent !== nodeRoot.componentInfo &&*/ drag.source.componentCategory === "Animation") {
+                        if ((nodeRoot.nodeAnimBase === "ParallelAnimation" || nodeRoot.nodeAnimBase === "SequentialAnimation") && drag.source.componentCategory === "Animation") {
                             //console.log("DTransitionTreeNode.centerDropArea.onEntered - ACCEPT!");
 
                             // Set Drop OK
@@ -568,15 +572,11 @@ Item {
                             // Accept Drag
                             drag.accept();
                         }
-
                     }
                 }
 
                 // Set Hovering Parent Node
-                transitionEditorRoot.hoveringNodeParent = nodeRoot;
-
-                // Emit Remove Empty Node Signal
-                transitionEditorRoot.removeEmptyNode();
+                nodeRoot.transitionEditorRoot.hoveringNodeParent = nodeRoot;
             }
 
             onDropped: {
@@ -705,7 +705,7 @@ Item {
 
             onPressed: {
                 // Set Current Node For Animating Height
-                transitionEditorRoot.currentNode = nodeRoot;
+                nodeRoot.transitionEditorRoot.currentNode = nodeRoot;
             }
 
             onClicked: {
@@ -787,10 +787,10 @@ Item {
                 anchors.fill: parent
 
                 onPressed: {
-                    // Check Node Tree
-                    if (transitionEditorRoot) {
+                    // Check Transition Editor Root
+                    if (nodeRoot.transitionEditorRoot !== null) {
                         // Emit Node Pressed Signal
-                        transitionEditorRoot.nodePressed(Math.round(mouse.x), Math.round(mouse.y), nodeMouseArea);
+                        nodeRoot.transitionEditorRoot.nodePressed(Math.round(mouse.x), Math.round(mouse.y), nodeMouseArea);
                         // Set Current Node For Animating Height
                         //transitionEditorRoot.currentNode = nodeRoot;
                     }
@@ -798,19 +798,28 @@ Item {
 
                 onClicked: {
                     // Set Current Node For Animating Height
-                    transitionEditorRoot.currentNode = nodeRoot;
+                    nodeRoot.transitionEditorRoot.currentNode = nodeRoot;
                     // Set Focus
                     nodeRoot.focus = true;
                 }
 
                 onDoubleClicked: {
-                    // Check If Expanded
-                    if (!nodeRoot.expanded) {
-                        // Set Expanded
-                        nodeRoot.expand();
+                    // Check Node Anim Base
+                    if (nodeRoot.nodeAnimBase === "ParallelAnimation" || nodeRoot.nodeAnimBase === "SequentialAnimation") {
+                        // Check If Expanded
+                        if (!nodeRoot.expanded) {
+                            // Set Expanded
+                            nodeRoot.expand();
+                        } else {
+                            // Collapse
+                            nodeRoot.collapse();
+                        }
                     } else {
-                        // Collapse
-                        nodeRoot.collapse();
+                        // Check Transition Editor Root
+                        if (nodeRoot.transitionEditorRoot !== null) {
+                            // Emit Edit Transition Node
+                            nodeRoot.transitionEditorRoot.editTransitionNode(nodeRoot.childIndex);
+                        }
                     }
                 }
 
@@ -894,9 +903,9 @@ Item {
                 //console.log("DTransitionTreeNode.hoverTimer.onTriggered - childIndex: " + nodeRoot.childIndex + " - TOP");
 
                 // Check Parent Node
-                if (parentNode !== null) {
+                if (nodeRoot.parentNode !== null) {
                     // Insert Empty Node
-                    parentNode.insertEmptyNode(childIndex);
+                    nodeRoot.parentNode.insertEmptyNode(childIndex);
                 }
 
             // Check Center Drop Area
@@ -911,9 +920,9 @@ Item {
                 //console.log("DTransitionTreeNode.hoverTimer.onTriggered - childIndex: " + nodeRoot.childIndex + " - BOTTOM");
 
                 // Check Parent Node
-                if (parentNode !== null) {
+                if (nodeRoot.parentNode !== null) {
                     // Insert Empty Node
-                    parentNode.insertEmptyNode(childIndex + 1);
+                    nodeRoot.parentNode.insertEmptyNode(childIndex + 1);
                 }
             } else {
 

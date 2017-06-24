@@ -51,6 +51,16 @@ DMouseArea {
         }
     }
 
+    // Set Text
+    function setText(newText) {
+        // Reset User Input
+        textInputRoot.userInput = false;
+        // Set Text
+        textInputRoot.text = newText;
+        // Set Text Input Text
+        textInput.text = newText;
+    }
+
     // Insert Text To The Current Cursor Position
     function insertText(plainText) {
         // Insert Text
@@ -65,6 +75,7 @@ DMouseArea {
         textInput.focus = aFocus;
         //textInput.forceActiveFocus();
         if (aSelect) {
+            // Select All
             selectAll();
         }
     }

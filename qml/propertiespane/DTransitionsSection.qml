@@ -12,7 +12,18 @@ DSection {
     id: transitionsSectionRoot
     width: 300
 
+    // Transitions Model
     property ComponentTransitionsModel transitionsModel: propertiesController.transitionsModel
+
+    // Properties Controller Connections
+    property Connections propertiesControllerConnections: Connections {
+        target: propertiesController
+
+        onFocusedComponentChanged: {
+            // Reset Transitions List View Current Index
+            transitionsListView.currentIndex = -1;
+        }
+    }
 
     title: "Transitions"
     minHeight: transitionsContainer.height + addTransitionButton.height
@@ -60,11 +71,11 @@ DSection {
                 }
             }
 
-//            highlight: Rectangle {
-//                width: transitionsListView.width
-//                height: CONSTS.defaultPaneItemHeight
-//                color: DStyle.colorSelectedHighLight
-//            }
+            highlight: Rectangle {
+                width: transitionsListView.width
+                height: CONSTS.defaultPaneItemHeight
+                color: DStyle.colorSelectedHighLight
+            }
         }
     }
 

@@ -44,7 +44,7 @@ var colorViewBG1                                    = "#11FFFFFF";
 var colorViewBG2                                    = "#11FFFFFF";
 
 // Default Selection Highlight Color
-var colorSelectedHighLight                          = "#22FFFFFF";
+var colorSelectedHighLight                          = "#11FFFFFF";
 
 // Default Colors For Accept/OK
 var colorOK                                         = "#77007700";

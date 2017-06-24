@@ -740,6 +740,11 @@ protected:
     // Save Behaviors
     void saveBehaviors();
 
+    // Save Component States
+    void saveStates();
+    // Save Component Transitions
+    void saveTransitions();
+
     // Set Children Loaded
     void setChildrenLoaded(const bool& aChildrenLoaded);
     // Set Animations Loaded
@@ -894,110 +899,111 @@ protected: // Data
     friend class AnimationComponentsModel;
 
     // Project Model
-    ProjectModel*           mProject;
+    ProjectModel*               mProject;
+    // Component States Model
+    ComponentStatesModel*       mStatesModel;
+    // Transition Parent
+    ComponentTransition*        mTransitionParent;
+    // Component Transitions Model
+    ComponentTransitionsModel*  mTransitionsModel;
+    // QML Handler Object
+    QObject*                    mComponentHandler;
 
     // ProtoType
-    bool                    mIsProtoType;
+    bool                        mIsProtoType;
     // Dirty
-    bool                    mDirty;
+    bool                        mDirty;
     // Built In
-    bool                    mBuiltIn;
+    bool                        mBuiltIn;
     // Locked For Editing
-    bool                    mLocked;
+    bool                        mLocked;
 
     // Component Info File Path
-    QString                 mInfoPath;
-    // QML File Path
-    QString                 mQMLPath;
+    QString                     mInfoPath;
 
     // Name
-    QString                 mName;
+    QString                     mName;
     // Type
-    QString                 mType;
+    QString                     mType;
     // Tag
-    QString                 mTag;
+    QString                     mTag;
     // Category
-    QString                 mCategory;
+    QString                     mCategory;
     // Base Component Name
-    QString                 mBaseName;
+    QString                     mBaseName;
 
     // Use Implicit Pos X
-    bool                    mImplicitPosX;
+    bool                        mImplicitPosX;
     // Use Implicit Pos Y
-    bool                    mImplicitPosY;
+    bool                        mImplicitPosY;
     // Use Implicit Width
-    bool                    mImplicitWidth;
+    bool                        mImplicitWidth;
     // Use Implicit Height
-    bool                    mImplicitHeight;
+    bool                        mImplicitHeight;
 
     // Focused State
-    bool                    mFocused;
+    bool                        mFocused;
     // Closing State
-    bool                    mClosing;
+    bool                        mClosing;
     // Layer Visible
-    bool                    mLayerVisible;
+    bool                        mLayerVisible;
     // Is Root
-    bool                    mIsRoot;
+    bool                        mIsRoot;
 
     // Groupped
-    bool                    mGroupped;
+    bool                        mGroupped;
 
     // Children Loaded
-    bool                    mChildrenLoaded;
+    bool                        mChildrenLoaded;
     // Animations Loaded
-    bool                    mAnimationsLoaded;
+    bool                        mAnimationsLoaded;
     // Behaviors Loaded
-    bool                    mBehaviorsLoaded;
+    bool                        mBehaviorsLoaded;
 
     // Reference Count For Children
-    int                     mRefCount;
-
-    // QML Handler Object
-    QObject*                mComponentHandler;
+    int                         mRefCount;
 
     // Base Component Info
-    ComponentInfo*          mBase;
+    ComponentInfo*              mBase;
     // Parent Component Info
-    ComponentInfo*          mParent;
-    // Transition Parent
-    ComponentTransition*    mTransitionParent;
+    ComponentInfo*              mParent;
     // Prototype Component
-    ComponentInfo*          mProtoType;
+    ComponentInfo*              mProtoType;
 
     // Children
-    QList<ComponentInfo*>   mChildComponents;
+    QList<ComponentInfo*>       mChildComponents;
     // Animations
-    QList<ComponentInfo*>   mAnimationComponents;
+    QList<ComponentInfo*>       mAnimationComponents;
     // Behaviors
-    QList<ComponentInfo*>   mBehaviorComponents;
+    QList<ComponentInfo*>       mBehaviorComponents;
 
     // Component Id Map
-    QMap<QString, QObject*> mIDMap;
+    QMap<QString, QObject*>     mIDMap;
 
     // Imports
-    QJsonArray              mImports;
+    QJsonArray                  mImports;
     // Anchors
-    QJsonObject             mAnchors;
+    QJsonObject                 mAnchors;
     // Own Properties
-    QJsonObject             mOwnProperties;
+    QJsonObject                 mOwnProperties;
     // Properties
-    QJsonObject             mProperties;
+    QJsonObject                 mProperties;
     // Behaviors
-    QJsonArray              mBehaviors;
+    QJsonArray                  mBehaviors;
     // Signals
-    QJsonArray              mSignals;
+    QJsonArray                  mSignals;
     // Slots
-    QJsonArray              mSlots;
+    QJsonArray                  mSlots;
     // Functions
-    QJsonArray              mFunctions;
+    QJsonArray                  mFunctions;
     // Children
-    QJsonArray              mChildren;
+    QJsonArray                  mChildren;
     // Animations
-    QJsonArray              mAnimations;
+    QJsonArray                  mAnimations;
     // States
-    QJsonArray              mStates;
+    QJsonArray                  mStates;
     // Transitions
-    QJsonArray              mTransitions;
+    QJsonArray                  mTransitions;
 };
 
 #endif // COMPONENTINFO_H

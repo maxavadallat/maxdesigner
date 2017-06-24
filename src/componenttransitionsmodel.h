@@ -24,7 +24,6 @@ class ComponentTransitionsModel : public QAbstractListModel
 
     Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent WRITE setCurrentComponent NOTIFY currentComponentChanged)
     Q_PROPERTY(ComponentTransition* currentTransition READ currentTransition WRITE setCurrentTransition NOTIFY currentTransitionChanged)
-//    Q_PROPERTY(int transitionsCount READ transitionsCount WRITE setTransitionsCount NOTIFY transitionsCountChanged)
 
 public:
     // Get Current Component
@@ -58,6 +57,9 @@ public:
     // Update Selected Transition
     Q_INVOKABLE void updateSelectedTransition();
 
+    // Validate Transition
+    Q_INVOKABLE bool validateTransition(const QString& aFromState, const QString& aToState);
+
     // Add Transition
     void addTransition(const QString& aFrom, const QString& aTo);
 
@@ -69,8 +71,6 @@ signals:
     void currentComponentChanged(ComponentInfo* aComponent);
     // Current Transition Changed
     void currentTransitionChanged(ComponentTransition* aTransition);
-//    // Transitions Count Changed Signal
-//    void transitionsCountChanged(const int& aCount);
 
 protected:
     friend class ComponentInfo;
@@ -91,6 +91,9 @@ protected:
     void loadComponentTransitions();
     // Save Component Transitions
     void saveComponentTransitions();
+
+    // Reset Transitions Dirty State
+    void resetTransitionsDirtyState();
 
     // Set Dirty State
     void setDirty(const bool& aDirty);
@@ -176,7 +179,7 @@ public:
     Q_INVOKABLE int nodesCount();
 
     // Create New Node
-    Q_INVOKABLE ComponentInfo* createNewNode(const QString& aComponentName);
+    Q_INVOKABLE ComponentInfo* createNewNode(const QString& aComponentName, ComponentInfo* aParentNode = NULL);
     // Discard New Node
     Q_INVOKABLE void discardNewNode();
 
@@ -223,6 +226,7 @@ signals:
     void nodeRemoved(ComponentInfo* aParentNode, const int& aIndex);
 
 protected:
+    friend class ComponentInfo;
     friend class ComponentTransitionsModel;
 
     // Constructor
@@ -358,7 +362,6 @@ protected:
     // Animation Components List
     QList<ComponentInfo*>   mAnimationComponents;
 };
-
 
 
 #endif // COMPONENTTRANSITIONSMODEL_H

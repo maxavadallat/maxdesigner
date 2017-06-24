@@ -101,6 +101,9 @@ void ComponentStatesModel::saveComponentStates()
 
         // Set Dirty State
         mComponent->setDirty(true);
+
+        // Reset Dirty State
+        setDirty(false);
     }
 }
 

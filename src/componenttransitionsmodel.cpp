@@ -44,6 +44,12 @@ void ComponentTransitionsModel::init()
 //==============================================================================
 void ComponentTransitionsModel::clear()
 {
+    // Check Current Component
+    if (mComponent) {
+        // Reset Transitions Model
+        mComponent->mTransitionsModel = NULL;
+    }
+
     // Check Count
     if (rowCount() > 0) {
         qDebug() << "ComponentTransitionsModel::clear";
@@ -80,10 +86,11 @@ void ComponentTransitionsModel::setCurrentComponent(ComponentInfo* aComponent)
 {
     // Check Current Component
     if (mComponent != aComponent) {
-        //qDebug() << "ComponentTransitionsModel::setCurrentComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
+        qDebug() << "ComponentTransitionsModel::setCurrentComponent - aComponent: " << (aComponent ? aComponent->mName : "NULL");
 
         // Save Component Transtions For Previous Component
         saveComponentTransitions();
+
         // Clear
         clear();
         // Discard New Transition
@@ -114,6 +121,11 @@ void ComponentTransitionsModel::setCurrentTransition(ComponentTransition* aTrans
 {
     // Check Current Transition
     if (mCurrentTransition != aTransition) {
+        // Check Transition
+        if (aTransition) {
+            qDebug() << "ComponentTransitionsModel::setCurrentTransition - fromState: " << aTransition->mFromState << " - toState: " << aTransition->mToState;
+        }
+
         // Set Current Transition
         mCurrentTransition = aTransition;
         // Emit Current Transition Changed Signal
@@ -128,6 +140,8 @@ ComponentTransition* ComponentTransitionsModel::selectTransition(const int& aInd
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
+        qDebug() << "ComponentTransitionsModel::selectTransition - aIndex: " << aIndex;
+
         // Set Selected Index
         mSelectedIndex = aIndex;
         // Get Transition
@@ -231,7 +245,7 @@ void ComponentTransitionsModel::loadComponentTransitions()
 
     // Check Count
     if (tCount > 0) {
-        qDebug() << "ComponentTransitionsModel::loadComponentTransitions";
+        qDebug() << "ComponentTransitionsModel::loadComponentTransitions - mName: " << mComponent->mName;
 
         // Begin Reset model
         beginResetModel();
@@ -249,6 +263,9 @@ void ComponentTransitionsModel::loadComponentTransitions()
         // End Reset Model
         endResetModel();
     }
+
+    // Set Transitions Mode
+    mComponent->mTransitionsModel = this;
 }
 
 //==============================================================================
@@ -262,12 +279,29 @@ void ComponentTransitionsModel::saveComponentTransitions()
 
         // Set Transiions
         mComponent->mTransitions = toJSONArray();
+    }
 
-        // Set Component's Dirty State
-        mComponent->setDirty(true);
+    // Reset Dirty State
+    setDirty(false);
+}
 
-        // Reset Dirty State
-        setDirty(false);
+//==============================================================================
+// Reset Transitions Dirty State
+//==============================================================================
+void ComponentTransitionsModel::resetTransitionsDirtyState()
+{
+    // Get Transitions Count
+    int tCount = mTransitions.count();
+
+    // Check Transitions Count
+    if (tCount > 0) {
+        qDebug() << "ComponentTransitionsModel::resetTransitionsDirtyState - tCount: " << tCount;
+
+        // Iterate Through Transitions
+        for (int i=0; i<tCount; i++) {
+            // Reset Dirty State
+            mTransitions[i]->setDirty(false);
+        }
     }
 }
 
@@ -278,15 +312,21 @@ void ComponentTransitionsModel::setDirty(const bool& aDirty)
 {
     // Check Dirty State
     if (mDirty != aDirty) {
-        qDebug() << "ComponentTransitionsModel::setDirty - aDirty: " << aDirty;
+        qDebug() << "#### ComponentTransitionsModel::setDirty - aDirty: " << aDirty;
 
         // Set Dirty State
         mDirty = aDirty;
 
-        // ...
+        // Check Dirty State
+        if (mDirty && mComponent) {
 
-        // Save Component Transitions
-        saveComponentTransitions();
+            // Set Component's Dirty State
+            mComponent->setDirty(true);
+
+        } else {
+            // Reset Transitions Dirty State
+            resetTransitionsDirtyState();
+        }
     }
 }
 
@@ -300,6 +340,7 @@ void ComponentTransitionsModel::addTransition(const QString& aFrom, const QStrin
 
     qDebug() << "ComponentTransitionsModel::addTransition - aFrom: " << aFrom << " - aTo: " << aTo;
 
+    // Append Transition
     appendTransition(newTransition);
 }
 
@@ -320,6 +361,9 @@ void ComponentTransitionsModel::removeTransition(const int& aIndex)
         delete takenTransition;
         // End Remove Rows
         endRemoveRows();
+
+        // Set Dirty State
+        setDirty(true);
     }
 }
 
@@ -330,6 +374,8 @@ void ComponentTransitionsModel::updateSelectedTransition()
 {
     // Check Selected Index
     if (mSelectedIndex >= 0 && mSelectedIndex < rowCount()) {
+
+        qDebug() << "ComponentTransitionsModel::updateSelectedTransition - mSelectedIndex: " << mSelectedIndex;
 
         // Get Selected State
         ComponentTransition* componentTransition = mTransitions[mSelectedIndex];
@@ -348,6 +394,36 @@ void ComponentTransitionsModel::updateSelectedTransition()
             // ...
         }
     }
+}
+
+//==============================================================================
+// Validate Transition
+//==============================================================================
+bool ComponentTransitionsModel::validateTransition(const QString& aFromState, const QString& aToState)
+{
+    qDebug() << "ComponentTransitionsModel::validateTransition - aFromState: " << aFromState << " - aToState: " << aToState;
+
+    // Compare From & To States
+    if (aFromState == aToState && aFromState != "") {
+        return false;
+    }
+
+    // Get Transitions Count
+    int tCount = rowCount();
+
+    // Iterate Through Transitions
+    for (int i=0; i<tCount; i++) {
+        // Get Transition
+        ComponentTransition* transition = mTransitions[i];
+
+        // Check To State
+        if (transition->mToState == aToState) {
+            return false;
+        }
+    }
+
+
+    return true;
 }
 
 //==============================================================================
@@ -399,6 +475,9 @@ void ComponentTransitionsModel::moveTransition(const int& aIndex, const int& aTa
 
         // Move Transition
         mTransitions.move(aIndex, aTarget);
+
+        // Set Dirty State
+        setDirty(true);
     }
 }
 
@@ -409,7 +488,7 @@ void ComponentTransitionsModel::componentTransitionDirtyChanged(const bool& aDir
 {
     // Check Dirty State
     if (aDirty) {
-        qDebug() << "ComponentTransitionsModel::componentTransitionDirtyChanged";
+        qDebug() << "#### ComponentTransitionsModel::componentTransitionDirtyChanged - aDirty: " << aDirty;
 
         // Get Sender Component Transition
         ComponentTransition* componentTransition = static_cast<ComponentTransition*>(sender());
@@ -599,7 +678,7 @@ int ComponentTransition::nodesCount()
 //==============================================================================
 // Create New Node
 //==============================================================================
-ComponentInfo* ComponentTransition::createNewNode(const QString& aComponentName)
+ComponentInfo* ComponentTransition::createNewNode(const QString& aComponentName, ComponentInfo* aParentNode)
 {
     // Check Transitions Model
     if (!mModel) {
@@ -609,9 +688,11 @@ ComponentInfo* ComponentTransition::createNewNode(const QString& aComponentName)
 
     // Check New Node
     if (!mNewNode) {
-        qDebug() << "ComponentTransition::createNewNode - aComponentName: " << aComponentName;
+        qDebug() << "ComponentTransition::createNewNode - aComponentName: " << aComponentName << " - aParentNode: " << aParentNode;
         // Create New Node
         mNewNode = mModel->mAnimComponents->cloneAnimation(aComponentName);
+        // Set Parent
+        mNewNode->mParent = aParentNode;
         // Set Transition Parent
         mNewNode->mTransitionParent = this;
         // Set Current Node
@@ -646,6 +727,8 @@ ComponentInfo* ComponentTransition::selectNode(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < mNodes.count()) {
+        qDebug() << "ComponentTransition::selectNode - aIndex: " << aIndex;
+
         // Set Current Node
         mCurrentNode = mNodes[aIndex];
 
@@ -691,6 +774,8 @@ QJsonObject ComponentTransition::toJSONObject()
     // Get Nodes Count
     int nCount = mNodes.count();
 
+    qDebug() << "ComponentTransition::toJSONObject - fromState: " << mFromState << " - toState: " << mToState << " - nCount: " << nCount;
+
     // Check Nodes Count
     if (nCount > 0) {
         // Init New JSON Array
@@ -698,8 +783,12 @@ QJsonObject ComponentTransition::toJSONObject()
 
         // Iterate Through Nodes
         for (int i=0; i<nCount; i++) {
+            // Get Node Component
+            ComponentInfo* nodeInfo = mNodes[i];
+            // Save Animations
+            nodeInfo->saveAnimations();
             // Append Node
-            newNodesArray << mNodes[i]->toJSONObject();
+            newNodesArray << nodeInfo->toJSONObject();
         }
 
         // Set Nodes Array
@@ -742,6 +831,10 @@ void ComponentTransition::readNodes(const QJsonArray& aNodes)
                 newNodeInfo->mTransitionParent = this;
                 // Load From JSON
                 newNodeInfo->fromJSONObject(nodeObject, true);
+                // Reset Dirty State
+                newNodeInfo->setDirty(false);
+
+                // ...
             }
 
             // Append To Nodes
@@ -841,6 +934,11 @@ void ComponentTransition::insertNode(const int& aIndex, ComponentInfo* aNode, Co
 //==============================================================================
 void ComponentTransition::moveNode(const int& aIndex, const int& aTargetIndex)
 {
+    // Check Index
+    if (aIndex == aTargetIndex) {
+        return;
+    }
+
     qDebug() << "ComponentTransition::moveNode - aIndex: " << aIndex << " - aTargetIndex: " << aTargetIndex;
 
     // Check Index
@@ -857,6 +955,20 @@ void ComponentTransition::moveNode(const int& aIndex, const int& aTargetIndex)
 void ComponentTransition::moveNode(ComponentInfo* aParentNode, const int& aIndex, ComponentInfo* aTargetNode, const int& aTargetIndex)
 {
     qDebug() << "ComponentTransition::moveNode - aParentNode: " << aParentNode << " - aIndex: " << aIndex << " - aTargetNode: " << aTargetNode << " - aTargetIndex: " << aTargetIndex;
+
+    // Check Parent Node & Target Node - Moving Root Nodes
+    if (!aParentNode && !aTargetNode) {
+
+    // Moving From Root To Animation Node
+    } else if (!aParentNode) {
+
+    // Move To Root
+    } else if (!aTargetNode) {
+
+    // Move Between Animation Nodes
+    } else {
+
+    }
 
     // ...
 
@@ -877,6 +989,7 @@ void ComponentTransition::removeNode(ComponentInfo* aParentNode, const int& aInd
         int aCount = aParentNode->animsCount();
         // Check Index
         if (aIndex >= 0 && aIndex < aCount) {
+            qDebug() << "ComponentTransition::removeNode - aParentNode: " << aParentNode << " - aIndex: " << aIndex;
             // Remove Child
             aParentNode->removeAnimation(aIndex);
             // Set Dirty
@@ -884,7 +997,6 @@ void ComponentTransition::removeNode(ComponentInfo* aParentNode, const int& aInd
             // Emit Node Removed Signal
             emit nodeRemoved(aParentNode, aIndex);
         }
-
     } else {
         // Check Index
         if (aIndex >= 0 && aIndex < mNodes.count()) {
@@ -912,7 +1024,7 @@ void ComponentTransition::removeNode(ComponentInfo* aNode)
         int anIndex = mNodes.indexOf(aNode);
         // Check Index
         if (anIndex >= 0) {
-            qDebug() << "ComponentTransition::removeNode - anIndex: " << anIndex;
+            qDebug() << "#### ComponentTransition::removeNode - anIndex: " << anIndex;
             // Remove Node
             delete mNodes.takeAt(anIndex);
             // Emit Nodes Count Changed Signal
@@ -965,10 +1077,23 @@ void ComponentTransition::setDirty(const bool& aDirty)
 {
     // Check Dirty State
     if (mDirty != aDirty) {
+        qDebug() << "ComponentTransition::setDirty - aDirty: " << aDirty;
+
         // Set Dirty State
         mDirty = aDirty;
         // Emit Dirty State changed Signal
         emit dirtyChanged(mDirty);
+
+        // Check Dirty State
+        if (!mDirty) {
+            // Get  Nodes Count
+            int nCount = mNodes.count();
+            // Iterate Through Nodes
+            for (int i=0; i<nCount; i++) {
+                // Reset Dirty State
+                mNodes[i]->setDirty(false);
+            }
+        }
     }
 }
 
@@ -979,7 +1104,6 @@ ComponentTransition::~ComponentTransition()
 {
     // Discard New Node
     discardNewNode();
-
     // Clear
     clear();
 
@@ -1013,7 +1137,7 @@ AnimationComponentsModel::AnimationComponentsModel(ProjectModel* aProject, QObje
     , mBaseComponents(mProject ? mProject->baseComponentsModel() : NULL)
     , mComponents(mProject ? mProject->componentsModel() : NULL)
 {
-    qDebug() << "AnimationComponentsModel created.";
+    //qDebug() << "AnimationComponentsModel created.";
 
     // Init
     init();
@@ -1042,7 +1166,7 @@ void AnimationComponentsModel::clear()
 {
     // Check Count
     if (mAnimationComponents.count() > 0) {
-        qDebug() << "AnimationComponentsModel::clear";
+        //qDebug() << "AnimationComponentsModel::clear";
         // Begin Reset Model
         beginResetModel();
         // Clear Anim Components
@@ -1066,7 +1190,7 @@ void AnimationComponentsModel::connectModelSignals()
         return;
     }
 
-    qDebug() << "AnimationComponentsModel::connectModelSignals";
+    //qDebug() << "AnimationComponentsModel::connectModelSignals";
 
     // Check Base Compoennts
     if (mBaseComponents) {
@@ -1095,7 +1219,7 @@ void AnimationComponentsModel::disconnectModelSignals()
         return;
     }
 
-    qDebug() << "AnimationComponentsModel::disconnectModelSignals";
+    //qDebug() << "AnimationComponentsModel::disconnectModelSignals";
 
     // Check Base Compoennts
     if (mBaseComponents) {
@@ -1125,7 +1249,7 @@ void AnimationComponentsModel::collectAnimationComponents()
         return;
     }
 
-    qDebug() << "AnimationComponentsModel::collectAnimationComponents";
+    //qDebug() << "AnimationComponentsModel::collectAnimationComponents";
 
     // Check Base Components Model
     if (mBaseComponents) {
@@ -1217,7 +1341,7 @@ ComponentInfo* AnimationComponentsModel::cloneAnimation(const int& aIndex)
 {
     // Check Index
     if (aIndex >= 0 && aIndex < rowCount()) {
-        qDebug() << "AnimationComponentsModel::cloneAnimation - aIndex: " << aIndex;
+        //qDebug() << "AnimationComponentsModel::cloneAnimation - aIndex: " << aIndex;
         // Clone Animation
         return mAnimationComponents[aIndex]->clone();
     }
@@ -1235,7 +1359,7 @@ ComponentInfo* AnimationComponentsModel::cloneAnimation(const QString& aName)
         return NULL;
     }
 
-    qDebug() << "AnimationComponentsModel::cloneAnimation - aName: " << aName;
+    //qDebug() << "AnimationComponentsModel::cloneAnimation - aName: " << aName;
 
     // Get Animation Component Count
     int acCount = rowCount();
@@ -1259,7 +1383,7 @@ void AnimationComponentsModel::componentCreated(ComponentInfo* aComponent, const
 {
     // Check Component
     if (aComponent && aComponent->mCategory == "Animation") {
-        qDebug() << "AnimationComponentsModel::componentCreated - mName: " << aComponent->mName;
+        //qDebug() << "AnimationComponentsModel::componentCreated - mName: " << aComponent->mName;
 
         // Begin Insert Rows
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
@@ -1280,7 +1404,7 @@ void AnimationComponentsModel::componentAdded(ComponentInfo* aComponent)
 {
     // Check Component - Filter Animations
     if (aComponent && aComponent->mCategory == "Animation" && aComponent->mName != "Animation") {
-        qDebug() << "AnimationComponentsModel::componentAdded - mName: " << aComponent->mName;
+        //qDebug() << "AnimationComponentsModel::componentAdded - mName: " << aComponent->mName;
 
         // Begin Insert Rows
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
@@ -1301,7 +1425,7 @@ void AnimationComponentsModel::componentAboutToBeRemoved(ComponentInfo* aCompone
 {
     // Check Component - Filter Animations
     if (aComponent && aComponent->mCategory == "Animation") {
-        qDebug() << "AnimationComponentsModel::componentCreated - mName: " << aComponent->mName;
+        //qDebug() << "AnimationComponentsModel::componentCreated - mName: " << aComponent->mName;
 
         // Get Index
         int acIndex = mAnimationComponents.indexOf(aComponent);
@@ -1376,5 +1500,5 @@ AnimationComponentsModel::~AnimationComponentsModel()
 
     // ...
 
-    qDebug() << "AnimationComponentsModel deleted.";
+    //qDebug() << "AnimationComponentsModel deleted.";
 }

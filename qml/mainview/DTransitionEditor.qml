@@ -28,6 +28,13 @@ DPaneBase {
     // New Transition
     property bool newTransition: false
 
+    // Current Transition Node
+    property DTransitionTreeNode currentNode: null
+    // Current Transition Node Component Info
+    property ComponentInfo currentNodeInfo: currentNode !== null ? currentNode.componentInfo : null
+    // Current Transition Node Animation Base
+    property string currentNodeAnimBase: currentNodeInfo !== null ? currentNodeInfo.animBase() : ""
+
     // Child Pane Connections
     property Connections childPaneConnections: Connections {
         target: childPane
@@ -35,8 +42,16 @@ DPaneBase {
         onAccepted: {
             // Check If New Transition Node
             if (childPane.newTransitionNode) {
+                // Init Parent MNode Info
+                var pnInfo = null;
+                // Check Current Node Component Animation Base
+                if (transitionEditorRoot.currentNodeAnimBase === "ParallelAnimation" || transitionEditorRoot.currentNodeAnimBase === "SequentialAnimation") {
+                    // Set Parent Node Info
+                    pnInfo = transitionEditorRoot.currentNodeInfo;
+                }
+
                 // Append Transition Node
-                componentTransition.appendNode(childPane.transitionNode);
+                componentTransition.appendNode(childPane.transitionNode, pnInfo);
             }
 
             // ...
@@ -141,18 +156,22 @@ DPaneBase {
         }
     }
 
+    // Node Press Pos X
     property int nodePressX: 0
+    // Node Press Pos Y
     property int nodePressY: 0
 
+    // Drag Mouse Area
     property QtObject dragMouseArea: null
 
-    property DTransitionTreeNode currentNode: null
-
+    // Hovering Node Parent Node`
     property DTransitionTreeNode hoveringNodeParent: null
 
+    // Node Grabbed State
     property alias nodeGrabbedState: grabbedNode.dragActive
+    // Grabbed Node Index
     property alias grabbedIndex: grabbedNode.childIndex
-
+    // Grabbed Child Index
     property int grabbedChildIndex: -1
 
     title: "Transition Editor"
@@ -185,7 +204,7 @@ DPaneBase {
 
     // On Completed
     Component.onCompleted: {
-        // Build Anims
+        // Build Available Anims Option List
         buildAnims();
     }
 
@@ -222,6 +241,8 @@ DPaneBase {
 
     // On Component Info Changed Slot
     onComponentInfoChanged: {
+        console.log("DTransitionEditor.onComponentInfoChanged - componentName: " + (transitionEditorRoot.componentInfo !== null ? transitionEditorRoot.componentInfo.componentName : "NULL"));
+
         // Clear Transition Nodes
         clearTransitionNodes();
         // Clear From States Option List
@@ -244,6 +265,21 @@ DPaneBase {
         // ...
     }
 
+    // On Current Node Changed Slot
+    onCurrentNodeChanged: {
+        // Check Current Node
+        if (transitionEditorRoot.currentNode !== null) {
+            console.log("DTransitionEditor.onCurrentNodeChanged - currentNode: " + (transitionEditorRoot.currentNode.componentInfo !== null ? transitionEditorRoot.currentNode.componentInfo.componentName : "NULL" ));
+
+            // ...
+
+        } else {
+            console.log("DTransitionEditor.onCurrentNodeChanged - NULL");
+        }
+    }
+
+
+
     // On New Transition Node Slot
     onNewTransitionNode: {
         // Check Anims Model
@@ -253,39 +289,34 @@ DPaneBase {
 
             console.log("DTransitionEditor.onNewTransitionNode - animName: " + animName);
 
-            // Get Current Node Component Info
-            var cnComponentInfo = transitionEditorRoot.currentNode ? transitionEditorRoot.currentNode.componentInfo : null;
+//            // Get Current Node Component Info
+//            var cnComponentInfo = transitionEditorRoot.currentNode ? transitionEditorRoot.currentNode.componentInfo : null;
 
             // Get Current Node Component Info Animation Base
-            var cnAnimBase = cnComponentInfo !== null ? cnComponentInfo.animBase() : "";
+            var cnAnimBase = transitionEditorRoot.currentNodeInfo !== null ? transitionEditorRoot.currentNodeInfo.animBase() : "";
 
             console.log("DTransitionEditor.onNewTransitionNode - cnAnimBase: " + cnAnimBase);
 
-            // Check Current Node Animation Base
-            if (cnAnimBase === "ParallelAnimation" || cnAnimBase === "SequentialAnimation") {
+            // Init Transition Node Component
+            var newTransitionNodeComponent = transitionEditorRoot.componentTransition.createNewNode(animName, transitionEditorRoot.currentNodeInfo);
 
-                // ...
-
+            // Check Anim Name
+            if (animName === "SequentialAnimation" || animName === "ParallelAnimation") {
+                // Add Animation Component
+                transitionEditorRoot.componentTransition.appendNode(newTransitionNodeComponent, transitionEditorRoot.currentNodeInfo);
+                // Enable Add Transition Option
+                addTransitionOption.enabled = true;
+                // Reset Current Index
+                addTransitionOption.currentIndex = 0;
             } else {
-                // Clone Animation Component
-                var newTransitionNodeComponent = transitionEditorRoot.componentTransition.createNewNode(animName);
-                // Check Anim Name
-                if (animName === "SequentialAnimation" || animName === "ParallelAnimation") {
-                    // Add Animation Component
-                    transitionEditorRoot.componentTransition.appendNode(newTransitionNodeComponent);
-                    // Enable Add Transition Option
-                    addTransitionOption.enabled = true;
-
-                } else {
-                    // Set New Transition Node
-                    childPane.newTransitionNode = true;
-                    // Set Component Transitions
-                    childPane.componentTransition = transitionEditorRoot.componentTransition;
-                    // Set Transition Node
-                    childPane.transitionNode = newTransitionNodeComponent;
-                    // Show Transition Node Editor
-                    childPane.show();
-                }
+                // Set New Transition Node
+                childPane.newTransitionNode = true;
+                // Set Component Transitions
+                childPane.componentTransition = transitionEditorRoot.componentTransition;
+                // Set Transition Node
+                childPane.transitionNode = newTransitionNodeComponent;
+                // Show Transition Node Editor
+                childPane.show();
             }
         }
     }
@@ -294,6 +325,8 @@ DPaneBase {
     onEditTransitionNode: {
         // Check Component Transition
         if (transitionEditorRoot.componentTransition !== null) {
+            // Disablbe Add Transition Option
+            addTransitionOption.enabled = false;
             // Set New Transition Node
             childPane.newTransitionNode = false;
             // Set Transition Node
@@ -308,7 +341,7 @@ DPaneBase {
         //console.log("DTransitionEditor.onAccepted");
 
         // Update Component Transition
-        updateComponentTransition();
+        //updateComponentTransition();
 
         // Check If New Transition
         if (transitionEditorRoot.newTransition) {
@@ -349,6 +382,7 @@ DPaneBase {
         removeEmptyNodeFromNodes();
     }
 
+    // On Node Focus Lost Slot
     onNodeFocusLost: {
         // Set Focus To Add Transition Option
         addTransitionOption.setOptionFocus(true);
@@ -420,7 +454,7 @@ DPaneBase {
         // Get Anim Components Model Count
         var acCount = transitionEditorRoot.animsModel ? transitionEditorRoot.animsModel.rowCount() : 0;
 
-        //console.log("DTransitionEditor.buildAnims - acCount: " + acCount);
+        console.log("DTransitionEditor.buildAnims - acCount: " + acCount);
 
         // Iterate Through Animation COmponents
         for (var i=0; i<acCount; i++) {
@@ -433,14 +467,18 @@ DPaneBase {
     function buildTransitionNodes() {
         // Check Component Transition
         if (transitionEditorRoot.componentTransition !== null) {
-            console.log("DTransitionEditor.buildTransitionNodes");
-
             // Get Nodes Count
             var tnCount = transitionEditorRoot.componentTransition.nodesCount;
-            // Iterate Through Transition Nodes
-            for (var i=0; i<tnCount; i++) {
-                // Insert Node
-                insertNode(i);
+
+            // Check Nodes Count
+            if (tnCount > 0) {
+                console.log("DTransitionEditor.buildTransitionNodes - tnCount: " + tnCount);
+
+                // Iterate Through Transition Nodes
+                for (var i=0; i<tnCount; i++) {
+                    // Insert Node
+                    insertNode(i);
+                }
             }
         }
     }
@@ -448,7 +486,7 @@ DPaneBase {
     // Clear Transition Nodes
     function clearTransitionNodes() {
         // Check Transition
-        if (transitionEditorRoot.componentTransition !== null) {
+        if (transitionEditorRoot.componentTransition !== null && transitionNodesModel.count > 0) {
             console.log("DTransitionEditor.clearTransitionNodes");
 
             // Clear Transition Nodes Model
@@ -459,7 +497,7 @@ DPaneBase {
 
     // Reset Transition Editor
     function resetTransitionEditor() {
-        console.log("DTransitionEditor.resetTransitionEditor");
+        console.log("DTransitionEditor.resetTransitionEditor - newTransition: " + transitionEditorRoot.newTransition);
 
         // Clear Transition Nodes
         clearTransitionNodes();
@@ -529,6 +567,8 @@ DPaneBase {
 
     // Accept Transition
     function acceptTransition() {
+        console.log("DTransitionEditor.acceptTransition");
+
         // Check If Transition Valid
         if (validateTransition()) {
             // Update Component Transition
@@ -542,14 +582,16 @@ DPaneBase {
     function createNode(componentInfo, nodeParent) {
         // Check Component Info
         if (componentInfo !== null) {
+            console.log("DTransitionEditor.createNode - componentInfo: " + componentInfo.componentName + " - nodeParent: " + nodeParent);
+
             // Create New Node Object
             var newNodeObject = newTransitionNodeComponent.createObject(nodeParent);
-            // Set Component Info
-            newNodeObject.componentInfo = componentInfo;
             // Set Transition Editor Root
-            newNodeObject.transitionEditorRoot = transitionEditorRoot
+            newNodeObject.transitionEditorRoot = transitionEditorRoot;
             // Set Parent Node
             newNodeObject.parentNode = transitionEditorRoot;
+            // Set Component Info
+            newNodeObject.componentInfo = componentInfo;
 
             return newNodeObject;
         }
@@ -568,10 +610,13 @@ DPaneBase {
 
             // Get Node Component Info
             var ncInfo = transitionEditorRoot.componentTransition.getNode(newNodeIndex);
+
             // Check Node Component Info
             if (ncInfo !== null) {
+
                 // Create New Node
                 var newNode = transitionEditorRoot.createNode(ncInfo, transitionEditorRoot);
+
                 // Check New Node
                 if (newNode !== null) {
                     // Append To Children Node Model
@@ -632,6 +677,7 @@ DPaneBase {
 
         // Move Item
         transitionNodesModel.move(nodeIndex, targetIndex);
+
         // Update Child Indexes
         updateChildIndexes(0);
     }
@@ -829,6 +875,7 @@ DPaneBase {
             opacity: height > 0 ? 1.0 : 0.0
             Behavior on opacity { DFadeAnimation { } }
             visible: opacity > 0.0
+            clip: true
 
             // Child Nodes Object Model
             ObjectModel {
@@ -925,53 +972,6 @@ DPaneBase {
         enableDropAreasVisibility: false
 
         property bool dragActive: false
-//        property int centerY: y + height * 0.5
-//        property int lastY: 0
-
-//        onYChanged: {
-//            //console.log("#### y: " + y + height * 0.5);
-
-//            if (scrollTimer.scrolling) {
-//                // Check Scroll Direction
-//                if (!scrollTimer.scrollDirection && y > lastY || scrollTimer.scrollDirection && y < lastY) {
-
-//                    //Reset Scrolling
-//                    scrollTimer.scrolling = false;
-//                }
-
-//            } else  if (lastY > y && (grabbedNode.centerY) < (animTreeFlickable.height * scrollTimer.panThreshold) && !scrollTimer.scrolling) {
-
-//                //console.log("#### cY: " + animTreeFlickable.contentY);
-
-//                // Check Content Position
-//                if (animTreeFlickable.contentY > 0) {
-
-//                    // Set Scroll Direction
-//                    scrollTimer.scrollDirection = false;
-//                    // Set Scrolling
-//                    scrollTimer.scrolling = true;
-//                }
-
-//            } else if ((lastY < y) && (grabbedNode.centerY) > (animTreeFlickable.height * (1 - scrollTimer.panThreshold))  && !scrollTimer.scrolling) {
-
-//                //console.log("#### cY: " + animTreeFlickable.contentY);
-
-//                // Check Content Position
-//                if (animTreeFlickable.contentY < animTreeFlickable.contentHeight - animTreeFlickable.height) {
-//                    // Set Scroll Direction
-//                    scrollTimer.scrollDirection = true;
-//                    // Set Scrolling
-//                    scrollTimer.scrolling = true;
-//                }
-
-//            } else {
-//                //Reset Scrolling
-//                scrollTimer.scrolling = false;
-//            }
-
-//            // Set Last Y
-//            lastY = y;
-//        }
 
         onDragActiveChanged: {
             //console.log("DNodeTree.grabbedNode.onDragActiveChanged - dragActive: " + dragActive);
@@ -997,5 +997,4 @@ DPaneBase {
         Drag.source: grabbedNode.componentInfo
         Drag.keys: [ CONSTS.childComponentDragKey ]
     }
-
 }

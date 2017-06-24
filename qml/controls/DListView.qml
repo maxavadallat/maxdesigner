@@ -33,6 +33,7 @@ DControl {
     ListView {
         id: listView
         anchors.fill: parent
+
         highlightFollowsCurrentItem: true
         interactive: contentHeight > height
 

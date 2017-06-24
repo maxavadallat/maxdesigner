@@ -108,6 +108,15 @@ DPaneBase {
         }
     }
 
+    onTransitionNodeChanged: {
+        // Check Transition Node
+        if (transitionNodeEditorRoot.transitionNode !== null) {
+            console.log("#### DTransitionNodeEditor.onTransitionNodeChanged - name: " + transitionNodeEditorRoot.transitionNode.componentName);
+
+            // ...
+        }
+    }
+
     // Reset Transition Node Editor
     function resetTransitionNodeEditor() {
         // Reset Invalid Value Of Property Editor
@@ -119,15 +128,15 @@ DPaneBase {
             switch (transitionNodeEditorRoot.nodeName) {
                 case "PropertyAnimation":
                     // Set Target Editor Text
-                    targetEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("target");
+                    targetEditor.setText(transitionNodeEditorRoot.transitionNode.propertyValue("target"));
                     // Set Property Editor Text
-                    propertyEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("properties");
+                    propertyEditor.setText(transitionNodeEditorRoot.transitionNode.propertyValue("properties"));
                     // Set From Value Editor Text
-                    fromValueEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("from");
+                    fromValueEditor.setText(transitionNodeEditorRoot.transitionNode.propertyValue("from"));
                     // Set To Value Editor Text
-                    toValueEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("to");
+                    toValueEditor.setText(transitionNodeEditorRoot.transitionNode.propertyValue("to"));
                     // Set Duration EDitor Text
-                    durationValueEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("duration");
+                    durationValueEditor.setText(transitionNodeEditorRoot.transitionNode.propertyValue("duration"));
 
                     // Get Esing Type Enums
                     var easingTypes = transitionNodeEditorRoot.transitionNode.propertyEnums("easing.type");
@@ -144,21 +153,21 @@ DPaneBase {
                     // Set Easing Type Option
                     easingValueOption.setValue(transitionNodeEditorRoot.transitionNode.propertyValue("easing.type"));
                     // Set Easing Curve Editor Text
-                    curveValueEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("easing.bezierCurve");
+                    curveValueEditor.setText(transitionNodeEditorRoot.transitionNode.propertyValue("easing.bezierCurve"));
                 break;
 
                 case "PropertyAction":
                     // Set Target Editor Text
-                    targetEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("target");
+                    targetEditor.setText(transitionNodeEditorRoot.transitionNode.propertyValue("target"));
                     // Set Property Editor Text
-                    propertyEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("property");
+                    propertyEditor.setText(transitionNodeEditorRoot.transitionNode.propertyValue("property"));
                     // Set Value Editor Text
-                    valueEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("value");
+                    valueEditor.setText(transitionNodeEditorRoot.transitionNode.propertyValue("value"));
                 break;
 
                 case "PauseAnimation":
                     // Set Duration EDitor Text
-                    durationValueEditor.text = transitionNodeEditorRoot.transitionNode.propertyValue("duration");
+                    durationValueEditor.setText(transitionNodeEditorRoot.transitionNode.propertyValue("duration"));
                 break;
 
                 case "ScriptAction":
@@ -173,6 +182,8 @@ DPaneBase {
     function updateTransitionNode() {
         // Check Transition Node
         if (transitionNodeEditorRoot.transitionNode !== null) {
+            console.log("DTransitionNodeEditor.updateTransitionNode");
+
             // Switch Node Name
             switch (transitionNodeEditorRoot.nodeName) {
                 case "PropertyAnimation":
@@ -261,6 +272,8 @@ DPaneBase {
 
     // Accept Transition Node
     function acceptTransitionNode() {
+        console.log("DTransitionNodeEditor.acceptTransitionNode");
+
         // Check If TransitionNode Valid
         if (validateTransitionNode()) {
             // Update TransitionNode
@@ -324,6 +337,8 @@ DPaneBase {
                     break;
                 }
             }
+
+            onAccepted: acceptTransitionNode();
         }
 
         // Property Label
@@ -361,6 +376,8 @@ DPaneBase {
                     break;
                 }
             }
+
+            onAccepted: acceptTransitionNode();
         }
 
         // Value Label
@@ -391,6 +408,8 @@ DPaneBase {
                     break;
                 }
             }
+
+            onAccepted: acceptTransitionNode();
         }
 
         // From Label
@@ -408,6 +427,7 @@ DPaneBase {
             id: fromValueEditor
             width: (fieldsFlow.width - fromValueLabel.width - toValueLabel.width - DStyle.defaultSpacing * 3) / 2
             visible: transitionNodeEditorRoot.nodeName === "PropertyAnimation"
+
             onKeyEvent: {
                 switch (event.key) {
                     case Qt.Key_Escape:
@@ -420,6 +440,8 @@ DPaneBase {
                     break;
                 }
             }
+
+            onAccepted: acceptTransitionNode();
         }
 
         // To Value Label
@@ -450,6 +472,8 @@ DPaneBase {
                     break;
                 }
             }
+
+            onAccepted: acceptTransitionNode();
         }
 
         // Spacer
@@ -490,6 +514,8 @@ DPaneBase {
                     break;
                 }
             }
+
+            onAccepted: acceptTransitionNode();
         }
 
 //        // Spacer
@@ -560,17 +586,10 @@ DPaneBase {
                     break;
                 }
             }
+
+            onAccepted: acceptTransitionNode();
         }
     }
-
-//    // Script Label
-//    DText {
-//        id: scriptLabel
-//        height: scriptEditor.height
-//        horizontalAlignment: Text.AlignRight
-//        text: "script:"
-//        visible: transitionNodeEditorRoot.nodeName === "ScriptAction"
-//    }
 
     // Script Editor
     DSourceCodeEditor {
@@ -583,9 +602,8 @@ DPaneBase {
         anchors.top:  transitionNodeEditorRoot.titleLabel.bottom
         anchors.topMargin: DStyle.defaultMargin
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: DStyle.defaultMargin
+        anchors.bottomMargin: DStyle.defaultMargin * 1.5
 
-        //height: transitionNodeEditorRoot.height - scriptLabel.height - transitionNodeEditorRoot.titleHeight - DStyle.defaultMargin - DStyle.defaultSpacing * 2
         visible: transitionNodeEditorRoot.nodeName === "ScriptAction"
 
         onEscapeClicked: {

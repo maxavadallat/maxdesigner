@@ -1103,7 +1103,7 @@ void MainWindow::clearQMLComponentCache()
     // Check Engine
     if (engine) {
         // Clear Component Cache
-        engine->clearComponentCache();
+        //engine->clearComponentCache();
     }
 }
 

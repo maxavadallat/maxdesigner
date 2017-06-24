@@ -13,9 +13,10 @@
 #include "mainwindow.h"
 #include "componentinfo.h"
 #include "projectmodel.h"
+#include "componentstatesmodel.h"
+#include "componenttransitionsmodel.h"
 #include "constants.h"
 #include "utils.h"
-#include "componenttransitionsmodel.h"
 
 //==============================================================================
 // Create Component From Component Info File
@@ -45,7 +46,7 @@ ComponentInfo* ComponentInfo::fromInfoFile(const QString& aFilePath, ProjectMode
 //==============================================================================
 ComponentInfo* ComponentInfo::clone()
 {
-    qDebug() << "#### ComponentInfo::clone - mName: " << mName;
+    qDebug() << "ComponentInfo::clone - mName: " << mName;
     // Load Children For Proto Type
     loadChildren();
     // Load Animations
@@ -128,12 +129,15 @@ ComponentInfo::ComponentInfo(const QString& aName,
                              QObject* aParent)
     : QObject(aParent)
     , mProject(aProject)
+    , mStatesModel(NULL)
+    , mTransitionParent(NULL)
+    , mTransitionsModel(NULL)
+    , mComponentHandler(NULL)
     , mIsProtoType(aProtoType)
     , mDirty(true)
     , mBuiltIn(aBuiltIn)
     , mLocked(false)
     , mInfoPath("")
-    , mQMLPath("")
     , mName(aName)
     , mType(aType)
     , mTag("")
@@ -152,10 +156,8 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mAnimationsLoaded(false)
     , mBehaviorsLoaded(false)
     , mRefCount(0)
-    , mComponentHandler(NULL)
     , mBase(NULL)
     , mParent(NULL)
-    , mTransitionParent(NULL)
     , mProtoType(NULL)
 {
     //qDebug() << "ComponentInfo " <<  mName << " created.";
@@ -209,6 +211,12 @@ void ComponentInfo::clear()
     clearAnimations();
     // Clear Behaviors
     clearBehaviors();
+
+    // Check ProtoType
+    if (mProtoType) {
+        // Release Reference
+        mProtoType->releaseRef();
+    }
 }
 
 //==============================================================================
@@ -406,6 +414,11 @@ bool ComponentInfo::save(const QString& aFilePath)
     // Save Behaviors
     saveBehaviors();
 
+    // Save States
+    saveStates();
+    // Save Transitions
+    saveTransitions();
+
     // Check If Prototype
     if (!mIsProtoType) {
         // Saving Only Prototypes...
@@ -472,7 +485,7 @@ void ComponentInfo::loadChildren()
 
         // Check To Create Children
         if (caCount > 0) {
-            qDebug() << "#### ComponentInfo::loadChildren";
+            qDebug() << "ComponentInfo::loadChildren - caCount: " << caCount;
 
             // Iterate Through Children Array
             for (int i=0; i<caCount; i++) {
@@ -498,6 +511,8 @@ void ComponentInfo::loadChildren()
                     emit childComponent->depthChanged(childComponent->depth());
                     // Set Up/Update Child Component from JSON Object
                     childComponent->fromJSONObject(childObject, true);
+                    // Reset Dirty State
+                    childComponent->setDirty(false);
                     // Add Child
                     addChild(childComponent, true);
 
@@ -524,7 +539,7 @@ void ComponentInfo::loadAnimations()
 
         // Check To Create Animations
         if (aaCount > 0) {
-            qDebug() << "#### ComponentInfo::loadAnimations";
+            qDebug() << "ComponentInfo::loadAnimations - aaCount: " << aaCount;
 
             // Iterate Through Animations Array
             for (int i=0; i<aaCount; i++) {
@@ -550,6 +565,8 @@ void ComponentInfo::loadAnimations()
                     emit animComponent->depthChanged(animComponent->depth());
                     // Set Up/Update Anim Component from JSON Object
                     animComponent->fromJSONObject(animObject, true);
+                    // Reset Dirty State
+                    animComponent->setDirty(false);
                     // Add Anim
                     addChild(animComponent, true);
 
@@ -582,7 +599,9 @@ void ComponentInfo::saveChildren()
 
     // Check Children JSON Array Count
     if (mChildren.count() > 0 && !mChildrenLoaded && cCount > 0) {
-        qWarning() << "ComponentInfo::saveChildren - CHILD COMPONENTS WERE NOT LOADED!!!";
+        qWarning() << "###########################################################################";
+        qWarning() << "#### ComponentInfo::saveChildren - CHILD COMPONENTS WERE NOT LOADED!!! ####";
+        qWarning() << "###########################################################################";
 
         // NEVER SHOULD GET HERE!!!
 
@@ -625,7 +644,9 @@ void ComponentInfo::saveAnimations()
 
     // Check Anims JSON Array Count
     if (mAnimations.count() > 0 && !mAnimationsLoaded && cCount > 0) {
-        qWarning() << "ComponentInfo::saveAnimations - ANIMATION COMPONENTS WERE NOT LOADED!!!";
+        qWarning() << "#################################################################################";
+        qWarning() << "#### ComponentInfo::saveAnimations - ANIMATION COMPONENTS WERE NOT LOADED!!! ####";
+        qWarning() << "#################################################################################";
 
         // NEVER SHOULD GET HERE!!!
 
@@ -666,7 +687,9 @@ void ComponentInfo::saveBehaviors()
 
     // Check Behaviors JSON Array Count
     if (mBehaviors.count() > 0 && !mBehaviorsLoaded && cCount > 0) {
-        qWarning() << "ComponentInfo::saveBehaviors - BEHAVIOR COMPONENTS WERE NOT LOADED!!!";
+        qWarning() << "################################################################################";
+        qWarning() << "#### ComponentInfo::saveBehaviors - BEHAVIOR COMPONENTS WERE NOT LOADED!!! #####";
+        qWarning() << "################################################################################";
 
         // NEVER SHOULD GET HERE!!!
 
@@ -691,6 +714,41 @@ void ComponentInfo::saveBehaviors()
     // Set Children JSON Array
     mBehaviors = newBehaviorsArray;
 }
+
+//==============================================================================
+// Component States
+//==============================================================================
+void ComponentInfo::saveStates()
+{
+    // Check Component States Model
+    if (mStatesModel) {
+        qDebug() << "ComponentInfo::saveStates";
+
+        // Save Component States
+        //mStatesModel->saveComponentStates();
+
+        // ...
+
+    }
+}
+
+//==============================================================================
+// Save Component Transitions
+//==============================================================================
+void ComponentInfo::saveTransitions()
+{
+    // Check Component Transitions Model
+    if (mTransitionsModel) {
+        qDebug() << "ComponentInfo::saveTransitions";
+
+        // Save Component Transitions
+        mTransitionsModel->saveComponentTransitions();
+
+        // ...
+
+    }
+}
+
 
 //==============================================================================
 // Set Children Loaded
@@ -1074,7 +1132,8 @@ void ComponentInfo::setInfoPath(const QString& aInfoPath)
 //==============================================================================
 QString ComponentInfo::sourcePath()
 {
-    return mQMLPath;
+    return "";
+//    return mQMLPath;
 }
 
 //==============================================================================
@@ -1082,13 +1141,14 @@ QString ComponentInfo::sourcePath()
 //==============================================================================
 void ComponentInfo::setSourcePath(const QString& aPath)
 {
-    // Check QML Path
-    if (mQMLPath != aPath) {
-        // Set QML Path
-        mQMLPath = aPath;
-        // Emit Source Path Changed Signal
-        emit sourcePathChanged(mQMLPath);
-    }
+    Q_UNUSED(aPath);
+//    // Check QML Path
+//    if (mQMLPath != aPath) {
+//        // Set QML Path
+//        mQMLPath = aPath;
+//        // Emit Source Path Changed Signal
+//        emit sourcePathChanged(mQMLPath);
+//    }
 }
 
 //==============================================================================
@@ -1683,19 +1743,34 @@ void ComponentInfo::setDirty(const bool& aDirty)
         // Emit Dirty Changed Signal
         emit dirtyChanged(mDirty);
 
-        // Check Parent
-        if (mParent && mDirty) {
-            // Set Dirty
-            mParent->setDirty(true);
+        // Check If Dirty
+        if (mDirty) {
+            // Check Parent
+            if (mParent) {
+                // Set Dirty
+                mParent->setDirty(true);
+            }
 
-        } else if (!mDirty) {
+            // Check Transition Parent
+            if (mTransitionParent) {
+                // Set Dirty
+                mTransitionParent->setDirty(true);
+            }
+
+        } else {
             // Get Children Count
             int cCount = childCount();
-
             // Iterate Through Children
             for (int i=0; i<cCount; i++) {
                 // Reset Dirty State
                 childInfo(i)->setDirty(false);
+            }
+            // Get Animations Count
+            int aCount = animsCount();
+            // Iterate Through Animations
+            for (int j=0; j<aCount; j++) {
+                // Reset Dirty State
+                animInfo(j)->setDirty(false);
             }
         }
     }
@@ -3572,8 +3647,8 @@ QString ComponentInfo::liveCodeFormatTransitionNode(const QJsonObject& aTransiti
         liveCode += QString("%1%2%2%3: %4\n").arg(aIndent).arg(DEFAULT_SOURCE_INDENT).arg(JSON_KEY_COMPONENT_PROPERTY_TRANSITION_SCRIPT).arg(tnScript);
     }
 
-    // Get Child Nodes
-    QJsonArray transitionNodes = aTransitionNode.value(JSON_KEY_COMPONENT_TRANSITION_NODES).toArray();
+    // Get Child Animation Nodes
+    QJsonArray transitionNodes = aTransitionNode.value(JSON_KEY_COMPONENT_ANIMATIONS).toArray();
 
     // Get Nodes Count
     int tnCount = transitionNodes.count();
@@ -3584,7 +3659,7 @@ QString ComponentInfo::liveCodeFormatTransitionNode(const QJsonObject& aTransiti
         // Check Count & Index
         if (tnCount > 1 && i < (tnCount - 1)) {
             // Append Comma And New Line
-            liveCode += QString(",\n\n");
+            liveCode += QString("\n\n");
         } else {
             liveCode += QString("\n");
         }
@@ -3635,16 +3710,22 @@ QString ComponentInfo::liveCodeFormatTransition(const int& aIndex, const QString
     // Get Nodes Count
     int tnCount = transitionNodes.count();
 
-    // Iterate Through Nodex
-    for (int i=0; i<tnCount; i++) {
-        // Generate Live Code
-        liveCode += liveCodeFormatTransitionNode(transitionNodes[i].toObject(), aIndent + DEFAULT_SOURCE_INDENT);
-        // Check Count & Index
-        if (tnCount > 1 && i < (tnCount - 1)) {
-            // Append Comma And New Line
-            liveCode += QString(",\n\n");
-        } else {
-            liveCode += QString("\n");
+    // Check Nodes Count
+    if (tnCount > 0) {
+        // Add New Line
+        liveCode += "\n";
+
+        // Iterate Through Nodex
+        for (int i=0; i<tnCount; i++) {
+            // Generate Live Code
+            liveCode += liveCodeFormatTransitionNode(transitionNodes[i].toObject(), aIndent + DEFAULT_SOURCE_INDENT);
+            // Check Count & Index
+            if (tnCount > 1 && i < (tnCount - 1)) {
+                // Append Comma And New Line
+                liveCode += QString("\n\n");
+            } else {
+                liveCode += QString("\n");
+            }
         }
     }
 
