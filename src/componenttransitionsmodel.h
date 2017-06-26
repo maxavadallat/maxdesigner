@@ -185,9 +185,10 @@ public:
 
     // Select Transition Node
     Q_INVOKABLE ComponentInfo* selectNode(const int& aIndex);
-
     // Get Node By Index
     Q_INVOKABLE ComponentInfo* getNode(const int& aIndex);
+    // Take Node
+    Q_INVOKABLE ComponentInfo* takeNode(const int& aIndex);
 
     // Append Node
     Q_INVOKABLE void appendNode(ComponentInfo* aNode, ComponentInfo* aParentNode = NULL);

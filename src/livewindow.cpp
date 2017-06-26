@@ -110,7 +110,7 @@ void LiveWindow::restoreUI()
     //resize(screenWidth(), screenHeight() + 22);
 
     // Init Meu Bar Height
-    int menuBarHeight = 22;
+//    int menuBarHeight = 22;
 
 //    // Set Geometry
 //    setGeometry((mMainWindow->width() - screenWidth()) / 2 + mMainWindow->x(),

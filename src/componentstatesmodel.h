@@ -19,12 +19,18 @@ class ComponentStatesModel : public QAbstractListModel
     Q_OBJECT
 
     Q_PROPERTY(ComponentInfo* currentComponent READ currentComponent WRITE setCurrentComponent NOTIFY currentComponentChanged)
+    Q_PROPERTY(ComponentState* currentState READ currentState WRITE setCurrentState NOTIFY currentStateChanged)
 
 public:
     // Get Current Component
     ComponentInfo* currentComponent();
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
+
+    // Get Current State
+    ComponentState* currentState();
+    // Set Current State
+    void setCurrentState(ComponentState* aState);
 
     // Create New State
     Q_INVOKABLE ComponentState* createNewState();
@@ -68,6 +74,8 @@ public:
 signals:
     // Current Component Changed Signal
     void currentComponentChanged(ComponentInfo* aComponent);
+    // Current State Changed Signal
+    void currentStateChanged(ComponentState* aState);
 
 protected:
     friend class ComponentInfo;
@@ -124,6 +132,8 @@ protected: // Data
     ComponentState*         mNewState;
     // Dirty State
     bool                    mDirty;
+    // Current State
+    ComponentState*         mCurrentState;
     // Selected Index
     int                     mSelectedIndex;
 };
@@ -222,11 +232,11 @@ protected:
     // To JSON Object
     QJsonObject toJSONObject();
 
-    // Set Has Children
-    void setHasChildren(const bool& aHasChildren);
-
     // Set Dirty State
     void setDirty(const bool& aDirty);
+
+    // Reset Property Changes Dirty State
+    void resetPropertyChangesDirtyState();
 
 public:
     // State Model Roles

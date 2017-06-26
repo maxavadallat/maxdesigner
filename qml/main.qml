@@ -607,10 +607,8 @@ Item {
                 if (propertiesController.transitionsModel !== null && transitionEditor.state === transitionEditor.stateCreate) {
                     // Set New Transition
                     transitionEditor.newTransition = true;
-
                     // Set Component Transition
                     transitionEditor.componentTransition = propertiesController.transitionsModel.createNewTransition();
-
                     // Show Transition Editor
                     transitionEditor.show();
                 }
@@ -621,10 +619,8 @@ Item {
                 if (propertiesController.transitionsModel !== null && transitionEditor.state === transitionEditor.stateCreate) {
                     // Set New Transition
                     transitionEditor.newTransition = false;
-
                     // Set Component Transition
                     transitionEditor.componentTransition = propertiesController.transitionsModel.selectTransition(index);
-
                     // Show Transition Editor
                     transitionEditor.show();
                 }

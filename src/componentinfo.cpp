@@ -4953,6 +4953,8 @@ void ComponentInfo::addChild(ComponentInfo* aChild, const bool& aLoadChildren)
         aChild->mDirty = false;
         // Set Parent
         aChild->mParent = this;
+        // Reset Transition Parent
+        aChild->mTransitionParent = NULL;
 
         // Check Child Component Category
         if (aChild->mCategory == "Animation") {
@@ -5007,6 +5009,8 @@ void ComponentInfo::insertChild(const int& aIndex, ComponentInfo* aChild, const 
     if (aChild) {
         // Reset ProtoType Flag
         aChild->mIsProtoType = false;
+        // Reset Transition Parent
+        aChild->mTransitionParent = NULL;
         // Set Parent
         aChild->mParent = this;
         // Clear Dirty Flag

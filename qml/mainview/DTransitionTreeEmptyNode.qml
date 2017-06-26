@@ -15,6 +15,7 @@ Item {
 
     // Child Index
     property int childIndex: -1
+
     // Transition Editor Root
     property QtObject transitionEditorRoot: null
     // Parent Node
@@ -147,15 +148,29 @@ Item {
 
                     // TODO: Add More Checking
 
-                    // Check Component Parent
-                    if (draggedComponentInfo.componentParent !== null) {
-                        // Move Animation
-                        draggedComponentInfo.componentParent.moveAnimation(draggedComponentInfo.componentParent, transitionEditorRoot.grabbedIndex,
-                                                                           emptyNodeRoot.parentNode.componentInfo, emptyNodeRoot.childIndex);
+                    // Init Grabbed Transition Node Component
+                    var grabbedTransitionComponent = null;
+
+                    // Take Node
+
+                    // Check Node Parent
+                    if (emptyNodeRoot.transitionEditorRoot.grabbedNodeParent === emptyNodeRoot.transitionEditorRoot) {
+                        // Take Transition Node
+                        grabbedTransitionComponent = emptyNodeRoot.transitionEditorRoot.componentTransition.takeNode(emptyNodeRoot.transitionEditorRoot.grabbedIndex);
                     } else {
+                        // Take Transition Node
+                        grabbedTransitionComponent = emptyNodeRoot.transitionEditorRoot.grabbedNodeParent.componentInfo.takeChild(emptyNodeRoot.transitionEditorRoot.grabbedIndex, false);
+                    }
 
-                        // ...
+                    // Insert Node
 
+                    // Check Hovering Parent
+                    if (emptyNodeRoot.transitionEditorRoot.hoveringNodeParent === emptyNodeRoot.transitionEditorRoot) {
+                        // Insert Transition Node
+                        emptyNodeRoot.transitionEditorRoot.componentTransition.insertNode(emptyNodeRoot.childIndex, grabbedTransitionComponent);
+                    } else {
+                        // Insert Transition Node
+                        emptyNodeRoot.transitionEditorRoot.hoveringNodeParent.componentInfo.insertChild(emptyNodeRoot.childIndex, grabbedTransitionComponent, false);
                     }
 
                 } else {

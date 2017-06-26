@@ -113,6 +113,9 @@ DPaneBase {
             if (aParentNode === null) {
                 // Insert Node
                 insertNode(aIndex);
+            } else {
+
+                // ...
             }
 
             // ...
@@ -142,6 +145,11 @@ DPaneBase {
             if (aParentNode === null) {
                 // Remove Node
                 removeNode(aIndex);
+
+            } else {
+
+                // ...
+
             }
 
             // ...
@@ -160,19 +168,18 @@ DPaneBase {
     property int nodePressX: 0
     // Node Press Pos Y
     property int nodePressY: 0
-
     // Drag Mouse Area
     property QtObject dragMouseArea: null
-
+    // Grabbed Node Parent
+    property QtObject grabbedNodeParent: null
     // Hovering Node Parent Node`
-    property DTransitionTreeNode hoveringNodeParent: null
-
+    property QtObject hoveringNodeParent: null
+    // Grabbed Child Index
+    property int grabbedChildIndex: -1
     // Node Grabbed State
     property alias nodeGrabbedState: grabbedNode.dragActive
     // Grabbed Node Index
     property alias grabbedIndex: grabbedNode.childIndex
-    // Grabbed Child Index
-    property int grabbedChildIndex: -1
 
     title: "Transition Editor"
 
@@ -253,16 +260,12 @@ DPaneBase {
         // Update States Count
         transitionEditorRoot.statesCount = transitionEditorRoot.statesModel ? transitionEditorRoot.statesModel.rowCount() : 0
 
-        // ...
-
         // Build From States Option List
         buildFromStates();
         // Build To States Option List
         buildToStates();
         // Build Transition Nodes
         buildTransitionNodes();
-
-        // ...
     }
 
     // On Current Node Changed Slot
@@ -270,15 +273,10 @@ DPaneBase {
         // Check Current Node
         if (transitionEditorRoot.currentNode !== null) {
             console.log("DTransitionEditor.onCurrentNodeChanged - currentNode: " + (transitionEditorRoot.currentNode.componentInfo !== null ? transitionEditorRoot.currentNode.componentInfo.componentName : "NULL" ));
-
-            // ...
-
         } else {
             console.log("DTransitionEditor.onCurrentNodeChanged - NULL");
         }
     }
-
-
 
     // On New Transition Node Slot
     onNewTransitionNode: {
@@ -363,17 +361,56 @@ DPaneBase {
 
     // On Node Presed Slot
     onNodePressed: {
+        console.log("#### DTransitionEditor.onNodePressed - [" + posX + ":" + posY + "]");
 
+        // Set Node Press X
+        transitionEditorRoot.nodePressX = posX;
+        // Set Node Press Y
+        transitionEditorRoot.nodePressY = posY;
+        // Set Node Drag Mouse Area
+        transitionEditorRoot.dragMouseArea = mouseArea;
     }
 
     // On Node Grabbed Slot
     onNodeGrabbed: {
+        console.log("#### DTransitionEditor.onNodeGrabbed - grabbedIndex: " + grabbedIndex);
 
+        // Set Drag Target
+        transitionEditorRoot.dragMouseArea.drag.target = grabbedNode;
+
+        // Set Grabbed Index
+        grabbedNode.childIndex = grabbedIndex;
+        // Set Up Grabbed Node
+        grabbedNode.x = nodeX;
+        grabbedNode.y = nodeY;
+
+        //grabbedNode.lastY = nodeY;
+        // Set Grabbed Node Width
+        grabbedNode.width = nodeWidth;
+        // Set Component Info
+        grabbedNode.componentInfo = componentInfo;
+        // Set Visibility
+        grabbedNode.visible = true;
+        // Scale Up
+        grabbedNode.scale = 1.05;
+        // Set Drag Active
+        grabbedNode.dragActive = true;
     }
 
     // On Node Released Slot
     onNodeReleased: {
+        console.log("#### DTransitionEditor.onNodeReleased");
 
+        // Reset Drag Active
+        grabbedNode.dragActive = false;
+        // Reset Drag Target
+        transitionEditorRoot.dragMouseArea.drag.target = undefined;
+        // Reset Node Drag Mouse Area
+        transitionEditorRoot.dragMouseArea = null;
+        // Reset Scale
+        grabbedNode.scale = 1.0;
+        // Set Visibility
+        grabbedNode.visible = false;
     }
 
     // On Remove Empty Node Slot
@@ -632,6 +669,12 @@ DPaneBase {
 
     // Remove Transition Node
     function removeNode(nodeIndex) {
+        // Check Empty Node
+        if (emptyNode.childIndex <= nodeIndex && transitionEditorRoot.grabbedNodeParent === transitionEditorRoot) {
+            // Inc Node Index
+            nodeIndex++;
+        }
+
         // Get Node Object
         var nodeObject = transitionNodesModel.get(nodeIndex);
         // Check Node Object
@@ -745,7 +788,6 @@ DPaneBase {
             // Set Child Index
             node.childIndex = i;
         }
-
     }
 
     // Disc Button
@@ -763,23 +805,19 @@ DPaneBase {
 
         anchors.left: parent.left
         anchors.leftMargin: DStyle.defaultMargin
-        anchors.right: parent.right
-        anchors.rightMargin: DStyle.defaultMargin * 2 + discButton.width + 16
+        anchors.right: discButton.left
+        anchors.rightMargin: DStyle.defaultMargin * 3
         anchors.top: parent.top
         anchors.topMargin: titleLabel.height + DStyle.defaultMargin * 2
+
         spacing: DStyle.defaultSpacing
 
         Row {
             id: fromToRow
-            anchors.left: parent.left
-            anchors.leftMargin: DStyle.defaultMargin
             spacing: DStyle.defaultSpacing
-
-            property int optionWidth: 132
 
             DText {
                 id: fromLabel
-                //width: 48
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Text.AlignRight
                 text: "From:"
@@ -787,7 +825,7 @@ DPaneBase {
 
             DOption {
                 id: fromOption
-                width: fromToRow.optionWidth
+                width: (transitionEditorColumn.width - fromLabel.width - toLabel.width - DStyle.defaultSpacing * 3) / 2
                 anchors.verticalCenter: parent.verticalCenter
 
                 model: []
@@ -819,6 +857,7 @@ DPaneBase {
 
             DText {
                 id: toLabel
+                width: fromLabel.width
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Text.AlignRight
                 text: "To:"
@@ -826,7 +865,7 @@ DPaneBase {
 
             DOption {
                 id: toOption
-                width: fromToRow.optionWidth
+                width: (transitionEditorColumn.width - fromLabel.width - toLabel.width - DStyle.defaultSpacing * 3) / 2
                 anchors.verticalCenter: parent.verticalCenter
 
                 model: []
@@ -860,10 +899,7 @@ DPaneBase {
         // Place Holder
         Item {
             width: parent.width
-            height: 2
-            //height: transitionsList.count > 0 ? 2 : 0
-            Behavior on height { DAnimation { } }
-            visible: height > 0
+            height: 1
         }
 
         // Transitions Container
@@ -914,14 +950,12 @@ DPaneBase {
         // Place Holder
         Item {
             width: parent.width
-            height: 2
+            height: 1
         }
 
         DOption {
             id: addTransitionOption
-            width: fromToRow.width
-            anchors.left: parent.left
-            anchors.leftMargin: DStyle.defaultMargin
+            width: parent.width
 
             model: []
 
@@ -957,7 +991,8 @@ DPaneBase {
     // Empty Node
     DTransitionTreeEmptyNode {
         id: emptyNode
-        width: transitionNodesColumn.width
+        width: transitionNodesColumn.width - CONSTS.defaultNodeTreeItemHeight * 0.5
+        anchors.right: parent ? parent.right : undefined
         transitionEditorRoot: transitionEditorRoot
         parentNode: transitionEditorRoot
     }
@@ -974,7 +1009,7 @@ DPaneBase {
         property bool dragActive: false
 
         onDragActiveChanged: {
-            //console.log("DNodeTree.grabbedNode.onDragActiveChanged - dragActive: " + dragActive);
+            //console.log("DTransitionEditor.grabbedNode.onDragActiveChanged - dragActive: " + dragActive);
 
             // Cheeck Drag Active
             if (dragActive) {
@@ -991,8 +1026,8 @@ DPaneBase {
 
         Drag.active: dragActive
 
-        Drag.hotSpot.x: grabbedNode.width * 0.5 //animTreeRoot.nodePressX
-        Drag.hotSpot.y: grabbedNode.height * 0.5 //animTreeRoot.nodePressY
+        Drag.hotSpot.x: grabbedNode.width * 0.5 //transitionEditorRoot.nodePressX
+        Drag.hotSpot.y: grabbedNode.height * 0.5 //transitionEditorRoot.nodePressY
 
         Drag.source: grabbedNode.componentInfo
         Drag.keys: [ CONSTS.childComponentDragKey ]

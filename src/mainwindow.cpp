@@ -551,6 +551,8 @@ void MainWindow::openProject(const QString& aFilePath)
         ui->actionShowComponentNames->setEnabled(true);
         // Set Show Borders Enabled
         ui->actionShowBorders->setEnabled(true);
+        // Set Clip Component Root Enabled
+        ui->actionClipRootContainer->setEnabled(true);
         // Set Go Live Action Enabled
         ui->actionGoLive->setEnabled(true);
         // Set Show Asset Browser Action Enabled
@@ -1103,7 +1105,7 @@ void MainWindow::clearQMLComponentCache()
     // Check Engine
     if (engine) {
         // Clear Component Cache
-        //engine->clearComponentCache();
+        engine->clearComponentCache();
     }
 }
 
@@ -1140,6 +1142,18 @@ void MainWindow::toggleShowComponentNames()
     if (mSettings) {
         // Set Show Component Names Visible
         mSettings->setComponentNamesVisible(!mSettings->componentNamesVisible());
+    }
+}
+
+//==============================================================================
+// Toggle Clip Root Containers
+//==============================================================================
+void MainWindow::toggleClipRootContainers()
+{
+    // Check Settings
+    if (mSettings) {
+        // Set Clip Root Container
+        mSettings->setClipComponentRoot(!mSettings->clipComponentRoot());
     }
 }
 
@@ -1211,6 +1225,8 @@ void MainWindow::createNewProject()
         ui->actionShowComponentNames->setEnabled(true);
         // Set Show Borders Enabled
         ui->actionShowBorders->setEnabled(true);
+        // Set Clip Component Root Enabled
+        ui->actionClipRootContainer->setEnabled(true);
         // Set Go Live Action Enabled
         ui->actionGoLive->setEnabled(true);
         // Set Show Asset Browser Action Enabled
@@ -1519,6 +1535,7 @@ void MainWindow::closeProject()
     ui->actionCreateView->setEnabled(false);
     ui->actionShowComponentNames->setEnabled(false);
     ui->actionShowBorders->setEnabled(false);
+    ui->actionClipRootContainer->setEnabled(false);
     ui->actionSaveComponent->setEnabled(false);
     ui->actionSaveAllComponents->setEnabled(false);
     ui->actionCloseComponent->setEnabled(false);
@@ -2258,6 +2275,15 @@ void MainWindow::on_actionTogglePropertiesPane_triggered()
 }
 
 //==============================================================================
+// On Toggle Clip Root Container Action triggered Slot
+//==============================================================================
+void MainWindow::on_actionClipRootContainer_triggered()
+{
+    // Toggle Component Root Clip
+    toggleClipRootContainers();
+}
+
+//==============================================================================
 // Action Quit Triggered Slot
 //==============================================================================
 void MainWindow::on_actionQuit_triggered()
@@ -2332,7 +2358,7 @@ MainWindow::~MainWindow()
     closeProject();
 
     // Clear QML Component Cache
-    clearQMLComponentCache();
+    //clearQMLComponentCache();
 
     // Release Settings
     mSettings->release();
@@ -2438,5 +2464,4 @@ MainWindow::~MainWindow()
 
     qDebug() << "MainWindow deleted.";
 }
-
 

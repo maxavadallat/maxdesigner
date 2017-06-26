@@ -825,7 +825,7 @@ DMouseArea {
 
             case Qt.Key_A:
                 // Check Root Component Container
-                if (chRoot.rootContainer !== null && animsManagetButton.visible) {
+                if (chRoot.rootContainer !== null && animsManagerButton.visible) {
                     // Toggle Animations
                     chRoot.rootContainer.toggleAnimationsPane();
                 }
@@ -1581,7 +1581,7 @@ DMouseArea {
         visible: false
     }
 
-    // Root
+    // Root Content Container
     Item {
         id: rootContentContainer
         anchors.fill: parent
@@ -1662,7 +1662,7 @@ DMouseArea {
 
     // Animations Manager Buton
     DMouseArea {
-        id: animsManagetButton
+        id: animsManagerButton
 
         width: 64
         height: 64

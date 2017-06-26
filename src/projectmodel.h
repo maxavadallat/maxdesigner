@@ -6,6 +6,7 @@
 #include <QStringList>
 #include <QList>
 #include <QJsonObject>
+#include <QPluginLoader>
 
 class ComponentInfo;
 class BaseComponentsModel;
@@ -344,6 +345,8 @@ private: // Data
     DataSourcesModel*       mDataSources;
     // Busy State
     bool                    mBusy;
+    // Plugins
+    QList<QPluginLoader*>   mPlugins;
 };
 
 #endif // PROJECTMODEL_H

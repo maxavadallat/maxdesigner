@@ -95,7 +95,7 @@ Column {
         width: 512
         height: Math.min(contentHeight, delegateHeight * 5)
 
-        property int delegateHeight: DStyle.fontSizeL
+        property int delegateHeight: DStyle.fontSizeXL
 
         anchors.horizontalCenter: parent.horizontalCenter
         model: recentProjectsModel

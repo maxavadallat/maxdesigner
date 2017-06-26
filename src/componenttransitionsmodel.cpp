@@ -56,18 +56,13 @@ void ComponentTransitionsModel::clear()
 
         // Begin Reset model
         beginResetModel();
-
         // Iterate Through Transitions
         while (mTransitions.count() > 0) {
             // Delete Last
             delete mTransitions.takeLast();
         }
-
         // End Reset Model
         endResetModel();
-
-//        // Emit Transitions Count Changed Signal
-//        emit transitionsCountChanged(mTransitions.count());
     }
 }
 
@@ -90,7 +85,6 @@ void ComponentTransitionsModel::setCurrentComponent(ComponentInfo* aComponent)
 
         // Save Component Transtions For Previous Component
         saveComponentTransitions();
-
         // Clear
         clear();
         // Discard New Transition
@@ -312,7 +306,7 @@ void ComponentTransitionsModel::setDirty(const bool& aDirty)
 {
     // Check Dirty State
     if (mDirty != aDirty) {
-        qDebug() << "#### ComponentTransitionsModel::setDirty - aDirty: " << aDirty;
+        qDebug() << "ComponentTransitionsModel::setDirty - aDirty: " << aDirty;
 
         // Set Dirty State
         mDirty = aDirty;
@@ -488,7 +482,7 @@ void ComponentTransitionsModel::componentTransitionDirtyChanged(const bool& aDir
 {
     // Check Dirty State
     if (aDirty) {
-        qDebug() << "#### ComponentTransitionsModel::componentTransitionDirtyChanged - aDirty: " << aDirty;
+        qDebug() << "ComponentTransitionsModel::componentTransitionDirtyChanged - aDirty: " << aDirty;
 
         // Get Sender Component Transition
         ComponentTransition* componentTransition = static_cast<ComponentTransition*>(sender());
@@ -500,7 +494,6 @@ void ComponentTransitionsModel::componentTransitionDirtyChanged(const bool& aDir
 
             // Set Dirty
             setDirty(true);
-
 
             // ...
 
@@ -752,6 +745,24 @@ ComponentInfo* ComponentTransition::getNode(const int& aIndex)
 }
 
 //==============================================================================
+// Take Node
+//==============================================================================
+ComponentInfo* ComponentTransition::takeNode(const int& aIndex)
+{
+    // Check Index
+    if (aIndex >= 0 && aIndex < mNodes.count()) {
+        qDebug() << "ComponentTransition::takeNode - aIndex: " << aIndex;
+
+        // Emit Node Removed Signal
+        emit nodeRemoved(NULL, aIndex);
+
+        return mNodes.takeAt(aIndex);
+    }
+
+    return NULL;
+}
+
+//==============================================================================
 // To JSON Object
 //==============================================================================
 QJsonObject ComponentTransition::toJSONObject()
@@ -864,19 +875,20 @@ void ComponentTransition::appendNode(ComponentInfo* aNode, ComponentInfo* aParen
     if (aParentNode) {
         // Append Node
         aParentNode->addChild(aNode);
-
         // Emit Node Added Signal
         emit nodeAdded(aParentNode, aParentNode->animsCount() - 1);
 
     } else {
+        // Reset Parent
+        aNode->mParent = NULL;
+        // Set Transition Parent
+        aNode->mTransitionParent = this;
         // Append Node
         mNodes << aNode;
-
-        // Emit Nodes Count Changed Signal
-        emit nodeCountChanged(mNodes.count());
-
         // Emit Node Added Signal
         emit nodeAdded(NULL, mNodes.count() - 1);
+        // Emit Nodes Count Changed Signal
+        emit nodeCountChanged(mNodes.count());
     }
 
     // Check New Node
@@ -906,13 +918,21 @@ void ComponentTransition::insertNode(const int& aIndex, ComponentInfo* aNode, Co
         // Insert Node
         aParentNode->insertChild(aIndex, aNode, false);
     } else {
+        // Reset Parent
+        aNode->mParent = NULL;
+        // Set Transition Parent
+        aNode->mTransitionParent = this;
         // Check Index
         if (aIndex >= 0 && aIndex < mNodes.count()) {
             // Insert Node
             mNodes.insert(aIndex, aNode);
+            // Emit Node Added Signal
+            emit nodeAdded(NULL, aIndex);
         } else {
             // Append Node
             mNodes << aNode;
+            // Emit Node Added Signal
+            emit nodeAdded(NULL, mNodes.count() - 1);
         }
 
         // Emit Nodes Count Changed Signal
@@ -939,14 +959,21 @@ void ComponentTransition::moveNode(const int& aIndex, const int& aTargetIndex)
         return;
     }
 
-    qDebug() << "ComponentTransition::moveNode - aIndex: " << aIndex << " - aTargetIndex: " << aTargetIndex;
-
     // Check Index
+    if (aIndex >= 0 && aIndex < mNodes.count()) {
+        qDebug() << "ComponentTransition::moveNode - aIndex: " << aIndex << " - aTargetIndex: " << aTargetIndex;
 
-    // ...
+        // Move Nodes
+        mNodes.move(aIndex, aTargetIndex);
 
-    // Set Dirty
-    setDirty(true);
+        // Emit Node Moved Signal
+        emit nodeMoved(NULL, aIndex, NULL, aTargetIndex);
+
+        // ...
+
+        // Set Dirty
+        setDirty(true);
+    }
 }
 
 //==============================================================================
@@ -958,16 +985,29 @@ void ComponentTransition::moveNode(ComponentInfo* aParentNode, const int& aIndex
 
     // Check Parent Node & Target Node - Moving Root Nodes
     if (!aParentNode && !aTargetNode) {
-
+        // Move Node
+        moveNode(aIndex, aTargetIndex);
     // Moving From Root To Animation Node
-    } else if (!aParentNode) {
-
+    } else if (!aParentNode && aTargetNode) {
+        // Take Node
+        ComponentInfo* takenNode = takeNode(aIndex);
+        // Insert Node
+        aTargetNode->insertChild(aTargetIndex, takenNode, false);
     // Move To Root
-    } else if (!aTargetNode) {
-
+    } else if (!aTargetNode && aParentNode) {
+        // Take Node
+        ComponentInfo* takenNode = aParentNode->takeAnimation(aIndex, false);
+        // Insert Node
+        insertNode(aTargetIndex, takenNode);
     // Move Between Animation Nodes
+    } else if (aParentNode == aTargetNode) {
+        // Move Child
+        aParentNode->moveChild(aIndex, aTargetIndex);
     } else {
-
+        // Take Node
+        ComponentInfo* takenNode = aParentNode->takeAnimation(aIndex, false);
+        // Insert Child
+        aTargetNode->insertChild(aTargetIndex, takenNode, false);
     }
 
     // ...
@@ -1024,7 +1064,7 @@ void ComponentTransition::removeNode(ComponentInfo* aNode)
         int anIndex = mNodes.indexOf(aNode);
         // Check Index
         if (anIndex >= 0) {
-            qDebug() << "#### ComponentTransition::removeNode - anIndex: " << anIndex;
+            qDebug() << "ComponentTransition::removeNode - anIndex: " << anIndex;
             // Remove Node
             delete mNodes.takeAt(anIndex);
             // Emit Nodes Count Changed Signal

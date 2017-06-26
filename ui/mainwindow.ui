@@ -100,6 +100,7 @@
     <addaction name="actionShowComponentNames"/>
     <addaction name="actionShowTracers"/>
     <addaction name="actionSlowMotion"/>
+    <addaction name="actionClipRootContainer"/>
     <addaction name="separator"/>
     <addaction name="actionToggleProjectPane"/>
     <addaction name="actionTogglePropertiesPane"/>
@@ -579,6 +580,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Right</string>
+   </property>
+  </action>
+  <action name="actionClipRootContainer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Clip Root Container</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
    </property>
   </action>
  </widget>

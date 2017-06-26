@@ -720,7 +720,6 @@ DContainer {
 
         // To Hidden
         Transition {
-            //from: stateShown
             to: stateHidden
 
             SequentialAnimation {

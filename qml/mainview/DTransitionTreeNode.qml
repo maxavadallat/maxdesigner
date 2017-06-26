@@ -20,12 +20,6 @@ Item {
             DAnimation {
                 duration: transitionEditorRoot !== null && transitionEditorRoot.currentNode === nodeRoot ? DStyle.animDuration : 0
             }
-
-//            ScriptAction {
-//                script: {
-//                    transitionEditorRoot.currentNode = null;
-//                }
-//            }
         }
     }
 
@@ -41,22 +35,90 @@ Item {
     property string nodeAnimBase: componentInfo !== null ? componentInfo.animBase() : ""
     // Node is Root
     property bool isRootNode: false
-    // Node Title Text
-    property string title: {
-        // Check Component Info
-        if (componentInfo !== null) {
-            // Check Component ID
-            if (componentInfo.componentID !== "") {
-                return componentInfo.componentID + ":" + componentInfo.componentName;
-            }
+    // Node Main Title Text
+    property string mainTitle: nodeAnimBase
 
-            return componentInfo.componentName;
+    // Node Property - Target
+    property string nodeTarget: {
+        if (componentInfo === null) {
+            return "";
         }
 
-        //componentInfo !== null ? ("[" + childIndex + "]: " + componentInfo.componentPath) : "Title test"
+        // Get Property
+        var temp = componentInfo.propertyValue("target")
 
-        return "";
+        return temp !== undefined ? temp : "";
     }
+
+    // Node Property - Properties:
+    property string nodeProperties: {
+        if (componentInfo === null) {
+            return "";
+        }
+        // Check Anim Base
+        if (nodeAnimBase === "PropertyAction") {
+            // Get Property
+            var pTemp = componentInfo.propertyValue("property");
+
+            return pTemp !== undefined ? pTemp : "";
+        }
+
+        // Get Property
+        var psTemp = componentInfo.propertyValue("properties");
+
+        return psTemp !== undefined ? psTemp : "";
+    }
+
+    // Node Property - Value
+    property string nodeValue: {
+        if (componentInfo === null) {
+            return "";
+        }
+
+        // Get Property
+        var pTemp = componentInfo.propertyValue("value");
+
+        return pTemp !== undefined ? pTemp : "";
+    }
+
+    // Node Property - Value From
+    property string nodeFromValue: {
+        if (componentInfo === null) {
+            return "";
+        }
+
+        // Get Property
+        var pTemp = componentInfo.propertyValue("from");
+
+        return pTemp !== undefined ? pTemp : "";
+    }
+
+    // Node Property - Value To
+    property string nodeToValue: {
+        if (componentInfo === null) {
+            return "";
+        }
+
+        // Get Property
+        var pTemp = componentInfo.propertyValue("to");
+
+        return pTemp !== undefined ? pTemp : "";
+    }
+
+    // Node Property - Duration
+    property string nodeDuration: {
+        if (componentInfo === null) {
+            return "";
+        }
+
+        // Get Property
+        var pTemp = componentInfo.propertyValue("duration");
+
+        return pTemp !== undefined ? pTemp : "";
+    }
+
+    // ...
+
     // Node Child Index
     property int childIndex: -1
     // Node's Grabbed Child Index
@@ -120,6 +182,15 @@ Item {
                 collapse();
             }
         }
+
+        onComponentPropertyChanged: {
+            //console.log("DTransitionTreeNode.componentInfoConnections.onComponentPropertyChanged - aName: " + aName + " - aValue: " + aValue);
+
+            // ...
+
+            // Emit Component Info Changed Signal To Update Title Values - TODO: Have a better solution!
+            componentInfoChanged();
+        }
     }
     // Transition Editor Connections
     property Connections transitionEditorConnections: Connections {
@@ -141,6 +212,7 @@ Item {
 
     clip: true
 
+    // On Component Completed
     Component.onCompleted: {
         // Set Node Init
         nodeRoot.nodeInit = true;
@@ -148,11 +220,13 @@ Item {
         // ...
     }
 
+    // On Component Destruction
     Component.onDestruction: {
         // Clear
         clear();
     }
 
+    // On Child Index Changed Slot
     onChildIndexChanged: {
         //console.log("DTransitionTreeNode.onChildIndexChanged - childIndex: " + childIndex);
 
@@ -199,6 +273,9 @@ Item {
             // Collapse
             collapse();
 
+            // Set Grabbed Node Parent
+            nodeRoot.transitionEditorRoot.grabbedNodeParent = nodeRoot.parentNode;
+
             // Get Position
             var pX = mapToItem(transitionEditorRoot, 0, 0).x;
             var pY = mapToItem(transitionEditorRoot, 0, 0).y;
@@ -211,9 +288,8 @@ Item {
                 // Set Parent Node's Grabbed Child Index
                 nodeRoot.parentNode.grabbedChildIndex = nodeRoot.childIndex;
             } else {
-
-                // ...
-
+                // Set Transition Editor Root Grabbed Child Index
+                nodeRoot.transitionEditorRoot.grabbedChildIndex = nodeRoot.childIndex;
             }
 
         } else {
@@ -224,9 +300,9 @@ Item {
                 // Reset Parent Node's Grabbed Child Index
                 nodeRoot.parentNode.grabbedChildIndex = -1;
             } else {
-                // ...
+                // Set Transition Editor Root Grabbed Child Index
+                nodeRoot.transitionEditorRoot.grabbedChildIndex = -1;
             }
-
         }
     }
 
@@ -309,7 +385,8 @@ Item {
                 // Append To Children Node Model
                 animNodesModel.append(newNode);
                 // Set Width
-                newNode.width = Qt.binding(function() { return nodeRoot.width * CONSTS.defaultNodeScaleRatio; });
+                newNode.width = Qt.binding(function() { return nodeRoot.width - 24; });
+                //newNode.width = Qt.binding(function() { return nodeRoot.width * CONSTS.defaultNodeScaleRatio; });
                 // Set Anchor
                 newNode.anchors.right = childrenColumn.right;
                 // Set Parent Node
@@ -335,7 +412,8 @@ Item {
             // Append To Children Node Model
             animNodesModel.insert(newNodeIndex, newNode);
             // Set Width
-            newNode.width = Qt.binding(function() { return nodeRoot.width * CONSTS.defaultNodeScaleRatio; });
+            newNode.width = Qt.binding(function() { return nodeRoot.width - 24; });
+            //newNode.width = Qt.binding(function() { return nodeRoot.width * CONSTS.defaultNodeScaleRatio; });
             // Set Anchor
             newNode.anchors.right = childrenColumn.right;
             // Set Parent Node
@@ -496,15 +574,10 @@ Item {
     // Empty Node
     DTransitionTreeEmptyNode {
         id: emptyNode
-        width: nodeRoot.width * CONSTS.defaultNodeScaleRatio - CONSTS.defaultNodeTreeItemHeight * 0.5
+        width: nodeRoot.width - 24 - CONSTS.defaultNodeTreeItemHeight * 0.5
         anchors.right: parent ? parent.right : undefined
         parentNode: nodeRoot
         transitionEditorRoot: nodeRoot.transitionEditorRoot
-
-        onEmptyNodeShown: {
-            // Ensure Empty Node Visible
-            transitionEditorRoot.ensureEmptyNodeVisible(emptyNode);
-        }
     }
 
     // Drop Area Container
@@ -629,16 +702,22 @@ Item {
 
                         // TODO: Add More Checking
 
-                        // Check Component Parent
-                        if (draggedComponentInfo.componentParent !== null) {
-                            // Move Animation
-                            draggedComponentInfo.componentParent.moveAnimation(draggedComponentInfo.componentParent, transitionEditorRoot.grabbedIndex,
-                                                                               nodeRoot.componentInfo, nodeRoot.componentInfo.animsCount);
+                        // Init Grabbed Transition Node Component
+                        var grabbedTransitionComponent = null;
+
+                        // Take Node
+
+                        // Check Node Parent
+                        if (nodeRoot.transitionEditorRoot.grabbedNodeParent === nodeRoot.transitionEditorRoot) {
+                            // Take Transition Node
+                            grabbedTransitionComponent = nodeRoot.transitionEditorRoot.componentTransition.takeNode(nodeRoot.transitionEditorRoot.grabbedIndex);
                         } else {
-
-                            // ...
-
+                            // Take Transition Node
+                            grabbedTransitionComponent = nodeRoot.transitionEditorRoot.grabbedNodeParent.componentInfo.takeChild(nodeRoot.transitionEditorRoot.grabbedIndex, false);
                         }
+
+                        // Append Node
+                        nodeRoot.componentInfo.addChild(grabbedTransitionComponent);
 
                     } else {
                         console.warn("DTransitionTreeNode.centerDropArea.onDropped - UNSUPPORTED DROP!");
@@ -768,17 +847,126 @@ Item {
                 imageSource: componentInfo ? CONSTS.nodeIconTypeMap[componentInfo.componentCategory] : ""
             }
 
-            // Title Label
-            DText {
-                id: titleLabel
+            // Title Row
+            Row {
+                id: titleRow
+
                 anchors.left: nodeIcon.right
                 anchors.leftMargin: DStyle.defaultMargin
                 anchors.right: parent.right
-                anchors.rightMargin: DStyle.defaultMargin
+                anchors.rightMargin: DStyle.defaultMargin * 2
                 anchors.verticalCenter: parent.verticalCenter
-                text: nodeRoot.title
-                wrapMode: Text.NoWrap
-                elide: Text.ElideMiddle
+
+                spacing: DStyle.defaultSpacing
+
+                clip: true
+
+                // Title Label
+                DText {
+                    id: mainTitleLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    wrapMode: Text.NoWrap
+                    text: nodeRoot.mainTitle
+                }
+
+                DText {
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: nodeRoot.nodeTarget !== ""
+                    text: "target:"
+                }
+
+                // Target
+                DText {
+                    id: targetLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.bold: true
+                    wrapMode: Text.NoWrap
+                    visible: nodeRoot.nodeTarget !== ""
+                    text: nodeRoot.nodeTarget
+                }
+
+                DText {
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: nodeRoot.nodeProperties !== ""
+                    text: "properties:"
+                }
+
+                // Properties
+                DText {
+                    id: propertiesLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.bold: true
+                    wrapMode: Text.NoWrap
+                    visible: nodeRoot.nodeProperties !== ""
+                    text: nodeRoot.nodeProperties
+                }
+
+                DText {
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: nodeRoot.nodeValue !== ""
+                    text: "value:"
+                }
+
+                // Value
+                DText {
+                    id: valueLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.bold: true
+                    wrapMode: Text.NoWrap
+                    visible: nodeRoot.nodeValue !== ""
+                    text: nodeRoot.nodeValue
+                }
+
+                DText {
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: nodeRoot.nodeFromValue !== ""
+                    text: "from:"
+                }
+
+                // From Value
+                DText {
+                    id: fromLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.bold: true
+                    wrapMode: Text.NoWrap
+                    visible: nodeRoot.nodeFromValue !== ""
+                    text: nodeRoot.nodeFromValue
+                }
+
+                DText {
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: nodeRoot.nodeToValue !== ""
+                    text: "to:"
+                }
+
+                // To Value
+                DText {
+                    id: toLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.bold: true
+                    wrapMode: Text.NoWrap
+                    visible: nodeRoot.nodeToValue !== ""
+                    text: nodeRoot.nodeToValue
+                }
+
+                DText {
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: nodeRoot.nodeDuration !== ""
+                    text: "duration:"
+                }
+
+                // Duration
+                DText {
+                    id: durationLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.bold: true
+                    wrapMode: Text.NoWrap
+                    visible: nodeRoot.nodeDuration !== ""
+                    text: nodeRoot.nodeDuration
+                }
+
+                // ...
+
             }
 
             // Node Mouse Area

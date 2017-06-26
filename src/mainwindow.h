@@ -158,6 +158,8 @@ private:
     void toggleShowBorders();
     // Toggle Show Component Names
     void toggleShowComponentNames();
+    // Toggle Clip Root Containers
+    void toggleClipRootContainers();
     // Toggle Slow Motion
     void toggleSlowMotion();
 
@@ -310,6 +312,8 @@ private slots:
     void on_actionToggleProjectPane_triggered();
     // On Toggle Properties Pane Action Triggered SLot
     void on_actionTogglePropertiesPane_triggered();
+    // On Toggle Clip Root Container Action triggered Slot
+    void on_actionClipRootContainer_triggered();
     // Action Quit Triggered Slot
     void on_actionQuit_triggered();
 

@@ -7,7 +7,7 @@ var colorFontLight                                  = "#FF76ACB7";
 // Font Color Dark
 var colorFontDark                                   = "#FF57787F";
 // Default Background Color
-var colorBG                                         = "#BB000000";
+var colorBG                                         = "#CC000000";
 // Default Border Color
 var colorBorder                                     = "#FF8ED5E1";
 // Default Unfocused Border Color
