@@ -11,7 +11,8 @@ class ProjectPropertiesDialog;
 }
 
 class ImportPathsModel;
-class PluginPathsModel;
+class PluginListModel;
+class ProjectModel;
 
 //==============================================================================
 // New Project Dialog Class
@@ -22,7 +23,12 @@ class ProjectPropertiesDialog : public QDialog
 
 public:
     // Construcotr
-    explicit ProjectPropertiesDialog(QWidget* aParent = NULL);
+    explicit ProjectPropertiesDialog(ProjectModel* aProject = NULL, QWidget* aParent = NULL);
+
+    // Get Project Model
+    ProjectModel* projectModel();
+    // Set Project Model
+    void setProjectModel(ProjectModel* aProjectModel);
 
     // Reset
     void reset();
@@ -93,16 +99,16 @@ public:
     void clearImportPaths();
 
     // Get Plugin PAths
-    QStringList pluginPaths();
+    QStringList pluginList();
     // Set Plugin Paths
-    void setPluginPaths(const QStringList& aPluginPaths);
+    void setPluginList(const QStringList& aPluginPaths);
 
     // Add Plugin Path
-    void addPluginPath(const QString& aPath);
+    void addPlugin(const QString& aPath);
     // Remove Plugin Path
-    void removePluginPath(const int& aIndex);
+    void removePlugin(const int& aIndex);
     // Clear Plugin Paths
-    void clearPluginPaths();
+    void clearPlugins();
 
     // Destructor
     ~ProjectPropertiesDialog();
@@ -128,10 +134,16 @@ private slots:
     void on_componentsDirBrowseButton_clicked();
     // On Views Dir Browse Button Clicked Slot
     void on_viewsDirBrowseButton_clicked();
+
     // On Add Import Path Button Clicked Slot
     void on_addImportDirButton_clicked();
     // On Remove Import Path Button Clicked Slot
     void on_removeImportDirButton_clicked();
+
+    // On Add Plugin Button Clicked Slot
+    void on_addPluginButton_clicked();
+    // On Remove Plugin Button Clicked Slot
+    void on_removePluginButton_clicked();
 
     // On Project Name Edit Text Changed Slot
     void on_projectNameEdit_textChanged(const QString& arg1);
@@ -153,15 +165,11 @@ private slots:
     // On Views Dir Edit Text Edited Slot
     void on_viewsDirEdit_textEdited(const QString& arg1);
 
+
     // On Import Paths List Clicked Slot
     void on_importPathsList_clicked(const QModelIndex &index);
     // On Import Paths List Double Clicked Slot
     void on_importPathsList_doubleClicked(const QModelIndex &index);
-
-    // On Add Plugin Path Button Clicked Slot
-    void on_addPluginDirButton_clicked();
-    // On Remove Plugin Path Button Clicked Slot
-    void on_removePluginDirButton_clicked();
 
     // On Plugin Paths List Clicked Slot
     void on_pluginPathsList_clicked(const QModelIndex &index);
@@ -171,17 +179,19 @@ private slots:
 private: // Data
     // UI
     Ui::ProjectPropertiesDialog*    ui;
+    // Project Model
+    ProjectModel*                   mProject;
     // Settings Controller
     SettingsController*             mSettings;
     // Import Paths Model
     ImportPathsModel*               mImportPathsModel;
-    // Plugin Paths Model
-    PluginPathsModel*               mPluginPathsModel;
+    // Plugin List Model
+    PluginListModel*                mPluginListModel;
 
     // Import Path List Current Index
     int                             mIPLCurrentIndex;
-    // Plugin Paths List Current Index
-    int                             mPPLCurrentIndex;
+    // Plugin List Current Index
+    int                             mPLCurrentIndex;
 
     // New Project
     bool                            mNewProject;
@@ -263,38 +273,62 @@ private: // Data
 
 
 
-
-
-
-
 //==============================================================================
-// Plugin Paths Model Class
+// Plugin List Item
 //==============================================================================
-class PluginPathsModel : public QAbstractListModel
+class PluginListItem
 {
 public:
-    // Construcotr
-    explicit PluginPathsModel(QWidget* aParent = NULL);
+    // Plugin Name
+    QString     mName;
+    // Plugin Path
+    QString     mPath;
+};
 
-    // Get Plugin Paths
-    QStringList pluginPaths();
-    // Set Plugin Paths
-    void setPluginPaths(const QStringList& aPluginPaths);
-    // Add Plugin Path
-    void addPluginPath(const QString& aPath);
+
+
+//==============================================================================
+// Plugin List Model Class
+//==============================================================================
+class PluginListModel : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+    // Construcotr
+    explicit PluginListModel(ProjectModel* aProject = NULL, QWidget* aParent = NULL);
+
+    // Get Project Model
+    ProjectModel* projectModel();
+    // Set Project Model
+    void setProjectModel(ProjectModel* aProjectModel);
+
+    // Get Plugin List
+    QStringList pluginList();
+
+    // Set Plugin List
+    void setPluginList(const QStringList& aPluginPaths);
+    // Add Plugin
+    void addPlugin(const QString& aPath);
     // Set Plugin Path
     void setPluginPath(const int& aIndex, const QString& aPath);
-    // Remove Plugin Path
-    void removePluginPath(const int& aIndex);
+
+    // Remove Plugin
+    void removePlugin(const int& aIndex);
+
     // Clear
     void clear();
 
     // Destructor
-    ~PluginPathsModel();
+    ~PluginListModel();
 
 private:
     // Init
     void init();
+    // Load PLugins Info
+    void loadPlugins();
+    // Check If Plugin Already Added
+    int checkPlugin(const QString& aPluginPath);
 
 public: // from QAbstractListModel
     // Column Count
@@ -303,18 +337,12 @@ public: // from QAbstractListModel
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
     // Data
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
-//    // Get Role Names
-//    virtual QHash<int,QByteArray> roleNames() const;
 
 private: // Data
-
-//    // Roles
-//    enum IPMRoles {
-//        PluginPathRole = Qt::UserRole + 1
-//    };
-
-    // Plugin Paths
-    QStringList     mPluginPaths;
+    // Project Model
+    ProjectModel*           mProject;
+    // Plugin List
+    QList<PluginListItem>   mPluginList;
 };
 
 

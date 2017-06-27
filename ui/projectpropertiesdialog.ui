@@ -608,7 +608,7 @@
      </widget>
      <widget class="QWidget" name="pluginPathsTab">
       <attribute name="title">
-       <string>Plugin Paths</string>
+       <string>Plug-ins</string>
       </attribute>
       <layout class="QGridLayout" name="pluginPathsLayout">
        <property name="leftMargin">
@@ -656,7 +656,7 @@
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
-            <widget class="QPushButton" name="addPluginDirButton">
+            <widget class="QPushButton" name="addPluginButton">
              <property name="text">
               <string>+</string>
              </property>
@@ -666,7 +666,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="removePluginDirButton">
+            <widget class="QPushButton" name="removePluginButton">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -747,8 +747,8 @@
   <tabstop>addImportDirButton</tabstop>
   <tabstop>removeImportDirButton</tabstop>
   <tabstop>pluginPathsList</tabstop>
-  <tabstop>addPluginDirButton</tabstop>
-  <tabstop>removePluginDirButton</tabstop>
+  <tabstop>addPluginButton</tabstop>
+  <tabstop>removePluginButton</tabstop>
  </tabstops>
  <resources/>
  <connections>

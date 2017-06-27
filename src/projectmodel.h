@@ -208,6 +208,11 @@ public:
     // Clear All Files From Live Temp Dir
     Q_INVOKABLE void clearLiveTemp();
 
+    // Import Plugin
+    void importPlugin(const QString& aPluginPath);
+    // Remove Plugin
+    void removePlugin(const QString& aPluginName);
+
     // Destructor
     ~ProjectModel();
 
@@ -287,6 +292,7 @@ signals:
 protected:
     friend class MainWindow;
     friend class PropertiesController;
+    friend class PluginListModel;
     // Init
     void init();
 
@@ -304,6 +310,11 @@ protected:
 
     // Create Initial Components
     void createInitialComponents();
+
+    // Load Plugins
+    void loadPlugins();
+    // Unload Plugins
+    void unloadPlugins();
 
     // Set Properties Controller
     void setPropertiesController(PropertiesController* aController);
@@ -326,7 +337,7 @@ protected:
     // Generate Root ID From Name
     QString generateID(const QString& aName);
 
-private: // Data
+protected: // Data
     // Project File Name
     QString                 mName;
     // Project Properties

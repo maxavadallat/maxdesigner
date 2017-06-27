@@ -19,15 +19,16 @@ public:
     virtual ~IDesignerTargetPluginInterface() { }
 
 public:
-
-    // Import Components
-
-    // Export Components
-
     // Get Target Name
     virtual QString targetName() = 0;
     // Get Version Info
     virtual QString version() = 0;
+
+    // Import Components
+
+    // ...
+
+    // Export Components
 
     // Export Base Components
     virtual void exportBaseComponents(const QString& aBaseComponentsPath) = 0;
@@ -42,5 +43,6 @@ public:
 
 };
 
+Q_DECLARE_INTERFACE(IDesignerTargetPluginInterface, "org.maxdesigner.targetplugininterface")
 
 #endif // IDESIGNERTARGETPLUGININTERFACE_H

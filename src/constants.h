@@ -1,6 +1,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include <QtGlobal>
 
 // Application Info
 #define DEFAULT_APPLICATION_NAME                            "MaxDesigner"
@@ -9,6 +10,25 @@
 
 // Application Version
 #define DEFAULT_APPLICATION_VERSION                         "0.1"
+
+// Default Target Plugin IID Prefix
+#define DEFAULT_TARGET_PLUGIN_IID_PREFIX                    "org.maxdesigner.targetplugin"
+// Default Target Plugin Interface Name
+#define DEFAULT_TARGET_PLUGIN_INTERFACE                     "org.maxdesigner.targetplugininterface"
+
+#if defined(Q_OS_MACOS)
+// Default Target Plugin Path
+#define DEFAULT_TARGET_PLUGIN_PATH                          "%1/Library/MaxDesigner/targetplugins/%2"
+
+#elif defined(Q_OS_LINUX)
+
+#define DEFAULT_TARGET_PLUGIN_PATH                          "%1/.config/MaxDesigner/targetplugins/%2"
+
+#else // Q_OS_UNIX
+
+#define DEFAULT_TARGET_PLUGIN_PATH                          "%1/AppData/local/MaxDesigner/targetplugins/%2"
+
+#endif
 
 // Main Window QML Widget QML File
 #define DEFAULT_MAIN_QMLFILE_URL                            "qrc:/qml/main.qml"

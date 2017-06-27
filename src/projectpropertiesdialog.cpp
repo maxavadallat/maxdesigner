@@ -2,20 +2,25 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QDir>
+#include <QPluginLoader>
+#include <QJsonObject>
 
 #include "projectpropertiesdialog.h"
 #include "ui_projectpropertiesdialog.h"
+#include "projectmodel.h"
+#include "idesignertargetplugininterface.h"
 #include "constants.h"
 
 //==============================================================================
 // Construcotr
 //==============================================================================
-ProjectPropertiesDialog::ProjectPropertiesDialog(QWidget* aParent)
+ProjectPropertiesDialog::ProjectPropertiesDialog(ProjectModel* aProject, QWidget* aParent)
     : QDialog(aParent)
     , ui(new Ui::ProjectPropertiesDialog)
+    , mProject(aProject)
     , mSettings(SettingsController::getInstance())
     , mImportPathsModel(NULL)
-    , mPluginPathsModel(NULL)
+    , mPluginListModel(NULL)
     , mIPLCurrentIndex(-1)
     , mNewProject(false)
     , mProjectDirEdited(false)
@@ -50,13 +55,13 @@ void ProjectPropertiesDialog::init()
     ui->importPathsList->setModel(mImportPathsModel);
 
     // Check Plugin Paths Model
-    if (!mPluginPathsModel) {
+    if (!mPluginListModel) {
         // Create Plugin Paths Model
-        mPluginPathsModel = new PluginPathsModel();
+        mPluginListModel = new PluginListModel(mProject);
     }
 
     // Set Model
-    ui->pluginPathsList->setModel(mPluginPathsModel);
+    ui->pluginPathsList->setModel(mPluginListModel);
 }
 
 //==============================================================================
@@ -68,10 +73,39 @@ void ProjectPropertiesDialog::restoreUI()
 }
 
 //==============================================================================
+// Get Project Model
+//==============================================================================
+ProjectModel* ProjectPropertiesDialog::projectModel()
+{
+    return mProject;
+}
+
+//==============================================================================
+// Set Project Model
+//==============================================================================
+void ProjectPropertiesDialog::setProjectModel(ProjectModel* aProjectModel)
+{
+    // Check Project Model
+    if (mProject != aProjectModel) {
+        // Set Project Model
+        mProject = aProjectModel;
+
+        // Check Plugin List Model
+        if (mPluginListModel) {
+            // Set Project Model
+            mPluginListModel->setProjectModel(mProject);
+        }
+    }
+}
+
+//==============================================================================
 // Reset
 //==============================================================================
 void ProjectPropertiesDialog::reset()
 {
+    // Reset Project Model
+    setProjectModel(NULL);
+
     // Reset All Imputs
     ui->projectNameEdit->setText("");
     ui->projectDirEdit->setText("");
@@ -84,14 +118,19 @@ void ProjectPropertiesDialog::reset()
     ui->viewsDirEdit->setText("");
     ui->assetsDirEdit->setText("");
 
+    // Check Import Paths Model
     if (mImportPathsModel) {
+        // Clear
         mImportPathsModel->clear();
     }
 
-    if (mPluginPathsModel) {
-        mPluginPathsModel->clear();
+    // Check Plugin List Model
+    if (mPluginListModel) {
+        // Clear
+        //mPluginListModel->clear();
     }
 
+    // Set Remove Import Dir Button Enabled State
     ui->removeImportDirButton->setEnabled(false);
 
     // Set New Project
@@ -360,70 +399,70 @@ void ProjectPropertiesDialog::clearImportPaths()
 }
 
 //==============================================================================
-// Get Plugin PAths
+// Get Plugin List
 //==============================================================================
-QStringList ProjectPropertiesDialog::pluginPaths()
+QStringList ProjectPropertiesDialog::pluginList()
 {
     // Check Plugin Paths Model
-    if (mPluginPathsModel) {
+    if (mPluginListModel) {
         // Get Plugin Paths
-        return mPluginPathsModel->pluginPaths();
+        return mPluginListModel->pluginList();
     }
 
     return QStringList();
 }
 
 //==============================================================================
-// Set Plugin Paths
+// Set Plugin List
 //==============================================================================
-void ProjectPropertiesDialog::setPluginPaths(const QStringList& aPluginPaths)
+void ProjectPropertiesDialog::setPluginList(const QStringList& aPluginPaths)
 {
     // Check Plugin Paths Model
-    if (mPluginPathsModel) {
+    if (mPluginListModel) {
         // Set Plugin Paths
-        mPluginPathsModel->setPluginPaths(aPluginPaths);
+        mPluginListModel->setPluginList(aPluginPaths);
         // Set Plugin Path List Current Index
-        mPPLCurrentIndex = mPluginPathsModel->rowCount() > 0 ? 0 : -1;
+        mPLCurrentIndex = mPluginListModel->rowCount() > 0 ? 0 : -1;
     }
 }
 
 //==============================================================================
-// Add Plugin Path
+// Add Plugin
 //==============================================================================
-void ProjectPropertiesDialog::addPluginPath(const QString& aPath)
+void ProjectPropertiesDialog::addPlugin(const QString& aPath)
 {
     // Check Plugin Paths Model
-    if (mPluginPathsModel) {
+    if (mPluginListModel) {
         // Add Plugin Path
-        mPluginPathsModel->addPluginPath(aPath);
+        mPluginListModel->addPlugin(aPath);
     }
 }
 
 //==============================================================================
-// Remove Plugin Path
+// Remove Plugin
 //==============================================================================
-void ProjectPropertiesDialog::removePluginPath(const int& aIndex)
+void ProjectPropertiesDialog::removePlugin(const int& aIndex)
 {
     // Check Plugin Paths Model
-    if (mPluginPathsModel) {
+    if (mPluginListModel) {
         // Remove Plugin Path
-        mPluginPathsModel->removePluginPath(aIndex);
+        mPluginListModel->removePlugin(aIndex);
     }
 }
 
 //==============================================================================
-// Clear Plugin Paths
+// Clear Plugins
 //==============================================================================
-void ProjectPropertiesDialog::clearPluginPaths()
+void ProjectPropertiesDialog::clearPlugins()
 {
     // Check Plugin Paths Model
-    if (mPluginPathsModel) {
-        // Clear Plugin Paths
-        mPluginPathsModel->clear();
+    if (mPluginListModel) {
+        // Clear Plugins
+        mPluginListModel->clear();
     }
 
-    // Reset Plugin Path List Current Index
-    mPPLCurrentIndex = -1;
+    // Reset Plugin List Current Index
+    mPLCurrentIndex = -1;
 }
 
 //==============================================================================
@@ -806,48 +845,50 @@ void ProjectPropertiesDialog::on_importPathsList_doubleClicked(const QModelIndex
     // ...
 }
 
+
 //==============================================================================
-// On Add Plugin Path Button Clicked Slot
+// On Add Plugin Button Clicked Slot
 //==============================================================================
-void ProjectPropertiesDialog::on_addPluginDirButton_clicked()
+void ProjectPropertiesDialog::on_addPluginButton_clicked()
 {
     // Init File Dialog
-    QFileDialog aupDialog(NULL, "Add Plugin Path");
+    QFileDialog apDialog(NULL, "Add Plugin");
 
-    // Get QML Dir Temp
-    QString qmlDirTemp = dataSourcesDir();
+    // Get Plugin Dir Temp
+    QString pluginDirTemp = projectDir();
 
     // Check If Dir Exists
-    if (!QFile::exists(qmlDirTemp)) {
-        // Set QML Dir Temp
-        qmlDirTemp = QDir::homePath();
+    if (!QFile::exists(pluginDirTemp)) {
+        // Set Plugin Dir Temp
+        pluginDirTemp = QDir::homePath();
     }
 
-    qDebug() << "ProjectPropertiesDialog::on_addPluginDirButton_clicked - qmlDir: " << qmlDirTemp;
+    qDebug() << "ProjectPropertiesDialog::on_addPluginButton_clicked - pluginDirTemp: " << pluginDirTemp;
 
     // Set File Mode
-    aupDialog.setFileMode(QFileDialog::DirectoryOnly);
+    apDialog.setFileMode(QFileDialog::ExistingFile);
     // Set Directory
-    aupDialog.setDirectory(qmlDirTemp);
+    apDialog.setDirectory(pluginDirTemp);
 
     // Exec Dialog
-    if (aupDialog.exec() && mPluginPathsModel) {
-        // Add Import Path
-        mPluginPathsModel->addPluginPath(aupDialog.selectedFiles()[0]);
+    if (apDialog.exec() && mPluginListModel) {
+        // Add Plugin
+        mPluginListModel->addPlugin(apDialog.selectedFiles()[0]);
     }
 }
 
 //==============================================================================
-// On Remove Plugin Path Button Clicked Slot
+// On Remove PLugin Button Clicked Slot
 //==============================================================================
-void ProjectPropertiesDialog::on_removePluginDirButton_clicked()
+void ProjectPropertiesDialog::on_removePluginButton_clicked()
 {
     // Check Current Index
-    if (mPluginPathsModel && mPPLCurrentIndex >= 0 && mPPLCurrentIndex < mPluginPathsModel->rowCount()) {
+    if (mPluginListModel && mPLCurrentIndex >= 0 && mPLCurrentIndex < mPluginListModel->rowCount()) {
+        qDebug() << "ProjectPropertiesDialog::on_removePluginButton_clicked - mPLCurrentIndex: " << mPLCurrentIndex;
         // Remove Plugin Path
-        mPluginPathsModel->removePluginPath(mPPLCurrentIndex);
+        mPluginListModel->removePlugin(mPLCurrentIndex);
         // Adjust Current Index
-        mPPLCurrentIndex = qMin(mPPLCurrentIndex, mPluginPathsModel->rowCount() - 1);
+        mPLCurrentIndex = qMin(mPLCurrentIndex, mPluginListModel->rowCount() - 1);
     }
 }
 
@@ -857,18 +898,20 @@ void ProjectPropertiesDialog::on_removePluginDirButton_clicked()
 void ProjectPropertiesDialog::on_pluginPathsList_clicked(const QModelIndex &index)
 {
     // Set Current Index
-    mPPLCurrentIndex = index.row();
+    mPLCurrentIndex = index.row();
+
+    qDebug() << "ProjectPropertiesDialog::on_pluginPathsList_clicked - mPLCurrentIndex: " << mPLCurrentIndex;
 
     // Check Plugin Paths Model
-    if (mPluginPathsModel) {
+    if (mPluginListModel) {
         // Check Current Index
-        if (mIPLCurrentIndex >= 0 && mIPLCurrentIndex < mPluginPathsModel->rowCount()) {
+        if (mPLCurrentIndex >= 0 && mPLCurrentIndex < mPluginListModel->rowCount()) {
             // Set Remove Plugin Path Button Enabled State
-            ui->removePluginDirButton->setEnabled(true);
+            ui->removePluginButton->setEnabled(true);
         }
     } else {
         // Set Remove Plugin Path Button Enabled State
-        ui->removePluginDirButton->setEnabled(false);
+        ui->removePluginButton->setEnabled(false);
     }
 }
 
@@ -878,7 +921,7 @@ void ProjectPropertiesDialog::on_pluginPathsList_clicked(const QModelIndex &inde
 void ProjectPropertiesDialog::on_pluginPathsList_doubleClicked(const QModelIndex &index)
 {
     // Set Current Index
-    mPPLCurrentIndex = index.row();
+    mPLCurrentIndex = index.row();
 
     // ...
 
@@ -900,10 +943,10 @@ ProjectPropertiesDialog::~ProjectPropertiesDialog()
     }
 
     // Check Plugin Paths Model
-    if (mPluginPathsModel) {
+    if (mPluginListModel) {
         // Delete Plugin Paths Model
-        delete mPluginPathsModel;
-        mPluginPathsModel = NULL;
+        delete mPluginListModel;
+        mPluginListModel = NULL;
     }
 
     // Release Settings Instance
@@ -1078,20 +1121,6 @@ QVariant ImportPathsModel::data(const QModelIndex& index, int role) const
 }
 
 //==============================================================================
-// Get Role Names
-//==============================================================================
-//QHash<int,QByteArray> ImportPathsModel::roleNames() const
-//{
-//    // Init Role Names
-//    QHash<int,QByteArray> ipmRoleNames;
-
-//    // Set Up Role Names
-//    ipmRoleNames[ImportPathRole] = "importPath";
-
-//    return ipmRoleNames;
-//}
-
-//==============================================================================
 // Destructor
 //==============================================================================
 ImportPathsModel::~ImportPathsModel()
@@ -1124,9 +1153,12 @@ ImportPathsModel::~ImportPathsModel()
 //==============================================================================
 // Construcotr
 //==============================================================================
-PluginPathsModel::PluginPathsModel(QWidget* aParent)
+PluginListModel::PluginListModel(ProjectModel* aProject, QWidget* aParent)
     : QAbstractListModel(aParent)
+    , mProject(aProject)
 {
+    qDebug() << "PluginListModel created.";
+
     // Init
     init();
 }
@@ -1134,71 +1166,252 @@ PluginPathsModel::PluginPathsModel(QWidget* aParent)
 //==============================================================================
 // Init
 //==============================================================================
-void PluginPathsModel::init()
+void PluginListModel::init()
 {
     // ...
+
+    // Load Plugins
+    loadPlugins();
 }
 
 //==============================================================================
-// Get Plugin Paths
+// Load PLugins Info
 //==============================================================================
-QStringList PluginPathsModel::pluginPaths()
+void PluginListModel::loadPlugins()
 {
-    return mPluginPaths;
+    // Check Project Model
+    if (mProject) {
+        qDebug() << "PluginListModel::loadPlugins - mProject: " << mProject->projectName();
+
+        // Get Plugin Paths Array
+        QJsonArray ppArray = mProject->mProperties.value(JSON_KEY_PROJECT_PLUGIN_PATHS).toArray();
+        // Get Plugin Paths Count
+        int ppCount = ppArray.count();
+        // Iterate Through Plugin Paths Array
+        for (int i=0; i<ppCount; i++) {
+            // Get Plugin Path
+            QString pluginPath = ppArray[i].toString();
+            // Add Plugin
+            addPlugin(pluginPath);
+        }
+    }
 }
 
 //==============================================================================
-// Set Plugin Paths
+// Check If Plugin Already Added
 //==============================================================================
-void PluginPathsModel::setPluginPaths(const QStringList& aPluginPaths)
+int PluginListModel::checkPlugin(const QString& aPluginPath)
 {
-    // Begin Reset Model
-    beginResetModel();
-    // Set Plugin Paths
-    mPluginPaths = aPluginPaths;
-    // End Reset Model
-    endResetModel();
+    // Get Plugins List Count
+    int plCount = mPluginList.count();
+    // Iterate Through Plugin List
+    for (int i=0; i<plCount; i++) {
+        // Check Path
+        if (mPluginList[i].mPath == aPluginPath) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+//==============================================================================
+// Get Project Model
+//==============================================================================
+ProjectModel* PluginListModel::projectModel()
+{
+    return mProject;
+}
+
+//==============================================================================
+// Set Project Model
+//==============================================================================
+void PluginListModel::setProjectModel(ProjectModel* aProjectModel)
+{
+    // Check Project Model
+    if (mProject != aProjectModel) {
+        qDebug() << "PluginListModel::setProjectModel - aProjectModel: " << (aProjectModel ? aProjectModel->projectName() : "NULL");
+
+        // Clear
+        clear();
+
+        // Set Project Model
+        mProject = aProjectModel;
+
+        // Load Project Plugins
+        loadPlugins();
+    }
+}
+
+//==============================================================================
+// Get Plugin List
+//==============================================================================
+QStringList PluginListModel::pluginList()
+{
+    // Init Plugin Path List
+    QStringList ppList = QStringList();
+
+    // Get Plugin List Count
+    int plCount = mPluginList.count();
+    // Iterate Through PLugin List
+    for (int i=0; i<plCount; i++) {
+        // Add Path To Plugin Path List
+        ppList << mPluginList[i].mPath;
+    }
+
+    return ppList;
+}
+
+//==============================================================================
+// Set Plugin List
+//==============================================================================
+void PluginListModel::setPluginList(const QStringList& aPluginPaths)
+{
+    // Get Plugin Paths Count
+    int ppCount = aPluginPaths.count();
+
+    // Check Plugin Paths
+    if (ppCount > 0) {
+        qDebug() << "PluginListModel::setPluginList - ppCount: " << ppCount;
+
+        // Begin Reset Model
+        beginResetModel();
+
+        // Iterate Through Plugin Paths
+        for (int i=0; i<ppCount; i++) {
+            // Init PLugin Loader
+            QPluginLoader pluginLoader(aPluginPaths[i]);
+
+            // Load
+            if (pluginLoader.load()) {
+
+                // Init New Plugin List Item
+                PluginListItem newListItem;
+
+                // Set Path
+                newListItem.mPath = aPluginPaths[i];
+                // Set Name
+                newListItem.mName = dynamic_cast<IDesignerTargetPluginInterface*>(pluginLoader.instance())->targetName();
+
+                // Append New List Item
+                mPluginList << newListItem;
+
+                // Unload Plugin
+                pluginLoader.unload();
+            }
+        }
+
+        // End Reset Model
+        endResetModel();
+    }
 }
 
 //==============================================================================
 // Add Plugin Path
 //==============================================================================
-void PluginPathsModel::addPluginPath(const QString& aPath)
+void PluginListModel::addPlugin(const QString& aPath)
 {
     // Check Path
-    if (mPluginPaths.indexOf(aPath) == -1) {
-        // Iterate Through Plugin Paths
-        for (int i=0; i<mPluginPaths.count(); i++) {
-            if (mPluginPaths[i] < aPath) {
-                // Begin Insert Rows
-                beginInsertRows(QModelIndex(), mPluginPaths.count(), mPluginPaths.count());
-                // Inser Path
-                mPluginPaths.insert(i, aPath);
-                // End Insert Rows
-                endInsertRows();
+    if (!aPath.isEmpty()) {
+        // Init Plugin File Info
+        QFileInfo pluginInfo(aPath);
 
-                return;
-            }
+        // Check If Exists
+        if (!pluginInfo.exists()) {
+            qWarning() << "PluginListModel::addPlugin - aPath: " << aPath << " - PLUGIN DOES NOT EXIST!";
+            return;
         }
 
-        // Begin Insert Rows
-        beginInsertRows(QModelIndex(), mPluginPaths.count(), mPluginPaths.count());
-        // Append Path
-        mPluginPaths << aPath;
-        // End Insert Rows
-        endInsertRows();
+        // Init PLugin Loader
+        QPluginLoader pluginLoader(aPath);
+        // Get Plugin Metadata
+        QJsonObject pluginMetaData = pluginLoader.metaData();
+        // Get Plugin IID
+        QString pluginIID = pluginMetaData.value("IID").toString();
+
+        // Check IID
+        if (!pluginIID.startsWith(DEFAULT_TARGET_PLUGIN_IID_PREFIX)) {
+            qWarning() << "PluginListModel::addPlugin - aPath: " << aPath << " - PLUGIN IS NOT A DESIGNER TARGET PLUGIN!";
+            return;
+        }
+
+        qDebug() << "PluginListModel::addPlugin - aPath: " << aPath;
+
+        // Load Plugin
+        if (pluginLoader.load()) {
+            // Get Instance
+            IDesignerTargetPluginInterface* pluginInterface = dynamic_cast<IDesignerTargetPluginInterface*>(pluginLoader.instance());
+            // Check Instance
+            if (pluginInterface) {
+
+                qDebug() << "PluginListModel::addPlugin - targetName: " << pluginInterface->targetName();
+                qDebug() << "PluginListModel::addPlugin - version:    " << pluginInterface->version();
+
+                // Init New PLugin List Item
+                PluginListItem newPluginListItem;
+
+                // Installed Plugin Path
+                QString installedPluginPath = QString(DEFAULT_TARGET_PLUGIN_PATH).arg(QDir::homePath()).arg(pluginInfo.fileName());
+
+                qDebug() << "PluginListModel::addPlugin - installedPluginPath: " << installedPluginPath;
+
+                // Set Path
+                newPluginListItem.mPath = installedPluginPath;
+                // Set Name
+                newPluginListItem.mName = pluginInterface->targetName();
+
+                // Get Plugin Index
+                int pluginIndex = checkPlugin(installedPluginPath);
+
+                // Check If Plugin Already Added
+                if (pluginIndex != -1) {
+                    // Update Plugin List
+                    mPluginList[pluginIndex] = newPluginListItem;
+                    // Emit Data Changed Signal
+                    emit dataChanged(index(pluginIndex), index(pluginIndex));
+
+                } else {
+                    // Init Intalled PLugin Dir
+                    QDir ipDir(QString(DEFAULT_TARGET_PLUGIN_PATH).arg(QDir::homePath()).arg(""));
+
+                    // Check If Installed Plugin Path Exists
+                    if (!ipDir.exists(installedPluginPath)) {
+                        // Make Path
+                        ipDir.mkpath(ipDir.absolutePath());
+                    }
+
+                    // Copy Plugin
+                    QFile::copy(pluginInfo.absoluteFilePath(), installedPluginPath);
+
+                    // Begin Insert Rows
+                    beginInsertRows(QModelIndex(), rowCount(), rowCount());
+                    // Append To Plugin List
+                    mPluginList << newPluginListItem;
+                    // End Insert Rows
+                    endInsertRows();
+                }
+            }
+
+            // Unload
+            pluginLoader.unload();
+
+        } else {
+            qDebug() << "Error Loading Plugin: " << pluginLoader.errorString();
+        }
     }
 }
 
 //==============================================================================
 // Set Plugin Path
 //==============================================================================
-void PluginPathsModel::setPluginPath(const int& aIndex, const QString& aPath)
+void PluginListModel::setPluginPath(const int& aIndex, const QString& aPath)
 {
     // Check Index
-    if (aIndex >= 0 && aIndex < mPluginPaths.count()) {
+    if (aIndex >= 0 && aIndex < mPluginList.count()) {
+        qDebug() << "PluginListModel::setPluginPath - aIndex: " << aIndex << " - aPath: " << aPath;
+
         // Set Plugin Path
-        mPluginPaths[aIndex] = aPath;
+        mPluginList[aIndex].mPath = aPath;
         // Emit Data Changed Signal
         emit dataChanged(index(aIndex), index(aIndex));
     }
@@ -1207,14 +1420,21 @@ void PluginPathsModel::setPluginPath(const int& aIndex, const QString& aPath)
 //==============================================================================
 // Remove Plugin Path
 //==============================================================================
-void PluginPathsModel::removePluginPath(const int& aIndex)
+void PluginListModel::removePlugin(const int& aIndex)
 {
     // Check Index
-    if (aIndex >= 0 && aIndex < mPluginPaths.count()) {
+    if (aIndex >= 0 && aIndex < mPluginList.count()) {
+        qDebug() << "PluginListModel::removePlugin - aIndex: " << aIndex;
+
+        // Get Plugin Path
+        QString pluginPath = mPluginList[aIndex].mPath;
+        // Remove File
+        QFile::remove(pluginPath);
+
         // Begin Remove Rows
         beginRemoveRows(QModelIndex(), aIndex, aIndex);
         // Remove Plugin Path
-        mPluginPaths.removeAt(aIndex);
+        mPluginList.removeAt(aIndex);
         // End Remove Rows
         endRemoveRows();
     }
@@ -1223,20 +1443,24 @@ void PluginPathsModel::removePluginPath(const int& aIndex)
 //==============================================================================
 // Clear
 //==============================================================================
-void PluginPathsModel::clear()
+void PluginListModel::clear()
 {
-    // Begin Reset Model
-    beginResetModel();
-    // Clear Plugin Paths
-    mPluginPaths.clear();
-    // End Reset Model
-    endResetModel();
+    // Check PLugin List Count
+    if (mPluginList.count() > 0) {
+        qDebug() << "PluginListModel::clear";
+        // Begin Reset Model
+        beginResetModel();
+        // Clear Plugin Paths
+        mPluginList.clear();
+        // End Reset Model
+        endResetModel();
+    }
 }
 
 //==============================================================================
 // Column Count
 //==============================================================================
-int PluginPathsModel::columnCount(const QModelIndex& ) const
+int PluginListModel::columnCount(const QModelIndex& ) const
 {
     return 1;
 }
@@ -1244,25 +1468,24 @@ int PluginPathsModel::columnCount(const QModelIndex& ) const
 //==============================================================================
 // Row Count
 //==============================================================================
-int PluginPathsModel::rowCount(const QModelIndex& ) const
+int PluginListModel::rowCount(const QModelIndex& ) const
 {
-    return mPluginPaths.count();
+    return mPluginList.count();
 }
 
 //==============================================================================
 // Data
 //==============================================================================
-QVariant PluginPathsModel::data(const QModelIndex& index, int role) const
+QVariant PluginListModel::data(const QModelIndex& index, int role) const
 {
     // Get Row
     int ppmRow = index.row();
 
     // Check Row
-    if (ppmRow >= 0 && ppmRow < mPluginPaths.count()) {
+    if (ppmRow >= 0 && ppmRow < mPluginList.count()) {
         // Switch Role
         switch (role) {
-            case Qt::DisplayRole:   return mPluginPaths[ppmRow];
-//            case PluginPathRole:
+            case Qt::DisplayRole:   return mPluginList[ppmRow].mName;
         }
     }
 
@@ -1270,25 +1493,14 @@ QVariant PluginPathsModel::data(const QModelIndex& index, int role) const
 }
 
 //==============================================================================
-// Get Role Names
-//==============================================================================
-//QHash<int,QByteArray> PluginPathsModel::roleNames() const
-//{
-//    // Init Role Names
-//    QHash<int,QByteArray> ipmRoleNames;
-
-//    // Set Up Role Names
-//    ipmRoleNames[PluginPathRole] = "importPath";
-
-//    return ipmRoleNames;
-//}
-
-//==============================================================================
 // Destructor
 //==============================================================================
-PluginPathsModel::~PluginPathsModel()
+PluginListModel::~PluginListModel()
 {
     // Clear
     clear();
+
+    qDebug() << "PluginListModel deleted.";
 }
+
 

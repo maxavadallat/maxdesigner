@@ -288,8 +288,6 @@ void MainWindow::init()
 void MainWindow::restoreUI()
 {
     qDebug() << "MainWindow::restoreUI";
-    // Grab Keyboard Focus
-    //grabKeyboard();
 
     //installEventFilter();
 
@@ -721,9 +719,6 @@ void MainWindow::launchCreateNewProject()
 //==============================================================================
 void MainWindow::launchOpenProject()
 {
-    // Release Keyboard Focus
-    //releaseKeyboard();
-
     // Init File Open Dialog
     QFileDialog fileOpenDialog;
 
@@ -735,9 +730,6 @@ void MainWindow::launchOpenProject()
         // Open Project
         openProject(fileOpenDialog.selectedFiles()[0]);
     }
-
-    // Grab Keyboard Focus
-    //grabKeyboard();
 }
 
 //==============================================================================
@@ -750,9 +742,6 @@ void MainWindow::launchSaveProjectAs()
         return;
     }
 
-    // Release Keyboard Focus
-    //releaseKeyboard();
-
     // Init File Open Dialog
     QFileDialog fileOpenDialog;
 
@@ -764,9 +753,6 @@ void MainWindow::launchSaveProjectAs()
         // Save Project
         saveProject(fileOpenDialog.selectedFiles()[0]);
     }
-
-    // Grab Keyboard Focus
-    //grabKeyboard();
 }
 
 //==============================================================================
@@ -779,14 +765,14 @@ void MainWindow::launchProjectProperties()
         return;
     }
 
-    // Release Keyboard Focus
-    //releaseKeyboard();
-
     // Check Project Properties Dialog
     if (!mProjectPropertiesDiaog) {
         // Create Project Properties Dialog
         mProjectPropertiesDiaog = new ProjectPropertiesDialog();
     }
+
+    // Set Project Model
+    mProjectPropertiesDiaog->setProjectModel(mProjectModel);
 
     // reset Project Properties
     mProjectPropertiesDiaog->reset();
@@ -821,7 +807,7 @@ void MainWindow::launchProjectProperties()
     // Set Import Paths
     mProjectPropertiesDiaog->setImportPaths(mProjectModel->importPaths());
     // Set Plugin Paths
-    mProjectPropertiesDiaog->setPluginPaths(mProjectModel->pluginPaths());
+    mProjectPropertiesDiaog->setPluginList(mProjectModel->pluginPaths());
 
     // Get Last Project Path
     QString lastProjectPath = mProjectModel->absoluteProjectFilePath();
@@ -837,9 +823,6 @@ void MainWindow::launchProjectProperties()
         // Close File
         mOpenFiles->closeFile(lastProjectPath);
     }
-
-    // Grab Keyboard Focus
-    //grabKeyboard();
 }
 
 //==============================================================================
@@ -851,9 +834,6 @@ void MainWindow::launchDefineBaseComponent()
     if (!mProjectModel) {
         return;
     }
-
-    // Release Keyboard Focus
-    //releaseKeyboard();
 
     // Check Define Base Component Dialog
     if (!mCreateComponentDialog) {
@@ -884,9 +864,6 @@ void MainWindow::launchDefineBaseComponent()
                            DEFAULT_COMPONENT_WIDTH,
                            DEFAULT_COMPONENT_HEIGHT);
     }
-
-    // Grab Keyboard Focus
-    //grabKeyboard();
 }
 
 //==============================================================================
@@ -898,9 +875,6 @@ void MainWindow::launchCreateComponent()
     if (!mProjectModel) {
         return;
     }
-
-    // Release Keyboard Focus
-    //releaseKeyboard();
 
     // Check Create Component Dialog
     if (!mCreateComponentDialog) {
@@ -934,8 +908,6 @@ void MainWindow::launchCreateComponent()
 
     // ...
 
-    // Grab Keyboard Focus
-    //grabKeyboard();
 }
 
 //==============================================================================
@@ -961,9 +933,6 @@ void MainWindow::launchCreateView()
     // Reset Dialog
     mCreateViewDialog->reset();
 
-    // Release Keyboard Focus
-    //releaseKeyboard();
-
     // Exec Create View Dialog
     if (mCreateViewDialog->exec()) {
         // Create New View Component
@@ -978,8 +947,6 @@ void MainWindow::launchCreateView()
 
     // ...
 
-    // Grab Keyboard Focus
-    //grabKeyboard();
 }
 
 //==============================================================================
@@ -1444,7 +1411,7 @@ void MainWindow::updateProject()
     // Set Import Paths
     mProjectModel->setImportPaths(mProjectPropertiesDiaog->importPaths());
     // Set Plugin Paths
-    mProjectModel->setPluginPaths(mProjectPropertiesDiaog->pluginPaths());
+    mProjectModel->setPluginPaths(mProjectPropertiesDiaog->pluginList());
 }
 
 //==============================================================================

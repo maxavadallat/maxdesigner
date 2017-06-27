@@ -281,6 +281,67 @@ void ProjectModel::createInitialComponents()
 }
 
 //==============================================================================
+// Load Plugins
+//==============================================================================
+void ProjectModel::loadPlugins()
+{
+    // Get Installed Target Plugins Array
+    QJsonArray ipArray = mProperties.value(JSON_KEY_PROJECT_PLUGIN_PATHS).toArray();
+    // Get Installed Plugins Count
+    int ipCount = ipArray.count();
+    // Check Installed Plugins Count
+    if (ipCount > 0) {
+        qDebug() << "ProjectModel::loadPlugins - ipCount: " << ipCount;
+
+        // Itarate Through Plugins
+        for (int i=0; i<ipCount; i++) {
+            // Get PLugin Path
+            QString pluginPath = ipArray[i].toString();
+
+            qDebug() << "ProjectModel::loadPlugins - pluginPath: " << pluginPath;
+
+            // Create New PLugin Loader
+            QPluginLoader* newPluginLoader = new QPluginLoader(pluginPath);
+            // Load Plugin
+            if (!newPluginLoader->load()) {
+                qWarning() << "ProjectModel::loadPlugins - pluginPath: " << pluginPath << " - ERROR LOADING PLUGIN: " << newPluginLoader->errorString();
+
+                // Delete Plugin Loader
+                delete newPluginLoader;
+
+                continue;
+            }
+
+            // Append To Plugins
+            mPlugins << newPluginLoader;
+        }
+    }
+}
+
+//==============================================================================
+// Unload Plugins
+//==============================================================================
+void ProjectModel::unloadPlugins()
+{
+    // Get Loaded Plugins Count
+    int lpCount = mPlugins.count();
+
+    // Check Loaded Plugins Count
+    if (lpCount > 0) {
+        qDebug() << "ProjectModel::unloadPlugins - lpCount: " << lpCount;
+        // Iterate Through Plugins
+        while (mPlugins.count() > 0) {
+            // Take Last Plugin Loader
+            QPluginLoader* pluginLoader = mPlugins.takeLast();
+            // Unload Plugin
+            pluginLoader->unload();
+            // Delete Plugin Loader
+            delete pluginLoader;
+        }
+    }
+}
+
+//==============================================================================
 // Set Properties Controller
 //==============================================================================
 void ProjectModel::setPropertiesController(PropertiesController* aController)
@@ -593,6 +654,9 @@ bool ProjectModel::loadProject(const QString& aFileName)
         // Update Base Components
         updateBaseComponents();
 
+        // Load Plugins
+        loadPlugins();
+
         //qDebug() << "ProjectModel::loadProject - aFileName: " << aFileName << " - DONE.";
 
         // Emit Project Loaded Signal
@@ -672,6 +736,9 @@ bool ProjectModel::saveProject(const QString& aFileName)
 void ProjectModel::closeProject(const bool& aSave)
 {
     //qDebug() << "ProjectModel::closeProject - aSave: " << aSave;
+
+    // Unload Plugins
+    unloadPlugins();
 
     // Clear Live Temp
     clearLiveTemp();
@@ -1803,6 +1870,35 @@ void ProjectModel::clearLiveTemp()
         ltIterator.next();
         // Remove File
         ltDir.remove(ltIterator.fileName());
+    }
+}
+
+//==============================================================================
+// Import Plugin
+//==============================================================================
+void ProjectModel::importPlugin(const QString& aPluginPath)
+{
+    // Check Plugin Path
+    if (!aPluginPath.isEmpty()) {
+        qDebug() << "ProjectModel::importPlugin - aPluginPath: " << aPluginPath;
+
+
+
+        // ...
+    }
+}
+
+//==============================================================================
+// Remove Plugin
+//==============================================================================
+void ProjectModel::removePlugin(const QString& aPluginName)
+{
+    // Check Plugin Name
+    if (!aPluginName.isEmpty()) {
+        qDebug() << "ProjectModel::importPlugin - aPluginName: " << aPluginName;
+
+        // ...
+
     }
 }
 
