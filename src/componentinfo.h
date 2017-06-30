@@ -165,7 +165,7 @@ public:
     // Clone Prototype Component Info
     Q_INVOKABLE ComponentInfo* clone();
     // Duplicate Component Info
-    Q_INVOKABLE ComponentInfo* duplicate(const bool& aBefore = false);
+    Q_INVOKABLE ComponentInfo* duplicate();
 
     // Get Prototype
     bool protoType();

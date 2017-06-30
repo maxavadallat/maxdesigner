@@ -68,20 +68,32 @@ ComponentInfo* ComponentInfo::clone()
 //==============================================================================
 // Duplicate Component Info
 //==============================================================================
-ComponentInfo* ComponentInfo::duplicate(const bool& aBefore)
+ComponentInfo* ComponentInfo::duplicate()
 {
-    // Check If Root
-    if (mIsRoot) {
+    // Check If Root & Parents
+    if (mIsRoot || (mParent == NULL && mTransitionParent == NULL)) {
         return NULL;
     }
 
-    qDebug() << "#### ComponentInfo::duplicate - mName: " << mName << " - aBefore: " << aBefore;
+    qDebug() << "#### ComponentInfo::duplicate - mName: " << mName;
 
     // Create Component Info
     ComponentInfo* newComponent = new ComponentInfo(mName, mType, mCategory, mProject, mBaseName, mBuiltIn, false);
+    // Set Is Root
+    newComponent->mIsRoot = false;
+    // Set Parent
+    newComponent->mParent = mParent;
+    // Set Transition Parent
+    newComponent->mTransitionParent = mTransitionParent;
+    // Set Base
+    newComponent->mBase = mBase;
+    // Set ProtoType
+    newComponent->mProtoType = mProtoType;
 
     // Copy Imports
     newComponent->mImports = mImports;
+    // Copy Anchors
+    newComponent->mAnchors = mAnchors;
     // Copy Own Properties
     newComponent->mOwnProperties = mOwnProperties;
     // Copy Properties
@@ -105,13 +117,51 @@ ComponentInfo* ComponentInfo::duplicate(const bool& aBefore)
     // Copy Transitions
     newComponent->mTransitions = mTransitions;
 
+    // Set Children Loaded
+    newComponent->mChildrenLoaded = mChildrenLoaded;
+    // Set Animations Loaded
+    newComponent->mAnimationsLoaded = mAnimationsLoaded;
+    // Set Behaviors Loaded
+    newComponent->mBehaviorsLoaded = mBehaviorsLoaded;
 
-    // Check If Insert Before
-    if (aBefore) {
+    // Deep Copy Children, Animations, Behaviors
 
-    } else {
+    // ...
 
+    // Check Children Loaded
+    if (mChildrenLoaded) {
+        // Get Child Components Count
+        int ccCount = mChildComponents.count();
+        // Iterate Through Child Components
+        for (int i=0; i<ccCount; i++) {
+            // Append Child Component
+            newComponent->mChildComponents << mChildComponents[i]->duplicate();
+        }
     }
+
+    // Check If Animations Loaded
+    if (mAnimationsLoaded) {
+        // Get Animation Components Count
+        int acCount = mAnimationComponents.count();
+        // Iterate Through Aniamtion Components
+        for (int j=0; j<acCount; j++) {
+            // Append Animation Components
+            newComponent->mAnimationComponents << mAnimationComponents[j]->duplicate();
+        }
+    }
+
+    // Check Behaviors Loaded
+    if (mBehaviorsLoaded) {
+        // Get Behavior Components Count
+        int bcCount = mBehaviorComponents.count();
+        // Iterate Through Behavior Components
+        for (int k=0; k<bcCount; k++) {
+            // Append Behavior Component
+            newComponent->mBehaviorComponents << mBehaviorComponents[k]->duplicate();
+        }
+    }
+
+    // ...
 
     return newComponent;
 }
@@ -2215,11 +2265,14 @@ void ComponentInfo::fromJSON(const QByteArray& aContent, const bool aCreateChild
 //==============================================================================
 void ComponentInfo::removeFromParent()
 {
+    qDebug() << "ComponentInfo::removeFromParent - componentPath: " << componentPath();
+
     // Check Parent
     if (mParent) {
         qDebug() << "ComponentInfo::removeFromParent - child";
         // Remove Child
         mParent->removeChild(this);
+        return;
     }
 
     // Check Transition Parent
@@ -2227,8 +2280,8 @@ void ComponentInfo::removeFromParent()
         qDebug() << "ComponentInfo::removeFromParent - transition node";
         // Remove Node
         mTransitionParent->removeNode(this);
-    }
 
+    }
 }
 
 //==============================================================================

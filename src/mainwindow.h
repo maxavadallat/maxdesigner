@@ -50,6 +50,8 @@ class MainWindow : public QMainWindow
 
     Q_PROPERTY(bool screenshotMode READ screenshotMode NOTIFY screenshotModeChanged)
 
+    Q_PROPERTY(int duplicateCount READ duplicateCount NOTIFY duplicateCountChanged)
+
 public:
     // Constructor
     explicit MainWindow(QWidget* aParent = NULL);
@@ -59,6 +61,9 @@ public:
 
     // Get Current Component
     ComponentInfo* currentComponent();
+
+    // Get Current Component Duplicate Count
+    int duplicateCount();
 
     // Get Base Components Model
     BaseComponentsModel* baseComponentsModel();
@@ -106,14 +111,23 @@ signals:
     void viewsModelChanged(ViewsModel* aViews);
     // Data Sources Model Changed Signal
     void dataSourcesModelChanged(DataSourcesModel* aDataSources);
+
     // Screen Shot Mode Changed Signal
     void screenshotModeChanged(const bool& aScreenShotMode);
     // Asset Selected Signal
     void assetSelected(const QString& aAssetPath);
-    // Toggle Project Pane Shown
+
+    // Toggle Project Pane Shown Signal
     void toggleProjectPaneShown();
-    // Toggle Properties Pane Show
+    // Toggle Properties Pane Show Signal
     void togglePropertiesPaneShown();
+
+    // Duplicate Current Component Signal
+    void duplicateCurrentComponent();
+
+    // Current Component Duplicate Count Changed Signal
+    void duplicateCountChanged(const int& aCount);
+
 
 private:
     // Init
@@ -195,6 +209,11 @@ private:
     void closeComponent();
     // Close All Component
     void closeAllComponents();
+
+    // Duplicate Component
+    void duplicateComponent();
+    // Set Current Component Duplicate Count
+    void setDuplicateCount(const int& aCount);
 
     // Remove Component By Name
     void removeComponent(const QString& aName);
@@ -314,6 +333,8 @@ private slots:
     void on_actionTogglePropertiesPane_triggered();
     // On Toggle Clip Root Container Action triggered Slot
     void on_actionClipRootContainer_triggered();
+    // On Action Duplicate Triggered Slot
+    void on_actionDuplicate_triggered();
     // Action Quit Triggered Slot
     void on_actionQuit_triggered();
 
@@ -381,6 +402,8 @@ private:
 
     // Current Component
     ComponentInfo*              mCurrentComponent;
+    // Current Component Duplicate Count
+    int                         mDuplicateCount;
 
     // Screen Shot Mode
     bool                        mScreenShotMode;

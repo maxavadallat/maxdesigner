@@ -91,6 +91,8 @@ MainWindow::MainWindow(QWidget* aParent)
     , mCategories(NULL)
 
     , mCurrentComponent(NULL)
+    , mDuplicateCount(0)
+
     , mScreenShotMode(false)
 {
     qDebug() << "MainWindow created.";
@@ -372,6 +374,14 @@ ComponentInfo* MainWindow::currentComponent()
 }
 
 //==============================================================================
+// Get Current Component Duplicate Count
+//==============================================================================
+int MainWindow::duplicateCount()
+{
+    return mDuplicateCount;
+}
+
+//==============================================================================
 // Set Current Component
 //==============================================================================
 void MainWindow::setCurrentComponent(ComponentInfo* aComponent)
@@ -391,6 +401,9 @@ void MainWindow::setCurrentComponent(ComponentInfo* aComponent)
 
         // Set Current Component
         mCurrentComponent = aComponent;
+
+        // Reset Duplicate Count
+        setDuplicateCount(0);
 
         // Check Current Component
         if (mCurrentComponent) {
@@ -417,6 +430,9 @@ void MainWindow::setCurrentComponent(ComponentInfo* aComponent)
                 ui->actionSaveAllComponents->setEnabled(true);
             }
 
+            // Set Action Enabled State
+            ui->actionDuplicate->setEnabled(!mCurrentComponent->isRoot());
+
             // ...
 
         } else {
@@ -424,6 +440,8 @@ void MainWindow::setCurrentComponent(ComponentInfo* aComponent)
             ui->actionSaveComponent->setEnabled(false);
             // Set Go Live Enabled State
             ui->actionGoLive->setEnabled(false);
+            // Set Duplicate Action Enabled State
+            ui->actionDuplicate->setEnabled(false);
         }
     }
 }
@@ -1589,6 +1607,41 @@ void MainWindow::closeAllComponents()
 }
 
 //==============================================================================
+// Duplicate Component
+//==============================================================================
+void MainWindow::duplicateComponent()
+{
+    // Check Current Component
+    if (!mCurrentComponent) {
+        return;
+    }
+
+    qDebug() << "MainWindow::duplicateComponent";
+
+    // Inc Duplicate Count
+    setDuplicateCount(mDuplicateCount + 1);
+
+    // Emit Duplicate Current Component Signal
+    emit duplicateCurrentComponent();
+
+    // ...
+}
+
+//==============================================================================
+// Set Current Component Duplicate Count
+//==============================================================================
+void MainWindow::setDuplicateCount(const int& aCount)
+{
+    // Check Current Component Duplicate Count
+    if (mDuplicateCount != aCount) {
+        // Set Current Compoennt Duplicate Count
+        mDuplicateCount = aCount;
+        // Emit Current Component Duplicate Count Changed Signal
+        emit duplicateCountChanged(mDuplicateCount);
+    }
+}
+
+//==============================================================================
 // Remove Component By Name
 //==============================================================================
 void MainWindow::removeComponent(const QString& aName)
@@ -2248,6 +2301,15 @@ void MainWindow::on_actionClipRootContainer_triggered()
 {
     // Toggle Component Root Clip
     toggleClipRootContainers();
+}
+
+//==============================================================================
+// On Action Duplicate Triggered Slot
+//==============================================================================
+void MainWindow::on_actionDuplicate_triggered()
+{
+    // Duplicate Component
+    duplicateComponent();
 }
 
 //==============================================================================

@@ -83,14 +83,14 @@ DMouseArea {
             return DStyle.colorBorderHoverNOK;
         }
 
-        // Check If Borders Visible
-        if (!chRoot.borderVisible) {
-            return "transparent";
-        }
-
         // Check If Focused
         if (chRoot.componentInfo !== null && propertiesController.focusedComponent === chRoot.componentInfo) {
             return DStyle.colorBorder;
+        }
+
+        // Check If Borders Visible
+        if (!chRoot.borderVisible) {
+            return "transparent";
         }
 
         return DStyle.colorBorderNoFocus;
@@ -695,6 +695,60 @@ DMouseArea {
 
         // ...
 
+    }
+
+    // Main Controller Connections
+    property Connections mainControllerConnections: Connections {
+        target: mainController
+
+        onDuplicateCurrentComponent: {
+            console.log("DComponentHandler.mainControllerConnections.onDuplicateCurrentComponent");
+
+            // Check Focused Component
+            if (propertiesController.focusedComponent === chRoot.componentInfo) {
+                // Duplicate Component Info
+                var newComponentInfo = chRoot.componentInfo.duplicate();
+
+                // Get Component Parent Layout Base
+                var plBase = chRoot.componentInfo.componentParent.layoutBase();
+
+                // Switch Parent Layout Base
+                switch (plBase) {
+                    case "Row":
+                    case "Column":
+                    case "Flow":
+                    break;
+
+                    default:
+                        // Get Current Position
+                        var posX = chRoot.x;
+                        var posY = chRoot.y;
+
+                        console.log("DComponentHandler.mainControllerConnections.onDuplicateCurrentComponent - pos: [" + posX + ":" + posY + "]");
+
+                        // Check Anchors
+
+                        // ...
+
+                        // Set New Component Position
+                        newComponentInfo.setPosX(posX + DStyle.defaultMargin * mainController.duplicateCount);
+                        newComponentInfo.setPosY(posY + DStyle.defaultMargin * mainController.duplicateCount);
+
+                        // TODO: Have More Sophisticated Positioning
+
+                        // ...
+
+                    break;
+                }
+
+                // Check Component Parent Layout Base
+
+                // Append Component
+                chRoot.componentInfo.componentParent.addChild(newComponentInfo);
+
+                // ...
+            }
+        }
     }
 
     // Drag Axis
