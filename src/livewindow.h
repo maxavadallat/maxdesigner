@@ -87,9 +87,13 @@ protected:
     // Shut Down Live
     void shutDown();
 
+    // Trim Component Cache
+    void trimQMLComponentCache();
+    // Clear Component Cache
+    void clearQMLComponentCache();
+
     // Toggle Show Dashboard
     void toggleDashBoard();
-
     // Set Busy
     void setBusy(const bool& aBusy);
 
@@ -102,7 +106,6 @@ public: // from QMainWindow
 private slots:
     // Component Updated Slot
     void componentUpdated();
-
     // On Action Show Dashboard Triggered Slot
     void on_actionShowDashboard_triggered();
     // Action Close Triggered Slot

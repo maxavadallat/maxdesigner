@@ -1071,6 +1071,30 @@ void MainWindow::launchAssetBrowser()
 }
 
 //==============================================================================
+// Trim Component Cache
+//==============================================================================
+void MainWindow::trimQMLComponentCache()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    qDebug() << "MainWindow::trimQMLComponentCache";
+
+    // Get Root QML Context
+    QQmlContext* ctx = ui->mainQuickWidget->rootContext();
+    // Get Engine
+    QQmlEngine* engine = ctx ? ctx->engine() : NULL;
+
+    // Check Engine
+    if (engine) {
+        // Trim Component Cache
+        engine->trimComponentCache();
+    }
+}
+
+//==============================================================================
 // Clear Component Cache
 //==============================================================================
 void MainWindow::clearQMLComponentCache()

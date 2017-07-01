@@ -59,7 +59,8 @@ SOURCES             += src/mainwindow.cpp \
                     src/qmleditorwindow.cpp \
                     src/resourceviewerdialog.cpp \
                     src/createdatasourcedialog.cpp \
-                    src/assetbrowserwindow.cpp
+                    src/assetbrowserwindow.cpp \
+                    src/flowwindow.cpp
 
 # Headers
 HEADERS             += src/designerapplication.h \
@@ -116,7 +117,8 @@ HEADERS             += src/mainwindow.h \
                     src/qmleditorwindow.h \
                     src/resourceviewerdialog.h \
                     src/createdatasourcedialog.h \
-                    src/assetbrowserwindow.h
+                    src/assetbrowserwindow.h \
+                    src/flowwindow.h
 
 # Forms
 FORMS               += ui/mainwindow.ui \
@@ -131,7 +133,8 @@ FORMS               += ui/mainwindow.ui \
                     ui/resourceviewerdialog.ui \
                     ui/livewindow.ui \
                     ui/createdatasourcedialog.ui \
-                    ui/assetbrowserwindow.ui
+                    ui/assetbrowserwindow.ui \
+                    ui/flowwindow.ui
 
 # Resources
 RESOURCES           += maxdesigner.qrc \

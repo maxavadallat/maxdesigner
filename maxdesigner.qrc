@@ -128,5 +128,9 @@
         <file>qml/mainview/DAnimationPane.qml</file>
         <file>qml/live/DDataSourceControl.qml</file>
         <file>qml/live/DStoryBoard.qml</file>
+        <file>qml/propertiespane/DPosXItemDelegate.qml</file>
+        <file>qml/propertiespane/DPosYItemDelegate.qml</file>
+        <file>qml/propertiespane/DWidthItemDelegate.qml</file>
+        <file>qml/propertiespane/DHeightItemDelegate.qml</file>
     </qresource>
 </RCC>

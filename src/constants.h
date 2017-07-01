@@ -34,6 +34,8 @@
 #define DEFAULT_MAIN_QMLFILE_URL                            "qrc:/qml/main.qml"
 // Live Window QML Widget QML File
 #define DEFAULT_LIVE_QMLFILE_URL                            "qrc:/qml/live/liveMain.qml"
+// Flow Window QML Widget QML File
+#define DEFAULT_FLOW_QMLFILE_URL                            "qrc:/qml/flow/flowMain.qml"
 // Asset Browser Window QML Widget QML File
 #define DEFAULT_ASSETBROWSER_QMLFILE_URL                    "qrc:/qml/assetbrowser/assetBrowserMain.qml"
 
@@ -102,6 +104,8 @@
 #define DEFAULT_LIVE_CONTROLLER_NAME                        "liveController"
 // Asset Browser Controller
 #define DEFAULT_ASSET_BROWSER_CONTROLLER_NAME               "assetBrowserController"
+// Flow Window Controller Name
+#define DEFAULT_FLOW_CONTROLLER_NAME                        "flowController"
 // Settings Controller Name
 #define DEFAULT_GLOBAL_SETTINGS_CONTROLLER                  "settingsController"
 // Properties Controller Name

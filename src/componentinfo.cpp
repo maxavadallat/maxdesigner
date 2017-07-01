@@ -451,6 +451,9 @@ bool ComponentInfo::save(const QString& aFilePath)
 {
     // Check File Path
     if (aFilePath.isEmpty() && !mDirty) {
+//        qDebug() << "##########################################################";
+//        qDebug() << "####                 NOT SAVING!                      ####";
+//        qDebug() << "##########################################################";
         // No Need to Save
         return false;
     }
@@ -1787,7 +1790,7 @@ void ComponentInfo::setDirty(const bool& aDirty)
 
         // Check Drity
         if (mDirty) {
-            qDebug() << "####" << componentPath() << " DIRTY! ####";
+            qDebug() << "#### ComponentInfo::setDirty - componentPath: " << componentPath() << " IS DIRTY! ####";
         }
 
         // Emit Dirty Changed Signal

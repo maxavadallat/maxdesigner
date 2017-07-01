@@ -222,6 +222,44 @@ void LiveWindow::shutDown()
 }
 
 //==============================================================================
+// Trim Component Cache
+//==============================================================================
+void LiveWindow::trimQMLComponentCache()
+{
+    qDebug() << "LiveWindow::trimQMLComponentCache";
+
+    // Get Root QML Context
+    QQmlContext* ctx = ui->quickLiveWidget->rootContext();
+    // Get Engine
+    QQmlEngine* engine = ctx ? ctx->engine() : NULL;
+
+    // Check Engine
+    if (engine) {
+        // Trim Component Cache
+        engine->trimComponentCache();
+    }
+}
+
+//==============================================================================
+// Clear Component Cache
+//==============================================================================
+void LiveWindow::clearQMLComponentCache()
+{
+    qDebug() << "LiveWindow::clearQMLComponentCache";
+
+    // Get Root QML Context
+    QQmlContext* ctx = ui->quickLiveWidget->rootContext();
+    // Get Engine
+    QQmlEngine* engine = ctx ? ctx->engine() : NULL;
+
+    // Check Engine
+    if (engine) {
+        // Clear Component Cache
+        engine->clearComponentCache();
+    }
+}
+
+//==============================================================================
 // Toggle Show Dashboard
 //==============================================================================
 void LiveWindow::toggleDashBoard()
@@ -282,6 +320,7 @@ void LiveWindow::showEvent(QShowEvent* aShowEvent)
 {
     QMainWindow::showEvent(aShowEvent);
 
+    // ...
 }
 
 //==============================================================================
@@ -313,6 +352,10 @@ void LiveWindow::componentUpdated()
 
     // Shut Down
     shutDown();
+
+    // Trim Component Cache
+    trimQMLComponentCache();
+
     // Set up Live
     setupLive();
 }

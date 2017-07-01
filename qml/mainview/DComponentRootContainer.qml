@@ -403,6 +403,9 @@ DPaneBase {
         // Remove Component QML Content
         removeComponentQMLContent();
 
+        // Trim Component Cache
+        mainController.trimQMLComponentCache();
+
         // Create Component QML Content
         createComponentQMLContent();
 

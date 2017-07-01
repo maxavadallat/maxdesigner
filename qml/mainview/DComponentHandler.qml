@@ -1315,7 +1315,7 @@ DMouseArea {
             }
 
             // CLEAR THE FUCKING QML COMPONENT CACHE BECAUSE THEY FUCKED IT UP! BUT THIS WILL CAUSE A CRASH AT SHUTDOWN!!!
-            mainController.clearQMLComponentCache();
+            //mainController.clearQMLComponentCache();
 
             // Create Component
             var component  = Qt.createComponent("file://" + cFileName);

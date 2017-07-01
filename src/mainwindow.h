@@ -93,6 +93,8 @@ public:
     // Launch Asset Browser Window
     Q_INVOKABLE void launchAssetBrowser();
 
+    // Trim Component Cache
+    Q_INVOKABLE void trimQMLComponentCache();
     // Clear Component Cache
     Q_INVOKABLE void clearQMLComponentCache();
 
