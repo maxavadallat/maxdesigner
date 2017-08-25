@@ -9,7 +9,7 @@ import "qrc:/qml/controls"
 import "qrc:/qml/animations"
 
 Item {
-    id: posYItemDelegate
+    id: posYItemDelegateRoot
 
     width: 220
     height: DStyle.spinnerHeight
@@ -19,12 +19,21 @@ Item {
 
     property ComponentInfo componentInfo: propertiesController.focusedComponent
 
-    Rectangle {
-        anchors.fill: parent
-        color: "transparent"
-        border.color: "purple"
+    signal tabKeyPressed()
+
+    // Set FLipped State
+    function setFlipY(aFlipped) {
+        // Set Flipped State
+        posYFlipable.flipped = aFlipped;
     }
 
+    // Set Editor Focus
+    function setEditorFocus(aFocus) {
+        // Set Spinner Focus
+        ySpinner.setSpinnerFocus(aFocus, aFocus);
+    }
+
+    // Pos Y Editor Flippable
     DFlipable {
         id: posYFlipable
         anchors.fill: parent
@@ -43,17 +52,29 @@ Item {
 
             DText {
                 id: yLabel
-                width: sizeAndPosSectionRoot.labelWidth
+                width: posYItemDelegateRoot.labelWidth
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Text.AlignRight
-                text: "y:"
+                text: {
+                    // Check Component Info
+                    if (posYItemDelegateRoot.componentInfo && posYItemDelegateRoot.componentInfo.propertyIsFormula("y")) {
+                        return "fy:"
+                    }
+
+                    // Check For Implicit Pos Y
+                    if (posYItemDelegateRoot.componentInfo && posYItemDelegateRoot.componentInfo.useIPosY) {
+                        return "iy:"
+                    }
+
+                    return "y:"; // •
+                }
             }
 
             DSpinner {
                 id: ySpinner
                 width: posYFlipable.width - yLabel.width - DStyle.defaultSpacing
                 anchors.verticalCenter: parent.verticalCenter
-                value: sizeAndPosSectionRoot.componentInfo ? Number(sizeAndPosSectionRoot.componentInfo.posY) : 0
+                value: posYItemDelegateRoot.componentInfo ? Number(posYItemDelegateRoot.componentInfo.posY) : 0
 
                 onValueIncreased: {
                     propertiesController.requestCY(newValue);
@@ -69,8 +90,10 @@ Item {
 
                 onKeyEvent: {
                     if (event.key === Qt.Key_Tab) {
-                        // Set Width Spinner Focus
-                        widthSpinner.setSpinnerFocus(true, true);
+                        // Emit Tab Key Pressed Signal
+                        posYItemDelegateRoot.tabKeyPressed();
+//                        // Set Width Spinner Focus
+//                        widthSpinner.setSpinnerFocus(true, true);
                     }
                 }
             }
@@ -81,7 +104,7 @@ Item {
 
             DText {
                 id: posYBackLabel
-                width: sizeAndPosSectionRoot.labelWidth
+                width: posYItemDelegateRoot.labelWidth
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Text.AlignRight
                 text: "y:"
@@ -97,7 +120,7 @@ Item {
 
             DButton {
                 id: posYEditButton
-                width: sizeAndPosSectionRoot.editButtonWidth
+                width: posYItemDelegateRoot.editButtonWidth
                 height: DStyle.spinnerHeight
 
                 text: "Edit"
@@ -113,7 +136,11 @@ Item {
         id: posYSwipe
         anchors.fill: parent
         actionButtonText: "Implicit"
-        enableSwipe: true
+
+        enableSwipe: {
+            return false;
+        }
+
         onActionButtonClicked: {
 
         }

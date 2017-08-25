@@ -19,10 +19,18 @@ Item {
 
     property ComponentInfo componentInfo: propertiesController.focusedComponent
 
-    Rectangle {
-        anchors.fill: parent
-        color: "transparent"
-        border.color: "purple"
+    signal tabKeyPressed()
+
+    // Set FLipped State
+    function setFlipX(aFlipped) {
+        // Set Flipped State
+        posXFlipable.flipped = aFlipped;
+    }
+
+    // Set Editor Focus
+    function setEditorFocus(aFocus) {
+        // Set Spinner Focus
+        xSpinner.setSpinnerFocus(aFocus, aFocus);
     }
 
     DFlipable {
@@ -43,13 +51,18 @@ Item {
 
             DText {
                 id: xLabel
-                width: sizeAndPosSectionRoot.labelWidth
+                width: posXItemDelegateRoot.labelWidth
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Text.AlignRight
                 text: {
                     // Check Component Info
-                    if (sizeAndPosSectionRoot.componentInfo && sizeAndPosSectionRoot.componentInfo.propertyIsFormula("x")) {
+                    if (posXItemDelegateRoot.componentInfo && posXItemDelegateRoot.componentInfo.propertyIsFormula("x")) {
                         return "fx:"
+                    }
+
+                    // Check For Implicit Pos X
+                    if (posXItemDelegateRoot.componentInfo && posXItemDelegateRoot.componentInfo.useIPosX) {
+                        return "ix:"
                     }
 
                     return "x:"; // •
@@ -61,7 +74,7 @@ Item {
                 width: posXFlipable.width - xLabel.width - DStyle.defaultSpacing
                 anchors.verticalCenter: parent.verticalCenter
 
-                value: sizeAndPosSectionRoot.componentInfo ? Number(sizeAndPosSectionRoot.componentInfo.posX) : 0
+                value: posXItemDelegateRoot.componentInfo ? Number(posXItemDelegateRoot.componentInfo.posX) : 0
 
                 onValueIncreased: {
                     propertiesController.requestCX(newValue);
@@ -77,8 +90,10 @@ Item {
 
                 onKeyEvent: {
                     if (event.key === Qt.Key_Tab) {
-                        // Set Y Spinner Focus
-                        ySpinner.setSpinnerFocus(true, true);
+                        // Emit Tab Key Pressed Signal
+                        posXItemDelegateRoot.tabKeyPressed();
+//                        // Set Y Spinner Focus
+//                        ySpinner.setSpinnerFocus(true, true);
                     }
                 }
             }
@@ -89,7 +104,7 @@ Item {
 
             DText {
                 id: posXBackLabel
-                width: sizeAndPosSectionRoot.labelWidth
+                width: posXItemDelegateRoot.labelWidth
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Text.AlignRight
                 text: "x:"
@@ -105,7 +120,7 @@ Item {
 
             DButton {
                 id: posXEditButton
-                width: sizeAndPosSectionRoot.editButtonWidth
+                width: posXItemDelegateRoot.editButtonWidth
                 height: DStyle.spinnerHeight
 
                 text: "Edit"
@@ -121,7 +136,11 @@ Item {
         id: posYSwipe
         anchors.fill: parent
         actionButtonText: "Implicit"
-        enableSwipe: true
+
+        enableSwipe: {
+            return false;
+        }
+
         onActionButtonClicked: {
 
         }

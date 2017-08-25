@@ -25,25 +25,25 @@ DSection {
     // Flip Pos X Editor
     function flipPosXEditor(flipState) {
         // Set Flipped State
-        posXFlipable.flipped = flipState;
+        posXItemDelegate.setFlipX(flipState);
     }
 
     // Flip Pos Y Editor
     function flipPosYEditor(flipState) {
         // Set Flipped State
-        posYFlipable.flipped = flipState;
+        posYItemDelegate.setFlipY(flipState);
     }
 
     // Flip Wisth Editor
     function flipWidthEditor(flipState) {
         // Set Flipped State
-        widthFlipable.flipped = flipState;
+        widthItemDelegate.setFlipWidth(flipState);
     }
 
     // Flip Height Editor
     function flipHeightEditor(flipState) {
         // Set Flipped State
-        heightFlipable.flipped = flipState;
+        heightItemDelegate.setFlipHeight(flipState);
     }
 
     Column {
@@ -72,12 +72,20 @@ DSection {
                 id: posXItemDelegate
                 width: (sizeAndPosColumn.width - DStyle.defaultSpacing) * 0.5
                 height: DStyle.spinnerHeight
+                onTabKeyPressed: {
+                    // Set Editor Focus
+                    posYItemDelegate.setEditorFocus(true);
+                }
             }
 
             DPosYItemDelegate {
                 id: posYItemDelegate
                 width: (sizeAndPosColumn.width - DStyle.defaultSpacing) * 0.5
                 height: DStyle.spinnerHeight
+                onTabKeyPressed: {
+                    // Set Editor Focus
+                    widthItemDelegate.setEditorFocus(true);
+                }
             }
         }
 
@@ -93,12 +101,26 @@ DSection {
                 id: widthItemDelegate
                 width: (sizeAndPosColumn.width - DStyle.defaultSpacing) * 0.5
                 height: DStyle.spinnerHeight
+                onTabKeyPressed: {
+                    // Set Editor Focus
+                    heightItemDelegate.setEditorFocus(true);
+                }
             }
 
             DHeightItemDelegate {
                 id: heightItemDelegate
                 width: (sizeAndPosColumn.width - DStyle.defaultSpacing) * 0.5
                 height: DStyle.spinnerHeight
+                onTabKeyPressed: {
+                    // Check If Pod Row Visible
+                    if (posRow.visible) {
+                        // Set Editor Focus
+                        posXItemDelegate.setEditorFocus(true);
+                    } else {
+                        // Set Editor Focus
+                        widthItemDelegate.setEditorFocus(true);
+                    }
+                }
             }
         }
     }

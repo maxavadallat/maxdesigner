@@ -18,6 +18,14 @@ Item {
 
     // Create New Component Root
     function createNewComponentRoot(componentInfo, width, height) {
+        // Check Component Info
+        if (componentInfo === null) {
+            console.warn("createNewComponentRoot - NULL COMPONENT INFO!!");
+            return;
+        }
+
+        console.log("createNewComponentRoot - componentInfo: " + componentInfo.componentName + " - width: " + width + " - height: " + height);
+
         // Incubate Object
         var incubator = componentRootFactory.incubateObject(mainGrabArea);
         // Check Status
@@ -26,16 +34,16 @@ Item {
             incubator.onStatusChanged = function(status) {
                 // Check Status
                 if (status === Component.Ready) {
-                    //console.log("componentRootFactory - object: ", incubator.object, " ready!");
+                    console.log("createNewComponentRoot - object: ", incubator.object, " ready!");
                     // Launch Root Component
                     launchComponentRoot(incubator.object, componentInfo, width, height);
 
                 } else if (status === Component.Error) {
-                    console.log("componentRootFactory - object: ", incubator.object, " ERROR: " + componentRootFactory.errorString());
+                    console.log("createNewComponentRoot - object: ", incubator.object, " ERROR: " + componentRootFactory.errorString());
                 }
             }
         } else {
-            //console.log("componentRootFactory - object: ", incubator.object, " immediately ready!");
+            console.log("createNewComponentRoot - object: ", incubator.object, " immediately ready!");
             // Launch Root Component
             launchComponentRoot(incubator.object, componentInfo, width, height);
         }
@@ -43,7 +51,7 @@ Item {
 
     // Launch Component Root
     function launchComponentRoot(object, componentInfo, width, height) {
-        //console.log("launchComponentRoot - componentName: " + componentInfo.componentName + " - width: " + width + " - height: " + height);
+        console.log("launchComponentRoot - componentName: " + componentInfo.componentName + " - width: " + width + " - height: " + height);
 
         // Check If Children Loaded
         if (componentInfo !== null) {

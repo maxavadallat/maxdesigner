@@ -49,7 +49,7 @@ class ComponentInfo : public QObject
     Q_PROPERTY(ComponentInfo* componentParent READ componentParent WRITE setComponentParent NOTIFY componentParentChanged)
     // Component Path
     Q_PROPERTY(QString componentPath READ componentPath NOTIFY componentPathChanged)
-    // QML Container
+    // QML Component Handler
     Q_PROPERTY(QObject* componentHandler READ componentHandler WRITE setComponentHandler NOTIFY componentContainerChanged)
     // Prototype
     Q_PROPERTY(bool protoType READ protoType NOTIFY protoTypeChanged)
@@ -88,9 +88,15 @@ class ComponentInfo : public QObject
     Q_PROPERTY(QString posX READ posX NOTIFY posXChanged)
     Q_PROPERTY(QString posY READ posY NOTIFY posYChanged)
     Q_PROPERTY(QString posZ READ posZ NOTIFY posZChanged)
+    // Implicit Pos
+    Q_PROPERTY(QString implicitPosX READ implicitPosX WRITE setImplicitPosX NOTIFY implicitPosXChanged)
+    Q_PROPERTY(QString implicitPosY READ implicitPosY WRITE setImplicitPosY NOTIFY implicitPosYChanged)
     // Size
     Q_PROPERTY(QString width READ width NOTIFY widthChanged)
     Q_PROPERTY(QString height READ height NOTIFY heightChanged)
+    // Implicit Size
+    Q_PROPERTY(QString implicitWidth READ implicitWidth WRITE setImplicitWidth NOTIFY implicitWidthChanged)
+    Q_PROPERTY(QString implicitHeight READ implicitHeight WRITE setImplicitHeight NOTIFY implicitHeightChanged)
 
     Q_PROPERTY(bool useIPosX READ useIPosX WRITE setUseIPosX NOTIFY useIPosXChanged)
     Q_PROPERTY(bool useIPosY READ useIPosY WRITE setUseIPosY NOTIFY useIPosYChanged)
@@ -256,6 +262,16 @@ public:
     // Get Pos Z
     QString posZ();
 
+    // Get Implicit Pos X
+    QString implicitPosX();
+    // Set Implicit Pos X
+    void setImplicitPosX(const QString& aIPosX);
+
+    // Get Implicit Pos Y
+    QString implicitPosY();
+    // Set Implicit Pos Y
+    void setImplicitPosY(const QString& aIPosY);
+
     // Get Width
     QString width();
     // Set Width
@@ -265,6 +281,16 @@ public:
     QString height();
     // Set Height
     Q_INVOKABLE void setHeight(const QString& aHeight);
+
+    // Get Implicit Width
+    QString implicitWidth();
+    // Set Implicit Width
+    void setImplicitWidth(const QString& aIWidth);
+
+    // Get Implicit Height
+    QString implicitHeight();
+    // Set Implicit Height
+    void setImplicitHeight(const QString& aIHeight);
 
     // Get Use Implicit Pos X
     bool useIPosX();
@@ -449,10 +475,12 @@ public:
     // Generate Data Source Live Code
     Q_INVOKABLE QString generateDataSourceLiveCode();
 
-    // Get Layout Base
+    // Get Layout Base Component Name
     Q_INVOKABLE QString layoutBase();
-    // Get Animation Base
+    // Get Animation Base Component Name
     Q_INVOKABLE QString animBase();
+    // Get Built In Base Component Name
+    Q_INVOKABLE QString builtInBase();
 
     // Get Global Child Index Map
     Q_INVOKABLE QString getGlobalChildIndexMap();
@@ -556,6 +584,15 @@ signals:
     void widthChanged(const QString& aWidth);
     // Height Changed Signal
     void heightChanged(const QString& aHeight);
+
+    // Implicit Pos X Changed Signal
+    void implicitPosXChanged(const QString& aIPosX);
+    // Implicit Pos Y Changed Signal
+    void implicitPosYChanged(const QString& aIPosY);
+    // Implicit Width Changed Signal
+    void implicitWidthChanged(const QString& aIWidth);
+    // Implicit Height Changed Signal
+    void implicitHeightChanged(const QString& aIHeight);
 
     // Use Implicit Pos X Changed Signal
     void useIPosXChanged(const bool& aUseIPosX);
@@ -933,13 +970,22 @@ protected: // Data
     QString                     mBaseName;
 
     // Use Implicit Pos X
-    bool                        mImplicitPosX;
+    bool                        mUseImplicitPosX;
     // Use Implicit Pos Y
-    bool                        mImplicitPosY;
+    bool                        mUseImplicitPosY;
     // Use Implicit Width
-    bool                        mImplicitWidth;
+    bool                        mUseImplicitWidth;
     // Use Implicit Height
-    bool                        mImplicitHeight;
+    bool                        mUseImplicitHeight;
+
+    // Implicit Pos X
+    QString                     mImplicitPosX;
+    // Implicit Pos Y
+    QString                     mImplicitPosY;
+    // Implisit Width
+    QString                     mImplicitWidth;
+    // Implicit Height
+    QString                     mImplicitHeight;
 
     // Focused State
     bool                        mFocused;

@@ -24,6 +24,8 @@ DMouseArea {
     property ComponentInfo componentInfo: null
     // Component Object
     property QtObject componentObject: null
+    // Component Handler Error
+    property bool chError: false
 
     // Root Content Container
     property alias rootContentContainer: rootContentContainer
@@ -100,6 +102,7 @@ DMouseArea {
     property int borderMargins: 0
 
     property bool rootHandler: false
+
     property bool mainDrag: false
 
     // Enable Drag
@@ -666,6 +669,8 @@ DMouseArea {
         ignoreUnknownSignals: true
 
         onXChanged: {
+            //console.log("DComponentHandler.componentObjectConnections.onXChanged - x: " + chRoot.componentObject.x);
+
             // Set Handler Pos X
             chRoot.x = componentObject.x;
 
@@ -673,6 +678,8 @@ DMouseArea {
         }
 
         onYChanged: {
+            //console.log("DComponentHandler.componentObjectConnections.onYChanged - y: " + chRoot.componentObject.y);
+
             // Set Handler Pos Y
             chRoot.y = componentObject.y;
 
@@ -680,6 +687,8 @@ DMouseArea {
         }
 
         onWidthChanged: {
+            //console.log("DComponentHandler.componentObjectConnections.onWidthChanged - width: " + chRoot.componentObject.width);
+
             // Set Handler Width
             chRoot.width = componentObject.width;
 
@@ -687,6 +696,8 @@ DMouseArea {
         }
 
         onHeightChanged: {
+            //console.log("DComponentHandler.componentObjectConnections.onHeightChanged - height: " + chRoot.componentObject.height);
+
             // Set Handler Height
             chRoot.height = componentObject.height;
 
@@ -776,6 +787,7 @@ DMouseArea {
 
     // Resize Pressed Signal
     signal resizePressed()
+    signal resizeReleased()
 
     Component.onDestruction: {
         //console.log("DComponentHandler.onDestruction");
@@ -975,12 +987,23 @@ DMouseArea {
     // On Height Changed Slot
     onHeightChanged: updateComponentHeight(chRoot.height)
 
+    // On Manual Resize Changed
+    onManualResizeChanged: {
+        //console.log("DComponentHandler.onManualResizeChanged - manualResize: " + manualResize);
+
+        // ...
+    }
+
     // Update Component Pos X
     function updateComponentPosX(posX) {
         // Check Upadte Component Info Enabled
-        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null && !chRoot.componentInfo.useIPosX) {
-            // Check If Root
-            if (!chRoot.componentInfo.isRoot) {
+        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null && !chRoot.componentInfo.isRoot) {
+            // Check If Using Implicit Pos X
+            if (chRoot.componentInfo.useIPosX) {
+
+                // ...
+
+            } else {
                 // Check Pos X
                 if (chRoot.componentInfo.posX !== posX) {
 
@@ -996,10 +1019,14 @@ DMouseArea {
     // Update Component Pos Y
     function updateComponentPosY(posY) {
         // Check Upadte Component Info Enabled
-        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null && !chRoot.componentInfo.useIPosY) {
-            // Check If Root
-            if (!chRoot.componentInfo.isRoot) {
-                // Check Pos X
+        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null && !chRoot.componentInfo.isRoot) {
+            // Check If Using Implicit Pos Y
+            if (chRoot.componentInfo.useIPosY) {
+
+                // ...
+
+            } else {
+                // Check Pos Y
                 if (chRoot.componentInfo.posY !== posY) {
 
                     // TODO: Check For Bindings
@@ -1013,30 +1040,70 @@ DMouseArea {
 
     // Update Component Width
     function updateComponentWidth(width) {
+        // Check Component Info
+        if (chRoot.componentInfo === null) {
+            return;
+        }
+
         // Check Upadte Component Info Enabled
-        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null && !chRoot.componentInfo.useIWidth) {
-            // Check Width
-            if (chRoot.componentInfo.width !== width) {
+        if (chRoot.updateComponentInfoEnabled) {
 
-                // TODO: Check For Bindings
+            console.log("DComponentHandler.updateComponentWidth - componentInfo: " + chRoot.componentInfo.componentPath + " - useIWidth: " + chRoot.componentInfo.useIWidth);
 
-                // Set Width
-                chRoot.componentInfo.setWidth(width);
+            // Check If Using Implicit Width
+            if (chRoot.componentInfo.useIWidth && !chRoot.manualResize) {
+
+                //console.log("DComponentHandler.updateComponentWidth - width: " + width + " - IMPLICIT");
+
+                // Set Implicit Width
+                chRoot.componentInfo.implicitWidth = width;
+
+            } else {
+                // Check Width
+                if (chRoot.componentInfo.width !== width) {
+
+                    //console.log("DComponentHandler.updateComponentWidth - width: " + width + " - EXLICIT");
+
+                    // TODO: Check For Bindings
+
+                    // Set Width
+                    chRoot.componentInfo.setWidth(width);
+                }
             }
         }
     }
 
     // Update Component Height
     function updateComponentHeight(height) {
+        // Check Component Info
+        if (chRoot.componentInfo === null) {
+            return;
+        }
+
         // Check Upadte Component Info Enabled
-        if (chRoot.updateComponentInfoEnabled && chRoot.componentInfo !== null && !chRoot.componentInfo.useIHeight) {
-            // Check Height
-            if (chRoot.componentInfo.height !== height) {
+        if (chRoot.updateComponentInfoEnabled) {
 
-                // TODO: Check For Bindings
+            //console.log("DComponentHandler.updateComponentHeight - componentInfo: " + chRoot.componentInfo.componentPath + " - useIHeight: " + chRoot.componentInfo.useIHeight);
 
-                // Set Width
-                chRoot.componentInfo.setHeight(height);
+            // Check If Using Implicit Height
+            if (chRoot.componentInfo.useIHeight && !chRoot.manualResize) {
+
+                //console.log("DComponentHandler.updateComponentHeight - height: " + height + " - IMPLICIT");
+
+                // Set Implicit Height
+                chRoot.componentInfo.implicitHeight = height;
+
+            } else {
+                // Check Height
+                if (chRoot.componentInfo.height !== height) {
+
+                    //console.log("DComponentHandler.updateComponentHeight - height: " + height + " - EXLICIT");
+
+                    // TODO: Check For Bindings
+
+                    // Set Width
+                    chRoot.componentInfo.setHeight(height);
+                }
             }
         }
     }
@@ -1314,6 +1381,8 @@ DMouseArea {
                 cFileName = propertiesController.currentProject.generateLiveCode(componentInfo, createChildren);
             }
 
+            console.log("DComponentHandler.createComponentObject - componentInfo: " + componentInfo.componentPath)
+
             // CLEAR THE FUCKING QML COMPONENT CACHE BECAUSE THEY FUCKED IT UP! BUT THIS WILL CAUSE A CRASH AT SHUTDOWN!!!
             //mainController.clearQMLComponentCache();
 
@@ -1328,9 +1397,6 @@ DMouseArea {
                 // Create New Root Object
                 newComponentObject = component.createObject(parent);
 
-                // Remove Live Temp File
-                //propertiesController.currentProject.removeLiveTempFile(cFileName);
-
             } else {
                 console.error("DComponentHandler.createComponentObject - ERROR CREATING NEW COMPONENT!! - error: " + component.errorString());
                 return null;
@@ -1341,6 +1407,8 @@ DMouseArea {
                 console.error("DComponentHandler.createComponentObject - ERROR CREATING NEW COMPONENT OBJECT!! - error: " + component.errorString());
                 return null;
             }
+
+            //console.log("DComponentHandler.createComponentObject - created. size: [" + newComponentObject.implicitWidth + "x" + newComponentObject.implicitHeight + "]");
 
             return newComponentObject;
 
@@ -1777,14 +1845,26 @@ DMouseArea {
         anchors.leftMargin: DStyle.defaultMargin
         anchors.rightMargin: DStyle.defaultMargin
         color: "white"
-        visible: settingsController.componentNamesVisible && chRoot.updateComponentInfoEnabled
-        opacity: CONSTS.componentNamesOpacity
+        visible: {
+            if (chRoot.chError) {
+                return true;
+            }
+
+            return settingsController.componentNamesVisible && chRoot.updateComponentInfoEnabled;
+        }
+        opacity: chRoot.chError ? 1.0 : CONSTS.componentNamesOpacity
         font.pixelSize: DStyle.fontSizeXXXL
         fontSizeMode: Text.HorizontalFit
         horizontalAlignment: Text.AlignHCenter
         clip: true
         wrapMode: Text.NoWrap
-        text: chRoot.componentInfo ? chRoot.componentInfo.componentName : ""
+        text: {
+            if (chRoot.chError) {
+                return "Component Error! = (";
+            }
+
+            return chRoot.componentInfo ? chRoot.componentInfo.componentName : "";
+        }
     }
 
     // Animation Image
@@ -1822,6 +1902,9 @@ DMouseArea {
         enabled: chRoot.enableResize && chRoot.resizeLeftEnabled && chRoot.resizeTopEnabled
 
         onPressed: {
+            // Set Manual Resize
+            chRoot.manualResize = true;
+
             // Check Main drag
             if (mainDrag) {
                 // Emit Resize Pressed Signal
@@ -1833,6 +1916,11 @@ DMouseArea {
                 // Set Focus
                 chRoot.focus = true;
             }
+        }
+
+        onReleased: {
+            // Reset Manual Resize
+            chRoot.manualResize = false;
         }
     }
 
@@ -1844,6 +1932,9 @@ DMouseArea {
         enabled: chRoot.enableResize && chRoot.resizeTopEnabled
 
         onPressed: {
+            // Set Manual Resize
+            chRoot.manualResize = true;
+
             // Check Main drag
             if (mainDrag) {
                 // Emit Resize Pressed Signal
@@ -1855,6 +1946,11 @@ DMouseArea {
                 // Set Focus
                 chRoot.focus = true;
             }
+        }
+
+        onReleased: {
+            // Reset Manual Resize
+            chRoot.manualResize = false;
         }
     }
 
@@ -1866,6 +1962,9 @@ DMouseArea {
         enabled: chRoot.enableResize && chRoot.resizeTopEnabled && chRoot.resizeRightEnabled
 
         onPressed: {
+            // Set Manual Resize
+            chRoot.manualResize = true;
+
             // Check Main drag
             if (mainDrag) {
                 // Emit Resize Pressed Signal
@@ -1877,6 +1976,11 @@ DMouseArea {
                 // Set Focus
                 chRoot.focus = true;
             }
+        }
+
+        onReleased: {
+            // Reset Manual Resize
+            chRoot.manualResize = false;
         }
     }
 
@@ -1888,6 +1992,9 @@ DMouseArea {
         enabled: chRoot.enableResize && chRoot.resizeLeftEnabled
 
         onPressed: {
+            // Set Manual Resize
+            chRoot.manualResize = true;
+
             // Check Main drag
             if (mainDrag) {
                 // Emit Resize Pressed Signal
@@ -1899,6 +2006,11 @@ DMouseArea {
                 // Set Focus
                 chRoot.focus = true;
             }
+        }
+
+        onReleased: {
+            // Reset Manual Resize
+            chRoot.manualResize = false;
         }
     }
 
@@ -1910,6 +2022,9 @@ DMouseArea {
         enabled: chRoot.enableResize && chRoot.resizeRightEnabled
 
         onPressed: {
+            // Set Manual Resize
+            chRoot.manualResize = true;
+
             // Check Main drag
             if (mainDrag) {
                 // Emit Resize Pressed Signal
@@ -1921,6 +2036,11 @@ DMouseArea {
                 // Set Focus
                 chRoot.focus = true;
             }
+        }
+
+        onReleased: {
+            // Reset Manual Resize
+            chRoot.manualResize = false;
         }
     }
 
@@ -1932,6 +2052,9 @@ DMouseArea {
         enabled: chRoot.enableResize && chRoot.resizeBottomEnabled && chRoot.resizeLeftEnabled
 
         onPressed: {
+            // Set Manual Resize
+            chRoot.manualResize = true;
+
             // Check Main drag
             if (mainDrag) {
                 // Emit Resize Pressed Signal
@@ -1943,6 +2066,11 @@ DMouseArea {
                 // Set Focus
                 chRoot.focus = true;
             }
+        }
+
+        onReleased: {
+            // Reset Manual Resize
+            chRoot.manualResize = false;
         }
     }
 
@@ -1954,6 +2082,9 @@ DMouseArea {
         enabled: chRoot.enableResize && chRoot.resizeBottomEnabled
 
         onPressed: {
+            // Set Manual Resize
+            chRoot.manualResize = true;
+
             // Check Main drag
             if (mainDrag) {
                 // Emit Resize Pressed Signal
@@ -1966,6 +2097,11 @@ DMouseArea {
                 chRoot.focus = true;
             }
         }
+
+        onReleased: {
+            // Reset Manual Resize
+            chRoot.manualResize = false;
+        }
     }
 
     // Resize Area - Bottom Right
@@ -1976,6 +2112,9 @@ DMouseArea {
         enabled: chRoot.enableResize && chRoot.resizeBottomEnabled && chRoot.resizeRightEnabled
 
         onPressed: {
+            // Set Manual Resize
+            chRoot.manualResize = true;
+
             // Check Main drag
             if (mainDrag) {
                 // Emit Resize Pressed Signal
@@ -1987,6 +2126,11 @@ DMouseArea {
                 // Set Focus
                 chRoot.focus = true;
             }
+        }
+
+        onReleased: {
+            // Reset Manual Resize
+            chRoot.manualResize = false;
         }
     }
 }

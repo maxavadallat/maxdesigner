@@ -339,60 +339,53 @@ DPaneBase {
     }
 
     onWidthChanged: {
-        // Check Root Component Handler Component Object
-        if (rootComponentHandler.componentObject !== null && rootComponentHandler.componentInfo !== null) {
-            // Check Type
-            if (crcRoot.componentCategory !== "NonVisual" && crcRoot.componentCategory !== "Animation") {
-                // Check Width
-                if (rootComponentHandler.componentObject.width !== crcRoot.width) {
-                    // Set Width
-                    rootComponentHandler.componentObject.width = crcRoot.width;
-                }
-            } else {
+        // Check Component Object
+        if (rootComponentHandler.componentObject === null || crcRoot.componentType === "DataSource") {
+            // Check State
+            if (crcRoot.state === crcRoot.stateShown) {
+                //console.warn("DComponentRootContainer.onWidthChanged - NO COMPONENT OBJECT!!");
+                // Just Set Width
+                rootComponentHandler.width = crcRoot.width;
+            }
 
+            return;
+        }
+
+        // Check Component Category
+        if (crcRoot.componentCategory !== "" && crcRoot.componentCategory !== "NonVisual" && crcRoot.componentCategory !== "Animation") {
+            // Check Width
+            if (rootComponentHandler.componentObject.width !== crcRoot.width) {
+                // Set Width
+                rootComponentHandler.componentObject.width = crcRoot.width;
             }
         }
     }
 
     onHeightChanged: {
-        // Check Root Component Handler Component Object
-        if (rootComponentHandler.componentObject !== null && rootComponentHandler.componentInfo !== null) {
-            // Check Type
-            if (crcRoot.componentCategory !== "NonVisual" && crcRoot.componentCategory !== "Animation") {
-                // Check Height
-                if (rootComponentHandler.componentObject.height !== crcRoot.height) {
-                    // Set Height
-                    rootComponentHandler.componentObject.height = crcRoot.height;
-                }
-            } else {
+        // Check Component Object
+        if (rootComponentHandler.componentObject === null || crcRoot.componentType === "DataSource") {
+            // Check State
+            if (crcRoot.state === crcRoot.stateShown) {
+                //console.warn("DComponentRootContainer.onHeightChanged - NO COMPONENT OBJECT!!");
+                // Just Set Height
+                rootComponentHandler.height = crcRoot.height;
+            }
 
+            return;
+        }
+
+        // Check Component Category
+        if (crcRoot.componentCategory !== "" && crcRoot.componentCategory !== "NonVisual" && crcRoot.componentCategory !== "Animation") {
+            // Check Height
+            if (rootComponentHandler.componentObject.height !== crcRoot.height) {
+                // Set Height
+                rootComponentHandler.componentObject.height = crcRoot.height;
             }
         }
     }
 
-    onComponentWidthChanged: {
-        // Check  Width
-        if (crcRoot.width !== newWidth) {
-            // Get Center Pos X
-            var centerPosX = crcRoot.x + crcRoot.width * 0.5;
-            // Set New Pos X
-            crcRoot.x = centerPosX - newWidth * 0.5;
-            // Set New Width
-            crcRoot.width = newWidth;
-        }
-    }
-
-    onComponentHeightChanged: {
-        // Check  Height
-        if (crcRoot.height !== newHeight) {
-            // Get Center Pos Y
-            var centerPosY = crcRoot.y + crcRoot.height * 0.5;
-            // Set New Pos Y
-            crcRoot.y = centerPosY - newHeight * 0.5;
-            // Set New Height
-            crcRoot.height = newHeight;
-        }
-    }
+    onComponentWidthChanged: updateContainerWidth(newWidth);
+    onComponentHeightChanged: updateContainerHeight(newHeight);
 
     onRebuildContent: {
         console.log("DComponentRootContainer.onRebuildContent");
@@ -421,6 +414,13 @@ DPaneBase {
     onFocusedChildChanged: {
         // Hide Animation Manager Pane
         hideAnimManagerPane();
+    }
+
+    onComponentInfoChanged: {
+        // Check Component Info
+        if (crcRoot.componentInfo) {
+
+        }
     }
 
     // Hide/Show/Pane Button Function
@@ -496,6 +496,8 @@ DPaneBase {
             // Check New Root Object
             if (rootComponentHandler.componentObject === null) {
                 console.error("DComponentRootContainer.createComponentQMLContent - ERROR CREATING ROOT OBJECT!!");
+                // Set Error State
+                rootComponentHandler.chError = true;
                 return;
             }
 
@@ -511,6 +513,8 @@ DPaneBase {
             rootComponentHandler.componentObject.destroy();
         }
 
+        // Reset Error State
+        rootComponentHandler.chError = false;
         // Reset Component Content Created
         crcRoot.componentContentCreated = false;
     }
@@ -540,7 +544,7 @@ DPaneBase {
 
                     // Check Child Info
                     if (childInfo !== null) {
-                        //console.log("DComponentRootContainer.createComponentHandlers - componentName: " + childInfo.componentName);
+                        //console.log("DComponentRootContainer.createComponentHandlers - childInfo: " + childInfo.componentPath);
 
                         // Create Handler For Child
                         var newComponentHandler = componentHandlerFactory.createObject(parentHandler.childHandlersContainer);
@@ -558,12 +562,33 @@ DPaneBase {
                             // Set Component Object
                             newComponentHandler.componentObject = childObject;
 
-                            // Set Pos
+                            // Set Pos X
                             newComponentHandler.x = childObject.x;
+                            // Set Pos Y
                             newComponentHandler.y = childObject.y;
-                            // Set Size
+
+                            // Set Width
                             newComponentHandler.width = childObject.width;
+                            // Set Height
                             newComponentHandler.height = childObject.height;
+
+                            // Check Component Info If Using Implicit Width
+                            if (childInfo.useIWidth) {
+                                // Check Component Info Implicit Width
+                                if (childInfo.implicitWidth !== childObject.width) {
+                                    // Set Implicit Width
+                                    childInfo.implicitWidth = childObject.width;
+                                }
+                            }
+
+                            // Check Component Info If Using Implicit Height
+                            if (childInfo.useIHeight) {
+                                // Check Component Info Implicit Height
+                                if (childInfo.implicitHeight !== childObject.height) {
+                                    // Set Implicit Height
+                                    childInfo.implicitHeight = childObject.height;
+                                }
+                            }
 
                             // ...
 
@@ -628,6 +653,39 @@ DPaneBase {
         // Set Focused Component
         propertiesController.focusedComponent = crcRoot.focusedChild;
     }
+
+    // Update Container Width
+    function updateContainerWidth(newWidth) {
+        // Check Width & State
+        if (crcRoot.width !== newWidth && crcRoot.state === crcRoot.stateShown) {
+            console.log("DComponentRootContainer.updateContainerWidth - newWidth: " + newWidth);
+            // Get Center Pos X
+            var centerPosX = crcRoot.x + crcRoot.width * 0.5;
+            // Set New Pos X
+            crcRoot.x = centerPosX - newWidth * 0.5;
+            // Set New Width
+            crcRoot.width = newWidth;
+        }
+    }
+
+    // Update Container Height
+    function updateContainerHeight(newHeight) {
+        // Check Height & State
+        if (crcRoot.height !== newHeight && crcRoot.state === crcRoot.stateShown) {
+            console.log("DComponentRootContainer.updateContainerHeight - newHeight: " + newHeight);
+            // Get Center Pos Y
+            var centerPosY = crcRoot.y + crcRoot.height * 0.5;
+            // Set New Pos Y
+            crcRoot.y = centerPosY - newHeight * 0.5;
+            // Set New Height
+            crcRoot.height = newHeight;
+        }
+    }
+
+//    Rectangle {
+//        anchors.fill: parent
+//        color: "#22FF0000"
+//    }
 
     // Zoom Area
     DMouseArea {

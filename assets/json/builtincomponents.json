@@ -87,7 +87,6 @@
             "componentType": "BaseComponent",
             "componentOwnProperties": {
                 "duration": "int::::200",
-                "easing.bezierCurve": "string::::",
                 "easing.type": "enum:::Easing.Linear,Easing.InQuad,Easing.OutQuad,Easing.InBack,Easing.OutBack,Easing.InOutBack,Easing.OutBounce,Easing.OutElastic:Easing.Linear",
                 "from": "var::::",
                 "properties": "string::::",
@@ -187,6 +186,8 @@
             "componentCategory": "Image",
             "componentName": "Image",
             "componentType": "BaseComponent",
+            "componentImplicitWidth": true,
+            "componentImplicitHeight": true,
             "componentOwnProperties": {
                 "asynchronous": "bool::::true",
                 "fillMode": "enum:::Image.Stretch,Image.PreserveAspectFit,Image.PreserveAspectCrop,Image.Tile,Image.TileVertically,Image.TileHorizontally,Image.Pad:Image.PreserveAspectFit",

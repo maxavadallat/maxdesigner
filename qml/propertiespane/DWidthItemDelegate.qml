@@ -19,10 +19,18 @@ Item {
 
     property ComponentInfo componentInfo: propertiesController.focusedComponent
 
-    Rectangle {
-        anchors.fill: parent
-        color: "transparent"
-        border.color: "purple"
+    signal tabKeyPressed()
+
+    // Set FLipped State
+    function setFlipWidth(aFlipped) {
+        // Set Flipped State
+        widthFlipable.flipped = aFlipped;
+    }
+
+    // Set Editor Focus
+    function setEditorFocus(aFocus) {
+        // Set Spinner Focus
+        widthSpinner.setSpinnerFocus(aFocus, aFocus);
     }
 
     DFlipable {
@@ -43,17 +51,29 @@ Item {
 
             DText {
                 id: widthLabel
-                width: sizeAndPosSectionRoot.labelWidth
+                width: widthItemDelegateRoot.labelWidth
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Text.AlignRight
-                text: "w:"
+                text: {
+                    // Check Component Info
+                    if (widthItemDelegateRoot.componentInfo && widthItemDelegateRoot.componentInfo.propertyIsFormula("w")) {
+                        return "fw:"
+                    }
+
+                    // Check For Implicit Width
+                    if (widthItemDelegateRoot.componentInfo && widthItemDelegateRoot.componentInfo.useIWidth) {
+                        return "iw:"
+                    }
+
+                    return "w:"; // •
+                }
             }
 
             DSpinner {
                 id: widthSpinner
                 width: widthFlipable.width - widthLabel.width - DStyle.defaultSpacing
                 anchors.verticalCenter: parent.verticalCenter
-                value: sizeAndPosSectionRoot.componentInfo ? Number(sizeAndPosSectionRoot.componentInfo.width) : 0
+                value: widthItemDelegateRoot.componentInfo ? Number(widthItemDelegateRoot.componentInfo.width) : 0
                 minValue: 0
 
                 onValueIncreased: {
@@ -70,8 +90,10 @@ Item {
 
                 onKeyEvent: {
                     if (event.key === Qt.Key_Tab) {
+                        // Emit Tab Key Pressed Signal
+                        widthItemDelegateRoot.tabKeyPressed();
                         // Set Height Spinner Focus
-                        heightSpinner.setSpinnerFocus(true, true);
+                        //heightSpinner.setSpinnerFocus(true, true);
                     }
                 }
             }
@@ -82,7 +104,7 @@ Item {
 
             DText {
                 id: widthBackLabel
-                width: sizeAndPosSectionRoot.labelWidth
+                width: widthItemDelegateRoot.labelWidth
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Text.AlignRight
                 text: "w:"
@@ -98,7 +120,7 @@ Item {
 
             DButton {
                 id: widthEditButton
-                width: sizeAndPosSectionRoot.editButtonWidth
+                width: widthItemDelegateRoot.editButtonWidth
                 height: DStyle.spinnerHeight
 
                 text: "Edit"
@@ -114,9 +136,30 @@ Item {
         id: posYSwipe
         anchors.fill: parent
         actionButtonText: "Implicit"
-        enableSwipe: true
-        onActionButtonClicked: {
 
+        enableSwipe: {
+            // Check Component Info
+            if (widthItemDelegateRoot.componentInfo) {
+                // Check If Already Use Implicit Width
+                if (widthItemDelegateRoot.componentInfo.useIWidth) {
+                    return false;
+                }
+
+                // Get Built In Base Component
+                var biBase = widthItemDelegateRoot.componentInfo.builtInBase();
+
+                // Check Built In Base Component
+                if (biBase === "Text" || biBase === "Image" || biBase === "Row" || biBase === "Flow") {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        onActionButtonClicked: {
+            // Set Use Implicit Width
+            widthItemDelegateRoot.componentInfo.useIWidth = true;
         }
     }
 }

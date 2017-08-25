@@ -193,10 +193,14 @@ ComponentInfo::ComponentInfo(const QString& aName,
     , mTag("")
     , mCategory(aCategory)
     , mBaseName(aBaseName)
-    , mImplicitPosX(false)
-    , mImplicitPosY(false)
-    , mImplicitWidth(false)
-    , mImplicitHeight(false)
+    , mUseImplicitPosX(false)
+    , mUseImplicitPosY(false)
+    , mUseImplicitWidth(false)
+    , mUseImplicitHeight(false)
+    , mImplicitPosX("-1")
+    , mImplicitPosY("-1")
+    , mImplicitWidth("-1")
+    , mImplicitHeight("-1")
     , mFocused(false)
     , mClosing(false)
     , mLayerVisible(true)
@@ -1324,10 +1328,59 @@ void ComponentInfo::setPosZ(const QString& aPosZ)
 }
 
 //==============================================================================
+// Get Implicit Pos X
+//==============================================================================
+QString ComponentInfo::implicitPosX()
+{
+    return mImplicitPosX;
+}
+
+//==============================================================================
+// Set Implicit Pos X
+//==============================================================================
+void ComponentInfo::setImplicitPosX(const QString& aIPosX)
+{
+    // Check Implicit Pos X
+    if (mImplicitPosX != aIPosX) {
+        // Set Implicit Pos X
+        mImplicitPosX = aIPosX;
+        // Emit Implicit Pos X Changed Signal
+        emit implicitPosXChanged(mImplicitPosX);
+    }
+}
+
+//==============================================================================
+// Get Implicit Pos Y
+//==============================================================================
+QString ComponentInfo::implicitPosY()
+{
+    return mImplicitPosY;
+}
+
+//==============================================================================
+// Set Implicit Pos Y
+//==============================================================================
+void ComponentInfo::setImplicitPosY(const QString& aIPosY)
+{
+    // Check Implicit Pos Y
+    if (mImplicitPosY != aIPosY) {
+        // Set Implicit Pos Y
+        mImplicitPosY = aIPosY;
+        // Emit Implicit Pos Y Changed Signal
+        emit implicitPosYChanged(mImplicitPosY);
+    }
+}
+
+//==============================================================================
 // Get Width
 //==============================================================================
 QString ComponentInfo::width()
 {
+    // Check If Using Implicit Width
+    if (mUseImplicitWidth) {
+        return mImplicitWidth;
+    }
+
     return componentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH).toString();
 }
 
@@ -1340,6 +1393,12 @@ void ComponentInfo::setWidth(const QString& aWidth)
     if (mCategory == "Animation" || mCategory == "Behavior") {
         return;
     }
+
+    //qDebug() << "ComponentInfo::setWidth - aWidth: " << aWidth;
+
+    // Reset Use Implicit Width
+    setUseIWidth(false);
+
     // Set Property - Width
     setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_WIDTH, aWidth);
     // Emit Width Changed Signal
@@ -1351,6 +1410,11 @@ void ComponentInfo::setWidth(const QString& aWidth)
 //==============================================================================
 QString ComponentInfo::height()
 {
+    // Check If Using Implicit Height
+    if (mUseImplicitHeight) {
+        return mImplicitHeight;
+    }
+
     return componentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT).toString();
 }
 
@@ -1363,6 +1427,12 @@ void ComponentInfo::setHeight(const QString& aHeight)
     if (mCategory == "Animation" || mCategory == "Behavior") {
         return;
     }
+
+    //qDebug() << "ComponentInfo::setHeight - aHeight: " << aHeight;
+
+    // Reset Use Implicit Height
+    setUseIHeight(false);
+
     // Set Property - Height
     setComponentProperty(JSON_KEY_COMPONENT_PROPERTY_HEIGHT, aHeight);
     // Emit Height Changed Signal
@@ -1370,11 +1440,67 @@ void ComponentInfo::setHeight(const QString& aHeight)
 }
 
 //==============================================================================
+// Get Implicit Width
+//==============================================================================
+QString ComponentInfo::implicitWidth()
+{
+    return mImplicitWidth;
+}
+
+//==============================================================================
+// Set Implicit Width
+//==============================================================================
+void ComponentInfo::setImplicitWidth(const QString& aIWidth)
+{
+    // Check Implicit Width
+    if (mImplicitWidth != aIWidth) {
+        //qDebug() << "ComponentInfo::setImplicitWidth - aIWidth: " << aIWidth;
+        // Set Implicit Width
+        mImplicitWidth = aIWidth;
+        // Emit Implicit Width Changed Signal
+        emit implicitWidthChanged(mImplicitWidth);
+        // Check Use Implicit Width
+        if (mUseImplicitWidth) {
+            // Emit Width Changed Signal
+            emit widthChanged(mImplicitWidth);
+        }
+    }
+}
+
+//==============================================================================
+// Get Implicit Height
+//==============================================================================
+QString ComponentInfo::implicitHeight()
+{
+    return mImplicitHeight;
+}
+
+//==============================================================================
+// Set Implicit Height
+//==============================================================================
+void ComponentInfo::setImplicitHeight(const QString& aIHeight)
+{
+    // Check Implicit Height
+    if (mImplicitHeight != aIHeight) {
+        //qDebug() << "ComponentInfo::setImplicitHeight - aIHeight: " << aIHeight;
+        // Set Implicit Height
+        mImplicitHeight = aIHeight;
+        // Emit Implicit Height Changed Signal
+        emit implicitHeightChanged(mImplicitHeight);
+        // Check Use Implicit Height
+        if (mUseImplicitHeight) {
+            // Emit Height Changed Signal
+            emit heightChanged(mImplicitHeight);
+        }
+    }
+}
+
+//==============================================================================
 // Get Use Implicit Pos X
 //==============================================================================
 bool ComponentInfo::useIPosX()
 {
-    return mImplicitPosX;
+    return mUseImplicitPosX;
 }
 
 //==============================================================================
@@ -1383,16 +1509,16 @@ bool ComponentInfo::useIPosX()
 void ComponentInfo::setUseIPosX(const bool& aUseIPosX)
 {
     // Check Use Implicit Pos X
-    if (mImplicitPosX != aUseIPosX) {
+    if (mUseImplicitPosX != aUseIPosX) {
         // Set Use Implicit Pos X
-        mImplicitPosX = aUseIPosX;
+        mUseImplicitPosX = aUseIPosX;
         // Emit Use Implicit Pos X Changed Signal
-        emit useIPosXChanged(mImplicitPosX);
+        emit useIPosXChanged(mUseImplicitPosX);
         // Set Dirty
         setDirty(true);
 
         // Check Use Implicit Width
-        if (mImplicitPosX && mProperties.keys().indexOf(JSON_KEY_COMPONENT_PROPERTY_X) >= 0) {
+        if (mUseImplicitPosX && mProperties.keys().indexOf(JSON_KEY_COMPONENT_PROPERTY_X) >= 0) {
             // Remove Property
             mProperties.remove(JSON_KEY_COMPONENT_PROPERTY_X);
             // Emit Need Refresh
@@ -1406,7 +1532,7 @@ void ComponentInfo::setUseIPosX(const bool& aUseIPosX)
 //==============================================================================
 bool ComponentInfo::useIPosY()
 {
-    return mImplicitPosY;
+    return mUseImplicitPosY;
 }
 
 //==============================================================================
@@ -1415,16 +1541,16 @@ bool ComponentInfo::useIPosY()
 void ComponentInfo::setUseIPosY(const bool& aUseIPosY)
 {
     // Check Use Implicit Pos Y
-    if (mImplicitPosY != aUseIPosY) {
+    if (mUseImplicitPosY != aUseIPosY) {
         // Set Use Implicit Pos Y
-        mImplicitPosY = aUseIPosY;
+        mUseImplicitPosY = aUseIPosY;
         // Emit Use Implicit Pos Y Changed Signal
-        emit useIPosYChanged(mImplicitPosY);
+        emit useIPosYChanged(mUseImplicitPosY);
         // Set Dirty
         setDirty(true);
 
         // Check Use Implicit Width
-        if (mImplicitPosY && mProperties.keys().indexOf(JSON_KEY_COMPONENT_PROPERTY_Y) >= 0) {
+        if (mUseImplicitPosY && mProperties.keys().indexOf(JSON_KEY_COMPONENT_PROPERTY_Y) >= 0) {
             // Remove Property
             mProperties.remove(JSON_KEY_COMPONENT_PROPERTY_Y);
             // Emit Need Refresh
@@ -1438,7 +1564,7 @@ void ComponentInfo::setUseIPosY(const bool& aUseIPosY)
 //==============================================================================
 bool ComponentInfo::useIWidth()
 {
-    return mImplicitWidth;
+    return mUseImplicitWidth;
 }
 
 //==============================================================================
@@ -1447,20 +1573,30 @@ bool ComponentInfo::useIWidth()
 void ComponentInfo::setUseIWidth(const bool& aUseIWidth)
 {
     // Check Use Implicit Width
-    if (mImplicitWidth != aUseIWidth) {
+    if (mUseImplicitWidth != aUseIWidth) {
+        //qDebug() << "ComponentInfo::setUseIWidth - aUseIWidth: " << aUseIWidth;
+
         // Set Use Implicit Width
-        mImplicitWidth = aUseIWidth;
+        mUseImplicitWidth = aUseIWidth;
         // Emit Use Implicit Width Changed Signal
-        emit useIWidthChanged(mImplicitWidth);
+        emit useIWidthChanged(mUseImplicitWidth);
         // Set Dirty
         setDirty(true);
 
         // Check Use Implicit Width
-        if (mImplicitWidth && mProperties.keys().indexOf(JSON_KEY_COMPONENT_PROPERTY_WIDTH) >= 0) {
-            // Remove Property
-            mProperties.remove(JSON_KEY_COMPONENT_PROPERTY_WIDTH);
+        if (mUseImplicitWidth) {
+            // Check If Property Set
+            if (mProperties.keys().indexOf(JSON_KEY_COMPONENT_PROPERTY_WIDTH) >= 0) {
+                // Remove Property
+                mProperties.remove(JSON_KEY_COMPONENT_PROPERTY_WIDTH);
+            }
+
             // Emit Need Refresh
             emit needRefresh();
+
+        } else {
+            // Reset Implicit Width
+            setImplicitWidth("-1");
         }
     }
 }
@@ -1470,7 +1606,7 @@ void ComponentInfo::setUseIWidth(const bool& aUseIWidth)
 //==============================================================================
 bool ComponentInfo::useIHeight()
 {
-    return mImplicitHeight;
+    return mUseImplicitHeight;
 }
 
 //==============================================================================
@@ -1479,21 +1615,31 @@ bool ComponentInfo::useIHeight()
 void ComponentInfo::setUseIHeight(const bool& aUseIHeight)
 {
     // Check Use Implicit Height
-    if (mImplicitHeight != aUseIHeight) {
+    if (mUseImplicitHeight != aUseIHeight) {
+        //qDebug() << "ComponentInfo::setUseIHeight - aUseIHeight: " << aUseIHeight;
+
         // Set Use Implicit Height
-        mImplicitHeight = aUseIHeight;
+        mUseImplicitHeight = aUseIHeight;
         // Emit Use Implicit Height Changed Signal
-        emit useIHeightChanged(mImplicitHeight);
+        emit useIHeightChanged(mUseImplicitHeight);
 
         // Set Dirty
         setDirty(true);
 
         // Check Use Implicit Height
-        if (mImplicitHeight && mProperties.keys().indexOf(JSON_KEY_COMPONENT_PROPERTY_HEIGHT) >= 0) {
-            // Clear Property Height
-            mProperties.remove(JSON_KEY_COMPONENT_PROPERTY_HEIGHT);
+        if (mUseImplicitHeight) {
+            // Check If Property Set
+            if (mProperties.keys().indexOf(JSON_KEY_COMPONENT_PROPERTY_HEIGHT) >= 0) {
+                // Clear Property Height
+                mProperties.remove(JSON_KEY_COMPONENT_PROPERTY_HEIGHT);
+            }
+
             // Emit Need Refresh
             emit needRefresh();
+
+        } else {
+            // Reset Implicit Height
+            setImplicitHeight("-1");
         }
     }
 }
@@ -2008,27 +2154,27 @@ QJsonObject ComponentInfo::toJSONObject(const bool& aChild)
     }
 
     // Check Use Implicit Pos X
-    if (mImplicitPosX) {
+    if (mUseImplicitPosX) {
         // Set Use Implicit Pos X
-        ciObject[JSON_KEY_COMPONENT_USE_IMPLICIT_POSX] = QJsonValue(mImplicitPosX);
+        ciObject[JSON_KEY_COMPONENT_USE_IMPLICIT_POSX] = QJsonValue(mUseImplicitPosX);
     }
 
     // Check Use Implicit Pos Y
-    if (mImplicitPosY) {
+    if (mUseImplicitPosY) {
         // Set Use Implicit Pos Y
-        ciObject[JSON_KEY_COMPONENT_USE_IMPLICIT_POSY] = QJsonValue(mImplicitPosY);
+        ciObject[JSON_KEY_COMPONENT_USE_IMPLICIT_POSY] = QJsonValue(mUseImplicitPosY);
     }
 
     // Check Use Implicit Width
-    if (mImplicitWidth) {
+    if (mUseImplicitWidth) {
         // Set Use Implicit Width
-        ciObject[JSON_KEY_COMPONENT_USE_IMPLICIT_WIDTH] = QJsonValue(mImplicitWidth);
+        ciObject[JSON_KEY_COMPONENT_USE_IMPLICIT_WIDTH] = QJsonValue(mUseImplicitWidth);
     }
 
     // Check Use Implicit Height
-    if (mImplicitHeight) {
+    if (mUseImplicitHeight) {
         // Set Use Implicit Height
-        ciObject[JSON_KEY_COMPONENT_USE_IMPLICIT_HEIGHT] = QJsonValue(mImplicitHeight);
+        ciObject[JSON_KEY_COMPONENT_USE_IMPLICIT_HEIGHT] = QJsonValue(mUseImplicitHeight);
     }
 
     // Check Anchors
@@ -2575,7 +2721,7 @@ QString ComponentInfo::liveCodeFormatPosition(const QString& aIndent)
         // Get Pos X
         QString cpX = posX();
         // Check Pos X
-        if (!mImplicitPosX && !cpX.isEmpty() && cpX.toInt() != 0) {
+        if (!mUseImplicitPosX && !cpX.isEmpty() && cpX.toInt() != 0) {
             // Add Pos X
             liveCode += QString("%1x: %2\n").arg(aIndent).arg(cpX);
         }
@@ -2583,7 +2729,7 @@ QString ComponentInfo::liveCodeFormatPosition(const QString& aIndent)
         // Get Pos Y
         QString cpY = posY();
         // Check Pos Y
-        if (!mImplicitPosY && !cpY.isEmpty() && cpY.toInt() != 0) {
+        if (!mUseImplicitPosY && !cpY.isEmpty() && cpY.toInt() != 0) {
             // Add Pos Y
             liveCode += QString("%1y: %2\n").arg(aIndent).arg(cpY);
         }
@@ -2613,7 +2759,7 @@ QString ComponentInfo::liveCodeFormatSize(const QString& aIndent)
         // Get Width
         QString cWidth = width();
         // Check Width
-        if (!mImplicitWidth && !cWidth.isEmpty() && cWidth != "0") {
+        if (!mUseImplicitWidth && !cWidth.isEmpty() && cWidth != "0") {
             // Add Width
             liveCode += QString("%1width: %2\n").arg(aIndent).arg(cWidth);
         }
@@ -2621,7 +2767,7 @@ QString ComponentInfo::liveCodeFormatSize(const QString& aIndent)
         // Get Height
         QString cHeight = height();
         // Check Height
-        if (!mImplicitHeight && !cHeight.isEmpty() && cHeight != "0") {
+        if (!mUseImplicitHeight && !cHeight.isEmpty() && cHeight != "0") {
             // Add Height
             liveCode += QString("%1height: %2\n").arg(aIndent).arg(cHeight);
         }
@@ -4372,6 +4518,19 @@ QString ComponentInfo::animBase()
 }
 
 //==============================================================================
+// Get Built In Base Component Name
+//==============================================================================
+QString ComponentInfo::builtInBase()
+{
+    // Check If Built In
+    if (mBuiltIn) {
+        return mName;
+    }
+
+    return mBase ? mBase->builtInBase() : "";
+}
+
+//==============================================================================
 // Inc Reference Count
 //==============================================================================
 void ComponentInfo::incRefCount()
@@ -4410,11 +4569,13 @@ QVariant ComponentInfo::componentProperty(const QString& aName)
 {
     // Check Property Keys
     if (mProperties.keys().indexOf(aName) >= 0) {
+        //qDebug() << "ComponentInfo::componentProperty - aName: " << aName << " - INHERITED";
         return mProperties.value(aName).toString();
     }
 
     // Check Own Properties First
     if (mOwnProperties.keys().indexOf(aName) >= 0) {
+        //qDebug() << "ComponentInfo::componentProperty - aName: " << aName << " - OWN";
         return Utils::parseValue(mOwnProperties.value(aName).toString(), true);
     }
 
@@ -4426,12 +4587,14 @@ QVariant ComponentInfo::componentProperty(const QString& aName)
             QString protoProperty = mProtoType->componentProperty(aName).toString();
             // Check Property
             if (!protoProperty.isNull()) {
+                //qDebug() << "ComponentInfo::componentProperty - aName: " << aName << " - PROTOTYPE";
                 return protoProperty;
             }
         }
 
         // Check Base Component
         if (mBase) {
+            //qDebug() << "ComponentInfo::componentProperty - aName: " << aName << " - BASE";
             // Get Property
             return mBase->componentProperty(aName);
         }
@@ -4860,7 +5023,7 @@ bool ComponentInfo::propertyIsFormula(const QString& aName)
     QString pValue = propertyValue(aName, true).toString();
 
     // Check If It Has Binding Or Formula
-    if (Utils::hasBinding(pValue) || Utils::hasFormula(pValue)) {
+    if (Utils::hasBinding(pValue) >= 0 || Utils::hasFormula(pValue) > 0) {
         return true;
     }
 

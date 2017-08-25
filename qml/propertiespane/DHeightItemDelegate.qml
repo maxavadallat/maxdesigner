@@ -19,10 +19,18 @@ Item {
 
     property ComponentInfo componentInfo: propertiesController.focusedComponent
 
-    Rectangle {
-        anchors.fill: parent
-        color: "transparent"
-        border.color: "purple"
+    signal tabKeyPressed()
+
+    // Set FLipped State
+    function setFlipHeight(aFlipped) {
+        // Set Flipped State
+        heightFlipable.flipped = aFlipped;
+    }
+
+    // Set Editor Focus
+    function setEditorFocus(aFocus) {
+        // Set Spinner Focus
+        heightSpinner.setSpinnerFocus(aFocus, aFocus);
     }
 
     DFlipable {
@@ -43,17 +51,29 @@ Item {
 
             DText {
                 id: heightLabel
-                width: sizeAndPosSectionRoot.labelWidth
+                width: heightItemDelegateRoot.labelWidth
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Text.AlignRight
-                text: "h:"
+                text: {
+                    // Check Component Info
+                    if (heightItemDelegateRoot.componentInfo && heightItemDelegateRoot.componentInfo.propertyIsFormula("h")) {
+                        return "fh:"
+                    }
+
+                    // Check For Implicit Height
+                    if (heightItemDelegateRoot.componentInfo && heightItemDelegateRoot.componentInfo.useIHeight) {
+                        return "ih:"
+                    }
+
+                    return "h:"; // •
+                }
             }
 
             DSpinner {
                 id: heightSpinner
                 width: heightFlipable.width - heightLabel.width - DStyle.defaultSpacing
                 anchors.verticalCenter: parent.verticalCenter
-                value: sizeAndPosSectionRoot.componentInfo ? Number(sizeAndPosSectionRoot.componentInfo.height) : 0
+                value: heightItemDelegateRoot.componentInfo ? Number(heightItemDelegateRoot.componentInfo.height) : 0
                 minValue: 0
 
                 onValueIncreased: {
@@ -70,14 +90,16 @@ Item {
 
                 onKeyEvent: {
                     if (event.key === Qt.Key_Tab) {
-                        // Check Pos Row height
-                        if (posRow.height > 0) {
-                            // Set X Spinner Focus
-                            xSpinner.setSpinnerFocus(true, true);
-                        } else {
-                            // Set Width Spinner Focus
-                            widthSpinner.setSpinnerFocus(true, true);
-                        }
+                        // Emit Tab Key Pressed Signal
+                        heightItemDelegateRoot.tabKeyPressed();
+//                        // Check Pos Row height
+//                        if (posRow.height > 0) {
+//                            // Set X Spinner Focus
+//                            xSpinner.setSpinnerFocus(true, true);
+//                        } else {
+//                            // Set Width Spinner Focus
+//                            widthSpinner.setSpinnerFocus(true, true);
+//                        }
                     }
                 }
             }
@@ -88,7 +110,7 @@ Item {
 
             DText {
                 id: heightBackLabel
-                width: sizeAndPosSectionRoot.labelWidth
+                width: heightItemDelegateRoot.labelWidth
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Text.AlignRight
                 text: "h:"
@@ -104,7 +126,7 @@ Item {
 
             DButton {
                 id: heightEditButton
-                width: sizeAndPosSectionRoot.editButtonWidth
+                width: heightItemDelegateRoot.editButtonWidth
                 height: DStyle.spinnerHeight
 
                 text: "Edit"
@@ -120,9 +142,30 @@ Item {
         id: posYSwipe
         anchors.fill: parent
         actionButtonText: "Implicit"
-        enableSwipe: true
-        onActionButtonClicked: {
 
+        enableSwipe: {
+            // Check Component Info
+            if (heightItemDelegateRoot.componentInfo) {
+                // Check If Already Use Implicit Height
+                if (heightItemDelegateRoot.componentInfo.useIHeight) {
+                    return false;
+                }
+
+                // Get Built In Base Component
+                var biBase = heightItemDelegateRoot.componentInfo.builtInBase();
+
+                // Check Built In Base Component
+                if (biBase === "Text" || biBase === "Image" || biBase === "Column" || biBase === "Flow") {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        onActionButtonClicked: {
+            // Set Use Implicit Height
+            heightItemDelegateRoot.componentInfo.useIHeight = true;
         }
     }
 }
