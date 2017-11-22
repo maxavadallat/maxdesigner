@@ -132,5 +132,7 @@
         <file>qml/propertiespane/DPosYItemDelegate.qml</file>
         <file>qml/propertiespane/DWidthItemDelegate.qml</file>
         <file>qml/propertiespane/DHeightItemDelegate.qml</file>
+        <file>qml/mainview/DAssetBrowserLauncher.qml</file>
+        <file>qml/mainview/DStoryBoardLauncher.qml</file>
     </qresource>
 </RCC>

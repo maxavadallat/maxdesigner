@@ -1065,8 +1065,8 @@ void ComponentInfo::setComponentHandler(QObject* aContainer)
         //qDebug() << "ComponentInfo::setComponentContainer - aContainer: " << aContainer;
         // Set QML Container
         mComponentHandler = aContainer;
-        // Emit QML Container Changed Signal
-        emit componentContainerChanged(mComponentHandler);
+        // Emit QML Handler Changed Signal
+        emit componentHandlerChanged(mComponentHandler);
     }
 }
 

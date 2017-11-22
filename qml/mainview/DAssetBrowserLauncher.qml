@@ -9,7 +9,7 @@ import "qrc:/qml/controls"
 import "qrc:/qml/animations"
 
 DMouseArea {
-    id: liveLauncherRoot
+    id: assetBrowserLauncherRoot
 
     width: DStyle.liveLauncherWidth
     height: DStyle.liveLauncherHeight
@@ -18,16 +18,17 @@ DMouseArea {
 
     hoverEnabled: true
 
-    visible: propertiesController.focusedComponent !== null && propertiesController.focusedComponent.isRoot
+    //visible: propertiesController.focusedComponent !== null && propertiesController.focusedComponent.isRoot
+    visible: mainController.currentProject !== null && DSystemModel.currentTextInput !== null
 
     onEntered: {
         // Set Show Live Button
-        liveLauncherRoot.showLauncherButton = true;
+        assetBrowserLauncherRoot.showLauncherButton = true;
     }
 
     onExited: {
         // Reset Show Live Button
-        liveLauncherRoot.showLauncherButton = false;
+        assetBrowserLauncherRoot.showLauncherButton = false;
     }
 
     Item {
@@ -36,7 +37,7 @@ DMouseArea {
         height: DStyle.liveLauncherHeight
 
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: liveLauncherRoot.showLauncherButton ? 0 : -buttonContainer.height
+        anchors.bottomMargin: assetBrowserLauncherRoot.showLauncherButton ? 0 : -buttonContainer.height
 
         Behavior on anchors.bottomMargin { DAnimation { } }
 
@@ -47,8 +48,8 @@ DMouseArea {
             anchors.centerIn: parent
 
             onClicked: {
-                // Launch Live Window
-                mainController.launchLiveWindow();
+                // Launch Asset Browser Window
+                mainController.launchAssetBrowser();
             }
         }
 
@@ -56,7 +57,7 @@ DMouseArea {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             anchors.bottomMargin: DStyle.defaultMargin
-            text: "Live"
+            text: "Assets"
         }
     }
 }

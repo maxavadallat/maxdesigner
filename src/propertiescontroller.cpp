@@ -22,6 +22,7 @@ PropertiesController::PropertiesController(ProjectModel* aProjectModel, QObject*
     , mProject(aProjectModel)
     , mFocusedComponent(NULL)
     , mFocusedContainer(NULL)
+    , mCurrentHandler(NULL)
     , mComponentImports(NULL)
     , mComponentAnchors(NULL)
     , mComponentOwnProperties(NULL)
@@ -595,6 +596,28 @@ void PropertiesController::setFocusedContainer(QObject* aContainer)
         mFocusedContainer = aContainer;
         // Emit Focused Container Changed Signal
         emit focusedContainerChanged(mFocusedContainer);
+    }
+}
+
+//==============================================================================
+// Get Current Handler
+//==============================================================================
+QObject* PropertiesController::currentHandler()
+{
+    return mCurrentHandler;
+}
+
+//==============================================================================
+// Set Current Handler
+//==============================================================================
+void PropertiesController::setCurrentHandler(QObject* aHandler)
+{
+    // Check Current Handler
+    if (mCurrentHandler != aHandler) {
+        // Set Current Handler
+        mCurrentHandler = aHandler;
+        // Emit Current Handler Changed Signal
+        emit currentHandlerChanged(mCurrentHandler);
     }
 }
 

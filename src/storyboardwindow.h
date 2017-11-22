@@ -4,7 +4,7 @@
 #include <QMainWindow>
 
 namespace Ui {
-class FlowWindow;
+class StoryBoardWindow;
 }
 
 class SettingsController;
@@ -14,20 +14,20 @@ class ProjectModel;
 //==============================================================================
 // UI Flow Window
 //==============================================================================
-class FlowWindow : public QMainWindow
+class StoryBoardWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
     // Constructor
-    explicit FlowWindow(ProjectModel* aProject, MainWindow* aMainWindow, QWidget* aParent = NULL);
+    explicit StoryBoardWindow(ProjectModel* aProject, MainWindow* aMainWindow, QWidget* aParent = NULL);
 
     // Destructor
-    ~FlowWindow();
+    ~StoryBoardWindow();
 
 signals:
-    // Flow View Closed Signal
-    void flowViewClosed();
+    // Story Board Window Closed Signal
+    void storyBoardWindowClosed();
 
 protected:
     // Init
@@ -50,7 +50,7 @@ private slots:
 
 private:
     // UI
-    Ui::FlowWindow*         ui;
+    Ui::StoryBoardWindow*   ui;
 
     // Settings Controller
     SettingsController*     mSettings;

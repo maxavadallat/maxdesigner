@@ -47,7 +47,7 @@ DPaneBase {
     // ...
 
     onComponentInfoChanged: {
-
+        widthEditorRoot.rejected();
     }
 
     onTransitionStarted: {
@@ -75,7 +75,10 @@ DPaneBase {
         // Check If Implicit Size Set
         if (widthEditorRoot.componentInfo && !widthEditorRoot.componentInfo.useIWidth) {
             // Set Property Value
-            widthEditorRoot.componentInfo.setPosX(widthEditorRoot.newPosX);
+            widthEditorRoot.componentInfo.setWidth(widthEditorRoot.newWidth);
+
+            // Emit Need Refresh for Rebuild
+            widthEditorRoot.componentInfo.needRefresh();
         }
     }
 

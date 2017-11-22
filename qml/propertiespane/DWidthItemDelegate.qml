@@ -18,6 +18,7 @@ Item {
     readonly property int editButtonWidth: 48
 
     property ComponentInfo componentInfo: propertiesController.focusedComponent
+    property QtObject currentHandler: propertiesController.currentHandler
 
     signal tabKeyPressed()
 
@@ -73,7 +74,8 @@ Item {
                 id: widthSpinner
                 width: widthFlipable.width - widthLabel.width - DStyle.defaultSpacing
                 anchors.verticalCenter: parent.verticalCenter
-                value: widthItemDelegateRoot.componentInfo ? Number(widthItemDelegateRoot.componentInfo.width) : 0
+                //value: widthItemDelegateRoot.componentInfo ? Math.round(Number(widthItemDelegateRoot.componentInfo.width)) : 0
+                value: widthItemDelegateRoot.currentHandler ? Math.round(widthItemDelegateRoot.currentHandler.width) : 0
                 minValue: 0
 
                 onValueIncreased: {
@@ -149,7 +151,7 @@ Item {
                 var biBase = widthItemDelegateRoot.componentInfo.builtInBase();
 
                 // Check Built In Base Component
-                if (biBase === "Text" || biBase === "Image" || biBase === "Row" || biBase === "Flow") {
+                if (biBase === "Text" || biBase === "Image" || biBase === "Row" || biBase === "Column" || biBase === "Flow") {
                     return true;
                 }
             }

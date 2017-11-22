@@ -60,6 +60,11 @@ DPaneBase {
         }
     }
 
+    onComponentInfoChanged: {
+        // Close Formula Editor
+        formulaEditorRoot.rejected();
+    }
+
 //    // Generate Formula From Property Value
 //    function generateFormula() {
 

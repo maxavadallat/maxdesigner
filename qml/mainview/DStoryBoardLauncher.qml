@@ -9,7 +9,7 @@ import "qrc:/qml/controls"
 import "qrc:/qml/animations"
 
 DMouseArea {
-    id: liveLauncherRoot
+    id: storyBoardLauncherRoot
 
     width: DStyle.liveLauncherWidth
     height: DStyle.liveLauncherHeight
@@ -18,16 +18,16 @@ DMouseArea {
 
     hoverEnabled: true
 
-    visible: propertiesController.focusedComponent !== null && propertiesController.focusedComponent.isRoot
+    visible: mainController.currentProject !== null
 
     onEntered: {
-        // Set Show Live Button
-        liveLauncherRoot.showLauncherButton = true;
+        // Set Show Launcher Button
+        storyBoardLauncherRoot.showLauncherButton = true;
     }
 
     onExited: {
-        // Reset Show Live Button
-        liveLauncherRoot.showLauncherButton = false;
+        // Reset Show Launcher Button
+        storyBoardLauncherRoot.showLauncherButton = false;
     }
 
     Item {
@@ -36,7 +36,7 @@ DMouseArea {
         height: DStyle.liveLauncherHeight
 
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: liveLauncherRoot.showLauncherButton ? 0 : -buttonContainer.height
+        anchors.bottomMargin: storyBoardLauncherRoot.showLauncherButton ? 0 : -buttonContainer.height
 
         Behavior on anchors.bottomMargin { DAnimation { } }
 
@@ -47,8 +47,8 @@ DMouseArea {
             anchors.centerIn: parent
 
             onClicked: {
-                // Launch Live Window
-                mainController.launchLiveWindow();
+                // Launch Story Board Window
+                mainController.launchStoryBoard();
             }
         }
 
@@ -56,7 +56,7 @@ DMouseArea {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             anchors.bottomMargin: DStyle.defaultMargin
-            text: "Live"
+            text: "Story Board"
         }
     }
 }

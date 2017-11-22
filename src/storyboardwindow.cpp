@@ -1,21 +1,21 @@
 #include <QDebug>
 
-#include "flowwindow.h"
-#include "ui_flowwindow.h"
+#include "storyboardwindow.h"
+#include "ui_storyboardwindow.h"
 #include "settingscontroller.h"
 #include "constants.h"
 
 //==============================================================================
 // Constructor
 //==============================================================================
-FlowWindow::FlowWindow(ProjectModel* aProject, MainWindow* aMainWindow, QWidget *parent)
+StoryBoardWindow::StoryBoardWindow(ProjectModel* aProject, MainWindow* aMainWindow, QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::FlowWindow)
+    , ui(new Ui::StoryBoardWindow)
     , mSettings(SettingsController::getInstance())
     , mMainWindow(aMainWindow)
     , mProject(aProject)
 {
-    qDebug() << "FlowWindow created.";
+    qDebug() << "StoryBoardWindow created.";
 
     // Setup UI
     ui->setupUi(this);
@@ -29,9 +29,9 @@ FlowWindow::FlowWindow(ProjectModel* aProject, MainWindow* aMainWindow, QWidget 
 //==============================================================================
 // Init
 //==============================================================================
-void FlowWindow::init()
+void StoryBoardWindow::init()
 {
-    qDebug() << "FlowWindow::init";
+    qDebug() << "StoryBoardWindow::init";
 
     // ...
 
@@ -42,16 +42,19 @@ void FlowWindow::init()
 //==============================================================================
 // Restore UI
 //==============================================================================
-void FlowWindow::restoreUI()
+void StoryBoardWindow::restoreUI()
 {
-    qDebug() << "FlowWindow::restoreUI";
+    qDebug() << "StoryBoardWindow::restoreUI";
 
+    setWindowTitle("Story Board");
+
+    // ...
 }
 
 //==============================================================================
 // Show Event
 //==============================================================================
-void FlowWindow::showEvent(QShowEvent* aShowEvent)
+void StoryBoardWindow::showEvent(QShowEvent* aShowEvent)
 {
     QMainWindow::showEvent(aShowEvent);
 
@@ -62,12 +65,12 @@ void FlowWindow::showEvent(QShowEvent* aShowEvent)
 //==============================================================================
 // Close Event
 //==============================================================================
-void FlowWindow::closeEvent(QCloseEvent* aCloseEvent)
+void StoryBoardWindow::closeEvent(QCloseEvent* aCloseEvent)
 {
     QMainWindow::closeEvent(aCloseEvent);
 
-    // Emit Flow View Closed Signal
-    emit flowViewClosed();
+    // Emit Story Board Window Closed Signal
+    emit storyBoardWindowClosed();
 
     // ...
 }
@@ -75,9 +78,9 @@ void FlowWindow::closeEvent(QCloseEvent* aCloseEvent)
 //==============================================================================
 // Shut Down Live
 //==============================================================================
-void FlowWindow::shutDown()
+void StoryBoardWindow::shutDown()
 {
-    qDebug() << "FlowWindow::shutDown";
+    qDebug() << "StoryBoardWindow::shutDown";
 
     // ...
 }
@@ -85,9 +88,9 @@ void FlowWindow::shutDown()
 //==============================================================================
 // On Actin Close Triggered Slot
 //==============================================================================
-void FlowWindow::on_actionClose_triggered()
+void StoryBoardWindow::on_actionClose_triggered()
 {
-    qDebug() << "FlowWindow::on_actionClose_triggered";
+    qDebug() << "StoryBoardWindow::on_actionClose_triggered";
 
     // ...
 
@@ -100,7 +103,7 @@ void FlowWindow::on_actionClose_triggered()
 //==============================================================================
 // Destructor
 //==============================================================================
-FlowWindow::~FlowWindow()
+StoryBoardWindow::~StoryBoardWindow()
 {
     // Shut Down
     shutDown();
@@ -113,6 +116,6 @@ FlowWindow::~FlowWindow()
     // Delete UI
     delete ui;
 
-    qDebug() << "FlowWindow deleted.";
+    qDebug() << "StoryBoardWindow deleted.";
 }
 

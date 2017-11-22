@@ -7,8 +7,6 @@ import "qrc:/qml/controls"
 QtObject {
     id: systemmModelRoot
 
-    property string firstMousePressOwner: ""
-
     property bool systemBusy: false
 
     // Current Text Input
@@ -39,6 +37,8 @@ QtObject {
 
     signal cancelMarkForDeletion()
 
+    // Currently Selected Root Container
+    property QtObject currentRootContainer: null
 
     // ...
 

@@ -306,7 +306,7 @@ DPaneBase {
             // Create Component Content
             crcRoot.createComponentQMLContent();
             // Create Handlers
-            crcRoot.createComponentHandlers(rootComponentHandler);
+            crcRoot.createComponentHandlers(rootComponentHandler, false);
             // Set Focus
             crcRoot.focus = true;
 
@@ -403,7 +403,7 @@ DPaneBase {
         createComponentQMLContent();
 
         // Create Component Handlers
-        createComponentHandlers(rootComponentHandler);
+        createComponentHandlers(rootComponentHandler, true);
 
         // Set Update Component Info Enabled
         rootComponentHandler.updateComponentInfoEnabled = (crcRoot.componentInfo !== null);
@@ -490,6 +490,12 @@ DPaneBase {
                 rootComponentHandler.height = crcRoot.componentInfo.height;
             }
 
+            // Check Component Info For Animation
+            if (crcRoot.componentInfo && crcRoot.componentInfo.componentName === "Animation") {
+                // Skip Creating Component Object for Animation
+                return;
+            }
+
             // Create New Root Object
             rootComponentHandler.componentObject = rootComponentHandler.createComponentObject(crcRoot.componentInfo, rootComponentHandler.rootContentContainer, true);
 
@@ -520,7 +526,7 @@ DPaneBase {
     }
 
     // Create Component Handlers
-    function createComponentHandlers(parentHandler) {
+    function createComponentHandlers(parentHandler, reBuild) {
         // Check Parent Handler Content Object
         if (parentHandler.componentObject !== null) {
 
@@ -549,10 +555,16 @@ DPaneBase {
                         // Create Handler For Child
                         var newComponentHandler = componentHandlerFactory.createObject(parentHandler.childHandlersContainer);
 
+                        // Set Component Handler
+                        childInfo.componentHandler = newComponentHandler;
+
                         // Check New Component Handler
                         if (newComponentHandler !== null) {
-                            // Set Parent Handler
-                            //newComponentHandler.rootContainer = crcRoot;
+                            // Check Rebuild and Focused Component
+                            if (reBuild && childInfo === propertiesController.focusedComponent) {
+                                propertiesController.currentHandler = newComponentHandler;
+                            }
+
                             // Set Parent Handler
                             newComponentHandler.parentHandler = parentHandler;
                             // Set Index Map
@@ -593,7 +605,7 @@ DPaneBase {
                             // ...
 
                             // Create Handlers For Children
-                            createComponentHandlers(newComponentHandler);
+                            createComponentHandlers(newComponentHandler, reBuild);
 
                             // Set Update Component Info Enabled
                             newComponentHandler.updateComponentInfoEnabled = true;

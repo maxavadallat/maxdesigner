@@ -48,7 +48,7 @@ DPaneBase {
     // ...
 
     onComponentInfoChanged: {
-
+        posYEditorRoot.rejected();
     }
 
     onTransitionStarted: {
@@ -77,6 +77,8 @@ DPaneBase {
         if (posYEditorRoot.componentInfo && !posYEditorRoot.componentInfo.useIPosY) {
             // Set Property Value
             posYEditorRoot.componentInfo.setPosY(posYEditorRoot.newPosY);
+            // Emit Need Refresh for Rebuild
+            posYEditorRoot.componentInfo.needRefresh();
         }
     }
 

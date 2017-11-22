@@ -18,6 +18,7 @@ Item {
     readonly property int editButtonWidth: 48
 
     property ComponentInfo componentInfo: propertiesController.focusedComponent
+    property QtObject currentHandler: propertiesController.currentHandler
 
     signal tabKeyPressed()
 
@@ -73,8 +74,8 @@ Item {
                 id: xSpinner
                 width: posXFlipable.width - xLabel.width - DStyle.defaultSpacing
                 anchors.verticalCenter: parent.verticalCenter
-
-                value: posXItemDelegateRoot.componentInfo ? Number(posXItemDelegateRoot.componentInfo.posX) : 0
+                //value: posXItemDelegateRoot.componentInfo ? Number(posXItemDelegateRoot.componentInfo.posX) : 0
+                value: posXItemDelegateRoot.currentHandler ? Math.round(posXItemDelegateRoot.currentHandler.x) : 0
 
                 onValueIncreased: {
                     propertiesController.requestCX(newValue);
@@ -92,8 +93,8 @@ Item {
                     if (event.key === Qt.Key_Tab) {
                         // Emit Tab Key Pressed Signal
                         posXItemDelegateRoot.tabKeyPressed();
-//                        // Set Y Spinner Focus
-//                        ySpinner.setSpinnerFocus(true, true);
+//                        // Set X Spinner Focus
+//                        xSpinner.setSpinnerFocus(true, true);
                     }
                 }
             }

@@ -411,6 +411,7 @@ DPane {
         namesColumnWidth: propertiesPaneRoot.namesColumnWidth
     }
 
+    // No Focused Component Container
     DControl {
         id: noFocusedComponentContainer
         width: propertiesPaneRoot.width

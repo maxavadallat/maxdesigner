@@ -50,7 +50,7 @@ class ComponentInfo : public QObject
     // Component Path
     Q_PROPERTY(QString componentPath READ componentPath NOTIFY componentPathChanged)
     // QML Component Handler
-    Q_PROPERTY(QObject* componentHandler READ componentHandler WRITE setComponentHandler NOTIFY componentContainerChanged)
+    Q_PROPERTY(QObject* componentHandler READ componentHandler WRITE setComponentHandler NOTIFY componentHandlerChanged)
     // Prototype
     Q_PROPERTY(bool protoType READ protoType NOTIFY protoTypeChanged)
     // Focused
@@ -508,8 +508,8 @@ signals:
     void componentParentChanged(ComponentInfo* aParent);
     // Component Path Changed Signal
     void componentPathChanged(const QString& aPath);
-    // Component Container Changed Signal
-    void componentContainerChanged(QObject* aContainer);
+    // Component Handler Changed Signal
+    void componentHandlerChanged(QObject* aContainer);
     // Info Path Changed Signal
     void infoPathChanged(const QString& aInfoPath);
     // Focused State Changed Signal

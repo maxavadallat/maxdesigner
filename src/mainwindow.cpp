@@ -26,6 +26,7 @@
 #include "createdatasourcedialog.h"
 #include "livewindow.h"
 #include "assetbrowserwindow.h"
+#include "storyboardwindow.h"
 
 #include "basecomponentsmodel.h"
 #include "componentsmodel.h"
@@ -80,6 +81,7 @@ MainWindow::MainWindow(QWidget* aParent)
     , mCreateDataSourceDialog(NULL)
     , mLiveWindow(NULL)
     , mAssetBrowser(NULL)
+    , mStoryBoard(NULL)
 
     , mPropertiesController(NULL)
 
@@ -1050,6 +1052,7 @@ void MainWindow::launchAssetBrowser()
         return;
     }
 
+    // Check Properties Controller
     if (!mPropertiesController) {
         return;
     }
@@ -1068,6 +1071,36 @@ void MainWindow::launchAssetBrowser()
 
     // Show Asset Browser Window
     mAssetBrowser->show();
+}
+
+//==============================================================================
+// Launch Story Board Window
+//==============================================================================
+void MainWindow::launchStoryBoard()
+{
+    // Check Project Model
+    if (!mProjectModel) {
+        return;
+    }
+
+    // Check Properties Controller
+    if (!mPropertiesController) {
+        return;
+    }
+
+    // Check Story Board Window
+    if (!mStoryBoard) {
+        // Create Story Board Window
+        mStoryBoard = new StoryBoardWindow(mProjectModel, this);
+
+        // Connect Signals
+        connect(mStoryBoard, SIGNAL(storyBoardWindowClosed()), this, SLOT(storyBoardClosed()));
+
+        // ...
+    }
+
+    // Show Story Board Window
+    mStoryBoard->show();
 }
 
 //==============================================================================
@@ -2054,6 +2087,21 @@ void MainWindow::assetBrowserClosed()
 }
 
 //==============================================================================
+// Story Board Window Closed Slot
+//==============================================================================
+void MainWindow::storyBoardClosed()
+{
+    qDebug() << "MainWindow::storyBoardClosed";
+
+    // Check Story Board Window
+    if (mStoryBoard) {
+
+        // ...
+
+    }
+}
+
+//==============================================================================
 // Action About Triggered Slot
 //==============================================================================
 void MainWindow::on_actionAbout_triggered()
@@ -2407,6 +2455,11 @@ bool MainWindow::event(QEvent* aEvent)
 //==============================================================================
 MainWindow::~MainWindow()
 {
+    qDebug() << "MainWindow deleting...";
+
+    // Save Settings
+    mSettings->saveSettings();
+
     // Close Project
     closeProject();
 
@@ -2506,6 +2559,11 @@ MainWindow::~MainWindow()
     if (mAssetBrowser) {
         delete mAssetBrowser;
         mAssetBrowser = NULL;
+    }
+
+    if (mStoryBoard) {
+        delete mStoryBoard;
+        mStoryBoard = NULL;
     }
 
     // Delete Main Quick Widget

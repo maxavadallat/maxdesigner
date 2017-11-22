@@ -41,7 +41,7 @@ DMouseArea {
     // Min Size
     property int minWidth: 0
     property int minHeight: 0
-    // MAx Size
+    // Max Size
     property int maxWidth: 8192
     property int maxHeight: 8192
 
@@ -435,7 +435,7 @@ DMouseArea {
         // On Pos X Changed Slot
         onPosXChanged: {
             // Check Component Object Position
-            if (chRoot.componentObject !== null && chRoot.componentObject.x !== aPosX && chRoot.updateComponentInfoEnabled) {
+            if (chRoot.componentObject !== null && !isNaN(aPosX) && chRoot.componentObject.x !== aPosX && chRoot.updateComponentInfoEnabled) {
                 // Check Component Category
                 if (chRoot.componentInfo.componentCategory !== "NonVisual" && chRoot.componentInfo.componentCategory !== "Animation") {
                     // Set Positin
@@ -447,7 +447,7 @@ DMouseArea {
         // On Pos Y Changed Slot
         onPosYChanged: {
             // Check Component Object Position
-            if (chRoot.componentObject !== null && chRoot.componentObject.y !== aPosY && chRoot.updateComponentInfoEnabled) {
+            if (chRoot.componentObject !== null && !isNaN(aPosY) && chRoot.componentObject.y !== aPosY && chRoot.updateComponentInfoEnabled) {
                 // Check Component Category
                 if (chRoot.componentInfo.componentCategory !== "NonVisual" && chRoot.componentInfo.componentCategory !== "Animation") {
                     // Set Positin
@@ -459,7 +459,7 @@ DMouseArea {
         // On Pos Z Changed Slot
         onPosZChanged: {
             // Check Component Object Position
-            if (chRoot.componentObject !== null && chRoot.componentObject.z !== aPosZ && chRoot.updateComponentInfoEnabled) {
+            if (chRoot.componentObject !== null && !isNaN(aPosZ) && chRoot.componentObject.z !== aPosZ && chRoot.updateComponentInfoEnabled) {
                 // Check Component Category
                 if (chRoot.componentInfo.componentCategory !== "NonVisual" && chRoot.componentInfo.componentCategory !== "Animation") {
                     // Set Positin
@@ -471,9 +471,10 @@ DMouseArea {
         // On Width Changed Slot
         onWidthChanged: {
             // Check Component Object Width
-            if (chRoot.componentObject !== null && chRoot.componentObject.width !== aWidth && chRoot.updateComponentInfoEnabled) {
+            if (chRoot.componentObject !== null && !isNaN(aWidth) && chRoot.componentObject.width !== aWidth && chRoot.updateComponentInfoEnabled) {
                 // Check Component Category
-                if (chRoot.componentInfo.componentCategory !== "NonVisual" && chRoot.componentInfo.componentCategory !== "Animation") {
+                if (chRoot.componentInfo.componentCategory !== "NonVisual" && chRoot.componentInfo.componentCategory !== "Animation"
+                        && !chRoot.componentInfo.useIWidth) {
                     // Set Component Object Width
                     chRoot.componentObject.width = aWidth;
                 }
@@ -489,9 +490,10 @@ DMouseArea {
         // On Height Changed Slot
         onHeightChanged: {
             // Check Component Object Height
-            if (chRoot.componentObject !== null && chRoot.componentObject.height !== aHeight && chRoot.updateComponentInfoEnabled) {
+            if (chRoot.componentObject !== null && !isNaN(aHeight) && chRoot.componentObject.height !== aHeight && chRoot.updateComponentInfoEnabled) {
                 // Check Component Category
-                if (chRoot.componentInfo.componentCategory !== "NonVisual" && chRoot.componentInfo.componentCategory !== "Animation") {
+                if (chRoot.componentInfo.componentCategory !== "NonVisual" && chRoot.componentInfo.componentCategory !== "Animation"
+                        && !chRoot.componentInfo.useIHeight) {
                     // Set Component Object Height
                     chRoot.componentObject.height = aHeight;
                 }
@@ -827,9 +829,11 @@ DMouseArea {
         //console.log("DComponentHandler.onFocusChanged - focus: " + chRoot.focus);
 
         // Check Focus
-        if (chRoot.focus && chRoot.componentInfo !== null) {
+        if (chRoot.focus) {
             // Set Focused Compoenent
             propertiesController.focusedComponent = chRoot.componentInfo;
+            // Set Current Handler
+            propertiesController.currentHandler = chRoot;
         }
 
         // ...
@@ -1050,8 +1054,8 @@ DMouseArea {
 
             console.log("DComponentHandler.updateComponentWidth - componentInfo: " + chRoot.componentInfo.componentPath + " - useIWidth: " + chRoot.componentInfo.useIWidth);
 
-            // Check If Using Implicit Width
-            if (chRoot.componentInfo.useIWidth && !chRoot.manualResize) {
+            // Check If Using Implicit Width Or Formula
+            if (chRoot.componentInfo.useIWidth && !chRoot.manualResize || isNaN(chRoot.componentInfo.width)) {
 
                 //console.log("DComponentHandler.updateComponentWidth - width: " + width + " - IMPLICIT");
 
@@ -1085,8 +1089,8 @@ DMouseArea {
 
             //console.log("DComponentHandler.updateComponentHeight - componentInfo: " + chRoot.componentInfo.componentPath + " - useIHeight: " + chRoot.componentInfo.useIHeight);
 
-            // Check If Using Implicit Height
-            if (chRoot.componentInfo.useIHeight && !chRoot.manualResize) {
+            // Check If Using Implicit Height Or Formula
+            if (chRoot.componentInfo.useIHeight && !chRoot.manualResize || isNaN(chRoot.componentInfo.height)) {
 
                 //console.log("DComponentHandler.updateComponentHeight - height: " + height + " - IMPLICIT");
 
@@ -1872,7 +1876,7 @@ DMouseArea {
         anchors.fill: parent
         opacity: CONSTS.componentNamesOpacity
         visible: chRoot.componentInfo !== null && chRoot.componentInfo.componentCategory === "Animation"
-        source: "qrc:/assets/icons/video-256.png"
+        source: visible ? "qrc:/assets/icons/video-256.png" : ""
     }
 
     // Position Indicator

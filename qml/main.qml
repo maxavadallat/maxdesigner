@@ -220,6 +220,16 @@ Item {
                 // Set Open Recent Files On Show Finished
                 openRecentFilesOnShowFinished = false;
 
+                // Store Project Pane Width
+                settingsController.projectPaneWidth = projectPane.width;
+                // Store Project Pane Height
+                settingsController.projectPaneHeight = projectPane.height;
+
+                // Store Properties Pane Width
+                settingsController.propertiesPaneWidth = propertiesPane.width;
+                // Store Properties Pane Height
+                settingsController.propertiesPaneHeight = propertiesPane.height;
+
                 // Reset Project Pane
                 projectPane.reset(false);
                 // Reset Properties Pane
@@ -964,6 +974,20 @@ Item {
     DLiveLauncher {
         id: liveLauncher
         anchors.right: parent.right
+        anchors.bottom: parent.bottom
+    }
+
+    // Asset Browser Launcher
+    DAssetBrowserLauncher {
+        id: assetBrowserLauncher
+        anchors.right: liveLauncher.left
+        anchors.bottom: parent.bottom
+    }
+
+    // Story Board Launcher
+    DStoryBoardLauncher {
+        id: storyBoardLauncher
+        anchors.right: assetBrowserLauncher.left
         anchors.bottom: parent.bottom
     }
 

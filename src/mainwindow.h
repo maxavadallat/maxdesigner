@@ -33,6 +33,7 @@ class LiveWindow;
 class MinimizedComponents;
 class AssetBrowserWindow;
 class AnimationComponentsModel;
+class StoryBoardWindow;
 
 //==============================================================================
 // Main Window Class
@@ -89,9 +90,10 @@ public:
 
     // Launch Live Window
     Q_INVOKABLE void launchLiveWindow();
-
     // Launch Asset Browser Window
     Q_INVOKABLE void launchAssetBrowser();
+    // Launch Story Board Window
+    Q_INVOKABLE void launchStoryBoard();
 
     // Trim Component Cache
     Q_INVOKABLE void trimQMLComponentCache();
@@ -265,9 +267,10 @@ private slots:
 
     // Live View Closed Slot
     void liveViewClosed();
-
     // Asset Browser Window Closed Slot
     void assetBrowserClosed();
+    // Story Board Window Closed Slot
+    void storyBoardClosed();
 
     // Set Current Component
     void setCurrentComponent(ComponentInfo* aComponent);
@@ -386,6 +389,8 @@ private:
     LiveWindow*                 mLiveWindow;
     // Asset Browser Window
     AssetBrowserWindow*         mAssetBrowser;
+    // Story Board Window
+    StoryBoardWindow*           mStoryBoard;
 
     // Properties Controller
     PropertiesController*       mPropertiesController;

@@ -48,7 +48,7 @@ DPaneBase {
     // ...
 
     onComponentInfoChanged: {
-
+        heightEditorRoot.rejected();
     }
 
     onTransitionStarted: {
@@ -76,7 +76,9 @@ DPaneBase {
         // Check If Implicit Size Set
         if (heightEditorRoot.componentInfo && !heightEditorRoot.componentInfo.useIHeight) {
             // Set Property Value
-            heightEditorRoot.componentInfo.setPosX(heightEditorRoot.newPosX);
+            heightEditorRoot.componentInfo.setHeight(heightEditorRoot.newHeight);
+            // Emit Need Refresh for Rebuild
+            heightEditorRoot.componentInfo.needRefresh();
         }
     }
 

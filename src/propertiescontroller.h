@@ -30,6 +30,7 @@ class PropertiesController : public QObject
     Q_PROPERTY(ProjectModel* currentProject READ currentProject NOTIFY currentProjectChanged)
     Q_PROPERTY(ComponentInfo* focusedComponent READ focusedComponent WRITE setFocusedComponent NOTIFY focusedComponentChanged)
     Q_PROPERTY(QObject* focusedContainer READ focusedContainer WRITE setFocusedContainer NOTIFY focusedContainerChanged)
+    Q_PROPERTY(QObject* currentHandler READ currentHandler WRITE setCurrentHandler NOTIFY currentHandlerChanged)
 
     Q_PROPERTY(QString cID READ cID NOTIFY cIDChanged)
     Q_PROPERTY(QString cObjectName READ cObjectName NOTIFY cObjectNameChanged)
@@ -75,6 +76,11 @@ public:
     QObject* focusedContainer();
     // Set Focused Container
     void setFocusedContainer(QObject* aContainer);
+
+    // Get Current Handler
+    QObject* currentHandler();
+    // Set Current Handler
+    void setCurrentHandler(QObject* aHandler);
 
     // Get Component ID
     QString cID();
@@ -208,6 +214,8 @@ signals:
     void focusedComponentChanged(ComponentInfo* aComponent);
     // Focused Container Changed Signal
     void focusedContainerChanged(QObject* aContainer);
+    // Current Handler Changed Signal
+    void currentHandlerChanged(QObject* aHandler);
 
     // Component ID Changed Signal
     void cIDChanged(const QString& aID);
@@ -301,6 +309,8 @@ protected: // Data
     ComponentInfo*                  mFocusedComponent;
     // Focused Container
     QObject*                        mFocusedContainer;
+    // Current Handler
+    QObject*                        mCurrentHandler;
 
     // Filtered Properties
     QStringList                     mFilteredProperties;
